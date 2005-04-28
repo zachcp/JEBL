@@ -1,29 +1,61 @@
 /*
- * Graph.java
- *
- * (c) 2002-2005 BEAST Development Core Team
+ * (c) 2002-2005 JEBL Development Core Team
  *
  * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.graphs;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Set;
 
 /**
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 12:06:25 PM
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public interface Graph {
 
-    Set getNodes();
-    Set getNodes(int degree);
+    /**
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
     Set getAdjacencies(Node node);
-    int getDegree(Node node);
 
-    double getEdgeLength(Node node1, Node node2);
+    /**
+     * @param node1
+     * @param node2
+     * @return the length of the edge connecting node1 and node2.
+     * @throws NoEdgeException if the nodes are not directly connected by an edge.
+     */
+    double getEdgeLength(Node node1, Node node2) throws NoEdgeException;
 
+    /**
+     * @return the set of all nodes in this graph.
+     */
+    Set getNodes();
+
+    /**
+     * @param degree the number of edges connected to a node
+     * @return a set containing all nodes in this graph of the given degree.
+     */
+    Set getNodes(int degree);
+
+    /**
+     * This class is thrown by getEdgeLength(node1, node2) if node1 and node2
+     * are not directly connected by an edge.
+     */
+    public class NoEdgeException extends Exception {}
+
+    public class Utils {
+
+        /**
+         * @param graph
+         * @param node
+         * @return the number of edges attached to this node.
+         */
+        public static final int getDegree(Graph graph, Node node) {
+            return graph.getAdjacencies(node).size();
+        }
+    }
 }
