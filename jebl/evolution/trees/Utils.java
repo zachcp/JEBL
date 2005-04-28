@@ -1,32 +1,59 @@
 /*
- * Utils.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 
+import java.util.Set;
+import java.util.Iterator;
+
 /**
+ * A collection of utility functions for trees.
+ *
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 12:31:58 PM
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public class Utils {
 
+    /**
+     * @param tree the tree
+     * @param node1
+     * @param node2
+     * @return the path length between the two nodes
+     */
     public double getPathLength(Tree tree, Node node1, Node node2) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    public boolean isBinary(RootedTree rootedTree) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    /**
+     * @param rootedTree the rooted tree
+     * @return true if all internal nodes in the given tree are of degree 3, except the root
+     * which must have a degree of 2.
+     */
+    public final boolean isBinary(RootedTree rootedTree) {
+
+        return (rootedTree.getNodes(3).size() == (rootedTree.getInternalNodes().size() - 1))
+                && (Tree.Utils.getDegree(rootedTree, rootedTree.getRootNode()) == 2);
     }
 
+    /**
+     * @param rootedTree the rooted tree
+     * @return true if all the external nodes in the tree have a height of 0.0
+     */
     public boolean isUltrametric(RootedTree rootedTree) {
-        throw new UnsupportedOperationException("Not implemented yet");
+
+        Set externalNodes = rootedTree.getExternalNodes();
+        for (Iterator i = externalNodes.iterator(); i.hasNext();) {
+            Node node = (Node)i.next();
+            if (rootedTree.getNodeHeight(node) != 0.0) return false;
+        }
+        return true;
     }
 
 }
