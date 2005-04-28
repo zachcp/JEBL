@@ -1,21 +1,25 @@
 /*
- * Node.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.graphs;
 
 /**
+ * Represents a node in a graph or tree. In general it is
+ * used only as a handle to traverse a graph or tree structure and
+ * it has no methods or instance variables.
+ *
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 12:07:45 PM
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public class Node {
 
-    public Node() {
-        // empty constructor
-    }
+    /**
+     * empty constructor
+     */
+    public Node() {}
 }
