@@ -1,9 +1,7 @@
 /*
- * TaxonomicLevel.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.taxa;
@@ -15,10 +13,11 @@ import java.util.HashMap;
 
 /**
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 2:33:20 PM
+ *
+ * @version $Id$
  */
 public class TaxonomicLevel {
+
     /**
      * A private constructor. TaxonomicLevel objects can only be created by the static TaxonomicLevel.getTaxonomicLevel()
      * factory method.

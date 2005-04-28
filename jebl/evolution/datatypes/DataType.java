@@ -1,14 +1,7 @@
-// DataType.java
-//
-// (c) 2002-2004 BEAST Development Core Team
-//
-// This package may be distributed under the
 /*
- * DataType.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 

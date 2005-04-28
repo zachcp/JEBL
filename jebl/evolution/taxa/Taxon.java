@@ -1,9 +1,7 @@
 /*
- * Taxon.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.taxa;
@@ -14,8 +12,9 @@ import java.util.*;
 
 /**
  * @author rambaut
- *         Date: Apr 5, 2005
- *         Time: 5:37:06 PM
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public final class Taxon {
 
@@ -25,8 +24,7 @@ public final class Taxon {
      * @param name the name of the taxon
      */
     private Taxon(String name) {
-        this.name = name;
-        this.taxonomicLevel = null;
+        this(name, null);
     }
 
     /**
@@ -37,6 +35,29 @@ public final class Taxon {
     private Taxon(String name, TaxonomicLevel taxonomicLevel) {
         this.name = name;
         this.taxonomicLevel = taxonomicLevel;
+    }
+
+    /**
+     * Set an attribute value for the given name. Will return null if no such attribute exists.
+     * @param name the name of the attribute
+     * @return the attribute's value or null
+     */
+    public Object getAttribute(String name) {
+        if (helper == null) {
+            return null;
+        }
+        return helper.getAttribute(name);
+    }
+
+    /**
+     * Returns a Set of strings which are the names of the available attributes
+     * @return
+     */
+    public Set getAttributeNames() {
+        if (helper == null) {
+            return Collections.EMPTY_SET;
+        }
+        return helper.getAttributeNames();
     }
 
     /**
@@ -67,41 +88,6 @@ public final class Taxon {
         helper.setAttribute(name, value);
     }
 
-    /**
-     * Set an attribute value for the given name. Will return null if no such attribute exists.
-     * @param name the name of the attribute
-     * @return the attribute's value or null
-     */
-    public Object getAttribute(String name) {
-        if (helper == null) {
-            return null;
-        }
-        return helper.getAttribute(name);
-    }
-
-    /**
-     * Returns a Set of strings which are the names of the available attributes
-     * @return
-     */
-    public Set getAttributeNames() {
-        if (helper == null) {
-            return Collections.EMPTY_SET;
-        }
-        return helper.getAttributeNames();
-    }
-
-    /**
-     * The name of this taxon
-     */
-    private final String name;
-
-    private final TaxonomicLevel taxonomicLevel;
-
-    /**
-     * A lazily allocated Attributable.Helper object
-     */
-    private Attributable helper = null;
-
     // Static factory methods
 
     /**
@@ -122,15 +108,26 @@ public final class Taxon {
     }
 
     /**
-     * Returns a Set containing all the currently created Taxon objects.
-     * @return
+     * @return a Set containing all the currently created Taxon objects.
      */
     public static Set getAllTaxa() {
-        return Collections.unmodifiableSet(taxa.entrySet());
+        return Collections.unmodifiableSet(new HashSet(taxa.values()));
     }
+
+    /**
+     * A lazily allocated Attributable.Helper object
+     */
+    private Attributable helper = null;
+
+    /**
+     * The name of this taxon
+     */
+    private final String name;
 
     /**
      * A hash map containing taxon name, object pairs.
      */
     private static Map taxa = new HashMap();
+
+    private final TaxonomicLevel taxonomicLevel;
 }

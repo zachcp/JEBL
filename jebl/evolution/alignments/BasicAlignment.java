@@ -12,12 +12,20 @@ import jebl.evolution.taxa.Taxon;
 import java.util.*;
 
 /**
+ * A basic implementation of the Alignment interface.
+ *
  * @author rambaut
+ * @author Alexei Drummond
  *
  * @version $Id$
  */
 public class BasicAlignment implements Alignment {
 
+    /**
+     * Constructs a basic alignment from a set of sequences. The sequence
+     * objects are not copied.
+     * @param sequences
+     */
     public BasicAlignment(Set sequences) {
         Iterator iter = sequences.iterator();
         while (iter.hasNext()) {
@@ -26,6 +34,11 @@ public class BasicAlignment implements Alignment {
         }
     }
 
+    /**
+     * Constructs a basic alignment from an array of sequences. The sequence
+     * objects are not copied.
+     * @param sequences
+     */
     public BasicAlignment(Sequence[] sequences) {
         for (int i = 0; i < sequences.length; i++) {
             this.sequences.put(sequences[i].getTaxon(), sequences[i]);
