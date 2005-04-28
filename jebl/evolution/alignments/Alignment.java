@@ -1,9 +1,7 @@
 /*
- * Alignment.java
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.alignments;
@@ -14,8 +12,8 @@ import java.util.List;
 
 /**
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 5:17:38 PM
+ *
+ * @version $Id$
  */
 public interface Alignment extends Sequences, SitePatterns {
 
