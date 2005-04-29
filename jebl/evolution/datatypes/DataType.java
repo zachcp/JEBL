@@ -9,10 +9,6 @@
 
 package jebl.evolution.datatypes;
 
-import dr.evolution.datatype.Nucleotides;
-import dr.evolution.datatype.TwoStates;
-import dr.evolution.datatype.AminoAcids;
-
 import java.util.*;
 
 /**
@@ -32,6 +28,14 @@ public abstract class DataType {
 
     public final static DataType getRNA() {
         return RNA_DATA_TYPE;
+    }
+
+    public final static DataType getAminoAcids() {
+        return AMINO_ACID_DATA_TYPE;
+    }
+
+    public final static DataType getCodons() {
+        return CODON_DATA_TYPE;
     }
 
     /**
@@ -56,12 +60,20 @@ public abstract class DataType {
     public abstract List getStates();
 
     /**
-     * Get state corresponding to a three-letter code
+     * Get state corresponding to a string code
      *
      * @param code a string code
      * @return the state
      */
     public abstract State getState(String code);
+
+    /**
+     * Get state corresponding to a state index
+     *
+     * @param index a state index
+     * @return the state
+     */
+    public abstract State getState(int index);
 
     /**
      * Get state corresponding to an unknown
@@ -101,29 +113,17 @@ public abstract class DataType {
 
     private final static DataType DNA_DATA_TYPE = new NucleotideDataType(false);
     private final static DataType RNA_DATA_TYPE = new NucleotideDataType(true);
+    private final static DataType AMINO_ACID_DATA_TYPE = new AminoAcidDataType();
+    private final static DataType CODON_DATA_TYPE = new CodonDataType();
 
     private static class NucleotideDataType extends DataType {
         private NucleotideDataType(boolean isRNA) {
 
             if (isRNA) {
-                states = new State[] {
-                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.U_STATE,
-                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
-                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
-                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
-                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
-                };
-
+                states = Nucleotides.RNA_CANONICAL_STATES;
                 name = "RNA";
             } else {
-                states = new State[] {
-                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.T_STATE,
-                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
-                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
-                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
-                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
-                };
-
+                states = Nucleotides.DNA_CANONICAL_STATES;
                 name = "DNA";
             }
 
@@ -161,7 +161,9 @@ public abstract class DataType {
 
         public List getStates() { return stateList; }
 
-        public State getState(String code) { return states[code.charAt(0)]; }
+        public State getState(String code) { return statesByCode[code.charAt(0)]; }
+
+        public State getState(int index) { return states[index]; }
 
         public State getUnknownState() { return Nucleotides.UNKNOWN_STATE; }
 
@@ -191,24 +193,18 @@ public abstract class DataType {
 
     private static class AminoAcidDataType extends DataType {
         private AminoAcidDataType() {
-                states = new State[] {
-                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.U_STATE,
-                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
-                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
-                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
-                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
-                };
-
+            states = AminoAcids.AMINO_ACID_STATES;
             stateList = Collections.unmodifiableList(Arrays.asList(states));
+            name = "Amino Acid";
 
             statesByCode = new State[128];
             for (int i = 0; i < states.length; i++) {
                 if (i >= 'A' && i <= 'z') {
                     // Undefined letters are mapped to UNKOWN_STATE
-                    statesByCode[i] = Nucleotides.UNKNOWN_STATE;
+                    statesByCode[i] = AminoAcids.UNKNOWN_STATE;
                 } else {
                     // Undefined punctuations are mapped to GAP_STATE
-                    statesByCode[i] = Nucleotides.GAP_STATE;
+                    statesByCode[i] = AminoAcids.GAP_STATE;
                 }
             }
 
@@ -220,21 +216,23 @@ public abstract class DataType {
 
         }
 
-        public int getStateCount() { return Nucleotides.CANONICAL_STATE_COUNT; }
+        public int getStateCount() { return AminoAcids.CANONICAL_STATE_COUNT; }
 
-        public int getAmbiguousStateCount() { return Nucleotides.AMBIGUOUS_STATE_COUNT; }
+        public int getAmbiguousStateCount() { return AminoAcids.AMBIGUOUS_STATE_COUNT; }
 
         public List getStates() { return stateList; }
 
-        public State getState(String code) { return states[code.charAt(0)]; }
+        public State getState(String code) { return statesByCode[code.charAt(0)]; }
 
-        public State getUnknownState() { return Nucleotides.UNKNOWN_STATE; }
+        public State getState(int index) { return states[index]; }
 
-        public State getGapState() { return Nucleotides.GAP_STATE; }
+        public State getUnknownState() { return AminoAcids.UNKNOWN_STATE; }
 
-        public boolean isUnknown(State state) { return state == Nucleotides.UNKNOWN_STATE; }
+        public State getGapState() { return AminoAcids.GAP_STATE; }
 
-        public boolean isGap(State state) { return state == Nucleotides.GAP_STATE; }
+        public boolean isUnknown(State state) { return state == AminoAcids.UNKNOWN_STATE; }
+
+        public boolean isGap(State state) { return state == AminoAcids.GAP_STATE; }
 
         public String getName() { return name; }
 
@@ -250,6 +248,46 @@ public abstract class DataType {
          * ? and - are mapped to themselves. All other chars are mapped to -.
          */
         private final State[] statesByCode;
+
+        private final String name;
+    };
+
+    private static class CodonDataType extends DataType {
+        private CodonDataType() {
+            states = Codons.CODON_STATES;
+            stateList = Collections.unmodifiableList(Arrays.asList(states));
+            name = "Codon";
+
+            statesByCode = new HashMap();
+            for (int i = 0; i < states.length; i++) {
+                statesByCode.put(states[i].getCode(), states[i]);
+            }
+        }
+
+        public int getStateCount() { return Codons.CANONICAL_STATE_COUNT; }
+
+        public int getAmbiguousStateCount() { return Codons.AMBIGUOUS_STATE_COUNT; }
+
+        public List getStates() { return stateList; }
+
+        public State getState(String code) { return (State)statesByCode.get(code); }
+
+        public State getState(int index) { return states[index]; }
+
+        public State getUnknownState() { return Codons.UNKNOWN_STATE; }
+
+        public State getGapState() { return Codons.GAP_STATE; }
+
+        public boolean isUnknown(State state) { return state == Codons.UNKNOWN_STATE; }
+
+        public boolean isGap(State state) { return state == Codons.GAP_STATE; }
+
+        public String getName() { return name; }
+
+        private final State[] states;
+        private final List stateList;
+
+        private final Map statesByCode;
 
         private final String name;
     };
