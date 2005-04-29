@@ -1,7 +1,9 @@
 /*
- * (c) 2002-2005 JEBL Development Core Team
+ * BasicAlignment.java
  *
- * This package is distributed under the
+ * (c) 2005 JEBL Development Team
+ *
+ * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.alignments;

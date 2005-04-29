@@ -1,7 +1,9 @@
 /*
- * (c) 2002-2005 JEBL Development Core Team
+ * DataType.java
  *
- * This package is distributed under the
+ * (c) 2005 JEBL Development Team
+ *
+ * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 
@@ -11,6 +13,8 @@ import dr.evolution.datatype.Nucleotides;
 import dr.evolution.datatype.TwoStates;
 import dr.evolution.datatype.AminoAcids;
 
+import java.util.*;
+
 /**
  * Base class for sequences data types.
  *
@@ -18,268 +22,235 @@ import dr.evolution.datatype.AminoAcids;
  *
  * @author Andrew Rambaut
  */
-public abstract class DataType
-{
-	public static final int NUCLEOTIDES = 0;
-	public static final int AMINO_ACIDS = 1;
-	public static final int CODONS = 2;
-	public static final int TWO_STATES = 3;
-	public static final int GENERAL = 4;
+public abstract class DataType {
 
-	public static final char UNKNOWN_CHARACTER = '?';
-	public static final char GAP_CHARACTER = '-';
-	
-	protected int stateCount;
-	protected int ambiguousStateCount;
+    // FACTORY METHODS
 
-	/**
-	 * guess data type suitable for a given sequences
-	 *
-	 * @param sequence a string of symbols representing a molecular sequences of unknown data type.
-	 *
-	 * @return suitable DataType object
-	 */
-	public static DataType guessDataType(String sequence)
-	{
-		// count A, C, G, T, U, N
-		long numNucs = 0;
-		long numChars = 0;
-		long numBins = 0;
-		for (int i = 0; i < sequence.length(); i++)
-		{
-			char c = sequence.charAt(i);
-			int s = Nucleotides.INSTANCE.getState(c);
-			
-			if (s != Nucleotides.UNKNOWN_STATE && s != Nucleotides.GAP_STATE) {
-				numNucs++;
-			}
+    public final static DataType getDNA() {
+        return DNA_DATA_TYPE;
+    }
 
-			if (c != '-' && c != '?') numChars++;
+    public final static DataType getRNA() {
+        return RNA_DATA_TYPE;
+    }
 
-			if (c == '0' || c == '1') numBins++;
-		}
+    /**
+     * Get number of unique states
+     *
+     * @return number of unique states
+     */
+    public abstract int getStateCount();
 
-		if (numChars == 0) { numChars = 1; }
+    /**
+     * Get number of states including ambiguous states
+     *
+     * @return number of ambiguous states
+     */
+    public abstract int getAmbiguousStateCount();
 
-		// more than 85 % frequency advocates nucleotide data
-		if ((double) numNucs / (double) numChars > 0.85) {
-			return Nucleotides.INSTANCE;
-		} else if ((double) numBins / (double) numChars > 0.2) {
-			return TwoStates.INSTANCE;
-		} else {
-			return AminoAcids.INSTANCE;
-		}
-	}
+    /**
+     * Get a list of states ordered by their indices.
+     *
+     * @return a list of states
+     */
+    public abstract List getStates();
 
-	/**
-	 * Get number of unique states
-	 *
-	 * @return number of unique states
-	 */
-	public int getStateCount() {
-		return stateCount;
-	}
+    /**
+     * Get state corresponding to a three-letter code
+     *
+     * @param code a string code
+     * @return the state
+     */
+    public abstract State getState(String code);
 
-	/**
-	 * Get number of states including ambiguous states
-	 *
-	 * @return number of ambiguous states
-	 */
-	public int getAmbiguousStateCount() {
-		return ambiguousStateCount;
-	}
+    /**
+     * Get state corresponding to an unknown
+     *
+     * @return the state
+     */
+    public abstract State getUnknownState();
 
-	/**
-	 * Get state corresponding to a character
-	 *
-	 * @param c character
-	 *
-	 * @return state
-	 */
-	public int getState(char c) {
-		return (int)c - 'A';
-	}
+    /**
+     * Get state corresponding to a gap
+     *
+     * @return state
+     */
+    public abstract State getGapState();
 
-	/**
-	 * Get state corresponding to an unknown
-	 *
-	 * @return state
-	 */
-	public int getUnknownState() {
-		return stateCount;
-	}
-
-	/**
-	 * Get state corresponding to a gap
-	 *
-	 * @return state
-	 */
-	public int getGapState() {
-		return stateCount + 1;
-	}
-
-	/**
-	 * Get character corresponding to a given state
-	 *
-	 * @param state state
-	 *
-	 * return corresponding character
-	 */
-	public char getChar(int state) {
-		return (char)(state + 'A');
-	}
-
-	/**
-	 * Get triplet string corresponding to a given state
-	 *
-	 * @param state state
-	 *
-	 * return corresponding triplet string
-	 */
-	public String getTriplet(int state)
-	{
-		return " " + getChar(state) + " ";
-	}
-
-	/**
-	 * returns an array containing the non-ambiguous states that this state represents.
-	 */
-	public int[] getStates(int state) {
-
-		int[] states;
-		if (!isAmbiguousState(state)) {
-			states = new int[1];
-			states[0] = state;
-		} else {
-			states = new int[stateCount];
-			for (int i = 0; i < stateCount; i++) {
-				states[i] = i;
-			}
-		}
-
-		return states;
-	}
-
-	/**
-	 * returns an array containing the non-ambiguous states that this state represents.
-	 */
-	public boolean[] getStateSet(int state) {
-	
-		boolean[] stateSet = new boolean[stateCount];
-		if (!isAmbiguousState(state)) {
-			for (int i = 0; i < stateCount; i++) {
-				stateSet[i] = false;
-			}
-				
-			stateSet[state] = true;
-		} else {
-			for (int i = 0; i < stateCount; i++) {
-				stateSet[i] = true;
-			}
-		}
-		
-		return stateSet;
-	}
-
-	/**
-	 * returns the uncorrected distance between two states
-	 */
-	public double getObservedDistance(int state1, int state2)
-	{
-		if (!isAmbiguousState(state1) && !isAmbiguousState(state2) && state1 != state2) {
-			return 1.0;
-		}
-
-		return 0.0;
-	}
-	
-	/**
-	 * returns the uncorrected distance between two states with full
-	 * treatment of ambiguity.
-	 */
-	public double getObservedDistanceWithAmbiguity(int state1, int state2)
-	{
-		boolean[] stateSet1 = getStateSet(state1);
-		boolean[] stateSet2 = getStateSet(state2);
-		
-		double sumMatch = 0.0;
-		double sum1 = 0.0;
-		double sum2 = 0.0;
-		for (int i = 0; i < stateCount; i++) {
-			if (stateSet1[i]) {
-				sum1 += 1.0;
-				if (stateSet1[i] == stateSet2[i]) {
-					sumMatch += 1.0;
-				}
-			} 
-			if (stateSet2[i]) {
-				sum2 += 1.0;
-			} 
-		}
-		
-		double distance = (1.0 - (sumMatch / (sum1 * sum2)));
-
-		return distance;
-	}
-	
-	public String toString() { 
-		return getDescription();
-	}
-	
-	/**
-	 * description of data type
-	 *
-	 * @return string describing the data type
-	 */
-	public abstract String getDescription();
-
-	/**
-	 * type of data type
-	 *
-	 * @return integer code for the data type
-	 */
-	public abstract int getType();
-
-	/**
-	 * @return true if this character is an ambiguous state
-	 */
-	public boolean isAmbiguousChar(char c) {
-		return isAmbiguousState(getState(c));
-	}
-
-	/**
-	 * @return true if this character is a gap
-	 */
-	public boolean isUnknownChar(char c) {
-		return isUnknownState(getState(c));
-	}
-
-	/**
-	 * @return true if this character is a gap
-	 */
-	public boolean isGapChar(char c) {
-		return isGapState(getState(c));
-	}
-
-	/**
-	 * returns true if this state is an ambiguous state.
-	 */
-	public boolean isAmbiguousState(int state) {
-		return (state >= stateCount);
-	}
 
 	/**
 	 * @return true if this state is an unknown state
 	 */
-	public boolean isUnknownState(int state) {
-		return (state == getUnknownState());
-	}
+	public abstract boolean isUnknown(State state);
 	
 	/**
 	 * @return true if this state is a gap
 	 */
-	public boolean isGapState(int state) {
-		return (state == getGapState());
-	}
+	public abstract boolean isGap(State state);
 
+    /**
+     * name of data type
+     *
+     * @return string describing the data type
+     */
+    public abstract String getName();
+
+    public String toString() {
+        return getName();
+    }
+
+    private final static DataType DNA_DATA_TYPE = new NucleotideDataType(false);
+    private final static DataType RNA_DATA_TYPE = new NucleotideDataType(true);
+
+    private static class NucleotideDataType extends DataType {
+        private NucleotideDataType(boolean isRNA) {
+
+            if (isRNA) {
+                states = new State[] {
+                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.U_STATE,
+                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
+                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
+                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
+                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
+                };
+
+                name = "RNA";
+            } else {
+                states = new State[] {
+                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.T_STATE,
+                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
+                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
+                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
+                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
+                };
+
+                name = "DNA";
+            }
+
+            stateList = Collections.unmodifiableList(Arrays.asList(states));
+
+            statesByCode = new State[128];
+            for (int i = 0; i < states.length; i++) {
+                if (i >= 'A' && i <= 'z') {
+                    // Undefined letters are mapped to UNKOWN_STATE
+                    statesByCode[i] = Nucleotides.UNKNOWN_STATE;
+                } else {
+                    // Undefined punctuations are mapped to GAP_STATE
+                    statesByCode[i] = Nucleotides.GAP_STATE;
+                }
+            }
+
+            for (int i = 0; i < states.length; i++) {
+                State state = (State)getStates().get(i);
+                statesByCode[state.getCode().charAt(0)] = state;
+                statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
+            }
+
+            if (isRNA) {
+                statesByCode['T'] = Nucleotides.U_STATE;
+                statesByCode['t'] = Nucleotides.U_STATE;
+            } else {
+                statesByCode['U'] = Nucleotides.T_STATE;
+                statesByCode['u'] = Nucleotides.T_STATE;
+            }
+        }
+
+        public int getStateCount() { return Nucleotides.CANONICAL_STATE_COUNT; }
+
+        public int getAmbiguousStateCount() { return Nucleotides.AMBIGUOUS_STATE_COUNT; }
+
+        public List getStates() { return stateList; }
+
+        public State getState(String code) { return states[code.charAt(0)]; }
+
+        public State getUnknownState() { return Nucleotides.UNKNOWN_STATE; }
+
+        public State getGapState() { return Nucleotides.GAP_STATE; }
+
+        public boolean isUnknown(State state) { return state == Nucleotides.UNKNOWN_STATE; }
+
+        public boolean isGap(State state) { return state == Nucleotides.GAP_STATE; }
+
+        public String getName() { return name; }
+
+        /**
+         * This table maps indices (0-17) into state objects.
+         */
+        private final State[] states;
+        private final List stateList;
+
+        /**
+         * This table maps nucleotide characters into state objects (0-17)
+         * Nucleotides go ACGTURYMWSKBDHVN?-", Other letters are mapped to ?.
+         * ? and - are mapped to themselves. All other chars are mapped to -.
+         */
+        private final State[] statesByCode;
+
+        private final String name;
+    };
+
+    private static class AminoAcidDataType extends DataType {
+        private AminoAcidDataType() {
+                states = new State[] {
+                    Nucleotides.A_STATE, Nucleotides.C_STATE, Nucleotides.G_STATE, Nucleotides.U_STATE,
+                    Nucleotides.R_STATE, Nucleotides.Y_STATE, Nucleotides.M_STATE, Nucleotides.W_STATE,
+                    Nucleotides.S_STATE, Nucleotides.K_STATE, Nucleotides.B_STATE, Nucleotides.D_STATE,
+                    Nucleotides.H_STATE, Nucleotides.V_STATE, Nucleotides.N_STATE,
+                    Nucleotides.UNKNOWN_STATE, Nucleotides.GAP_STATE
+                };
+
+            stateList = Collections.unmodifiableList(Arrays.asList(states));
+
+            statesByCode = new State[128];
+            for (int i = 0; i < states.length; i++) {
+                if (i >= 'A' && i <= 'z') {
+                    // Undefined letters are mapped to UNKOWN_STATE
+                    statesByCode[i] = Nucleotides.UNKNOWN_STATE;
+                } else {
+                    // Undefined punctuations are mapped to GAP_STATE
+                    statesByCode[i] = Nucleotides.GAP_STATE;
+                }
+            }
+
+            for (int i = 0; i < states.length; i++) {
+                State state = (State)getStates().get(i);
+                statesByCode[state.getCode().charAt(0)] = state;
+                statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
+            }
+
+        }
+
+        public int getStateCount() { return Nucleotides.CANONICAL_STATE_COUNT; }
+
+        public int getAmbiguousStateCount() { return Nucleotides.AMBIGUOUS_STATE_COUNT; }
+
+        public List getStates() { return stateList; }
+
+        public State getState(String code) { return states[code.charAt(0)]; }
+
+        public State getUnknownState() { return Nucleotides.UNKNOWN_STATE; }
+
+        public State getGapState() { return Nucleotides.GAP_STATE; }
+
+        public boolean isUnknown(State state) { return state == Nucleotides.UNKNOWN_STATE; }
+
+        public boolean isGap(State state) { return state == Nucleotides.GAP_STATE; }
+
+        public String getName() { return name; }
+
+        /**
+         * This table maps indices (0-17) into state objects.
+         */
+        private final State[] states;
+        private final List stateList;
+
+        /**
+         * This table maps nucleotide characters into state objects (0-17)
+         * Nucleotides go ACGTURYMWSKBDHVN?-", Other letters are mapped to ?.
+         * ? and - are mapped to themselves. All other chars are mapped to -.
+         */
+        private final State[] statesByCode;
+
+        private final String name;
+    };
 }

@@ -1,7 +1,7 @@
 /*
  * Attributable.java
  *
- * (c) 2002-2005 BEAST Development Core Team
+ * (c) 2005 JEBL Development Team
  *
  * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
