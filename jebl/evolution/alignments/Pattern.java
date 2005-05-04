@@ -3,7 +3,7 @@
  *
  * (c) 2005 JEBL Development Team
  *
- * This package may be distributed under the
+ * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.alignments;
