@@ -12,9 +12,10 @@ import jebl.evolution.datatypes.DataType;
 import jebl.evolution.taxa.Taxon;
 
 /**
+ * @author Alexei Drummond
  * @author rambaut
- *         Date: Apr 7, 2005
- *         Time: 12:23:51 PM
+ *
+ * @version $Id$
  */
 public class BasicSequence implements Sequence {
 
@@ -25,20 +26,32 @@ public class BasicSequence implements Sequence {
         this.sequenceString = sequenceString;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Taxon getTaxon() {
-        return taxon;
-    }
-
+    /**
+     * @return the type of symbols that this sequence is made up of.
+     */
     public DataType getDataType() {
         return dataType;
     }
 
+    /**
+     * @return a human-readable name for this sequence.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return a string representing the sequence of symbols.
+     */
     public String getSequenceString() {
         return sequenceString;
+    }
+
+    /**
+     * @return that taxon that this sequence represents (primarily used to match sequences with tree nodes)
+     */
+    public Taxon getTaxon() {
+        return taxon;
     }
 
     private final String name;

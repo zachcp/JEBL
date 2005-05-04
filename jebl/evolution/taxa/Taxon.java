@@ -93,6 +93,13 @@ public final class Taxon {
     // Static factory methods
 
     /**
+     * @return a Set containing all the currently created Taxon objects.
+     */
+    public static Set getAllTaxa() {
+        return Collections.unmodifiableSet(new HashSet(taxa.values()));
+    }
+
+    /**
      * A static method that returns a Taxon object with the given name. If this has
      * already been created then the same instance will be returned.
      * @param name
@@ -109,20 +116,15 @@ public final class Taxon {
         return taxon;
     }
 
-    /**
-     * @return a Set containing all the currently created Taxon objects.
-     */
-    public static Set getAllTaxa() {
-        return Collections.unmodifiableSet(new HashSet(taxa.values()));
-    }
+    // private members
 
     /**
-     * A lazily allocated Attributable.Helper object
+     * A lazily allocated Attributable.Helper object.
      */
     private Attributable helper = null;
 
     /**
-     * The name of this taxon
+     * The name of this taxon.
      */
     private final String name;
 
@@ -131,5 +133,8 @@ public final class Taxon {
      */
     private static Map taxa = new HashMap();
 
+    /**
+     * the taxonomic level of this taxon.
+     */
     private final TaxonomicLevel taxonomicLevel;
 }

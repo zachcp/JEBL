@@ -12,15 +12,32 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.datatypes.DataType;
 
 /**
+ * A biomolecular sequence.
+ *
+ * @author Alexei Drummond
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 4:55:38 PM
+ *
+ * @version $Id$
  */
 public interface Sequence {
 
-    String getName();
-    Taxon getTaxon();
+    /**
+     * @return the type of symbols that this sequence is made up of.
+     */
     DataType getDataType();
 
+    /**
+     * @return a human-readable name for this sequence.
+     */
+    String getName();
+
+    /**
+     * @return a string representing the sequence of symbols.
+     */
     String getSequenceString();
+
+    /**
+     * @return that taxon that this sequence represents (primarily used to match sequences with tree nodes)
+     */
+    Taxon getTaxon();
 }
