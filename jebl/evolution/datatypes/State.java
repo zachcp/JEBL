@@ -9,12 +9,11 @@
 package jebl.evolution.datatypes;
 
 import java.util.*;
-import java.lang.reflect.Array;
 
 /**
  * @author rambaut
- *         Date: Apr 29, 2005
- *         Time: 10:16:36 AM
+ *
+ * @version $Id$
  */
 public class State implements Comparable {
 

@@ -14,9 +14,9 @@ import java.util.*;
 /**
  * Base class for sequences data types.
  *
- * @version $Id$
- *
  * @author Andrew Rambaut
+ *
+ * @version $Id$
  */
 public abstract class DataType {
 

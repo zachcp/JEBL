@@ -10,8 +10,8 @@ package jebl.evolution.datatypes;
 
 /**
  * @author rambaut
- *         Date: Apr 29, 2005
- *         Time: 12:05:51 PM
+ *
+ * @version $Id$
  */
 public final class Nucleotides {
     public static final int CANONICAL_STATE_COUNT = 4;
