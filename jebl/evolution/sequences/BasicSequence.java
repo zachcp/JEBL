@@ -12,6 +12,8 @@ import jebl.evolution.datatypes.DataType;
 import jebl.evolution.taxa.Taxon;
 
 /**
+ * A default implementation of the Sequence interface.
+ *
  * @author Alexei Drummond
  * @author rambaut
  *
@@ -21,6 +23,19 @@ public class BasicSequence implements Sequence {
 
     public BasicSequence(String name, Taxon taxon, DataType dataType, String sequenceString) {
         this.name = name;
+        this.taxon = taxon;
+        this.dataType = dataType;
+        this.sequenceString = sequenceString;
+    }
+
+    /**
+     * Creates a sequence with a name corresponding to the taxon name
+     * @param taxon
+     * @param dataType
+     * @param sequenceString
+     */
+    public BasicSequence(Taxon taxon, DataType dataType, String sequenceString) {
+        this.name = taxon.getName();
         this.taxon = taxon;
         this.dataType = dataType;
         this.sequenceString = sequenceString;

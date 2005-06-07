@@ -26,16 +26,33 @@ public class BasicAlignment implements Alignment {
     /**
      * Constructs a basic alignment from a set of sequences. The sequence
      * objects are not copied.
-     * @param sequences
+     * @param seqs
      */
-    public BasicAlignment(Set sequences) {
-        Iterator iter = sequences.iterator();
+    public BasicAlignment(Set seqs) {
+        Iterator iter = seqs.iterator();
         while (iter.hasNext()) {
-            Sequence seq = (Sequence)iter.next();
-            this.sequences.put(seq.getTaxon(), seq);
+            Object obj = iter.next();
+            if (obj instanceof Sequence) {
+                Sequence sequence = (Sequence)obj;
+                this.sequences.put(sequence.getTaxon(), sequence);
+            } else throw new IllegalArgumentException("Set must only contain sequences.");
         }
     }
 
+    /**
+     * Constructs a basic alignment from a sequence. The sequence
+     * object is not copied.
+     * @param sequence
+     */
+    public BasicAlignment(Sequence sequence) {
+        sequences.put(sequence.getTaxon(), sequence);
+    }
+
+    /**
+     * Constructs a basic alignment with no sequences.
+     */
+    public BasicAlignment() {}
+       
     /**
      * Constructs a basic alignment from an array of sequences. The sequence
      * objects are not copied.
@@ -47,8 +64,11 @@ public class BasicAlignment implements Alignment {
         }
     }
 
-    public Set getSequences() {
-        return sequences.entrySet();
+    /**
+     * @return a set containing all the sequences in this alignment.
+     */
+    public <Sequence>Set getSequences() {
+        return new HashSet(sequences.values());
     }
 
     public Sequence getSequence(Taxon taxon) {
@@ -61,6 +81,14 @@ public class BasicAlignment implements Alignment {
 
     public List getSitePatternList() {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Adds a sequence to this alignment
+     * @param sequence the new sequence.
+     */
+    public void addSequence(Sequence sequence) {
+        sequences.put(sequence.getTaxon(),sequence);
     }
 
     private Map sequences = new TreeMap();

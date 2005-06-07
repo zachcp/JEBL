@@ -13,13 +13,16 @@ import jebl.evolution.taxa.Taxon;
 import java.util.Set;
 
 /**
+ * A set of sequence objects.
+ *
+ * @author Alexei Drummond
  * @author rambaut
- *         Date: Apr 6, 2005
- *         Time: 5:16:08 PM
+ *
+ * @version $Id$
  */
 public interface Sequences {
 
-    Set getSequences();
+    <Sequence>Set getSequences();
 
     Sequence getSequence(Taxon taxon);
 }
