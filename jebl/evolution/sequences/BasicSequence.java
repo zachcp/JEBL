@@ -22,6 +22,7 @@ import jebl.evolution.taxa.Taxon;
 public class BasicSequence implements Sequence {
 
     public BasicSequence(String name, Taxon taxon, DataType dataType, String sequenceString) {
+
         this.name = name;
         this.taxon = taxon;
         this.dataType = dataType;
@@ -35,6 +36,7 @@ public class BasicSequence implements Sequence {
      * @param sequenceString
      */
     public BasicSequence(Taxon taxon, DataType dataType, String sequenceString) {
+
         this.name = taxon.getName();
         this.taxon = taxon;
         this.dataType = dataType;
@@ -68,6 +70,8 @@ public class BasicSequence implements Sequence {
     public Taxon getTaxon() {
         return taxon;
     }
+
+    // private members
 
     private final String name;
     private final Taxon taxon;
