@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * @author rambaut
+ * @author Andrew Rambaut
+ * @author Alexei Drummond
  *
  * @version $Id$
  */

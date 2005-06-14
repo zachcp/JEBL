@@ -13,7 +13,7 @@ package jebl.evolution.graphs;
  * used only as a handle to traverse a graph or tree structure and
  * it has no methods or instance variables.
  *
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$

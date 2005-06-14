@@ -15,14 +15,14 @@ import java.util.Set;
 /**
  * A set of sequence objects.
  *
+ * @author Andrew Rambaut
  * @author Alexei Drummond
- * @author rambaut
  *
  * @version $Id$
  */
 public interface Sequences {
 
-    <Sequence>Set getSequences();
+    Set<Sequence> getSequences();
 
     Sequence getSequence(Taxon taxon);
 }

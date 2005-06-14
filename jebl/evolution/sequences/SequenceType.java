@@ -1,5 +1,5 @@
 /*
- * DataType.java
+ * SequenceType.java
  *
  * (c) 2005 JEBL Development Team
  *
@@ -7,7 +7,7 @@
  * Lesser Gnu Public Licence (LGPL)
  */
 
-package jebl.evolution.datatypes;
+package jebl.evolution.sequences;
 
 import java.util.*;
 
@@ -15,27 +15,28 @@ import java.util.*;
  * Base class for sequences data types.
  *
  * @author Andrew Rambaut
+ * @author Alexei Drummond
  *
  * @version $Id$
  */
-public abstract class DataType {
+public abstract class SequenceType {
 
     // FACTORY METHODS
 
-    public final static DataType getDNA() {
-        return DNA_DATA_TYPE;
+    public final static SequenceType getDNA() {
+        return DNA_SEQUENCE;
     }
 
-    public final static DataType getRNA() {
-        return RNA_DATA_TYPE;
+    public final static SequenceType getRNA() {
+        return RNA_SEQUENCE;
     }
 
-    public final static DataType getAminoAcids() {
-        return AMINO_ACID_DATA_TYPE;
+    public final static SequenceType getAminoAcids() {
+        return AMINO_ACID_SEQUENCE;
     }
 
-    public final static DataType getCodons() {
-        return CODON_DATA_TYPE;
+    public final static SequenceType getCodons() {
+        return CODON_SEQUENCE;
     }
 
     /**
@@ -89,12 +90,11 @@ public abstract class DataType {
      */
     public abstract State getGapState();
 
-
 	/**
 	 * @return true if this state is an unknown state
 	 */
 	public abstract boolean isUnknown(State state);
-	
+
 	/**
 	 * @return true if this state is a gap
 	 */
@@ -107,17 +107,24 @@ public abstract class DataType {
      */
     public abstract String getName();
 
+	/**
+	 * Converts a string of state codes into an array of State objects for this SequenceType
+	 * @param sequenceString
+	 * @return the State array
+	 */
+	public abstract State[] toStateArray(String sequenceString);
+
     public String toString() {
         return getName();
     }
 
-    private final static DataType DNA_DATA_TYPE = new NucleotideDataType(false);
-    private final static DataType RNA_DATA_TYPE = new NucleotideDataType(true);
-    private final static DataType AMINO_ACID_DATA_TYPE = new AminoAcidDataType();
-    private final static DataType CODON_DATA_TYPE = new CodonDataType();
+    private final static SequenceType DNA_SEQUENCE = new NucleotideSequenceType(false);
+    private final static SequenceType RNA_SEQUENCE = new NucleotideSequenceType(true);
+    private final static SequenceType AMINO_ACID_SEQUENCE = new AminoAcidSequenceType();
+    private final static SequenceType CODON_SEQUENCE = new CodonSequenceType();
 
-    private static class NucleotideDataType extends DataType {
-        private NucleotideDataType(boolean isRNA) {
+    private static class NucleotideSequenceType extends SequenceType {
+        private NucleotideSequenceType(boolean isRNA) {
 
             if (isRNA) {
                 states = Nucleotides.RNA_CANONICAL_STATES;
@@ -175,6 +182,14 @@ public abstract class DataType {
 
         public String getName() { return name; }
 
+	    public State[] toStateArray(String sequenceString) {
+		    State[] states = new State[sequenceString.length()];
+		    for (int i = 0; i < states.length; i++) {
+			    states[i] = statesByCode[sequenceString.charAt(i)];
+		    }
+		    return states;
+	    }
+
         /**
          * This table maps indices (0-17) into state objects.
          */
@@ -191,8 +206,8 @@ public abstract class DataType {
         private final String name;
     };
 
-    private static class AminoAcidDataType extends DataType {
-        private AminoAcidDataType() {
+    private static class AminoAcidSequenceType extends SequenceType {
+        private AminoAcidSequenceType() {
             states = AminoAcids.AMINO_ACID_STATES;
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Amino Acid";
@@ -236,6 +251,14 @@ public abstract class DataType {
 
         public String getName() { return name; }
 
+	    public State[] toStateArray(String sequenceString) {
+		    State[] states = new State[sequenceString.length()];
+		    for (int i = 0; i < states.length; i++) {
+			    states[i] = statesByCode[sequenceString.charAt(i)];
+		    }
+		    return states;
+	    }
+
         /**
          * This table maps indices (0-17) into state objects.
          */
@@ -252,8 +275,8 @@ public abstract class DataType {
         private final String name;
     };
 
-    private static class CodonDataType extends DataType {
-        private CodonDataType() {
+    private static class CodonSequenceType extends SequenceType {
+        private CodonSequenceType() {
             states = Codons.CODON_STATES;
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Codon";
@@ -283,6 +306,15 @@ public abstract class DataType {
         public boolean isGap(State state) { return state == Codons.GAP_STATE; }
 
         public String getName() { return name; }
+
+	    public State[] toStateArray(String sequenceString) {
+		    int n = sequenceString.length() / 3;
+		    State[] states = new State[n];
+		    for (int i = 0; i < n; i++) {
+			    states[i] = getState(sequenceString.substring(i * 3, (i * 3) + 3));
+		    }
+		    return states;
+	    }
 
         private final State[] states;
         private final List stateList;

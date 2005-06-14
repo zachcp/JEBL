@@ -13,7 +13,7 @@ import jebl.util.Attributable;
 import java.util.*;
 
 /**
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$

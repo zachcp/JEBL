@@ -11,7 +11,7 @@ package jebl.evolution.graphs;
 /**
  * A collection of utility functions for graphs.
  *
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$

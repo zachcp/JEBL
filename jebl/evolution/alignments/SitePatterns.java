@@ -8,15 +8,18 @@
  */
 package jebl.evolution.alignments;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * An interface representing a set of site patterns.
  *
- * @author rambaut
+ * @author Andrew Rambaut
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public interface SitePatterns {
 
-    Set getSitePatterns();
-    
+	List<Pattern> getSitePatterns();
+
 }

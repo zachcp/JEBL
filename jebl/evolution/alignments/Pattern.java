@@ -8,14 +8,14 @@
  */
 package jebl.evolution.alignments;
 
-import jebl.evolution.datatypes.DataType;
+import jebl.evolution.sequences.SequenceType;
 
 import java.util.List;
 
 /**
  * An interface representing a list of states for a list of taxa.
  *
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$
@@ -25,7 +25,7 @@ public interface Pattern {
     /**
      * @return the data type of the states in this pattern.
      */
-    DataType getDataType();
+    SequenceType getDataType();
 
     /**
      * @return the list of taxa that the state values correspond to.

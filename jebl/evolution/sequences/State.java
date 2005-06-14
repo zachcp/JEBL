@@ -6,12 +6,13 @@
 * This package is distributed under the
 * Lesser Gnu Public Licence (LGPL)
 */
-package jebl.evolution.datatypes;
+package jebl.evolution.sequences;
 
 import java.util.*;
 
 /**
- * @author rambaut
+ * @author Andrew Rambaut
+ * @author Alexei Drummond
  *
  * @version $Id$
  */
@@ -21,10 +22,9 @@ public class State implements Comparable {
 
         this.name = name;
         this.stateCode = stateCode;
-        Set a = new TreeSet();
 
         State[] ambiguities = new State[] { this };
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet(Arrays.asList(ambiguities)));
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
         this.index = index;
     }
 
@@ -32,7 +32,7 @@ public class State implements Comparable {
 
         this.name = name;
         this.stateCode = stateCode;
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet(Arrays.asList(ambiguities)));
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
         this.index = index;
     }
 
@@ -50,7 +50,7 @@ public class State implements Comparable {
         return getCanonicalStates().size() > 1;
     }
 
-    public <State>Set getCanonicalStates() {
+    public Set<State> getCanonicalStates() {
         return ambiguities;
     }
 
@@ -63,6 +63,6 @@ public class State implements Comparable {
 
     private String stateCode;
     private String name;
-    private Set ambiguities;
+    private Set<State> ambiguities;
     private int index;
 }

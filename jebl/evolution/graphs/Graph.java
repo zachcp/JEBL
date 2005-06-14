@@ -11,7 +11,7 @@ package jebl.evolution.graphs;
 import java.util.Set;
 
 /**
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$

@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * A basic implementation of the Alignment interface.
  *
- * @author rambaut
+ * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$
@@ -52,7 +52,7 @@ public class BasicAlignment implements Alignment {
      * Constructs a basic alignment with no sequences.
      */
     public BasicAlignment() {}
-       
+
     /**
      * Constructs a basic alignment from an array of sequences. The sequence
      * objects are not copied.
@@ -67,19 +67,15 @@ public class BasicAlignment implements Alignment {
     /**
      * @return a set containing all the sequences in this alignment.
      */
-    public <Sequence>Set getSequences() {
-        return new HashSet(sequences.values());
+    public Set<Sequence> getSequences() {
+        return new HashSet<Sequence>(sequences.values());
     }
 
     public Sequence getSequence(Taxon taxon) {
         return (Sequence)sequences.get(taxon);
     }
 
-    public Set getSitePatterns() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    public List getSitePatternList() {
+    public List<Pattern> getSitePatterns() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

@@ -6,10 +6,11 @@
  * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
-package jebl.evolution.datatypes;
+package jebl.evolution.sequences;
 
 /**
- * @author rambaut
+ * @author Andrew Rambaut
+ * @author Alexei Drummond
  *
  * @version $Id$
  */
