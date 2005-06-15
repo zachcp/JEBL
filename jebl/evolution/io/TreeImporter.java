@@ -9,9 +9,6 @@
 
 package jebl.evolution.io;
 
-import dr.evolution.tree.Tree;
-import dr.evolution.util.TaxonList;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2005 Your Corporation. All Rights Reserved.
+ */
 package jebl.evolution.sequences;
 
 /**
@@ -11,7 +14,8 @@ public class Utils {
 	public static State[] translate(State[] nucleotides, GeneticCode geneticCode) {
 		State[] translation = new State[nucleotides.length / 3];
 		for (int i = 0; i < translation.length; i++) {
-			translation[i] = geneticCode.translate(nucleotides[i], nucleotides[i+1], nucleotides[i+2]);
+            State state = Codons.getState(nucleotides[i * 3], nucleotides[(i * 3) + 1], nucleotides[(i * 3) + 2]);
+			translation[i] = geneticCode.getTranslation(state);
 		}
 		return translation;
 	}

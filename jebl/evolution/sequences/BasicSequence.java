@@ -50,7 +50,12 @@ public class BasicSequence implements Sequence {
 
 		State[] states = sourceSequence.getSequenceStates();
 
-	    this.sequenceString = Utils.translate(states, GeneticCode.UNIVERSAL);
+	    State[] translatedStates = Utils.translate(states, GeneticCode.UNIVERSAL);
+        StringBuffer buffer = new StringBuffer();
+        for (State state : translatedStates) {
+            buffer.append(state.getCode());
+        }
+        sequenceString = buffer.toString();
 	}
 
     /**

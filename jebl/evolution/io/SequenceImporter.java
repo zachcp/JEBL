@@ -9,9 +9,6 @@
 
 package jebl.evolution.io;
 
-import dr.evolution.alignment.Alignment;
-import dr.evolution.sequence.SequenceList;
-
 import java.io.IOException;
 import java.util.List;
 

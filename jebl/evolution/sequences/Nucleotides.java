@@ -1,10 +1,5 @@
 /*
- * Nucleotides.java
- *
- * (c) 2005 JEBL Development Team
- *
- * This package is distributed under the
- * Lesser Gnu Public Licence (LGPL)
+ * Copyright (c) 2005 Your Corporation. All Rights Reserved.
  */
 package jebl.evolution.sequences;
 
@@ -59,7 +54,5 @@ public final class Nucleotides {
         S_STATE, K_STATE, B_STATE, D_STATE,
         H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
-
-
 
 }

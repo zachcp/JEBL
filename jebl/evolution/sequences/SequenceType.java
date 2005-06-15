@@ -1,10 +1,5 @@
 /*
- * SequenceType.java
- *
- * (c) 2005 JEBL Development Team
- *
- * This package is distributed under the
- * Lesser Gnu Public Licence (LGPL)
+ * Copyright (c) 2005 Your Corporation. All Rights Reserved.
  */
 
 package jebl.evolution.sequences;

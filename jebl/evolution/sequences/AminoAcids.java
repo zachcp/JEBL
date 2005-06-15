@@ -1,10 +1,5 @@
 /*
- * AminoAcids.java
- *
- * (c) 2005 JEBL Development Team
- *
- * This package is distributed under the
- * Lesser Gnu Public Licence (LGPL)
+ * Copyright (c) 2005 Your Corporation. All Rights Reserved.
  */
 package jebl.evolution.sequences;
 
@@ -50,14 +45,16 @@ public final class AminoAcids {
     public static final State Z_STATE = new State("Z", "Z", 21, new State[] {E_STATE, Q_STATE});
     public static final State X_STATE = new State("X", "X", 22, CANONICAL_STATES);
     public static final State UNKNOWN_STATE = new State("?", "?", 23, CANONICAL_STATES);
-    public static final State GAP_STATE = new State("-", "-", 24, CANONICAL_STATES);
+    public static final State STOP_STATE = new State("*", "*", 24, CANONICAL_STATES);
+    public static final State GAP_STATE = new State("-", "-", 25, CANONICAL_STATES);
 
     public static final State[] AMINO_ACID_STATES = new State[] {
             A_STATE, C_STATE, D_STATE, E_STATE, F_STATE,
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
             S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE,
-            B_STATE, Z_STATE, X_STATE, UNKNOWN_STATE, GAP_STATE
+            B_STATE, Z_STATE, X_STATE, UNKNOWN_STATE,
+            STOP_STATE, GAP_STATE
     };
 
 
@@ -77,4 +74,35 @@ public final class AminoAcids {
           "Trp",  "Tyr",  "Asx",  "Glx",  " X ",  " * ",  " ? ",  " - "
     };
 
+    public static State getState(char code) {
+        return statesByCode[code];
+    }
+
+    public static State getState(String code) {
+        return statesByCode[code.charAt(0)];
+    }
+
+    public static State getState(int index) {
+        return AMINO_ACID_STATES[index];
+    }
+
+    private static final State[] statesByCode;
+
+    static {
+        statesByCode = new State[128];
+        for (int i = 0; i < AMINO_ACID_STATES.length; i++) {
+            if (i >= 'A' && i <= 'z') {
+                // Undefined letters are mapped to UNKOWN_STATE
+                statesByCode[i] = AminoAcids.UNKNOWN_STATE;
+            } else {
+                // Undefined punctuations are mapped to GAP_STATE
+                statesByCode[i] = AminoAcids.GAP_STATE;
+            }
+        }
+
+        for (State state : AMINO_ACID_STATES) {
+            statesByCode[state.getCode().charAt(0)] = state;
+            statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
+        }
+    }
 }
