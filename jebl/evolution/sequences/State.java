@@ -11,23 +11,24 @@ import java.util.*;
  *
  * @version $Id$
  */
-public class State implements Comparable {
+public abstract class State<T extends State> implements Comparable {
 
     State(String name, String stateCode, int index) {
 
         this.name = name;
         this.stateCode = stateCode;
 
-        State[] ambiguities = new State[] { this };
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
+        List<T> ambiguities = new ArrayList<T>();
+        ambiguities.add((T)this);
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<T>(ambiguities));
         this.index = index;
     }
 
-    State(String name, String stateCode, int index, State[] ambiguities) {
+    State(String name, String stateCode, int index, T[] ambiguities) {
 
         this.name = name;
         this.stateCode = stateCode;
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<T>(Arrays.asList(ambiguities)));
         this.index = index;
     }
 
@@ -45,7 +46,7 @@ public class State implements Comparable {
         return getCanonicalStates().size() > 1;
     }
 
-    public Set<State> getCanonicalStates() {
+    public Set<T> getCanonicalStates() {
         return ambiguities;
     }
 
@@ -55,9 +56,8 @@ public class State implements Comparable {
 
     public String toString() { return stateCode; }
 
-
     private String stateCode;
     private String name;
-    private Set<State> ambiguities;
+    private Set<T> ambiguities;
     private int index;
 }

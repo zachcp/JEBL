@@ -11,10 +11,10 @@ package jebl.evolution.sequences;
  */
 public class Utils {
 
-	public static State[] translate(State[] nucleotides, GeneticCode geneticCode) {
-		State[] translation = new State[nucleotides.length / 3];
+	public static AminoAcidState[] translate(NucleotideState[] nucleotides, GeneticCode geneticCode) {
+		AminoAcidState[] translation = new AminoAcidState[nucleotides.length / 3];
 		for (int i = 0; i < translation.length; i++) {
-            State state = Codons.getState(nucleotides[i * 3], nucleotides[(i * 3) + 1], nucleotides[(i * 3) + 2]);
+            CodonState state = Codons.getState(nucleotides[i * 3], nucleotides[(i * 3) + 1], nucleotides[(i * 3) + 2]);
 			translation[i] = geneticCode.getTranslation(state);
 		}
 		return translation;

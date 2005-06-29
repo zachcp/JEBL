@@ -42,15 +42,15 @@ public final class GeneticCode {
 
 		this.geneticCodeId = geneticCodeId;
 		String codeTable = GENETIC_CODE_TABLES[geneticCodeId];
-        Map<State, State> translationMap = new TreeMap<State, State>();
+        Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
 
         if (codeTable.length() != Codons.CODON_STATES.length) {
             throw new IllegalArgumentException("Code Table length does not match number of codon states");
         }
 
         for (int i = 0; i < codeTable.length(); i++) {
-            State codonState = Codons.CODON_STATES[i];
-            State aminoAcidState = SequenceType.getAminoAcids().getState(codeTable.substring(i, i+1));
+            CodonState codonState = Codons.CODON_STATES[i];
+            AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i+1));
             translationMap.put(codonState, aminoAcidState);
         }
 
@@ -85,7 +85,7 @@ public final class GeneticCode {
 	 * @see Codons
 	 * @return '?' if codon unknown
 	 */
-	public State getTranslation(State codonState) {
+	public AminoAcidState getTranslation(CodonState codonState) {
 		return translationMap.get(codonState);
 	}
 
@@ -93,16 +93,16 @@ public final class GeneticCode {
 	 * Note that the state is the canonical state (generated combinatorially)
      * @return whether the codonState is a stop codon
 	 */
-	public boolean isStopCodon(State codonState) {
+	public boolean isStopCodon(CodonState codonState) {
 		return (translationMap.get(codonState) == AminoAcids.STOP_STATE);
 	}
 
 	/**
 	 * @return all the possible codons for a given amino acid
 	 */
-	public Set<State> getCodonsForAminoAcid(State aminoAcidState) {
-        Set<State> aaSet = new HashSet<State>();
-        for (State state : translationMap.keySet()) {
+	public Set<CodonState> getCodonsForAminoAcid(AminoAcidState aminoAcidState) {
+        Set<CodonState> aaSet = new HashSet<CodonState>();
+        for (CodonState state : translationMap.keySet()) {
             if (translationMap.get(state) == aminoAcidState) {
                 aaSet.add(state);
             }
@@ -113,9 +113,9 @@ public final class GeneticCode {
 	/**
 	 * @return the codon states of stops.
 	 */
-	public Set<State> getStopCodons() {
-        Set<State> stopSet = new HashSet<State>();
-        for (State state : translationMap.keySet()) {
+	public Set<CodonState> getStopCodons() {
+        Set<CodonState> stopSet = new HashSet<CodonState>();
+        for (CodonState state : translationMap.keySet()) {
             if (isStopCodon(state)) {
                 stopSet.add(state);
             }
@@ -128,7 +128,7 @@ public final class GeneticCode {
 	 */
 	public int getStopCodonCount() {
         int count = 0;
-        for (State state : translationMap.values()) {
+        for (AminoAcidState state : translationMap.values()) {
             if (state == AminoAcids.STOP_STATE) {
                 count++;
             }
@@ -137,7 +137,7 @@ public final class GeneticCode {
 	}
 
     private final int geneticCodeId;
-	private final Map<State, State> translationMap;
+	private final Map<CodonState, AminoAcidState> translationMap;
 
     /**
      * Constants used to refer to the built in code tables

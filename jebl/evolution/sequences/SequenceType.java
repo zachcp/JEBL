@@ -53,7 +53,7 @@ public abstract class SequenceType {
      *
      * @return a list of states
      */
-    public abstract List getStates();
+    public abstract List<State> getStates();
 
     /**
      * Get state corresponding to a string code
@@ -109,6 +109,13 @@ public abstract class SequenceType {
 	 */
 	public abstract State[] toStateArray(String sequenceString);
 
+    /**
+     * Converts an array of state indices into an array of State objects for this SequenceType
+     * @param indexArray
+     * @return the State array
+     */
+    public abstract State[] toStateArray(int[] indexArray);
+
     public String toString() {
         return getName();
     }
@@ -131,7 +138,7 @@ public abstract class SequenceType {
 
             stateList = Collections.unmodifiableList(Arrays.asList(states));
 
-            statesByCode = new State[128];
+            statesByCode = new NucleotideState[128];
             for (int i = 0; i < states.length; i++) {
                 if (i >= 'A' && i <= 'z') {
                     // Undefined letters are mapped to UNKOWN_STATE
@@ -143,7 +150,7 @@ public abstract class SequenceType {
             }
 
             for (int i = 0; i < states.length; i++) {
-                State state = (State)getStates().get(i);
+                State state = getStates().get(i);
                 statesByCode[state.getCode().charAt(0)] = state;
                 statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
             }
@@ -161,7 +168,7 @@ public abstract class SequenceType {
 
         public int getAmbiguousStateCount() { return Nucleotides.AMBIGUOUS_STATE_COUNT; }
 
-        public List getStates() { return stateList; }
+        public List<State> getStates() { return stateList; }
 
         public State getState(String code) { return statesByCode[code.charAt(0)]; }
 
@@ -178,18 +185,26 @@ public abstract class SequenceType {
         public String getName() { return name; }
 
 	    public State[] toStateArray(String sequenceString) {
-		    State[] states = new State[sequenceString.length()];
-		    for (int i = 0; i < states.length; i++) {
-			    states[i] = statesByCode[sequenceString.charAt(i)];
+		    State[] seq = new NucleotideState[sequenceString.length()];
+		    for (int i = 0; i < seq.length; i++) {
+			    seq[i] = statesByCode[sequenceString.charAt(i)];
 		    }
-		    return states;
+		    return seq;
 	    }
+
+        public State[] toStateArray(int[] indexArray) {
+            State[] seq = new NucleotideState[indexArray.length];
+            for (int i = 0; i < seq.length; i++) {
+                seq[i] = statesByCode[indexArray[i]];
+            }
+            return seq;
+        }
 
         /**
          * This table maps indices (0-17) into state objects.
          */
         private final State[] states;
-        private final List stateList;
+        private final List<State> stateList;
 
         /**
          * This table maps nucleotide characters into state objects (0-17)
@@ -207,7 +222,7 @@ public abstract class SequenceType {
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Amino Acid";
 
-            statesByCode = new State[128];
+            statesByCode = new AminoAcidState[128];
             for (int i = 0; i < states.length; i++) {
                 if (i >= 'A' && i <= 'z') {
                     // Undefined letters are mapped to UNKOWN_STATE
@@ -219,7 +234,7 @@ public abstract class SequenceType {
             }
 
             for (int i = 0; i < states.length; i++) {
-                State state = (State)getStates().get(i);
+                AminoAcidState state = (AminoAcidState)getStates().get(i);
                 statesByCode[state.getCode().charAt(0)] = state;
                 statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
             }
@@ -230,7 +245,7 @@ public abstract class SequenceType {
 
         public int getAmbiguousStateCount() { return AminoAcids.AMBIGUOUS_STATE_COUNT; }
 
-        public List getStates() { return stateList; }
+        public List<State> getStates() { return stateList; }
 
         public State getState(String code) { return statesByCode[code.charAt(0)]; }
 
@@ -247,25 +262,33 @@ public abstract class SequenceType {
         public String getName() { return name; }
 
 	    public State[] toStateArray(String sequenceString) {
-		    State[] states = new State[sequenceString.length()];
-		    for (int i = 0; i < states.length; i++) {
-			    states[i] = statesByCode[sequenceString.charAt(i)];
+		    State[] seq = new State[sequenceString.length()];
+		    for (int i = 0; i < seq.length; i++) {
+			    seq[i] = statesByCode[sequenceString.charAt(i)];
 		    }
-		    return states;
+		    return seq;
 	    }
+
+        public State[] toStateArray(int[] indexArray) {
+            State[] seq = new State[indexArray.length];
+            for (int i = 0; i < seq.length; i++) {
+                seq[i] = statesByCode[indexArray[i]];
+            }
+            return seq;
+        }
 
         /**
          * This table maps indices (0-17) into state objects.
          */
         private final State[] states;
-        private final List stateList;
+        private final List<State> stateList;
 
         /**
          * This table maps nucleotide characters into state objects (0-17)
          * Nucleotides go ACGTURYMWSKBDHVN?-", Other letters are mapped to ?.
          * ? and - are mapped to themselves. All other chars are mapped to -.
          */
-        private final State[] statesByCode;
+        private final AminoAcidState[] statesByCode;
 
         private final String name;
     };
@@ -276,7 +299,7 @@ public abstract class SequenceType {
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Codon";
 
-            statesByCode = new HashMap();
+            statesByCode = new HashMap<String, State>();
             for (int i = 0; i < states.length; i++) {
                 statesByCode.put(states[i].getCode(), states[i]);
             }
@@ -286,9 +309,9 @@ public abstract class SequenceType {
 
         public int getAmbiguousStateCount() { return Codons.AMBIGUOUS_STATE_COUNT; }
 
-        public List getStates() { return stateList; }
+        public List<State> getStates() { return stateList; }
 
-        public State getState(String code) { return (State)statesByCode.get(code); }
+        public State getState(String code) { return statesByCode.get(code); }
 
         public State getState(int index) { return states[index]; }
 
@@ -304,17 +327,25 @@ public abstract class SequenceType {
 
 	    public State[] toStateArray(String sequenceString) {
 		    int n = sequenceString.length() / 3;
-		    State[] states = new State[n];
+		    State[] seq = new CodonState[n];
 		    for (int i = 0; i < n; i++) {
-			    states[i] = getState(sequenceString.substring(i * 3, (i * 3) + 3));
+			    seq[i] = getState(sequenceString.substring(i * 3, (i * 3) + 3));
 		    }
-		    return states;
+		    return seq;
 	    }
 
-        private final State[] states;
-        private final List stateList;
+        public State[] toStateArray(int[] indexArray) {
+            State[] seq = new CodonState[indexArray.length];
+            for (int i = 0; i < seq.length; i++) {
+                seq[i] = getState(indexArray[i]);
+            }
+            return seq;
+        }
 
-        private final Map statesByCode;
+        private final State[] states;
+        private final List<State> stateList;
+
+        private final Map<String, State> statesByCode;
 
         private final String name;
     };

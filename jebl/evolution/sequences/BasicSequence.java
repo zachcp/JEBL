@@ -20,14 +20,6 @@ import jebl.evolution.taxa.Taxon;
  */
 public class BasicSequence implements Sequence {
 
-    public BasicSequence(String name, Taxon taxon, SequenceType sequenceType, String sequenceString) {
-
-        this.name = name;
-        this.taxon = taxon;
-        this.sequenceType = sequenceType;
-        this.sequenceString = sequenceString;
-    }
-
     /**
      * Creates a sequence with a name corresponding to the taxon name
      * @param taxon
@@ -36,27 +28,34 @@ public class BasicSequence implements Sequence {
      */
     public BasicSequence(Taxon taxon, SequenceType sequenceType, String sequenceString) {
 
-        this.name = taxon.getName();
         this.taxon = taxon;
         this.sequenceType = sequenceType;
-        this.sequenceString = sequenceString;
+        this.sequence = new int[sequenceString.length()];
+        for (int i = 0; i < sequence.length; i++) {
+            sequence[i] = sequenceType.getState(sequenceString.substring(i, i + 1)).getIndex();
+        }
     }
 
-	public BasicSequence(SequenceType sequenceType, Sequence sourceSequence) {
+    public BasicSequence(SequenceType sequenceType, Sequence sourceSequence) {
 
-	    this.name = sourceSequence.getName();
-	    this.taxon = sourceSequence.getTaxon();
-	    this.sequenceType = sequenceType;
+        this(sourceSequence.getTaxon(), sequenceType, Utils.translate((NucleotideState[])sourceSequence.getSequenceStates(), GeneticCode.UNIVERSAL));
+    }
 
-		State[] states = sourceSequence.getSequenceStates();
+    /**
+     * Creates a sequence with a name corresponding to the taxon name
+     * @param taxon
+     * @param sequenceType
+     * @param states
+     */
+    public BasicSequence(Taxon taxon, SequenceType sequenceType, State[] states) {
 
-	    State[] translatedStates = Utils.translate(states, GeneticCode.UNIVERSAL);
-        StringBuffer buffer = new StringBuffer();
-        for (State state : translatedStates) {
-            buffer.append(state.getCode());
+        this.taxon = taxon;
+        this.sequenceType = sequenceType;
+        this.sequence = new int[states.length];
+        for (int i = 0; i < sequence.length; i++) {
+            sequence[i] = states[i].getIndex();
         }
-        sequenceString = buffer.toString();
-	}
+    }
 
     /**
      * @return the type of symbols that this sequence is made up of.
@@ -66,25 +65,29 @@ public class BasicSequence implements Sequence {
     }
 
     /**
-     * @return a human-readable name for this sequence.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * @return a string representing the sequence of symbols.
      */
     public String getSequenceString() {
-        return sequenceString;
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < sequence.length; i++) {
+            buffer.append(sequenceType.getState(sequence[i]).getCode());
+        }
+        return buffer.toString();
     }
 
 	/**
 	 * @return an array of state objects.
 	 */
 	public State[] getSequenceStates() {
-	    return sequenceType.toStateArray(sequenceString);
+	    return sequenceType.toStateArray(sequence);
 	}
+
+    /**
+     * @return the state at site.
+     */
+    public State getState(int site) {
+        return null;
+    }
 
     /**
      * @return that taxon that this sequence represents (primarily used to match sequences with tree nodes)
@@ -95,8 +98,7 @@ public class BasicSequence implements Sequence {
 
     // private members
 
-    private final String name;
     private final Taxon taxon;
     private final SequenceType sequenceType;
-    private final String sequenceString;
+    private final int[] sequence;
 }

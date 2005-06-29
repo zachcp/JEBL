@@ -13,42 +13,42 @@ public final class AminoAcids {
     public static final int CANONICAL_STATE_COUNT = 20;
     public static final int AMBIGUOUS_STATE_COUNT = 25;
 
-    public static final State A_STATE = new State("A", "A", 0);
-    public static final State C_STATE = new State("C", "C", 1);
-    public static final State D_STATE = new State("D", "D", 2);
-    public static final State E_STATE = new State("E", "E", 3);
-    public static final State F_STATE = new State("F", "F", 4);
-    public static final State G_STATE = new State("G", "G", 5);
-    public static final State H_STATE = new State("H", "H", 6);
-    public static final State I_STATE = new State("I", "I", 7);
-    public static final State K_STATE = new State("K", "K", 8);
-    public static final State L_STATE = new State("L", "L", 9);
-    public static final State M_STATE = new State("M", "M", 10);
-    public static final State N_STATE = new State("N", "N", 11);
-    public static final State P_STATE = new State("P", "P", 12);
-    public static final State Q_STATE = new State("Q", "Q", 13);
-    public static final State R_STATE = new State("R", "R", 14);
-    public static final State S_STATE = new State("S", "S", 15);
-    public static final State T_STATE = new State("T", "T", 16);
-    public static final State V_STATE = new State("V", "V", 17);
-    public static final State W_STATE = new State("W", "W", 18);
-    public static final State Y_STATE = new State("Y", "Y", 19);
+    public static final AminoAcidState A_STATE = new AminoAcidState("A", "A", 0);
+    public static final AminoAcidState C_STATE = new AminoAcidState("C", "C", 1);
+    public static final AminoAcidState D_STATE = new AminoAcidState("D", "D", 2);
+    public static final AminoAcidState E_STATE = new AminoAcidState("E", "E", 3);
+    public static final AminoAcidState F_STATE = new AminoAcidState("F", "F", 4);
+    public static final AminoAcidState G_STATE = new AminoAcidState("G", "G", 5);
+    public static final AminoAcidState H_STATE = new AminoAcidState("H", "H", 6);
+    public static final AminoAcidState I_STATE = new AminoAcidState("I", "I", 7);
+    public static final AminoAcidState K_STATE = new AminoAcidState("K", "K", 8);
+    public static final AminoAcidState L_STATE = new AminoAcidState("L", "L", 9);
+    public static final AminoAcidState M_STATE = new AminoAcidState("M", "M", 10);
+    public static final AminoAcidState N_STATE = new AminoAcidState("N", "N", 11);
+    public static final AminoAcidState P_STATE = new AminoAcidState("P", "P", 12);
+    public static final AminoAcidState Q_STATE = new AminoAcidState("Q", "Q", 13);
+    public static final AminoAcidState R_STATE = new AminoAcidState("R", "R", 14);
+    public static final AminoAcidState S_STATE = new AminoAcidState("S", "S", 15);
+    public static final AminoAcidState T_STATE = new AminoAcidState("T", "T", 16);
+    public static final AminoAcidState V_STATE = new AminoAcidState("V", "V", 17);
+    public static final AminoAcidState W_STATE = new AminoAcidState("W", "W", 18);
+    public static final AminoAcidState Y_STATE = new AminoAcidState("Y", "Y", 19);
 
-    public static final State[] CANONICAL_STATES = new State[] {
+    public static final AminoAcidState[] CANONICAL_STATES = new AminoAcidState[] {
             A_STATE, C_STATE, D_STATE, E_STATE, F_STATE,
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
             S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE
     };
 
-    public static final State B_STATE = new State("B", "B", 20, new State[] {D_STATE, N_STATE});
-    public static final State Z_STATE = new State("Z", "Z", 21, new State[] {E_STATE, Q_STATE});
-    public static final State X_STATE = new State("X", "X", 22, CANONICAL_STATES);
-    public static final State UNKNOWN_STATE = new State("?", "?", 23, CANONICAL_STATES);
-    public static final State STOP_STATE = new State("*", "*", 24, CANONICAL_STATES);
-    public static final State GAP_STATE = new State("-", "-", 25, CANONICAL_STATES);
+    public static final AminoAcidState B_STATE = new AminoAcidState("B", "B", 20, new AminoAcidState[] {D_STATE, N_STATE});
+    public static final AminoAcidState Z_STATE = new AminoAcidState("Z", "Z", 21, new AminoAcidState[] {E_STATE, Q_STATE});
+    public static final AminoAcidState X_STATE = new AminoAcidState("X", "X", 22, CANONICAL_STATES);
+    public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("?", "?", 23, CANONICAL_STATES);
+    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 24, CANONICAL_STATES);
+    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 25, CANONICAL_STATES);
 
-    public static final State[] AMINO_ACID_STATES = new State[] {
+    public static final AminoAcidState[] AMINO_ACID_STATES = new AminoAcidState[] {
             A_STATE, C_STATE, D_STATE, E_STATE, F_STATE,
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
@@ -74,22 +74,22 @@ public final class AminoAcids {
           "Trp",  "Tyr",  "Asx",  "Glx",  " X ",  " * ",  " ? ",  " - "
     };
 
-    public static State getState(char code) {
+    public static AminoAcidState getState(char code) {
         return statesByCode[code];
     }
 
-    public static State getState(String code) {
+    public static AminoAcidState getState(String code) {
         return statesByCode[code.charAt(0)];
     }
 
-    public static State getState(int index) {
+    public static AminoAcidState getState(int index) {
         return AMINO_ACID_STATES[index];
     }
 
-    private static final State[] statesByCode;
+    private static final AminoAcidState[] statesByCode;
 
     static {
-        statesByCode = new State[128];
+        statesByCode = new AminoAcidState[128];
         for (int i = 0; i < AMINO_ACID_STATES.length; i++) {
             if (i >= 'A' && i <= 'z') {
                 // Undefined letters are mapped to UNKOWN_STATE
@@ -100,7 +100,7 @@ public final class AminoAcids {
             }
         }
 
-        for (State state : AMINO_ACID_STATES) {
+        for (AminoAcidState state : AMINO_ACID_STATES) {
             statesByCode[state.getCode().charAt(0)] = state;
             statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
         }
