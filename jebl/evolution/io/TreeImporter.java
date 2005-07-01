@@ -1,7 +1,7 @@
 /*
  * TreeImporter.java
  *
- * (c) 2002-2005 BEAST Development Core Team
+ * (c) 2002-2005 JEBL Development Core Team
  *
  * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)

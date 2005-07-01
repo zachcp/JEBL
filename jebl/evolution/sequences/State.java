@@ -1,5 +1,10 @@
 /*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
+ * State.java
+ *
+ * (c) 2002-2005 JEBL Development Core Team
+ *
+ * This package may be distributed under the
+ * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.sequences;
 

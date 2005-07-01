@@ -1,9 +1,9 @@
 /*
  * BasicSequence.java
  *
- * (c) 2005 JEBL Development Team
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * This package is distributed under the
+ * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.sequences;
@@ -94,6 +94,10 @@ public class BasicSequence implements Sequence {
      */
     public Taxon getTaxon() {
         return taxon;
+    }
+
+    public int compare(Sequence s) {
+        return taxon.compare(s.getTaxon());
     }
 
     // private members

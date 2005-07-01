@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
@@ -49,18 +50,16 @@ public class FastaImporter implements SequenceImporter {
             }
 
     		do {
-				StringBuffer name = new StringBuffer();
-				
-				while (!Character.isWhitespace(ch)) {
-					name.append(ch);
-					ch = helper.read();
-				}
-				
+                String line = helper.readLine();
+
+                StringTokenizer tokenizer = new StringTokenizer(line, " \t");
+                String name = tokenizer.nextToken();
+
 				StringBuffer seq = new StringBuffer();
 				helper.readSequence(seq, sequenceType, ">", Integer.MAX_VALUE, "-", "?", "", null);
 				ch = helper.getLastDelimiter();
 
-				sequences.add(new BasicSequence(Taxon.getTaxon(name.toString()), sequenceType, seq.toString()));
+				sequences.add(new BasicSequence(Taxon.getTaxon(name), sequenceType, seq.toString()));
 
 			} while(ch == '>');
 			

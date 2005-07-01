@@ -1,9 +1,9 @@
 /*
  * Sequence.java
  *
- * (c) 2005 JEBL Development Team
+ * (c) 2002-2005 JEBL Development Core Team
  *
- * This package is distributed under the
+ * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
 package jebl.evolution.sequences;

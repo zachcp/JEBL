@@ -28,14 +28,9 @@ public class BasicAlignment implements Alignment {
      * objects are not copied.
      * @param seqs
      */
-    public BasicAlignment(Set seqs) {
-        Iterator iter = seqs.iterator();
-        while (iter.hasNext()) {
-            Object obj = iter.next();
-            if (obj instanceof Sequence) {
-                Sequence sequence = (Sequence)obj;
-                this.sequences.put(sequence.getTaxon(), sequence);
-            } else throw new IllegalArgumentException("Set must only contain sequences.");
+    public BasicAlignment(Set<Sequence> sequences) {
+        for (Sequence sequence : sequences) {
+            this.sequences.put(sequence.getTaxon(), sequence);
         }
     }
 
@@ -72,7 +67,7 @@ public class BasicAlignment implements Alignment {
     }
 
     public Sequence getSequence(Taxon taxon) {
-        return (Sequence)sequences.get(taxon);
+        return sequences.get(taxon);
     }
 
     public List<Pattern> getSitePatterns() {
@@ -84,8 +79,8 @@ public class BasicAlignment implements Alignment {
      * @param sequence the new sequence.
      */
     public void addSequence(Sequence sequence) {
-        sequences.put(sequence.getTaxon(),sequence);
+        sequences.put(sequence.getTaxon(), sequence);
     }
 
-    private Map sequences = new TreeMap();
+    private Map<Taxon, Sequence> sequences = new HashMap<Taxon, Sequence>();
 }

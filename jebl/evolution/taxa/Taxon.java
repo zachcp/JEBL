@@ -137,4 +137,21 @@ public final class Taxon {
      * the taxonomic level of this taxon.
      */
     private final TaxonomicLevel taxonomicLevel;
+
+    public String toString() {
+        return name;
+    }
+
+    public int compare(Taxon t) {
+        return name.compareTo(t.getName());
+    }
+
+    public boolean equals(Taxon t) {
+        if (this == t) return true;
+        return false;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

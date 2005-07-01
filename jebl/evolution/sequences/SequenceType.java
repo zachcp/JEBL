@@ -1,5 +1,10 @@
 /*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
+ * SequenceType.java
+ *
+ * (c) 2002-2005 JEBL Development Core Team
+ *
+ * This package may be distributed under the
+ * Lesser Gnu Public Licence (LGPL)
  */
 
 package jebl.evolution.sequences;
@@ -18,12 +23,8 @@ public abstract class SequenceType {
 
     // FACTORY METHODS
 
-    public final static SequenceType getDNA() {
-        return DNA_SEQUENCE;
-    }
-
-    public final static SequenceType getRNA() {
-        return RNA_SEQUENCE;
+    public final static SequenceType getNucleotides() {
+        return NUCLEOTIDE_SEQUENCE;
     }
 
     public final static SequenceType getAminoAcids() {
@@ -120,48 +121,17 @@ public abstract class SequenceType {
         return getName();
     }
 
-    private final static SequenceType DNA_SEQUENCE = new NucleotideSequenceType(false);
-    private final static SequenceType RNA_SEQUENCE = new NucleotideSequenceType(true);
+    private final static SequenceType NUCLEOTIDE_SEQUENCE = new NucleotideSequenceType();
     private final static SequenceType AMINO_ACID_SEQUENCE = new AminoAcidSequenceType();
     private final static SequenceType CODON_SEQUENCE = new CodonSequenceType();
 
     private static class NucleotideSequenceType extends SequenceType {
-        private NucleotideSequenceType(boolean isRNA) {
+        private NucleotideSequenceType() {
 
-            if (isRNA) {
-                states = Nucleotides.RNA_CANONICAL_STATES;
-                name = "RNA";
-            } else {
-                states = Nucleotides.DNA_CANONICAL_STATES;
-                name = "DNA";
-            }
+            states = Nucleotides.CANONICAL_STATES;
+            name = "Nucleotides";
 
             stateList = Collections.unmodifiableList(Arrays.asList(states));
-
-            statesByCode = new NucleotideState[128];
-            for (int i = 0; i < states.length; i++) {
-                if (i >= 'A' && i <= 'z') {
-                    // Undefined letters are mapped to UNKOWN_STATE
-                    statesByCode[i] = Nucleotides.UNKNOWN_STATE;
-                } else {
-                    // Undefined punctuations are mapped to GAP_STATE
-                    statesByCode[i] = Nucleotides.GAP_STATE;
-                }
-            }
-
-            for (int i = 0; i < states.length; i++) {
-                State state = getStates().get(i);
-                statesByCode[state.getCode().charAt(0)] = state;
-                statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
-            }
-
-            if (isRNA) {
-                statesByCode['T'] = Nucleotides.U_STATE;
-                statesByCode['t'] = Nucleotides.U_STATE;
-            } else {
-                statesByCode['U'] = Nucleotides.T_STATE;
-                statesByCode['u'] = Nucleotides.T_STATE;
-            }
         }
 
         public int getStateCount() { return Nucleotides.CANONICAL_STATE_COUNT; }
@@ -170,9 +140,9 @@ public abstract class SequenceType {
 
         public List<State> getStates() { return stateList; }
 
-        public State getState(String code) { return statesByCode[code.charAt(0)]; }
+        public State getState(String code) { return Nucleotides.getState(code); }
 
-        public State getState(int index) { return states[index]; }
+        public State getState(int index) { return Nucleotides.getState(index); }
 
         public State getUnknownState() { return Nucleotides.UNKNOWN_STATE; }
 
@@ -187,7 +157,7 @@ public abstract class SequenceType {
 	    public State[] toStateArray(String sequenceString) {
 		    State[] seq = new NucleotideState[sequenceString.length()];
 		    for (int i = 0; i < seq.length; i++) {
-			    seq[i] = statesByCode[sequenceString.charAt(i)];
+			    seq[i] = Nucleotides.getState(sequenceString.charAt(i));
 		    }
 		    return seq;
 	    }
@@ -195,7 +165,7 @@ public abstract class SequenceType {
         public State[] toStateArray(int[] indexArray) {
             State[] seq = new NucleotideState[indexArray.length];
             for (int i = 0; i < seq.length; i++) {
-                seq[i] = statesByCode[indexArray[i]];
+                seq[i] = Nucleotides.getState(indexArray[i]);
             }
             return seq;
         }
@@ -206,13 +176,6 @@ public abstract class SequenceType {
         private final State[] states;
         private final List<State> stateList;
 
-        /**
-         * This table maps nucleotide characters into state objects (0-17)
-         * Nucleotides go ACGTURYMWSKBDHVN?-", Other letters are mapped to ?.
-         * ? and - are mapped to themselves. All other chars are mapped to -.
-         */
-        private final State[] statesByCode;
-
         private final String name;
     };
 
@@ -221,24 +184,6 @@ public abstract class SequenceType {
             states = AminoAcids.AMINO_ACID_STATES;
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Amino Acid";
-
-            statesByCode = new AminoAcidState[128];
-            for (int i = 0; i < states.length; i++) {
-                if (i >= 'A' && i <= 'z') {
-                    // Undefined letters are mapped to UNKOWN_STATE
-                    statesByCode[i] = AminoAcids.UNKNOWN_STATE;
-                } else {
-                    // Undefined punctuations are mapped to GAP_STATE
-                    statesByCode[i] = AminoAcids.GAP_STATE;
-                }
-            }
-
-            for (int i = 0; i < states.length; i++) {
-                AminoAcidState state = (AminoAcidState)getStates().get(i);
-                statesByCode[state.getCode().charAt(0)] = state;
-                statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
-            }
-
         }
 
         public int getStateCount() { return AminoAcids.CANONICAL_STATE_COUNT; }
@@ -247,9 +192,9 @@ public abstract class SequenceType {
 
         public List<State> getStates() { return stateList; }
 
-        public State getState(String code) { return statesByCode[code.charAt(0)]; }
+        public State getState(String code) { return AminoAcids.getState(code.charAt(0)); }
 
-        public State getState(int index) { return states[index]; }
+        public State getState(int index) { return AminoAcids.getState(index); }
 
         public State getUnknownState() { return AminoAcids.UNKNOWN_STATE; }
 
@@ -264,7 +209,7 @@ public abstract class SequenceType {
 	    public State[] toStateArray(String sequenceString) {
 		    State[] seq = new State[sequenceString.length()];
 		    for (int i = 0; i < seq.length; i++) {
-			    seq[i] = statesByCode[sequenceString.charAt(i)];
+			    seq[i] = AminoAcids.getState(sequenceString.charAt(i));
 		    }
 		    return seq;
 	    }
@@ -272,7 +217,7 @@ public abstract class SequenceType {
         public State[] toStateArray(int[] indexArray) {
             State[] seq = new State[indexArray.length];
             for (int i = 0; i < seq.length; i++) {
-                seq[i] = statesByCode[indexArray[i]];
+                seq[i] = AminoAcids.getState(indexArray[i]);
             }
             return seq;
         }
@@ -283,13 +228,6 @@ public abstract class SequenceType {
         private final State[] states;
         private final List<State> stateList;
 
-        /**
-         * This table maps nucleotide characters into state objects (0-17)
-         * Nucleotides go ACGTURYMWSKBDHVN?-", Other letters are mapped to ?.
-         * ? and - are mapped to themselves. All other chars are mapped to -.
-         */
-        private final AminoAcidState[] statesByCode;
-
         private final String name;
     };
 
@@ -298,11 +236,6 @@ public abstract class SequenceType {
             states = Codons.CODON_STATES;
             stateList = Collections.unmodifiableList(Arrays.asList(states));
             name = "Codon";
-
-            statesByCode = new HashMap<String, State>();
-            for (int i = 0; i < states.length; i++) {
-                statesByCode.put(states[i].getCode(), states[i]);
-            }
         }
 
         public int getStateCount() { return Codons.CANONICAL_STATE_COUNT; }
@@ -311,9 +244,9 @@ public abstract class SequenceType {
 
         public List<State> getStates() { return stateList; }
 
-        public State getState(String code) { return statesByCode.get(code); }
+        public State getState(String code) { return Codons.getState(code); }
 
-        public State getState(int index) { return states[index]; }
+        public State getState(int index) { return Codons.getState(index); }
 
         public State getUnknownState() { return Codons.UNKNOWN_STATE; }
 
@@ -329,7 +262,7 @@ public abstract class SequenceType {
 		    int n = sequenceString.length() / 3;
 		    State[] seq = new CodonState[n];
 		    for (int i = 0; i < n; i++) {
-			    seq[i] = getState(sequenceString.substring(i * 3, (i * 3) + 3));
+			    seq[i] = Codons.getState(sequenceString.substring(i * 3, (i * 3) + 3));
 		    }
 		    return seq;
 	    }
@@ -337,15 +270,13 @@ public abstract class SequenceType {
         public State[] toStateArray(int[] indexArray) {
             State[] seq = new CodonState[indexArray.length];
             for (int i = 0; i < seq.length; i++) {
-                seq[i] = getState(indexArray[i]);
+                seq[i] = Codons.getState(indexArray[i]);
             }
             return seq;
         }
 
         private final State[] states;
         private final List<State> stateList;
-
-        private final Map<String, State> statesByCode;
 
         private final String name;
     };
