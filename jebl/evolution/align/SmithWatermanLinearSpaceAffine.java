@@ -11,18 +11,18 @@ import jebl.evolution.align.scores.Scores;
 public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
 
     TracebackSimple[][] start;	// Best alignment ending at (i,j) begins at start[i][j]
-    int maxval;           // Score of best alignment
+    float maxval;           // Score of best alignment
     int start1, start2;   // Best alignment begins at (start1, start2)
     int end1, end2;       // Best alignment ends at (end1, end2)
 
-    public SmithWatermanLinearSpaceAffine(Scores sub, int d, int e, String sq1, String sq2) {
+    public SmithWatermanLinearSpaceAffine(Scores sub, float d, float e, String sq1, String sq2) {
 
         super(sub, d, e, sq1, sq2);
         int n = this.n, m = this.m;
-        int[][] score = sub.score;
-        int[][] M = F[0], Ix = F[1], Iy = F[2];
+        float[][] score = sub.score;
+        float[][] M = F[0], Ix = F[1], Iy = F[2];
         start = new TracebackSimple[2][m+1];
-        maxval = NegInf;
+        maxval = Float.NEGATIVE_INFINITY;
         // Initialize first column (i=0); score is zero:
         for (int j=0; j<=m; j++) {
             start[1][j] = new TracebackSimple(0, j);
@@ -33,8 +33,8 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
             // Initialize first row (j=0):
             start[1][0] = new TracebackSimple(i, 0);
             for (int j=1; j<=m; j++) {
-                int s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                int val, valm, valix, valiy;
+                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float val, valm, valix, valiy;
                 valm  = M[1][j]  = max(0, M[0][j-1]+s, Ix[0][j-1]+s, Iy[0][j-1]+s);
                 valix = Ix[1][j] = max(M[0][j]-d, Ix[0][j]-e);
                 valiy = Iy[1][j] = max(M[1][j-1]-d, Iy[1][j-1]-e);
@@ -61,7 +61,7 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
         }
     }
 
-    public int getScore() { return maxval; }
+    public float getScore() { return maxval; }
 
     public String[] getMatch() {
 

@@ -7,14 +7,12 @@ import jebl.evolution.align.scores.Blosum50;
 abstract class Align {
 
     Scores sub;             // scores matrix
-    int d;                        // gap cost
+    float d;                        // gap cost
     String seq1, seq2;            // the sequences
     int n, m;                     // their lengths
     Traceback B0;                 // the starting point of the traceback
 
-    final static int NegInf = Integer.MIN_VALUE/2; // negative infinity
-
-    public Align(Scores sub, int d, String seq1, String seq2) {
+    public Align(Scores sub, float d, String seq1, String seq2) {
         this.sub = sub;
         this.seq1 = strip(seq1); this.seq2 = strip(seq2);
         this.d = d;
@@ -45,12 +43,8 @@ abstract class Align {
         return res;
     }
 
-    public String fmtscore(int val) {
-        if (val < NegInf/2) {
-            return "-Inf";
-        } else {
-            return Integer.toString(val);
-        }
+    public String formatScore(float val) {
+        return Float.toString(val);
     }
 
     // Print the score, the F matrix, and the alignment
@@ -76,7 +70,7 @@ abstract class Align {
     /**
      * @return the score of the best alignment
      */
-    public abstract int getScore();
+    public abstract float getScore();
 
     // Print the matrix (matrices) used to compute the alignment
     public abstract void printf(Output out);
@@ -137,11 +131,11 @@ abstract class Align {
 
     // auxillary static functions
 
-    static int max(int x1, int x2) { return (x1 > x2 ? x1 : x2); }
+    static float max(float x1, float x2) { return (x1 > x2 ? x1 : x2); }
 
-    static int max(int x1, int x2, int x3) { return max(x1, max(x2, x3)); }
+    static float max(float x1, float x2, float x3) { return max(x1, max(x2, x3)); }
 
-    static int max(int x1, int x2, int x3, int x4) { return max(max(x1, x2), max(x3, x4)); }
+    static float max(float x1, float x2, float x3, float x4) { return max(max(x1, x2), max(x3, x4)); }
 
     static String padLeft(String s, int width) {
       int filler = width - s.length();

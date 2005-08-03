@@ -3,7 +3,7 @@ package jebl.evolution.align.scores;
 public class Blosum50 extends AminoAcidScores {
 
 
-  private final int[][] residueScores =
+  private final float[][] residueScores =
             /* A  R  N  D  C  Q  E  G  H  I  L  K  M  F  P  S  T  W  Y  V */
   { /* A */ {  5                                                          },
     /* R */ { -2, 7                                                       },

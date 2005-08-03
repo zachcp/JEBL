@@ -6,11 +6,11 @@ public class RepeatAlign extends AlignSimple {
 
     private int T;
 
-    public RepeatAlign(Scores sub, int d, int T, String sq1, String sq2) {
+    public RepeatAlign(Scores sub, float d, int T, String sq1, String sq2) {
         super(sub, d, sq1, sq2);
         this.T = T;
         int n = this.n, m = this.m;
-        int[][] score = sub.score;
+        float[][] score = sub.score;
 
         // F[0][0..m] = 0 by construction
         for (int i=1; i<=n; i++) {
@@ -19,8 +19,8 @@ public class RepeatAlign extends AlignSimple {
             B[i][0] = new TracebackSimple(i-1, maxj);
 
             for (int j=1; j<=m; j++) {
-                int s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                int val = max(F[i][0], F[i-1][j-1]+s, F[i-1][j]-d, F[i][j-1]-d);
+                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float val = max(F[i][0], F[i-1][j-1]+s, F[i-1][j]-d, F[i][j-1]-d);
                 F[i][j] = val;
                 if (val == F[i][0]) {
                     B[i][j] = new TracebackSimple(i, 0);
@@ -63,7 +63,8 @@ public class RepeatAlign extends AlignSimple {
 
     private int maxj(int i) {
 
-        int maxj = 0, val = F[i][maxj]+T;
+        int maxj = 0;
+        float val = F[i][maxj]+T;
         for (int j=1; j<=m; j++) {
             if (val < F[i][j]) {
                 maxj = j;
@@ -73,7 +74,7 @@ public class RepeatAlign extends AlignSimple {
         return maxj;
     }
 
-    private int maxjval(int i, int maxj) {
+    private float maxjval(int i, int maxj) {
         if (maxj == 0) {
             return F[i][0];
         } else {

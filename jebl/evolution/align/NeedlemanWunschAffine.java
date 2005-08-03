@@ -6,12 +6,12 @@ import jebl.evolution.align.scores.Scores;
 
 class NeedlemanWunschAffine extends AlignAffine {
 
-    public NeedlemanWunschAffine(Scores sub, int d, int e, String sq1, String sq2) {
+    public NeedlemanWunschAffine(Scores sub, float d, float e, String sq1, String sq2) {
 
         super(sub, d, e, sq1, sq2);
         int n = this.n, m = this.m;
-        int[][] score = sub.score;
-        int[][] M = F[0], Ix = F[1], Iy = F[2];
+        float[][] score = sub.score;
+        float[][] M = F[0], Ix = F[1], Iy = F[2];
 
         for (int i=1; i<=n; i++) {
             Ix[i][0] = -d - e * (i-1);
@@ -19,7 +19,7 @@ class NeedlemanWunschAffine extends AlignAffine {
         }
 
         for (int i=1; i<=n; i++) {
-            Iy[i][0] = M[i][0] = NegInf;
+            Iy[i][0] = M[i][0] = Float.NEGATIVE_INFINITY;
         }
 
         for (int j=1; j<=m; j++) {
@@ -28,14 +28,14 @@ class NeedlemanWunschAffine extends AlignAffine {
         }
 
         for (int j=1; j<=m; j++) {
-            Ix[0][j] = M[0][j] = NegInf;
+            Ix[0][j] = M[0][j] = Float.NEGATIVE_INFINITY;
         }
 
         for (int i=1; i<=n; i++) {
 
             for (int j=1; j<=m; j++) {
-                int val;
-                int s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float val;
+                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
                 val = M[i][j] = max(M[i-1][j-1]+s, Ix[i-1][j-1]+s, Iy[i-1][j-1]+s);
                 if (val == M[i-1][j-1]+s) {
                     B[0][i][j] = new TracebackAffine(0, i-1, j-1);
@@ -70,7 +70,7 @@ class NeedlemanWunschAffine extends AlignAffine {
         }
         // Find maximal score
         int maxk = 0;
-        int maxval = F[0][n][m];
+        float maxval = F[0][n][m];
         for (int k=1; k<3; k++) {
             if (maxval < F[k][n][m]) {
                 maxval = F[k][n][m];

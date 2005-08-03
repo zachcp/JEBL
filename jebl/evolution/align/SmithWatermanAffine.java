@@ -5,7 +5,7 @@ import jebl.evolution.align.scores.Scores;
 class SmithWatermanLinearSpace extends AlignLinearSpace {
 
     TracebackSimple[][] start; // Best alignment ending at (i,j) begins at start[i][j]
-    int maxval;           // Score of best alignment
+    float maxval;           // Score of best alignment
     int start1, start2;   // Best alignment begins at (start1, start2)
     int end1, end2;       // Best alignment ends at (end1, end2)
 
@@ -13,9 +13,9 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
 
         super(sub, d, sq1, sq2);
         int n = this.n, m = this.m;
-        int[][] score = sub.score;
+        float[][] score = sub.score;
         start = new TracebackSimple[2][m+1];
-        maxval = NegInf;
+        maxval = Float.NEGATIVE_INFINITY;
         // Initialize first column (i=0):
         for (int j=0; j<=m; j++) {
             start[1][j] = new TracebackSimple(0, j);
@@ -27,8 +27,8 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
             // Initialize first row (j=0):
             start[1][0] = new TracebackSimple(i, 0);
             for (int j=1; j<=m; j++) {
-                int s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                int val = max(0, F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
+                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float val = max(0, F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
                 F[1][j] = val;
                 if (val == 0) {          // Best alignment starts (and ends) here
                     start[1][j] = new TracebackSimple(i, j);
@@ -51,7 +51,7 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
         }
     }
 
-    public int getScore() { return maxval; }
+    public float getScore() { return maxval; }
 
     public String[] getMatch() {
         String subseq1 = seq1.substring(start1, end1);

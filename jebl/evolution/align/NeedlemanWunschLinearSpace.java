@@ -11,12 +11,12 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
     int u;     // Halfway through seq1
     int[][] c; // Best alignment from (0,0) to (i,j) passes through (u, c[i][j])
 
-    public NeedlemanWunschLinearSpace(Scores sub, int d, String sq1, String sq2) {
+    public NeedlemanWunschLinearSpace(Scores sub, float d, String sq1, String sq2) {
         super(sub, d, sq1, sq2);
         int n = this.n, m = this.m;
         u = n/2;
         c = new int[2][m+1];
-        int[][] score = sub.score;
+        float[][] score = sub.score;
         for (int j=0; j<=m; j++) {
             F[1][j] = -d * j;
         }
@@ -25,8 +25,8 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
             // F[1] represents (new) column i and F[0] represents (old) column i-1
             F[1][0] = -d * i;
             for (int j=1; j<=m; j++) {
-                int s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                int val = max(F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
+                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float val = max(F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
                 F[1][j] = val;
                 if (i == u) {
                     c[1][j] = j;
@@ -63,6 +63,6 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
         }
     }
 
-    public int getScore() { return F[1][m]; }
+    public float getScore() { return F[1][m]; }
 }
 

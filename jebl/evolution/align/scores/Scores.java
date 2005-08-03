@@ -2,13 +2,13 @@ package jebl.evolution.align.scores;
 
 public abstract class Scores {
 
-    public int[][] score;
+    public float[][] score;
 
-    void buildScores(int[][] scores) {
+    void buildScores(float[][] scores) {
 
         String states = getStates();
         // Allow lowercase and uppercase states (ASCII code <= 127):
-        score = new int[127][127];
+        score = new float[127][127];
         for (int i=0; i<states.length(); i++) {
             char res1 = states.charAt(i);
             for (int j=0; j<=i; j++) {
