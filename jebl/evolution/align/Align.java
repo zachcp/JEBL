@@ -99,7 +99,7 @@ abstract class Align {
         }
         long timeTaken = System.currentTimeMillis() - time;
         System.out.println(timeTaken + " ms");
-        sw.doMatch(new SystemOut(),"blah");
+        sw.doMatch(new SystemOut(),"Smith-Waterman");
 
         /*NeedlemanWunsch nw = null;
         time = System.currentTimeMillis();
@@ -117,7 +117,7 @@ abstract class Align {
         }
         timeTaken = System.currentTimeMillis() - time;
         System.out.println(timeTaken + " ms");
-        swls.doMatch(new SystemOut(),"blah");
+        swls.doMatch(new SystemOut(),"Smith-Waterman-linear-space");
 
         SmithWatermanLinearSpaceAffine swlsa = null;
         time = System.currentTimeMillis();
@@ -126,7 +126,7 @@ abstract class Align {
         }
         timeTaken = System.currentTimeMillis() - time;
         System.out.println(timeTaken + " ms");
-        swlsa.doMatch(new SystemOut(),"blah");
+        swlsa.doMatch(new SystemOut(),"Smith-Waterman-linear-space-affine");
     }
 
     // auxillary static functions
