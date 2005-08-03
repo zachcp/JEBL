@@ -15,10 +15,11 @@ import java.util.*;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
+ * @author Richard Moir
  *
  * @version $Id$
  */
-public final class Taxon {
+public final class Taxon implements Comparable {
 
     /**
      * A private constructor. Taxon objects can only be created by the static Taxon.getTaxon()
@@ -114,6 +115,20 @@ public final class Taxon {
         }
 
         return taxon;
+    }
+
+    /**
+     * @param o
+     * @return comparison of parameter taxon's name to this Taxon's name.
+     */
+    
+    public int compareTo(Object o) {
+    	if(!(o instanceof Taxon)) {
+    		throw new ClassCastException("Can only compare Taxon to another Taxon.");
+        }
+        else {
+    		return compare((Taxon)o);
+        }
     }
 
     // private members
