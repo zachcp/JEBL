@@ -8,6 +8,8 @@
  */
 package jebl.evolution.sequences;
 
+import java.util.*;
+
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
@@ -49,9 +51,24 @@ public final class Nucleotides {
         H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
 
-    public static NucleotideState getState(char code) {
-        return statesByCode[code];
-    }
+	public static final NucleotideState[] COMPLEMENTARY_STATES = new NucleotideState[] {
+	    G_STATE, T_STATE, A_STATE, C_STATE,
+	    Y_STATE, R_STATE, K_STATE, S_STATE,
+	    W_STATE, M_STATE, H_STATE, V_STATE,
+	    B_STATE, D_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
+	};
+
+	// Static utility functions
+
+	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
+
+	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
+
+	public static List<NucleotideState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+
+	public static NucleotideState getState(char code) {
+	    return statesByCode[code];
+	}
 
     public static NucleotideState getState(String code) {
         return statesByCode[code.charAt(0)];
@@ -60,6 +77,32 @@ public final class Nucleotides {
     public static NucleotideState getState(int index) {
         return STATES[index];
     }
+
+	public static State getUnknownState() { return UNKNOWN_STATE; }
+
+	public static State getGapState() { return GAP_STATE; }
+
+	public static boolean isUnknown(State state) { return state == UNKNOWN_STATE; }
+
+	public static boolean isGap(State state) { return state == GAP_STATE; }
+
+	public String getName() { return "Nucleotides"; }
+
+	public static NucleotideState[] toStateArray(String sequenceString) {
+		NucleotideState[] seq = new NucleotideState[sequenceString.length()];
+		for (int i = 0; i < seq.length; i++) {
+			seq[i] = getState(sequenceString.charAt(i));
+		}
+		return seq;
+	}
+
+	public static NucleotideState[] toStateArray(int[] indexArray) {
+	    NucleotideState[] seq = new NucleotideState[indexArray.length];
+	    for (int i = 0; i < seq.length; i++) {
+	        seq[i] = getState(indexArray[i]);
+	    }
+	    return seq;
+	}
 
     private static final NucleotideState[] statesByCode;
 

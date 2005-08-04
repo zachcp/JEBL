@@ -8,6 +8,8 @@
  */
 package jebl.evolution.sequences;
 
+import java.util.*;
+
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
@@ -53,7 +55,7 @@ public final class AminoAcids {
     public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 24, CANONICAL_STATES);
     public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 25, CANONICAL_STATES);
 
-    public static final AminoAcidState[] AMINO_ACID_STATES = new AminoAcidState[] {
+    public static final AminoAcidState[] STATES = new AminoAcidState[] {
             A_STATE, C_STATE, D_STATE, E_STATE, F_STATE,
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
@@ -79,23 +81,53 @@ public final class AminoAcids {
           "Trp",  "Tyr",  "Asx",  "Glx",  " X ",  " * ",  " ? ",  " - "
     };
 
-    public static AminoAcidState getState(char code) {
-        return statesByCode[code];
-    }
+	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
 
-    public static AminoAcidState getState(String code) {
-        return statesByCode[code.charAt(0)];
-    }
+	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
 
-    public static AminoAcidState getState(int index) {
-        return AMINO_ACID_STATES[index];
-    }
+	public static List<AminoAcidState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+
+	public static AminoAcidState getState(char code) {
+	    return statesByCode[code];
+	}
+
+	public static AminoAcidState getState(String code) {
+	    return statesByCode[code.charAt(0)];
+	}
+
+	public static AminoAcidState getState(int index) {
+	    return STATES[index];
+	}
+
+	public static AminoAcidState getUnknownState() { return UNKNOWN_STATE; }
+
+	public static AminoAcidState getGapState() { return GAP_STATE; }
+
+	public static boolean isUnknown(AminoAcidState state) { return state == UNKNOWN_STATE; }
+
+	public static boolean isGap(AminoAcidState state) { return state == GAP_STATE; }
+
+	public static AminoAcidState[] toStateArray(String sequenceString) {
+		AminoAcidState[] seq = new AminoAcidState[sequenceString.length()];
+		for (int i = 0; i < seq.length; i++) {
+			seq[i] = getState(sequenceString.charAt(i));
+		}
+		return seq;
+	}
+
+	public static AminoAcidState[] toStateArray(int[] indexArray) {
+	    AminoAcidState[] seq = new AminoAcidState[indexArray.length];
+	    for (int i = 0; i < seq.length; i++) {
+	        seq[i] = getState(indexArray[i]);
+	    }
+	    return seq;
+	}
 
     private static final AminoAcidState[] statesByCode;
 
     static {
         statesByCode = new AminoAcidState[128];
-        for (int i = 0; i < AMINO_ACID_STATES.length; i++) {
+        for (int i = 0; i < STATES.length; i++) {
             if (i >= 'A' && i <= 'z') {
                 // Undefined letters are mapped to UNKOWN_STATE
                 statesByCode[i] = AminoAcids.UNKNOWN_STATE;
@@ -105,7 +137,7 @@ public final class AminoAcids {
             }
         }
 
-        for (AminoAcidState state : AMINO_ACID_STATES) {
+        for (AminoAcidState state : STATES) {
             statesByCode[state.getCode().charAt(0)] = state;
             statesByCode[Character.toLowerCase(state.getCode().charAt(0))] = state;
         }

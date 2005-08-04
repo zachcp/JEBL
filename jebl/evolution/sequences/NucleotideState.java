@@ -14,8 +14,8 @@ package jebl.evolution.sequences;
  *
  * @version $Id$
  */
-public final class NucleotideState extends State<NucleotideState> {
-    
+public final class NucleotideState extends State {
+
     public NucleotideState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
@@ -23,5 +23,9 @@ public final class NucleotideState extends State<NucleotideState> {
     public NucleotideState(String name, String stateCode, int index, NucleotideState[] ambiguities) {
         super(name, stateCode, index, ambiguities);
     }
-    
+
+	public boolean isGap() {
+		return this == Nucleotides.GAP_STATE;
+	}
+
 }

@@ -16,24 +16,24 @@ import java.util.*;
  *
  * @version $Id$
  */
-public abstract class State<T extends State> implements Comparable {
+public abstract class State implements Comparable {
 
     State(String name, String stateCode, int index) {
 
         this.name = name;
         this.stateCode = stateCode;
 
-        List<T> ambiguities = new ArrayList<T>();
-        ambiguities.add((T)this);
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<T>(ambiguities));
+        List<State> ambiguities = new ArrayList<State>();
+        ambiguities.add(this);
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(ambiguities));
         this.index = index;
     }
 
-    State(String name, String stateCode, int index, T[] ambiguities) {
+    State(String name, String stateCode, int index, State[] ambiguities) {
 
         this.name = name;
         this.stateCode = stateCode;
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<T>(Arrays.asList(ambiguities)));
+        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
         this.index = index;
     }
 
@@ -51,7 +51,7 @@ public abstract class State<T extends State> implements Comparable {
         return getCanonicalStates().size() > 1;
     }
 
-    public Set<T> getCanonicalStates() {
+    public Set<State> getCanonicalStates() {
         return ambiguities;
     }
 
@@ -61,8 +61,10 @@ public abstract class State<T extends State> implements Comparable {
 
     public String toString() { return stateCode; }
 
-    private String stateCode;
+	public abstract boolean isGap();
+
+	private String stateCode;
     private String name;
-    private Set<T> ambiguities;
+    private Set<State> ambiguities;
     private int index;
 }

@@ -8,8 +8,7 @@
  */
 package jebl.evolution.sequences;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Andrew Rambaut
@@ -21,19 +20,19 @@ public final class Codons {
     public static final int CANONICAL_STATE_COUNT = 64;
     public static final int AMBIGUOUS_STATE_COUNT = 66;
 
-    public static final CodonState[] CODON_CANONICAL_STATES;
-    public static final CodonState[] CODON_STATES;
+    public static final CodonState[] CANONICAL_STATES;
+    public static final CodonState[] STATES;
 
     // This bit of static code creates the 64 canonical codon states
     static {
-        CODON_CANONICAL_STATES = new CodonState[CANONICAL_STATE_COUNT];
+        CANONICAL_STATES = new CodonState[CANONICAL_STATE_COUNT];
         char[] nucs = new char[] { 'A', 'C', 'G', 'T' };
         int x = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 for (int k = 0; k < 4; k++) {
                     String code = "" + nucs[i] + nucs[j] + nucs[k];
-                    CODON_CANONICAL_STATES[x] = new CodonState(code, code, x);
+                    CANONICAL_STATES[x] = new CodonState(code, code, x);
                     x++;
                 }
             }
@@ -41,36 +40,67 @@ public final class Codons {
 
     }
 
-    public static final CodonState UNKNOWN_STATE = new CodonState("?", "???", 15, CODON_CANONICAL_STATES);
-    public static final CodonState GAP_STATE = new CodonState("-", "---", 16, CODON_CANONICAL_STATES);
+    public static final CodonState UNKNOWN_STATE = new CodonState("?", "???", 15, CANONICAL_STATES);
+    public static final CodonState GAP_STATE = new CodonState("-", "---", 16, CANONICAL_STATES);
 
-    public static CodonState getState(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3) {
-        String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
-        return statesByCode.get(code);
-    }
+	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
 
-    public static CodonState getState(String code) {
-        return statesByCode.get(code);
-    }
+	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
 
-    public static CodonState getState(int index) {
-        return CODON_STATES[index];
-    }
+	public static List<CodonState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+
+	public static CodonState getState(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3) {
+	    String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
+	    return statesByCode.get(code);
+	}
+
+	public static CodonState getState(String code) {
+	    return statesByCode.get(code);
+	}
+
+	public static CodonState getState(int index) {
+	    return STATES[index];
+	}
+
+	public static CodonState getUnknownState() { return UNKNOWN_STATE; }
+
+	public static CodonState getGapState() { return GAP_STATE; }
+
+	public static boolean isUnknown(CodonState state) { return state == UNKNOWN_STATE; }
+
+	public static boolean isGap(CodonState state) { return state == GAP_STATE; }
+
+	public static CodonState[] toStateArray(String sequenceString) {
+		int n = sequenceString.length() / 3;
+		CodonState[] seq = new CodonState[n];
+		for (int i = 0; i < n; i++) {
+			seq[i] = getState(sequenceString.substring(i * 3, (i * 3) + 3));
+		}
+		return seq;
+	}
+
+	public static CodonState[] toStateArray(int[] indexArray) {
+	    CodonState[] seq = new CodonState[indexArray.length];
+	    for (int i = 0; i < seq.length; i++) {
+	        seq[i] = getState(indexArray[i]);
+	    }
+	    return seq;
+	}
 
     private static final Map<String, CodonState> statesByCode;
 
     // now create the complete codon state array
     static {
-        CODON_STATES = new CodonState[AMBIGUOUS_STATE_COUNT];
+        STATES = new CodonState[AMBIGUOUS_STATE_COUNT];
         for (int i = 0; i < 64; i++) {
-            CODON_STATES[i] = CODON_CANONICAL_STATES[i];
+            STATES[i] = CANONICAL_STATES[i];
         }
-        CODON_STATES[64] = UNKNOWN_STATE;
-        CODON_STATES[65] = GAP_STATE;
+        STATES[64] = UNKNOWN_STATE;
+        STATES[65] = GAP_STATE;
 
         statesByCode = new HashMap<String, CodonState>();
-        for (int i = 0; i < CODON_STATES.length; i++) {
-            statesByCode.put(CODON_STATES[i].getCode(), CODON_STATES[i]);
+        for (int i = 0; i < STATES.length; i++) {
+            statesByCode.put(STATES[i].getCode(), STATES[i]);
         }
     }
 

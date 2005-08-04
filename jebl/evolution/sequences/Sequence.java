@@ -9,6 +9,7 @@
 package jebl.evolution.sequences;
 
 import jebl.evolution.taxa.Taxon;
+import jebl.util.Attributable;
 
 /**
  * A biomolecular sequence.
@@ -18,7 +19,7 @@ import jebl.evolution.taxa.Taxon;
  *
  * @version $Id$
  */
-public interface Sequence {
+public interface Sequence extends Attributable, Comparable {
 
     /**
      * @return that taxon that this sequence represents (primarily used to match sequences with tree nodes)
@@ -33,12 +34,12 @@ public interface Sequence {
     /**
      * @return a string representing the sequence of symbols.
      */
-    String getSequenceString();
+    String getString();
 
 	/**
 	 * @return an array of state objects.
 	 */
-	State[] getSequenceStates();
+	State[] getStates();
 
     /**
      * @return the state at site.

@@ -14,8 +14,8 @@ package jebl.evolution.sequences;
  *
  * @version $Id$
  */
-public final class CodonState extends State<CodonState> {
-    
+public final class CodonState extends State {
+
     public CodonState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
@@ -23,5 +23,8 @@ public final class CodonState extends State<CodonState> {
     public CodonState(String name, String stateCode, int index, CodonState[] ambiguities) {
         super(name, stateCode, index, ambiguities);
     }
-    
+
+	public boolean isGap() {
+		return this == Codons.GAP_STATE;
+	}
 }

@@ -10,6 +10,8 @@ package jebl.evolution.sequences;
 
 import jebl.evolution.taxa.Taxon;
 
+import java.util.*;
+
 /**
  * A default implementation of the Sequence interface.
  *
@@ -23,22 +25,16 @@ public class BasicSequence implements Sequence {
     /**
      * Creates a sequence with a name corresponding to the taxon name
      * @param taxon
-     * @param sequenceType
      * @param sequenceString
      */
-    public BasicSequence(Taxon taxon, SequenceType sequenceType, String sequenceString) {
+    public BasicSequence(SequenceType sequenceType, Taxon taxon, String sequenceString) {
 
+	    this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequenceType = sequenceType;
         this.sequence = new int[sequenceString.length()];
         for (int i = 0; i < sequence.length; i++) {
             sequence[i] = sequenceType.getState(sequenceString.substring(i, i + 1)).getIndex();
         }
-    }
-
-    public BasicSequence(SequenceType sequenceType, Sequence sourceSequence) {
-
-        this(sourceSequence.getTaxon(), sequenceType, Utils.translate((NucleotideState[])sourceSequence.getSequenceStates(), GeneticCode.UNIVERSAL));
     }
 
     /**
@@ -47,10 +43,10 @@ public class BasicSequence implements Sequence {
      * @param sequenceType
      * @param states
      */
-    public BasicSequence(Taxon taxon, SequenceType sequenceType, State[] states) {
+    public BasicSequence(SequenceType sequenceType, Taxon taxon, State[] states) {
 
+	    this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequenceType = sequenceType;
         this.sequence = new int[states.length];
         for (int i = 0; i < sequence.length; i++) {
             sequence[i] = states[i].getIndex();
@@ -67,7 +63,7 @@ public class BasicSequence implements Sequence {
     /**
      * @return a string representing the sequence of symbols.
      */
-    public String getSequenceString() {
+    public String getString() {
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < sequence.length; i++) {
             buffer.append(sequenceType.getState(sequence[i]).getCode());
@@ -78,7 +74,7 @@ public class BasicSequence implements Sequence {
 	/**
 	 * @return an array of state objects.
 	 */
-	public State[] getSequenceStates() {
+	public State[] getStates() {
 	    return sequenceType.toStateArray(sequence);
 	}
 
@@ -86,7 +82,7 @@ public class BasicSequence implements Sequence {
      * @return the state at site.
      */
     public State getState(int site) {
-        return null;
+        return sequenceType.getState(sequence[site]);
     }
 
     /**
@@ -96,13 +92,38 @@ public class BasicSequence implements Sequence {
         return taxon;
     }
 
-    public int compare(Sequence s) {
-        return taxon.compare(s.getTaxon());
+    public int compareTo(Object o) {
+        return taxon.compareTo(((Sequence)o).getTaxon());
     }
 
-    // private members
+	// Attributable implementation
+
+	public void setAttribute(String name, Object value) {
+		if (attributeMap == null) {
+			attributeMap = new HashMap<String, Object>();
+		}
+		attributeMap.put(name, value);
+	}
+
+	public Object getAttribute(String name) {
+		if (attributeMap == null) {
+			return null;
+		}
+		return attributeMap.get(name);
+	}
+
+	public Set<String> getAttributeNames() {
+		if (attributeMap == null) {
+			return Collections.emptySet();
+		}
+		return attributeMap.keySet();
+	}
+
+	// private members
 
     private final Taxon taxon;
     private final SequenceType sequenceType;
     private final int[] sequence;
+
+	private Map<String, Object>attributeMap = null;
 }

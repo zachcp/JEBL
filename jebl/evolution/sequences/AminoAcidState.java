@@ -14,7 +14,7 @@ package jebl.evolution.sequences;
  *
  * @version $Id$
  */
-public final class AminoAcidState extends State<AminoAcidState> {
+public final class AminoAcidState extends State {
 
     public AminoAcidState(String name, String stateCode, int index) {
         super(name, stateCode, index);
@@ -24,4 +24,8 @@ public final class AminoAcidState extends State<AminoAcidState> {
         super(name, stateCode, index, ambiguities);
     }
 
+
+	public boolean isGap() {
+		return this == AminoAcids.GAP_STATE;
+	}
 }

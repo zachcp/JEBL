@@ -189,9 +189,9 @@ class ImportHelper {
 				if (!Character.isWhitespace(ch)) {
 
 					if (gapCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getGapState());
+						sequence.append(sequenceType.getGapState().getCode());
 					} else if (missingCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getUnknownState());
+						sequence.append(sequenceType.getUnknownState().getCode());
 					} else if (matchCharacters.indexOf(ch) != -1) {
 						if (matchSequence == null) {
 							throw new ImportException("Match character in first sequences");
@@ -261,9 +261,9 @@ class ImportHelper {
 
 				if (ch != ' ' && ch != '\t') {
 					if (gapCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getGapState());
+						sequence.append(sequenceType.getGapState().getCode());
 					} else if (missingCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getUnknownState());
+						sequence.append(sequenceType.getUnknownState().getCode());
 					} else if (matchCharacters.indexOf(ch) != -1) {
 						if (matchSequence == null) {
 							throw new ImportException("Match character in first sequences");

@@ -15,11 +15,10 @@ import java.util.*;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @author Richard Moir
  *
  * @version $Id$
  */
-public final class Taxon implements Comparable {
+public final class Taxon implements Attributable, Comparable {
 
     /**
      * A private constructor. Taxon objects can only be created by the static Taxon.getTaxon()
@@ -41,29 +40,6 @@ public final class Taxon implements Comparable {
     }
 
     /**
-     * Set an attribute value for the given name. Will return null if no such attribute exists.
-     * @param name the name of the attribute
-     * @return the attribute's value or null
-     */
-    public Object getAttribute(String name) {
-        if (helper == null) {
-            return null;
-        }
-        return helper.getAttribute(name);
-    }
-
-    /**
-     * Returns a Set of strings which are the names of the available attributes
-     * @return
-     */
-    public Set getAttributeNames() {
-        if (helper == null) {
-            return Collections.EMPTY_SET;
-        }
-        return helper.getAttributeNames();
-    }
-
-    /**
      * get the name of the taxon
      * @return the name
      */
@@ -79,35 +55,46 @@ public final class Taxon implements Comparable {
         return taxonomicLevel;
     }
 
-    /**
-     * Set an attribute name, value pair
-     * @param name the name of the attribute
-     * @param value the value of the attribute
-     */
-    public void setAttribute(String name, Object value) {
-        if (helper == null) {
-            helper = new Attributable.Helper();
-        }
-        helper.setAttribute(name, value);
-    }
+	// Attributable implementation
+
+	public void setAttribute(String name, Object value) {
+		if (attributeMap == null) {
+			attributeMap = new HashMap<String, Object>();
+		}
+		attributeMap.put(name, value);
+	}
+
+	public Object getAttribute(String name) {
+		if (attributeMap == null) {
+			return null;
+		}
+		return attributeMap.get(name);
+	}
+
+	public Set<String> getAttributeNames() {
+		if (attributeMap == null) {
+			return Collections.emptySet();
+		}
+		return attributeMap.keySet();
+	}
 
     // Static factory methods
 
     /**
      * @return a Set containing all the currently created Taxon objects.
      */
-    public static Set getAllTaxa() {
-        return Collections.unmodifiableSet(new HashSet(taxa.values()));
+    public static Set<Taxon> getAllTaxa() {
+        return Collections.unmodifiableSet(new HashSet<Taxon>(taxa.values()));
     }
 
     /**
      * A static method that returns a Taxon object with the given name. If this has
      * already been created then the same instance will be returned.
      * @param name
-     * @return
+     * @return the taxon
      */
     public static Taxon getTaxon(String name) {
-        Taxon taxon = (Taxon)taxa.get(name);
+        Taxon taxon = taxa.get(name);
 
         if (taxon == null) {
             taxon = new Taxon(name);
@@ -117,26 +104,12 @@ public final class Taxon implements Comparable {
         return taxon;
     }
 
-    /**
-     * @param o
-     * @return comparison of parameter taxon's name to this Taxon's name.
-     */
-    
-    public int compareTo(Object o) {
-    	if(!(o instanceof Taxon)) {
-    		throw new ClassCastException("Can only compare Taxon to another Taxon.");
-        }
-        else {
-    		return compare((Taxon)o);
-        }
-    }
-
-    // private members
+	// private members
 
     /**
-     * A lazily allocated Attributable.Helper object.
+     * A lazily allocated Attribute Map .
      */
-    private Attributable helper = null;
+    private Map<String, Object> attributeMap = null;
 
     /**
      * The name of this taxon.
@@ -146,7 +119,7 @@ public final class Taxon implements Comparable {
     /**
      * A hash map containing taxon name, object pairs.
      */
-    private static Map taxa = new HashMap();
+    private static Map<String, Taxon> taxa = new HashMap<String, Taxon>();
 
     /**
      * the taxonomic level of this taxon.
@@ -157,9 +130,10 @@ public final class Taxon implements Comparable {
         return name;
     }
 
-    public int compare(Taxon t) {
-        return name.compareTo(t.getName());
-    }
+	public int compareTo(Object o) {
+		return name.compareTo(((Taxon)o).getName());
+	}
+
 
     public boolean equals(Taxon t) {
         if (this == t) return true;

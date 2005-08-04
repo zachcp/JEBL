@@ -21,6 +21,62 @@ import java.util.*;
  */
 
 public final class GeneticCode {
+	/**
+	 * Standard genetic code tables from GENBANK
+	 * Nucleotides go A, C, G, T - Note: this is not the order used by the Genbank web site
+	 * With the first codon position most significant (i.e. AAA, AAC, AAG, AAT, ACA, etc.).
+	 */
+	private static final String[] GENETIC_CODE_TABLES = {
+	    // Universal
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
+	    // Vertebrate Mitochondrial
+	    "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Yeast
+	    "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Mold Protozoan Mitochondrial
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Mycoplasma
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Invertebrate Mitochondrial
+	    "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Ciliate
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF",
+	    // Echinoderm Mitochondrial
+	    "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Euplotid Nuclear
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF",
+	    // Bacterial
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
+	    // Alternative Yeast
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
+	    // Ascidian Mitochondrial
+	    "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
+	    // Flatworm Mitochondrial
+	    "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF",
+	    // Blepharisma Nuclear
+	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF"
+	};
+
+	/**
+	 * Names of the standard genetic code tables from GENBANK
+	 */
+	private static final String[] GENETIC_CODE_NAMES = {
+	    "universal", "vertebrateMitochondrial", "yeast", "moldProtozoanMitochondrial",
+	    "mycoplasma", "invertebrateMitochondrial", "ciliate", "echinodermMitochondrial",
+	    "euplotidNuclear", "bacterial", "alternativeYeast", "ascidianMitochondrial",
+	    "flatwormMitochondrial", "blepharismaNuclear"
+	};
+
+	/**
+	 * Descriptions of the standard genetic code tables from GENBANK
+	 */
+	private static final String[] GENETIC_CODE_DESCRIPTIONS = {
+	    "Universal", "Vertebrate Mitochondrial", "Yeast", "Mold Protozoan Mitochondrial",
+	    "Mycoplasma", "Invertebrate Mitochondrial", "Ciliate", "Echinoderm Mitochondrial",
+	    "Euplotid Nuclear", "Bacterial", "Alternative Yeast", "Ascidian Mitochondrial",
+	    "Flatworm Mitochondrial", "Blepharisma Nuclear"
+	};
+
 
     public static final GeneticCode UNIVERSAL = new GeneticCode(GeneticCode.UNIVERSAL_ID);
     public static final GeneticCode VERTEBRATE_MT = new GeneticCode(GeneticCode.VERTEBRATE_MT_ID);
@@ -49,26 +105,26 @@ public final class GeneticCode {
 		String codeTable = GENETIC_CODE_TABLES[geneticCodeId];
         Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
 
-        if (codeTable.length() != Codons.CODON_STATES.length) {
+        if (codeTable.length() != 64) {
             throw new IllegalArgumentException("Code Table length does not match number of codon states");
         }
 
         for (int i = 0; i < codeTable.length(); i++) {
-            CodonState codonState = Codons.CODON_STATES[i];
+            CodonState codonState = Codons.STATES[i];
             AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i+1));
             translationMap.put(codonState, aminoAcidState);
         }
 
         this.translationMap = Collections.unmodifiableMap(translationMap);
 	}
-	
+
 	/**
 	 * Returns the name of the genetic code
 	 */
 	public String getName() {
 		return GENETIC_CODE_NAMES[geneticCodeId];
 	}
-	
+
 	/**
 	 * Returns the description of the genetic code
 	 */
@@ -162,60 +218,5 @@ public final class GeneticCode {
     private static final int FLATWORM_MT_ID = 12;
     private static final int BLEPHARISMA_NUC_ID = 13;
 
-    /**
-     * Standard genetic code tables from GENBANK
-     * Nucleotides go A, C, G, T - Note: this is not the order used by the Genbank web site
-     * With the first codon position most significant (i.e. AAA, AAC, AAG, AAT, ACA, etc.).
-     */
-    private static final String[] GENETIC_CODE_TABLES = {
-        // Universal
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-        // Vertebrate Mitochondrial
-        "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Yeast
-        "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Mold Protozoan Mitochondrial
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Mycoplasma
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Invertebrate Mitochondrial
-        "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Ciliate
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF",
-        // Echinoderm Mitochondrial
-        "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Euplotid Nuclear
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF",
-        // Bacterial
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-        // Alternative Yeast
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-        // Ascidian Mitochondrial
-        "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-        // Flatworm Mitochondrial
-        "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF",
-        // Blepharisma Nuclear
-        "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF"
-    };
-
-    /**
-     * Names of the standard genetic code tables from GENBANK
-     */
-    private static final String[] GENETIC_CODE_NAMES = {
-        "universal", "vertebrateMitochondrial", "yeast", "moldProtozoanMitochondrial",
-        "mycoplasma", "invertebrateMitochondrial", "ciliate", "echinodermMitochondrial",
-        "euplotidNuclear", "bacterial", "alternativeYeast", "ascidianMitochondrial",
-        "flatwormMitochondrial", "blepharismaNuclear"
-    };
-
-    /**
-     * Descriptions of the standard genetic code tables from GENBANK
-     */
-    private static final String[] GENETIC_CODE_DESCRIPTIONS = {
-        "Universal", "Vertebrate Mitochondrial", "Yeast", "Mold Protozoan Mitochondrial",
-        "Mycoplasma", "Invertebrate Mitochondrial", "Ciliate", "Echinoderm Mitochondrial",
-        "Euplotid Nuclear", "Bacterial", "Alternative Yeast", "Ascidian Mitochondrial",
-        "Flatworm Mitochondrial", "Blepharisma Nuclear"
-    };
 
 }
