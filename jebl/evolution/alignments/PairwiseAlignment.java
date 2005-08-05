@@ -1,3 +1,11 @@
+/*
+ * PairwiseAlignment.java
+ *
+ * (c) 2002-2005 JEBL Development Core Team
+ *
+ * This package may be distributed under the
+ * Lesser Gnu Public Licence (LGPL)
+ */
 package jebl.evolution.alignments;
 
 import java.util.HashSet;
@@ -9,15 +17,6 @@ import java.util.TreeMap;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
 
-/*
- * A pairwise alignment result. Can only store 2 sequences.
- *
- * @author Richard Moir
- * @author Alexei Drummond
- *
- * @version $Id$
- */
-
 public class PairwiseAlignment implements Alignment {
 	
 	/*
@@ -25,7 +24,7 @@ public class PairwiseAlignment implements Alignment {
 	 * that was used to obtain the alignment and the name of the algorithm used.
 	 */
 	public PairwiseAlignment(Sequence sequence1, Sequence sequence2, float score, String matrixName) {
-		if((sequence1.getSequenceString()).length() != (sequence2.getSequenceString()).length()) throw new IllegalArgumentException("Sequences must be of same length.");
+		if((sequence1.getString()).length() != (sequence2.getString()).length()) throw new IllegalArgumentException("Sequences must be of same length.");
 		addSequence(sequence1);
 		addSequence(sequence2);
 		this.score = score;
@@ -75,7 +74,7 @@ public class PairwiseAlignment implements Alignment {
 	public String toString() {
 		String str = "";
 		for(Sequence seq : getSequences()) {
-			str.concat(seq.getSequenceString() + "\n");
+			str.concat(seq.getString() + "\n");
 		}
 		return str;
 	}
