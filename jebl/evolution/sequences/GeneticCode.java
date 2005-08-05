@@ -110,10 +110,12 @@ public final class GeneticCode {
         }
 
         for (int i = 0; i < codeTable.length(); i++) {
-            CodonState codonState = Codons.STATES[i];
+            CodonState codonState = Codons.CANONICAL_STATES[i];
             AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i+1));
             translationMap.put(codonState, aminoAcidState);
         }
+		translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
+		translationMap.put(Codons.getUnknownState(), AminoAcids.getUnknownState());
 
         this.translationMap = Collections.unmodifiableMap(translationMap);
 	}

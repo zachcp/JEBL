@@ -4,20 +4,12 @@
 
 package jebl.evolution.io;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
-import java.util.ArrayList;
-
-import jebl.evolution.io.ImportHelper;
-import jebl.evolution.io.SequenceImporter;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.*;
 import jebl.evolution.taxa.Taxon;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for importing PHYLIP sequential file format
@@ -40,7 +32,7 @@ public class PhylipSequentialImporter implements SequenceImporter {
 	}
 
 	/**
-	 * importSequences. 
+	 * importSequences.
 	 */
 	public List<Sequence> importSequences() throws IOException, ImportException {
 
@@ -69,7 +61,7 @@ public class PhylipSequentialImporter implements SequenceImporter {
 
                 if (firstSeq == null) { firstSeq = seq.toString(); }
 
-                sequences.add(new BasicSequence(Taxon.getTaxon(name.toString()), sequenceType, seq.toString()));
+                sequences.add(new BasicSequence(sequenceType, Taxon.getTaxon(name.toString()), seq.toString()));
             }
 
 

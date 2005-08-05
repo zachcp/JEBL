@@ -17,6 +17,8 @@ import java.util.*;
  * @version $Id$
  */
 public final class AminoAcids {
+	public static final String NAME = "amino acid";
+
     public static final int CANONICAL_STATE_COUNT = 20;
     public static final int AMBIGUOUS_STATE_COUNT = 25;
 
@@ -85,7 +87,7 @@ public final class AminoAcids {
 
 	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
 
-	public static List<AminoAcidState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static AminoAcidState getState(char code) {
 	    return statesByCode[code];

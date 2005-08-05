@@ -17,6 +17,8 @@ import java.util.*;
  * @version $Id$
  */
 public final class Nucleotides {
+	public static final String NAME = "nucleotide";
+
     public static final int CANONICAL_STATE_COUNT = 4;
     public static final int AMBIGUOUS_STATE_COUNT = 17;
 
@@ -64,7 +66,7 @@ public final class Nucleotides {
 
 	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
 
-	public static List<NucleotideState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static NucleotideState getState(char code) {
 	    return statesByCode[code];
@@ -78,13 +80,13 @@ public final class Nucleotides {
         return STATES[index];
     }
 
-	public static State getUnknownState() { return UNKNOWN_STATE; }
+	public static NucleotideState getUnknownState() { return UNKNOWN_STATE; }
 
-	public static State getGapState() { return GAP_STATE; }
+	public static NucleotideState getGapState() { return GAP_STATE; }
 
-	public static boolean isUnknown(State state) { return state == UNKNOWN_STATE; }
+	public static boolean isUnknown(NucleotideState state) { return state == UNKNOWN_STATE; }
 
-	public static boolean isGap(State state) { return state == GAP_STATE; }
+	public static boolean isGap(NucleotideState state) { return state == GAP_STATE; }
 
 	public String getName() { return "Nucleotides"; }
 

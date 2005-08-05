@@ -30,7 +30,7 @@ public abstract class FilteredSequence implements Sequence {
 	 * @return a string representing the sequence of symbols.
 	 */
 	public String getString() {
-		if (sequence != null) {
+		if (sequence == null) {
 			sequence = filterSequence(source);
 		}
 
@@ -45,7 +45,7 @@ public abstract class FilteredSequence implements Sequence {
 	 * @return an array of state objects.
 	 */
 	public State[] getStates() {
-		if (sequence != null) {
+		if (sequence == null) {
 			sequence = filterSequence(source);
 		}
 	    return sequence;
@@ -55,7 +55,7 @@ public abstract class FilteredSequence implements Sequence {
      * @return the state at site.
      */
     public State getState(int site) {
-	    if (sequence != null) {
+	    if (sequence == null) {
 		    sequence = filterSequence(source);
 	    }
         return sequence[site];

@@ -26,21 +26,21 @@ public interface SequenceType {
      *
      * @return number of unique states
      */
-    public abstract int getStateCount();
+    int getStateCount();
 
     /**
      * Get number of states including ambiguous states
      *
      * @return number of ambiguous states
      */
-    public abstract int getAmbiguousStateCount();
+    int getAmbiguousStateCount();
 
     /**
      * Get a list of states ordered by their indices.
      *
      * @return a list of states
      */
-    public abstract List<State> getStates();
+    List<State> getStates();
 
     /**
      * Get state corresponding to a string code
@@ -48,7 +48,7 @@ public interface SequenceType {
      * @param code a string code
      * @return the state
      */
-    public abstract State getState(String code);
+    State getState(String code);
 
     /**
      * Get state corresponding to a state index
@@ -56,51 +56,95 @@ public interface SequenceType {
      * @param index a state index
      * @return the state
      */
-    public abstract State getState(int index);
+    State getState(int index);
 
     /**
      * Get state corresponding to an unknown
      *
      * @return the state
      */
-    public abstract State getUnknownState();
+    State getUnknownState();
 
     /**
      * Get state corresponding to a gap
      *
      * @return state
      */
-    public abstract State getGapState();
+    State getGapState();
 
 	/**
 	 * @return true if this state is an unknown state
 	 */
-	public abstract boolean isUnknown(State state);
+	boolean isUnknown(State state);
 
 	/**
 	 * @return true if this state is a gap
 	 */
-	public abstract boolean isGap(State state);
+	boolean isGap(State state);
 
     /**
      * name of data type
      *
      * @return string describing the data type
      */
-    public abstract String getName();
+    String getName();
 
 	/**
 	 * Converts a string of state codes into an array of State objects for this SequenceType
 	 * @param sequenceString
 	 * @return the State array
 	 */
-	public abstract State[] toStateArray(String sequenceString);
+	State[] toStateArray(String sequenceString);
 
     /**
      * Converts an array of state indices into an array of State objects for this SequenceType
      * @param indexArray
      * @return the State array
      */
-    public abstract State[] toStateArray(int[] indexArray);
+    State[] toStateArray(int[] indexArray);
 
+	public static final SequenceType NUCLEOTIDE = new SequenceType() {
+		public int getStateCount() { return Nucleotides.getStateCount(); }
+		public int getAmbiguousStateCount() { return Nucleotides.getAmbiguousStateCount(); }
+		public List<State> getStates() { return Nucleotides.getStates(); }
+		public State getState(String code) { return Nucleotides.getState(code); }
+		public State getState(int index) { return Nucleotides.getState(index); }
+		public State getUnknownState() { return Nucleotides.getUnknownState(); }
+		public State getGapState() { return Nucleotides.getGapState(); }
+		public boolean isUnknown(State state) { return Nucleotides.isUnknown((NucleotideState)state); }
+		public boolean isGap(State state) { return Nucleotides.isGap((NucleotideState)state); }
+		public String getName() { return Nucleotides.NAME; }
+		public State[] toStateArray(String sequenceString) { return Nucleotides.toStateArray(sequenceString); }
+		public State[] toStateArray(int[] indexArray) { return Nucleotides.toStateArray(indexArray); }
+	};
+
+	public static final SequenceType AMINO_ACID = new SequenceType() {
+		public int getStateCount() { return AminoAcids.getStateCount(); }
+		public int getAmbiguousStateCount() { return AminoAcids.getAmbiguousStateCount(); }
+		public List<State> getStates() { return AminoAcids.getStates(); }
+		public State getState(String code) { return AminoAcids.getState(code); }
+		public State getState(int index) { return AminoAcids.getState(index); }
+		public State getUnknownState() { return AminoAcids.getUnknownState(); }
+		public State getGapState() { return AminoAcids.getGapState(); }
+		public boolean isUnknown(State state) { return AminoAcids.isUnknown((AminoAcidState)state); }
+		public boolean isGap(State state) { return AminoAcids.isGap((AminoAcidState)state); }
+		public String getName() { return AminoAcids.NAME; }
+		public State[] toStateArray(String sequenceString) { return AminoAcids.toStateArray(sequenceString); }
+		public State[] toStateArray(int[] indexArray) { return AminoAcids.toStateArray(indexArray); }
+	};
+
+	public static final SequenceType CODON = new SequenceType() {
+		public int getStateCount() { return Codons.getStateCount(); }
+		public int getAmbiguousStateCount() { return Codons.getAmbiguousStateCount(); }
+		public List<State> getStates() { return Codons.getStates(); }
+		public State getState(String code) { return Codons.getState(code); }
+		public State getState(int index) { return Codons.getState(index); }
+		public State getUnknownState() { return Codons.getUnknownState(); }
+		public State getGapState() { return Codons.getGapState(); }
+		public boolean isUnknown(State state) { return Codons.isUnknown((CodonState)state); }
+		public boolean isGap(State state) { return Codons.isGap((CodonState)state); }
+		public String getName() { return Codons.NAME; }
+		public State[] toStateArray(String sequenceString) { return Codons.toStateArray(sequenceString); }
+		public State[] toStateArray(int[] indexArray) { return Codons.toStateArray(indexArray); }
+	};
 }

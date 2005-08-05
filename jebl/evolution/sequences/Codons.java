@@ -17,6 +17,8 @@ import java.util.*;
  * @version $Id$
  */
 public final class Codons {
+	public static final String NAME = "codon";
+
     public static final int CANONICAL_STATE_COUNT = 64;
     public static final int AMBIGUOUS_STATE_COUNT = 66;
 
@@ -47,9 +49,17 @@ public final class Codons {
 
 	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
 
-	public static List<CodonState> getStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
+	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static CodonState getState(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3) {
+		if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
+			return GAP_STATE;
+		}
+
+		if (nucleotide1.isAmbiguous() || nucleotide2.isAmbiguous() || nucleotide3.isAmbiguous()) {
+			return UNKNOWN_STATE;
+		}
+
 	    String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
 	    return statesByCode.get(code);
 	}

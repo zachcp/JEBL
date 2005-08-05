@@ -19,46 +19,25 @@ import java.util.*;
  * @author Andrew Rambaut
  */
 public interface Attributable {
-	
+
 	/**
 	 * Sets an named attribute for this object.
 	 * @param name the name of the attribute.
 	 * @param value the new value of the attribute.
 	 */
-	public void setAttribute(String name, Object value);
+	void setAttribute(String name, Object value);
 
 	/**
 	 * @return an object representing the named attributed for this object.
 	 * @param name the name of the attribute of interest.
 	 */
-	public Object getAttribute(String name);
+	Object getAttribute(String name);
 
 	/**
 	 * @return an array of the attributes that this object has.
 	 */
-    Set getAttributeNames();
+    Set<String> getAttributeNames();
 
-	public static final class Helper implements Attributable {
-		public void setAttribute(String name, Object value) {
-			attributes.put(name, value);
-		}
-
-		public Object getAttribute(String name) {
-			return attributes.get(name);
-		}
-
-		public Set getAttributeNames() {
-			return attributes.keySet();
-		}
-	
-		// **************************************************************
-		// INSTANCE VARIABLE
-		// **************************************************************
-		
-		private Map attributes = new TreeMap();
-	};
-	
-	
 }
 
 

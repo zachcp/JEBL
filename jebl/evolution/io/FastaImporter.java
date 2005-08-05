@@ -4,18 +4,11 @@
 
 package jebl.evolution.io;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.*;
 import jebl.evolution.taxa.Taxon;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * Class for importing PHYLIP sequential file format
@@ -34,16 +27,16 @@ public class FastaImporter implements SequenceImporter {
         helper = new ImportHelper(reader);
         this.sequenceType = sequenceType;
 	}
-	
+
 	/**
-	 * importAlignment. 
+	 * importAlignment.
 	 */
 	public 	List<Sequence> importSequences() throws IOException, ImportException {
 
 		List<Sequence> sequences = new ArrayList<Sequence>();
-		
+
 		try {
-		
+
             int ch = helper.read();
             while (ch != '>') {
                 ch = helper.read();
@@ -59,12 +52,12 @@ public class FastaImporter implements SequenceImporter {
 				helper.readSequence(seq, sequenceType, ">", Integer.MAX_VALUE, "-", "?", "", null);
 				ch = helper.getLastDelimiter();
 
-				sequences.add(new BasicSequence(Taxon.getTaxon(name), sequenceType, seq.toString()));
+				sequences.add(new BasicSequence(sequenceType, Taxon.getTaxon(name), seq.toString()));
 
 			} while(ch == '>');
-			
-			
-		} catch (EOFException e) { }	
+
+
+		} catch (EOFException e) { }
 
 		return sequences;
 	}

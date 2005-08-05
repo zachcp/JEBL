@@ -92,6 +92,11 @@ public class BasicSequence implements Sequence {
         return taxon;
     }
 
+	/**
+	 * Sequences are compared by their taxa
+	 * @param o another sequence
+	 * @return an integer
+	 */
     public int compareTo(Object o) {
         return taxon.compareTo(((Sequence)o).getTaxon());
     }
