@@ -8,11 +8,7 @@
  */
 package jebl.evolution.alignments;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
@@ -41,7 +37,11 @@ public class PairwiseAlignment implements Alignment {
 	public Set<Sequence> getSequences() {
 		 return new HashSet<Sequence>(sequences.values());
 	}
-	
+
+    public List<Sequence> getSequenceList() {
+         return new ArrayList<Sequence>(sequences.values());
+    }
+
 	public Sequence getSequence(Taxon taxon) {
         return (Sequence)sequences.get(taxon);
     }

@@ -9,6 +9,8 @@
 package jebl.evolution.alignments;
 
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.List;
 
@@ -25,15 +27,15 @@ public interface Pattern {
     /**
      * @return the data type of the states in this pattern.
      */
-    SequenceType getDataType();
+    SequenceType getSequenceType();
 
     /**
      * @return the list of taxa that the state values correspond to.
      */
-    List getTaxa();
+    List<Taxon> getTaxa();
 
     /**
      * @return the list of state values of this pattern.
      */
-    List getStates();
+    List<State> getStates();
 }

@@ -9,6 +9,8 @@
 package jebl.evolution.alignments;
 
 import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.State;
+import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
@@ -24,29 +26,21 @@ import java.util.*;
 public class BasicAlignment implements Alignment {
 
     /**
-     * Constructs a basic alignment from a set of sequences. The sequence
-     * objects are not copied.
-     * @param seqs
-     */
-    public BasicAlignment(Set<Sequence> sequences) {
-        for (Sequence sequence : sequences) {
-            this.sequences.put(sequence.getTaxon(), sequence);
-        }
-    }
-
-    /**
-     * Constructs a basic alignment from a sequence. The sequence
-     * object is not copied.
-     * @param sequence
-     */
-    public BasicAlignment(Sequence sequence) {
-        sequences.put(sequence.getTaxon(), sequence);
-    }
-
-    /**
      * Constructs a basic alignment with no sequences.
      */
     public BasicAlignment() {}
+
+    /**
+     * Constructs a basic alignment from a collection of sequences. The sequence
+     * objects are not copied.
+     * @param sequences
+     */
+    public BasicAlignment(Collection<Sequence> sequences) {
+        for (Sequence sequence : sequences) {
+            put(sequence);
+        }
+        constructPatterns();
+    }
 
     /**
      * Constructs a basic alignment from an array of sequences. The sequence
@@ -54,9 +48,10 @@ public class BasicAlignment implements Alignment {
      * @param sequences
      */
     public BasicAlignment(Sequence[] sequences) {
-        for (int i = 0; i < sequences.length; i++) {
-            this.sequences.put(sequences[i].getTaxon(), sequences[i]);
+        for (Sequence sequence : sequences) {
+            put(sequence);
         }
+        constructPatterns();
     }
 
     /**
@@ -66,12 +61,16 @@ public class BasicAlignment implements Alignment {
         return new HashSet<Sequence>(sequences.values());
     }
 
+    public List<Sequence> getSequenceList() {
+        return new ArrayList<Sequence>(sequences.values());
+    }
+
     public Sequence getSequence(Taxon taxon) {
         return sequences.get(taxon);
     }
 
     public List<Pattern> getSitePatterns() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return patterns;
     }
 
     /**
@@ -79,8 +78,79 @@ public class BasicAlignment implements Alignment {
      * @param sequence the new sequence.
      */
     public void addSequence(Sequence sequence) {
-        sequences.put(sequence.getTaxon(), sequence);
+        put(sequence);
+        constructPatterns();
     }
 
+    private void put(Sequence sequence) {
+        if (sequenceType == null) {
+            sequenceType = sequence.getSequenceType();
+        }
+        if (sequenceType != sequence.getSequenceType()) throw new IllegalArgumentException("Type of sequence " + sequence.getTaxon().getName() + " does not match that of other sequences in the alignment.");
+        sequences.put(sequence.getTaxon(), sequence);
+        taxonList.add(sequence.getTaxon());
+    }
+
+    private void constructPatterns() {
+        patterns.clear();
+
+        State[][] seqs = new State[sequences.size()][];
+        int i = 0;
+        int maxLen = 0;
+        for (Sequence seq : getSequenceList()) {
+            seqs[i] = seq.getStates();
+            if (seqs[i].length > maxLen) {
+                maxLen = seqs[i].length;
+            }
+            i++;
+        }
+
+        for (int j = 0; j < maxLen; j++) {
+            List<State> states = new ArrayList<State>();
+            for (i = 0; i < seqs.length; i++) {
+                if (j < seqs[i].length) {
+                    states.add(seqs[i][j]);
+                } else {
+                    states.add(sequenceType.getGapState());
+                }
+            }
+            patterns.add(new BasicPattern(states));
+        }
+    }
+
+    private SequenceType sequenceType = null;
+    private List<Taxon> taxonList = new ArrayList<Taxon>();
     private Map<Taxon, Sequence> sequences = new HashMap<Taxon, Sequence>();
+    private List<Pattern> patterns = new ArrayList<Pattern>();
+
+    private class BasicPattern implements Pattern {
+
+        public BasicPattern(List<State> states) {
+            this.states = states;
+        }
+
+        /**
+         * @return the data type of the states in this pattern.
+         */
+        public SequenceType getSequenceType() {
+            return sequenceType;
+        }
+
+        /**
+         * @return the list of taxa that the state values correspond to.
+         */
+        public List<Taxon> getTaxa() {
+            return taxonList;
+        }
+
+        /**
+         * @return the list of state values of this pattern.
+         */
+        public List<State> getStates() {
+            return states;
+        }
+
+        private final List<State> states;
+    };
+
 }

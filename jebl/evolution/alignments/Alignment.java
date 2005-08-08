@@ -9,6 +9,9 @@
 package jebl.evolution.alignments;
 
 import jebl.evolution.sequences.Sequences;
+import jebl.evolution.sequences.Sequence;
+
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -18,4 +21,5 @@ import jebl.evolution.sequences.Sequences;
  */
 public interface Alignment extends Sequences, SitePatterns {
 
+    List<Sequence> getSequenceList();
 }
