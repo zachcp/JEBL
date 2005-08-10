@@ -56,7 +56,7 @@ public interface Graph {
          * @param node
          * @return the number of edges attached to this node.
          */
-        public static final int getDegree(Graph graph, Node node) {
+        public static int getDegree(Graph graph, Node node) {
             return graph.getAdjacencies(node).size();
         }
     }

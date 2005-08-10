@@ -136,8 +136,7 @@ public final class Taxon implements Attributable, Comparable {
 
 
     public boolean equals(Taxon t) {
-        if (this == t) return true;
-        return false;
+        return this == t;
     }
 
     public int hashCode() {

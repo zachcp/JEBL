@@ -13,8 +13,14 @@ import java.util.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
 
+/**
+ * @author Richard Moir
+ * @author Alexei Drummond
+ *
+ * @version $Id$
+ */
 public class PairwiseAlignment implements Alignment {
-	
+
 	/*
 	 * Constructs a pairwise alignment containing the two given sequences, score, the scoring matrix name
 	 * that was used to obtain the alignment and the name of the algorithm used.
@@ -28,12 +34,12 @@ public class PairwiseAlignment implements Alignment {
 
         // TODO set the identity of this pairwise alignment
 	}
-	
+
 	private void addSequence(Sequence sequence) {
 		if(sequences.size() > 2) throw new IllegalArgumentException("PairwiseAlignment can only contain 2 sequences.");
         sequences.put(sequence.getTaxon(),sequence);
     }
-	
+
 	public Set<Sequence> getSequences() {
 		 return new HashSet<Sequence>(sequences.values());
 	}
@@ -43,20 +49,20 @@ public class PairwiseAlignment implements Alignment {
     }
 
 	public Sequence getSequence(Taxon taxon) {
-        return (Sequence)sequences.get(taxon);
+        return sequences.get(taxon);
     }
-	
+
 	public List<Pattern> getSitePatterns() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
-	
+
 	/*
 	 * @return the name of the scoring matrix used to obtain the alignment.
 	 */
 	public String getScoringMatrix() {
 		return matrixName;
 	}
-	
+
 	 /*
 	  * @return the percent identity for this pairwise alignment.
 	  */
@@ -70,16 +76,16 @@ public class PairwiseAlignment implements Alignment {
 	public float getScore() {
 		return score;
 	}
-	
+
 	public String toString() {
-		String str = "";
+		StringBuffer buffer = new StringBuffer();
 		for(Sequence seq : getSequences()) {
-			str.concat(seq.getString() + "\n");
+            buffer.append(seq.getString()).append("\n");
 		}
-		return str;
+		return buffer.toString();
 	}
 	
-	private Map sequences = new TreeMap();
+	private Map<Taxon, Sequence> sequences = new TreeMap<Taxon, Sequence>();
 	private float score;
 	private float identity;
 	private String matrixName;

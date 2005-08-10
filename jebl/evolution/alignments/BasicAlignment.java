@@ -151,6 +151,6 @@ public class BasicAlignment implements Alignment {
         }
 
         private final List<State> states;
-    };
+    }
 
 }

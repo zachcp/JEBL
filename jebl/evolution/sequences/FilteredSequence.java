@@ -6,8 +6,9 @@ import java.util.*;
 
 /**
  * @author rambaut
- *         Date: Jul 27, 2005
- *         Time: 12:28:14 AM
+ * @author Alexei Drummond
+ *
+ * @version $Id$
  */
 public abstract class FilteredSequence implements Sequence {
 	/**
@@ -35,9 +36,9 @@ public abstract class FilteredSequence implements Sequence {
 		}
 
 	    StringBuffer buffer = new StringBuffer();
-	    for (int i = 0; i < sequence.length; i++) {
-	        buffer.append(sequence[i].getCode());
-	    }
+        for (State aSequence : sequence) {
+            buffer.append(aSequence.getCode());
+        }
 		return source.getString();
 	}
 
