@@ -10,4 +10,10 @@ class TracebackAffine extends Traceback {
         this.i = i;
         this.j = j;
     }
+    
+    public final void setTraceback(int k, int i, int j) {
+    	this.i = i;
+    	this.j = j;
+    	this.k = k;
+    }
 }

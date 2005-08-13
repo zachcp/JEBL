@@ -2,13 +2,20 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
-public class RepeatAlign extends AlignSimple {
+public class RepeatAlign extends AlignRepeat {
+	
+    public RepeatAlign(Scores sub, float d, int T) {
+    	super(sub, d, T);
+    }
 
-    private int T;
-
-    public RepeatAlign(Scores sub, float d, int T, String sq1, String sq2) {
-        super(sub, d, sq1, sq2);
-        this.T = T;
+    /**
+	 * @param sq1
+	 * @param sq2
+	 */
+    public void doAlignment(String sq1, String sq2) {
+    	
+        prepareAlignment(sq1, sq2);
+        
         int n = this.n, m = this.m;
         float[][] score = sub.score;
 
@@ -16,20 +23,20 @@ public class RepeatAlign extends AlignSimple {
         for (int i=1; i<=n; i++) {
             int maxj = maxj(i-1);
             F[i][0] = maxjval(i-1, maxj);
-            B[i][0] = new TracebackSimple(i-1, maxj);
+            B[i][0].setTraceback(i-1, maxj);
 
             for (int j=1; j<=m; j++) {
                 float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
                 float val = max(F[i][0], F[i-1][j-1]+s, F[i-1][j]-d, F[i][j-1]-d);
                 F[i][j] = val;
                 if (val == F[i][0]) {
-                    B[i][j] = new TracebackSimple(i, 0);
+                    B[i][j].setTraceback(i, 0);
                 } else if (val == F[i-1][j-1]+s) {
-                    B[i][j] = new TracebackSimple(i-1, j-1);
+                    B[i][j].setTraceback(i-1, j-1);
                 } else if (val == F[i-1][j]-d) {
-                    B[i][j] = new TracebackSimple(i-1, j);
+                    B[i][j].setTraceback(i-1, j);
                 } else if (val == F[i][j-1]-d) {
-                    B[i][j] = new TracebackSimple(i, j-1);
+                    B[i][j].setTraceback(i, j-1);
                 } else {
                     throw new Error("Error in repeat align.");
                 }
@@ -38,6 +45,9 @@ public class RepeatAlign extends AlignSimple {
         B0 = new TracebackSimple(n, maxj(n));
     }
 
+    /**
+     * @return two-element array containing an alignment with maximal score
+     */
     public String[] getMatch() {
 
         StringBuffer res1 = new StringBuffer();
@@ -57,8 +67,7 @@ public class RepeatAlign extends AlignSimple {
             }
             i = tb.i; j = tb.j;
         }
-        String[] res = { res1.reverse().toString(), res2.reverse().toString() };
-        return res;
+        return new String[]{ res1.reverse().toString(), res2.reverse().toString() };
     }
 
     private int maxj(int i) {

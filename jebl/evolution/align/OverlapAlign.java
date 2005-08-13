@@ -5,9 +5,19 @@ import jebl.evolution.align.scores.Scores;
 // Overlap matching (simple gap costs)
 
 public class OverlapAlign extends AlignSimple {
+	
+	public OverlapAlign(Scores sub, float d) {
+		super(sub, d);
+	}
 
-  public OverlapAlign(Scores sub, float d, String sq1, String sq2) {
-    super(sub, d, sq1, sq2);
+	/**
+	 * @param sq1
+	 * @param sq2
+	 */
+  public void doAlignment(String sq1, String sq2) {
+	  
+    super.prepareAlignment(sq1, sq2);
+    
     int n = this.n, m = this.m;
     float[][] score = sub.score;
     // F[0][0..m] = F[0..n][0] = 0 by construction
@@ -17,11 +27,11 @@ public class OverlapAlign extends AlignSimple {
         float val = max(F[i-1][j-1]+s, F[i-1][j]-d, F[i][j-1]-d);
         F[i][j] = val;
         if (val == F[i-1][j-1]+s)
-          B[i][j] = new TracebackSimple(i-1, j-1);
+          B[i][j].setTraceback(i-1, j-1);
         else if (val == F[i-1][j]-d)
-          B[i][j] = new TracebackSimple(i-1, j);
+          B[i][j].setTraceback(i-1, j);
         else if (val == F[i][j-1]-d)
-          B[i][j] = new TracebackSimple(i, j-1);
+          B[i][j].setTraceback(i, j-1);
         else
           throw new Error("RM 1");
       }

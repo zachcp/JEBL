@@ -1,30 +1,54 @@
 package jebl.evolution.align;
 
-
 import jebl.evolution.align.scores.Scores;
-import jebl.evolution.align.scores.Blosum50;
+import jebl.evolution.align.scores.Blosum45;
 
 abstract class Align {
 
-    Scores sub;             // scores matrix
-    float d;                        // gap cost
-    String seq1, seq2;            // the sequences
-    int n, m;                     // their lengths
-    Traceback B0;                 // the starting point of the traceback
+    Scores sub;             		// scores matrix
+    float d;          				// gap cost
+    String seq1 = null;
+    String seq2 = null;           	// the sequences
+    int n = 0; int m = 0;           // their lengths
+    Traceback B0;                	// the starting point of the traceback
 
-    public Align(Scores sub, float d, String seq1, String seq2) {
-        this.sub = sub;
-        this.seq1 = strip(seq1); this.seq2 = strip(seq2);
-        this.d = d;
-        this.n = this.seq1.length(); this.m = this.seq2.length();
+    public Align(Scores sub, float d) {
+        setGapOpen(d);
+        setScores(sub);
     }
 
+    /**
+     * Performs the alignment, abstract.
+     * 
+     * @param seq1
+     * @param seq2
+     */
+    public abstract void doAlignment(String seq1, String seq2);
 
-    // Return two-element array containing an alignment with maximal score
+    /**
+     * Initialises the matrices for the alignment.
+     * 
+     * @param seq1
+     * @param seq2
+     */
+    public abstract void prepareAlignment(String seq1, String seq2);
+
+    public void setGapOpen(float d) {
+        this.d = d;
+    }
+
+    public void setScores(Scores sub) {
+        this.sub = sub;
+    }
+
+    /**
+     * @return two-element array containing an alignment with maximal score
+     */
     public String[] getMatch() {
         StringBuffer res1 = new StringBuffer();
         StringBuffer res2 = new StringBuffer();
         Traceback tb = B0;
+
         int i = tb.i, j = tb.j;
         while ((tb = next(tb)) != null) {
             if (i == tb.i) {
@@ -39,15 +63,25 @@ abstract class Align {
             }
             i = tb.i; j = tb.j;
         }
-        String[] res = { res1.reverse().toString(), res2.reverse().toString() };
-        return res;
+        return new String[]{ res1.reverse().toString(), res2.reverse().toString() };
     }
 
+    /**
+     * 
+     * @param val
+     * @return float value of string val
+     */
     public String formatScore(float val) {
         return Float.toString(val);
     }
 
-    // Print the score, the F matrix, and the alignment
+    /**
+     * Print the score, the F matrix, and the alignment
+     * 
+     * @param out output to print to
+     * @param msg message printed at start
+     * @param outputFMatrix print the score matrix
+     */
     public void doMatch(Output out, String msg, boolean outputFMatrix) {
         out.println(msg + ":");
         out.println("Score = " + getScore());
@@ -62,9 +96,20 @@ abstract class Align {
         out.println();
     }
 
+    /**
+     * Print the score and the alignment
+     * 
+     * @param out output to print to
+     * @param msg msg printed at the start
+     */
     public void doMatch(Output out, String msg) { doMatch(out, msg, false); }
 
-    // Get the next state in the traceback
+    /**
+     * Get the next state in the traceback
+     * 
+     * @param tb current Traceback
+     * @return next Traceback
+     */
     public Traceback next(Traceback tb) { return tb; } // dummy implementation for the `smart' algs.
 
     /**
@@ -72,62 +117,12 @@ abstract class Align {
      */
     public abstract float getScore();
 
-    // Print the matrix (matrices) used to compute the alignment
+    /**
+     * Print the matrix (matrices) used to compute the alignment
+     * 
+     * @param out output to print to
+     */
     public abstract void printf(Output out);
-
-    // test main
-    public static void main(String[] args) {
-
-        Blosum50 blosum50 = new Blosum50();
-
-        String seq1 =
-                "MYKRLFISHVILIFALILVISTPNVLAESQPDPKPDELHKSSKFTGLMENMKVLYDDNHVSAINVKSIDQ\n" +
-                "FLYFDLIYSIKDTKLGNYDNVRVEFKNKDLADKYKDKYVDVFGANYYYQCYFSKKTNDINSHQTDKRKTC\n" +
-                "MYGGVTEHNGNQLDKYRSITVRVFEDGKNLLSFDVQTNKKKVTAQELDYLTRHYLVKNKKLYEFNNSPYE\n" +
-                "TGYIKFIENENSFWYDMMPAPGDKFDQSKYLMMYNDNKMVDSKDVKIEVYLTTKKK";
-
-        String seq2 =
-                "PLQMKKTAFTLLLFIALTLTTSPLVNGSEKSEEINEKDLRKKSELQGTALGNLKQIYYYNEKAKTENKES\n" +
-                "HDQFLQHTILFKGFFTDHSWYNDLLVDFDSKDIVDKYKGKKVDLYGAYYGYQCAGGTPNKTACMYGGVTL\n" +
-                "HDNNRLTEEKKVPINLWLDGKQNTVPLETVKTNKKNVTVQELDLQARRYLQEKYNLYNSDVFDGKVQRGL\n" +
-                "IVFHTSTEPSVNYDLFGAQGQYSNTLLRIYRDNKTISSENMHIDIYLYTSY";
-
-        SmithWaterman sw = null;
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < 50; i++) {
-             sw = new SmithWaterman(blosum50,8,seq1,seq2);
-        }
-        long timeTaken = System.currentTimeMillis() - time;
-        System.out.println(timeTaken + " ms");
-        sw.doMatch(new SystemOut(),"Smith-Waterman");
-
-        /*NeedlemanWunsch nw = null;
-        time = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
-             nw = new NeedlemanWunsch(blosum50,8,seq1,seq2);
-        }
-        timeTaken = System.currentTimeMillis() - time;
-        System.out.println(timeTaken + " ms");
-        nw.doMatch(new SystemOut(),"blah");*/
-
-        SmithWatermanLinearSpace swls = null;
-        time = System.currentTimeMillis();
-        for (int i = 0; i < 50; i++) {
-             swls = new SmithWatermanLinearSpace(blosum50,8,seq1,seq2);
-        }
-        timeTaken = System.currentTimeMillis() - time;
-        System.out.println(timeTaken + " ms");
-        swls.doMatch(new SystemOut(),"Smith-Waterman-linear-space");
-
-        SmithWatermanLinearSpaceAffine swlsa = null;
-        time = System.currentTimeMillis();
-        for (int i = 0; i < 50; i++) {
-             swlsa = new SmithWatermanLinearSpaceAffine(blosum50,10,2,seq1,seq2);
-        }
-        timeTaken = System.currentTimeMillis() - time;
-        System.out.println(timeTaken + " ms");
-        swlsa.doMatch(new SystemOut(),"Smith-Waterman-linear-space-affine");
-    }
 
     // auxillary static functions
 
@@ -137,6 +132,12 @@ abstract class Align {
 
     static float max(float x1, float x2, float x3, float x4) { return max(max(x1, x2), max(x3, x4)); }
 
+    /**
+     * 
+     * @param s string to pad
+     * @param width width to pad to
+     * @return string padded to specified width with space chars.
+     */
     static String padLeft(String s, int width) {
       int filler = width - s.length();
       if (filler > 0) {           // and therefore width > 0
@@ -152,10 +153,11 @@ abstract class Align {
 
     /**
      * Strips the given string of all characters that are not recognized sequence states.
+     * 
      * @param s
      * @return the stripped string
      */
-    private String strip(String s) {
+    String strip(String s) {
 
         boolean[] valid = new boolean[127];
         String residues = sub.getStates();
@@ -174,5 +176,81 @@ abstract class Align {
             }
         }
         return res.toString();
+    }
+
+
+    /*
+    Performance characteristics (ms, 1.8 GHz PowerPC G5 iMac with 1Gb RAM, reps=500)
+
+    NeedlemanWunsch	                3753	3814	3851	3824	3862
+    NeedlemanWunschAffine	        9626	9678	9753	9839	9782
+    NeedlemanWunschLinearSpace	    3468	3534	3518	3542	3567
+    SmithWaterman	                4249	4332	4342	4363	4409
+    SmithWatermanLinearSpaceAffine	6824	6929	6924	6981	6975
+    */
+
+    public static void main(String[] args) {
+
+        String seq1 = "PLQMKKTAFTLLLFIALTLTTSPLVNGSEKSEEINEKDLRKKSELQGTALGNLKQIYYYNEKAKTENKES" +
+                    "HDQFLQHTILFKGFFTDHSWYNDLLVDFDSKDIVDKYKGKKVDLYGAYYGYQCAGGTPNKTACMYGGVTL" +
+                    "HDNNRLTEEKKVPINLWLDGKQNTVPLETVKTNKKNVTVQELDLQARRYLQEKYNLYNSDVFDGKVQRGL" +
+                    "IVFHTSTEPSVNYDLFGAQGQYSNTLLRIYRDNKTISSENMHIDIYLYTSY";
+
+        String seq2 = "MYKRLFISHVILIFALILVISTPNVLAESQPDPKPDELHKSSKFTGLMENMKVLYDDNHVSAINVKSIDQ" +
+                    "FLYFDLIYSIKDTKLGNYDNVRVEFKNKDLADKYKDKYVDVFGANYYYQCYFSKKTNDINSHQTDKRKTC" +
+                    "MYGGVTEHNGNQLDKYRSITVRVFEDGKNLLSFDVQTNKKKVTAQELDYLTRHYLVKNKKLYEFNNSPYE" +
+                    "TGYIKFIENENSFWYDMMPAPGDKFDQSKYLMMYNDNKMVDSKDVKIEVYLTTKKK";
+
+        int reps = 500;
+
+        NeedlemanWunsch nw = new NeedlemanWunsch(new Blosum45(), 10);
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nw.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunsch\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunsch nw2 = new NeedlemanWunsch(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nw2.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunsch\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunschAffine nwa = new NeedlemanWunschAffine(new Blosum45(), 10, 4);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nwa.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunschAffine\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunschLinearSpace nwls = new NeedlemanWunschLinearSpace(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nwls.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunschLinearSpace\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+
+        SmithWaterman sw = new SmithWaterman(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            sw.doAlignment(seq1, seq2);
+        }
+        System.out.print("SmithWaterman\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        SmithWatermanLinearSpaceAffine swlsa = new SmithWatermanLinearSpaceAffine(new Blosum45(), 10, 4);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            swlsa.doAlignment(seq1, seq2);
+        }
+        System.out.print("SmithWatermanLinearSpaceAffine\t");
+        System.out.println((System.currentTimeMillis() - start));
+
     }
 }

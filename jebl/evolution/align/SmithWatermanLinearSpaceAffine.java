@@ -4,20 +4,28 @@ import jebl.evolution.align.scores.Scores;
 
 /**
  * @author Alexei Drummond
- * @author modified from work by
  *
  * @version $Id$
  */
 public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
 
     TracebackSimple[][] start;	// Best alignment ending at (i,j) begins at start[i][j]
-    float maxval;           // Score of best alignment
-    int start1, start2;   // Best alignment begins at (start1, start2)
-    int end1, end2;       // Best alignment ends at (end1, end2)
-
-    public SmithWatermanLinearSpaceAffine(Scores sub, float d, float e, String sq1, String sq2) {
-
-        super(sub, d, e, sq1, sq2);
+    float maxval;           	// Score of best alignment
+    int start1, start2;   		// Best alignment begins at (start1, start2)
+    int end1, end2;       		// Best alignment ends at (end1, end2)
+    
+    public SmithWatermanLinearSpaceAffine(Scores sub, float d, float e) {
+    	super(sub, d, e);
+    }
+    
+    /**
+	 * @param sq1
+	 * @param sq2
+	 */
+    public void doAlignment(String sq1, String sq2) {
+    	
+    	prepareAlignment(sq1, sq2);
+    	
         int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
@@ -60,9 +68,15 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
             }
         }
     }
-
+    
+    /**
+     * @return the score of the best alignment
+     */
     public float getScore() { return maxval; }
 
+    /**
+     * @return two-element array containing an alignment with maximal score
+     */
     public String[] getMatch() {
 
         String subseq1 = seq1.substring(start1, end1);
@@ -70,7 +84,9 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         // The optimal local alignment between seq1 and seq2 is the
         // optimal global alignment between subseq1 and subseq2:
-        return (new NeedlemanWunschAffine(sub, d, e, subseq1, subseq2)).getMatch();
+        NeedlemanWunschAffine nwa1 = new NeedlemanWunschAffine(sub, d, e);
+        nwa1.doAlignment(subseq1, subseq2);
+        return nwa1.getMatch();
     }
 }
 
