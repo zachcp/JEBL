@@ -23,4 +23,9 @@ public abstract class Scores {
     }
 
     abstract public String getStates();
+
+    public String toString() {
+        String name = getClass().getName();
+        return name.substring(name.lastIndexOf(".")+1);
+    }
 }

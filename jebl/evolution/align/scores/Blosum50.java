@@ -28,5 +28,8 @@ public class Blosum50 extends AminoAcidScores {
             /* A  R  N  D  C  Q  E  G  H  I  L  K  M  F  P  S  T  W  Y  V */
   };
 
-  public Blosum50() { buildScores(residueScores); }
+    public Blosum50() { buildScores(residueScores); }
+
+    public String getName() { return "Blosum50"; }
+
 }
