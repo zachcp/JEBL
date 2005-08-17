@@ -92,11 +92,11 @@ public class AlignApplet extends JApplet {
                 message.append("Aligning " + names[i] + " and " + names[j] + " [");
                 message.append(alignmentComboBox.getSelectedItem());
                 message.append(", ");
-                message.append("S=" + scoresComboBox.getSelectedItem());
+                message.append("S=").append(scoresComboBox.getSelectedItem());
                 message.append(", ");
-                message.append("d="+d);
+                message.append("d=").append(d);
                 message.append(", ");
-                message.append("e="+e);
+                message.append("e=").append(e);
                 message.append("]");
 
                 align.doAlignment(seq1, seq2);
