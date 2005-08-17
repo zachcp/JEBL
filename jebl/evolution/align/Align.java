@@ -96,6 +96,18 @@ abstract class Align {
         out.println();
     }
 
+    public void traceback(TracebackPlotter plotter) {
+
+        plotter.newTraceBack(seq1, seq2);
+
+        Traceback tb = B0;
+        while (tb != null) {
+            plotter.traceBack(tb);
+            tb = next(tb);
+        }
+        plotter.finishedTraceBack();
+    }
+
     /**
      * Print the score and the alignment
      * 

@@ -1,6 +1,7 @@
 package jebl.evolution.align;
 
 import jebl.evolution.align.scores.*;
+import jebl.evolution.align.gui.TracebackPlot;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -37,7 +38,9 @@ public class AlignApplet extends JApplet {
     JTextArea output = new JTextArea();
 
     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    JTabbedPane tabbedPane = new JTabbedPane();
+
+    JTabbedPane leftTabbedPane = new JTabbedPane();
+    JTabbedPane rightTabbedPane = new JTabbedPane();
 
     JButton alignButton = new JButton("Align");
     JComboBox sequence1Combo;
@@ -46,10 +49,13 @@ public class AlignApplet extends JApplet {
     JComboBox gapExtensionPenalty = new JComboBox(penalties);
     JComboBox scoresComboBox = new JComboBox(scores);
 
+    TracebackPlot tracebackPlot = new TracebackPlot();
+
     JComboBox alignmentComboBox = new JComboBox(
         new String[] {
             "Smith-Waterman",
-            "Needleman-Wunsch"
+            "Needleman-Wunsch",
+            "Maximal Segment Pair",
         }
     );
 
@@ -58,11 +64,29 @@ public class AlignApplet extends JApplet {
         final String[] names = new String[] {"A","B"};
         final String[] sequences = new String[] {"ACAGCTAGCTGACT", "ACACGACATCATCGA"};
 
-        tabbedPane.add("Align", new AlignPanel(names));
-        tabbedPane.add("Sequences", new SequencePanel(names, sequences));
 
-        splitPane.setTopComponent(tabbedPane);
-        splitPane.setBottomComponent(new JScrollPane(output));
+        alignmentComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (alignmentComboBox.getSelectedIndex() == 2) {
+                    gapCreationPenalty.setEnabled(false);
+                    gapExtensionPenalty.setEnabled(false);
+                } else {
+                    gapCreationPenalty.setEnabled(true);
+                    gapExtensionPenalty.setEnabled(true);
+
+                }
+            }
+        });
+
+        leftTabbedPane.add("Align", new AlignPanel(names));
+        leftTabbedPane.add("Sequences", new SequencePanel(names, sequences));
+
+        rightTabbedPane.add("Output", output);
+        rightTabbedPane.add("Plot", tracebackPlot);
+
+        splitPane.setTopComponent(leftTabbedPane);
+        splitPane.setBottomComponent(rightTabbedPane);
         splitPane.setDividerLocation(240);
 
         getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -82,21 +106,30 @@ public class AlignApplet extends JApplet {
                 Scores scores = (Scores)scoresComboBox.getSelectedItem();
 
                 Align align;
-                if (alignmentComboBox.getSelectedIndex() == 0) {
-                    align = new SmithWatermanLinearSpaceAffine(scores,d, e);
-                } else {
-                    align = new NeedlemanWunschAffine(scores,d, e);
+                int selected = alignmentComboBox.getSelectedIndex();
+                switch (selected) {
+                    case 0:
+                        align = new SmithWatermanLinearSpaceAffine(scores,d, e); break;
+                    case 1:
+                        align = new NeedlemanWunschAffine(scores,d, e); break;
+                    default:
+                        align = new MaximalSegmentPair(scores); break;
                 }
+
+
+
 
                 StringBuffer message = new StringBuffer();
                 message.append("Aligning " + names[i] + " and " + names[j] + " [");
                 message.append(alignmentComboBox.getSelectedItem());
                 message.append(", ");
                 message.append("S=").append(scoresComboBox.getSelectedItem());
-                message.append(", ");
-                message.append("d=").append(d);
-                message.append(", ");
-                message.append("e=").append(e);
+                if (selected < 2) {
+                    message.append(", ");
+                    message.append("d=").append(d);
+                    message.append(", ");
+                    message.append("e=").append(e);
+                }
                 message.append("]");
 
                 align.doAlignment(seq1, seq2);
@@ -108,6 +141,8 @@ public class AlignApplet extends JApplet {
                         public void println() { output.append("\n"); }
                    },
                    message.toString());
+
+                align.traceback(tracebackPlot);
             }
         });
     }

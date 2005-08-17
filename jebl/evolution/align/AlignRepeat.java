@@ -2,48 +2,31 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
-abstract class AlignSimple extends Align {
+abstract class AlignRepeat extends Align {
 
-    float[][] F = null;                 // the matrix used to compute the alignment
-    TracebackSimple[][] B;             	// the traceback matrix
+    float[][] F;           			// the matrix used to compute the alignment
+    TracebackSimple[][] B;         	// the traceback matrix
+    int T;							// threshold
     
-    public AlignSimple(Scores sub, float d) {
+    public AlignRepeat(Scores sub, float d, int T) {
     	super(sub, d);
+    	this.T = T;
     }
     
     /**
      * Performs the alignment. Abstract.
      * 
-     * @param seq1
-     * @param seq2
+     * @param sq1
+     * @param sq2
      */
-    public abstract void doAlignment(String seq1, String seq2);
+    public abstract void doAlignment(String sq1, String sq2);
     
     public void prepareAlignment(String sq1, String sq2) {
     	
     	//first time running this alignment. Create all new matrices.
-		if(F == null) {
-			this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
-    		F = new float[n+1][m+1];
-    		B = new TracebackSimple[n+1][m+1];
-    		for(int i = 0; i < n+1; i ++) {
-				for(int j = 0; j < m+1; j++)
-					B[i][j] = new TracebackSimple(0,0);
-			}
-    	}
-    	
-    	//alignment already been run and existing matrix is big enough to reuse.
-    	else if(seq1.length() <= this.n && seq2.length() <= this.m) {
+    	if(F == null) {
     		this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
-    	}
-
-    	//alignment already been run but matrices not big enough for new alignment.
-    	//create all new matrices.
-    	else {
-    		this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
     		F = new float[n+1][m+1];
     		B = new TracebackSimple[n+1][m+1];
     		for(int i = 0; i < n+1; i ++) {
@@ -51,6 +34,29 @@ abstract class AlignSimple extends Align {
     				B[i][j] = new TracebackSimple(0,0);
     		}
     	}
+    	
+    	//alignment already been run and existing matrix is big enough to reuse.
+    	else if(sq1.length() <= n && sq2.length() <= m) {
+    		this.n = sq1.length(); this.m = sq2.length();
+    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+    	}
+    	
+    	//alignment already been run but matrices not big enough for new alignment.
+    	//create all new matrices.
+    	else {
+    		this.n = sq1.length(); this.m = sq2.length();
+    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+    		F = new float[n+1][m+1];
+    		B = new TracebackSimple[n+1][m+1];
+    		for(int i = 0; i < n+1; i ++) {
+    			for(int j = 0; j < m+1; j++)
+    				B[i][j] = new TracebackSimple(0,0);
+    		}
+    	}
+    }
+    
+    public void setThreshold(int T) {
+    	this.T = T;
     }
 
     /**
@@ -61,7 +67,7 @@ abstract class AlignSimple extends Align {
      */
     public Traceback next(Traceback tb) {
         TracebackSimple tb2 = (TracebackSimple)tb;
-        if((tb.i == 0 && tb.j == 0 && B[tb2.i][tb2.j].i == 0 && B[tb2.i][tb2.j].j == 0) || tb.i == -1)
+        if(tb.i == 0 && tb.j == 0 && B[tb2.i][tb2.j].i == 0 && B[tb2.i][tb2.j].j == 0)
         	return null;
         else
         	return B[tb2.i][tb2.j];
@@ -80,8 +86,7 @@ abstract class AlignSimple extends Align {
     public void printf(Output out) {
 
         for (int j=0; j<=m; j++) {
-            for (int i = 0; i < F.length; i++) {
-                float[] f = F[i];
+            for (float[] f : F) {
                 out.print(padLeft(formatScore(f[j]), 5));
             }
             out.println();
