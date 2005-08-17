@@ -48,29 +48,4 @@ public class MaximalSegmentPair extends AlignSimple {
         }
         return next;
     }
-
-    /**
-     * @return two-element array containing an alignment with maximal score
-     */
-    public String[] getMatch() {
-        StringBuffer res1 = new StringBuffer();
-        StringBuffer res2 = new StringBuffer();
-        Traceback tb = B0;
-
-        int i = tb.i, j = tb.j;
-        while ((tb = next(tb)) != null) {
-            if (i == tb.i) {
-                res1.append('-');
-            } else {
-                res1.append(seq1.charAt(i-1));
-            }
-            if (j == tb.j) {
-                res2.append('-');
-            } else {
-                res2.append(seq2.charAt(j-1));
-            }
-            i = tb.i; j = tb.j;
-        }
-        return new String[]{ res1.reverse().toString(), res2.reverse().toString() };
-    }
 }
