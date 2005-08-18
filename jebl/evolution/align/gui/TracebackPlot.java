@@ -12,7 +12,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- *
  * @author Alexei Drummond
  *
  * @version $Id$
@@ -29,14 +28,19 @@ public class TracebackPlot extends JComponent implements TracebackPlotter {
         m = sequence1.length();
         n = sequence2.length();
 
-        tracebacks.clear();
+        tracebacks.add(new ArrayList());
     }
 
     public void traceBack(Traceback t) {
-        tracebacks.add(t);
+        ((List)tracebacks.get(tracebacks.size()-1)).add(t);
     }
 
     public void finishedTraceBack() {
+        repaint();
+    }
+
+    public void clear() {
+        tracebacks.clear();
         repaint();
     }
 
@@ -75,18 +79,34 @@ public class TracebackPlot extends JComponent implements TracebackPlotter {
 
         g2d.draw(new Rectangle2D.Double(tx,ty,(double)m*scale - strokeWidth,(double)n*scale - strokeWidth));
 
-        for (int i = 1; i < getPointCount(); i++) {
-            Point2D p = getPoint(i-1, scale, tx, ty);
-            Point2D q = getPoint(i, scale, tx, ty);
-            Line2D line = new Line2D.Double(p,q);
-            g2d.draw(line);
+        for (int i = 0; i < tracebacks.size(); i++) {
+
+            g2d.setColor(colors[i%colors.length]);
+            for (int j = 1; j < getPointCount(i); j++) {
+                Point2D p = getPoint(i, j-1, scale, tx, ty);
+                Point2D q = getPoint(i, j, scale, tx, ty);
+                Line2D line = new Line2D.Double(p,q);
+                g2d.draw(line);
+            }
         }
     }
 
-    public Point2D getPoint(int i, double scale, double tx, double ty) {
-        Traceback t = (Traceback)tracebacks.get(i);
+    public Point2D getPoint(int i, int j, double scale, double tx, double ty) {
+        Traceback t = (Traceback)((List)tracebacks.get(i)).get(j);
         return new Point2D.Double((double)t.getX()*scale+tx, (double)t.getY()*scale+ty);
     }
 
-    public int getPointCount() { return tracebacks.size(); }
+    public int getPointCount(int i) { return ((List)tracebacks.get(i)).size(); }
+
+    private Color[] colors = new Color[] {
+            Color.black,
+            Color.red,
+            Color.blue,
+            Color.green,
+            Color.yellow,
+            Color.orange,
+            Color.cyan,
+            Color.magenta,
+            Color.darkGray,
+            Color.lightGray};
 }

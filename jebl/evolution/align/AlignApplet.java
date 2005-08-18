@@ -3,6 +3,7 @@ package jebl.evolution.align;
 import jebl.evolution.align.scores.*;
 import jebl.evolution.align.gui.TracebackPlot;
 import jebl.evolution.align.gui.FastaPanel;
+import jebl.evolution.align.gui.TracebackPanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.util.StringTokenizer;
+import java.util.ArrayList;
 
 /**
  * @author Alexei Drummond
@@ -38,6 +41,7 @@ public class AlignApplet extends JApplet {
     };
 
     JTextArea output = new JTextArea();
+    JScrollPane pane = new JScrollPane(output);
 
     JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
@@ -62,6 +66,7 @@ public class AlignApplet extends JApplet {
     JComboBox alignmentComboBox = new JComboBox(
         new String[] {
             "Smith-Waterman",
+//            "Overlap",
             "Needleman-Wunsch",
             "Maximal Segment Pair",
         }
@@ -82,7 +87,25 @@ public class AlignApplet extends JApplet {
     }
 
 
+    private String[] parse(String s) {
+
+        if (s != null) {
+            StringTokenizer tokens = new StringTokenizer(s,",");
+            ArrayList tokensArray = new ArrayList();
+            while (tokens.hasMoreElements()) {
+                tokensArray.add(tokens.nextElement());
+            }
+            return (String[])tokensArray.toArray();
+        }
+        return null;
+    }
+
     public void init() {
+
+        String nameString = getParameter("names");
+        String sequenceString = getParameter("sequences");
+        names = parse(nameString);
+        sequences = parse(sequenceString);
 
         names = new String[] {"seq1","seq2"};
         sequences = new String[] {"ACAGCTAGCTGACT", "ACACGACATCATCGA"};
@@ -135,8 +158,13 @@ public class AlignApplet extends JApplet {
         leftTabbedPane.add("Sequences", sequencePanel);
         leftTabbedPane.add("Import", panel);
 
-        rightTabbedPane.add("Output", output);
-        rightTabbedPane.add("Plot", tracebackPlot);
+
+        TracebackPanel panel2 = new TracebackPanel(tracebackPlot);
+
+
+
+        rightTabbedPane.add("Output", pane);
+        rightTabbedPane.add("Plot", panel2);
 
         splitPane.setTopComponent(leftTabbedPane);
         splitPane.setBottomComponent(rightTabbedPane);
@@ -170,9 +198,6 @@ public class AlignApplet extends JApplet {
                     default:
                         align = new MaximalSegmentPair(scores); break;
                 }
-
-
-
 
                 StringBuffer message = new StringBuffer();
                 message.append("Aligning " + names[i] + " and " + names[j] + " [");
