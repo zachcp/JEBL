@@ -17,7 +17,7 @@ import java.util.*;
 
 public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	
-	private ArrayList<LocalAlignment> localAligns = new ArrayList<LocalAlignment>();
+	private ArrayList localAligns = new ArrayList();
 	private SmithWatermanLinearSpaceAffine swlsa;
 	
 	public NonOverlapMultipleLocalAffine(Scores sub, float d, float e, int T) {
@@ -74,10 +74,11 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public String[] getMatch() {
 		String sq1 = "";
 		String sq2 = "";
-		for(LocalAlignment la : localAligns) {
-			sq1 += la.sq1 + " - ";
-			sq2 += la.sq2 + " - ";
-		}
+        for (Iterator it = localAligns.iterator(); it.hasNext();) {
+            LocalAlignment la = (LocalAlignment) it.next();
+            sq1 += la.sq1 + " - ";
+            sq2 += la.sq2 + " - ";
+        }
 		return new String[] {sq1.substring(0,sq1.length() - 3), sq2.substring(0,sq1.length() - 3)};
 	}
 	
@@ -90,31 +91,30 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 		String sq2;
 		float score;
 		String matchScores = "";
-		for(LocalAlignment la : localAligns) {
-			sq1 = la.sq1;
-			sq2 = la.sq2;
-			score = la.score;
-			if(la.sq1.length() < width) {
-				matchScores += "Score: " + score + "\n";
-				matchScores += sq1 + "\n";
-				matchScores += sq1 + "\n\n\n";
-			}
-			else {
-				matchScores += "Score: " + score + "\n";
-				int size = sq1.length();
-				for(int i = width; i < size + width; i += width) {
-					if(i > size) {
-						matchScores += sq1.substring(i - width, size) + "\n";
-						matchScores += sq2.substring(i - width, size) + "\n\n";
-					}
-					else {
-						matchScores += sq1.substring(i - width, i) + "\n";
-						matchScores += sq2.substring(i - width, i) + "\n\n";
-					}
-				}
-				matchScores += "\n";
-			}
-		}
+        for (Iterator it = localAligns.iterator(); it.hasNext();) {
+            LocalAlignment la = (LocalAlignment) it.next();
+            sq1 = la.sq1;
+            sq2 = la.sq2;
+            score = la.score;
+            if (la.sq1.length() < width) {
+                matchScores += "Score: " + score + "\n";
+                matchScores += sq1 + "\n";
+                matchScores += sq1 + "\n\n\n";
+            } else {
+                matchScores += "Score: " + score + "\n";
+                int size = sq1.length();
+                for (int i = width; i < size + width; i += width) {
+                    if (i > size) {
+                        matchScores += sq1.substring(i - width, size) + "\n";
+                        matchScores += sq2.substring(i - width, size) + "\n\n";
+                    } else {
+                        matchScores += sq1.substring(i - width, i) + "\n";
+                        matchScores += sq2.substring(i - width, i) + "\n\n";
+                    }
+                }
+                matchScores += "\n";
+            }
+        }
 		return matchScores;
 	}
 	
@@ -123,8 +123,10 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
      */
 	public float getScore() {
 		float score = 0;
-		for(LocalAlignment la : localAligns)
-			score += la.score;
+        for (Iterator it = localAligns.iterator(); it.hasNext();) {
+            LocalAlignment la = (LocalAlignment) it.next();
+            score += la.score;
+        }
 		return score;
 	}
 	
@@ -136,10 +138,11 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public float[] getScores() {
 		float[] scores = new float[localAligns.size()];
 		int i = 0;
-		for(LocalAlignment la : localAligns) {
-			scores[i] = la.score;
-			i++;
-		}
+        for (Iterator it = localAligns.iterator(); it.hasNext();) {
+            LocalAlignment la = (LocalAlignment) it.next();
+            scores[i] = la.score;
+            i++;
+        }
 		return scores;
 	}
 	
@@ -151,11 +154,12 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public String[][] getAlignments() {
 		String[][] aligns = new String[localAligns.size()][2];
 		int i = 0;
-		for(LocalAlignment la : localAligns) {
-			aligns[i][0] = la.sq1;
-			aligns[i][2] = la.sq2;
-			i++;
-		}
+        for (Iterator it = localAligns.iterator(); it.hasNext();) {
+            LocalAlignment la = (LocalAlignment) it.next();
+            aligns[i][0] = la.sq1;
+            aligns[i][2] = la.sq2;
+            i++;
+        }
 		return aligns;
 	}
 	

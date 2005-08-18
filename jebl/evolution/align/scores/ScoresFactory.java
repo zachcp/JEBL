@@ -65,7 +65,7 @@ public class ScoresFactory {
 		try {
 			Class c = Class.forName("jebl.evolution.align.scores." + name);
 			Constructor con[] = c.getConstructors();
-			sub = (Scores)(con[0].newInstance(val));
+			sub = (Scores)(con[0].newInstance(new Object[] {new Float(val)}));
 		}
 		catch(Exception e) {
 			System.out.println("no such substitution matrix!\n" + e);

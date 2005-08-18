@@ -2,12 +2,15 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.*;
 import jebl.evolution.align.gui.TracebackPlot;
+import jebl.evolution.align.gui.FastaPanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Alexei Drummond
@@ -22,17 +25,16 @@ public class AlignApplet extends JApplet {
     };
 
     Scores[] scores = new Scores[] {
-        new Blosum45(),
-        new Blosum50(),
-        new Blosum60(),
-        new Blosum62(),
-        new Blosum70(),
-        new Blosum80(),
-        new Blosum90(),
-        new NucleotideScores(3,-6),
-        new NucleotideScores(4,-5),
-        new NucleotideScores(5,-4),
-        new NucleotideScores(6,-3)
+            new NucleotideScores(5,-4),
+            new NucleotideScores(4,-5),
+            new NucleotideScores(3,-6),
+            new Blosum45(),
+            new Blosum50(),
+            new Blosum60(),
+            new Blosum62(),
+            new Blosum70(),
+            new Blosum80(),
+            new Blosum90()
     };
 
     JTextArea output = new JTextArea();
@@ -46,10 +48,16 @@ public class AlignApplet extends JApplet {
     JComboBox sequence1Combo;
     JComboBox sequence2Combo;
     JComboBox gapCreationPenalty = new JComboBox(penalties);
-    JComboBox gapExtensionPenalty = new JComboBox(penalties);
+
+
+//    JComboBox gapExtensionPenalty = new JComboBox(penalties);
     JComboBox scoresComboBox = new JComboBox(scores);
 
+    JButton importButton = new JButton("Import fasta");
+
     TracebackPlot tracebackPlot = new TracebackPlot();
+
+    SequencePanel sequencePanel;
 
     JComboBox alignmentComboBox = new JComboBox(
         new String[] {
@@ -59,35 +67,80 @@ public class AlignApplet extends JApplet {
         }
     );
 
+    String[] names;
+    String[] sequences;
+
+    public void setNames(String[] names) {
+        this.names = names;
+        sequence1Combo.setModel(new DefaultComboBoxModel(names));
+        sequence2Combo.setModel(new DefaultComboBoxModel(names));
+        sequencePanel.repaint();
+    }
+
+    public void setSequences(String[] sequences) {
+        this.sequences = sequences;
+    }
+
+
     public void init() {
 
-        final String[] names = new String[] {"A","B"};
-        final String[] sequences = new String[] {"ACAGCTAGCTGACT", "ACACGACATCATCGA"};
+        names = new String[] {"seq1","seq2"};
+        sequences = new String[] {"ACAGCTAGCTGACT", "ACACGACATCATCGA"};
 
+        gapCreationPenalty.setSelectedIndex(7);
 
         alignmentComboBox.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (alignmentComboBox.getSelectedIndex() == 2) {
                     gapCreationPenalty.setEnabled(false);
-                    gapExtensionPenalty.setEnabled(false);
+ //                   gapExtensionPenalty.setEnabled(false);
                 } else {
                     gapCreationPenalty.setEnabled(true);
-                    gapExtensionPenalty.setEnabled(true);
+//                    gapExtensionPenalty.setEnabled(true);
 
                 }
             }
         });
 
+
+        final FastaPanel fastaPanel = new FastaPanel(importButton);
+
+        importButton.setAction(new AbstractAction("Import fasta") {
+
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    fastaPanel.importSequences();
+                    setNames(fastaPanel.getNames());
+                    setSequences(fastaPanel.getSequences());
+                    fastaPanel.setText("Import successful.");
+                }
+                catch (Exception e) {
+                    StringWriter writer = new StringWriter();
+                    PrintWriter pw = new PrintWriter(writer);
+                    e.printStackTrace(pw);
+                    pw.flush();
+                    fastaPanel.setText("Error importing:\n" + writer.toString());
+                }
+
+            }
+        });
+
+        sequencePanel = new SequencePanel();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(fastaPanel,BorderLayout.NORTH);
+
         leftTabbedPane.add("Align", new AlignPanel(names));
-        leftTabbedPane.add("Sequences", new SequencePanel(names, sequences));
+        leftTabbedPane.add("Sequences", sequencePanel);
+        leftTabbedPane.add("Import", panel);
 
         rightTabbedPane.add("Output", output);
         rightTabbedPane.add("Plot", tracebackPlot);
 
         splitPane.setTopComponent(leftTabbedPane);
         splitPane.setBottomComponent(rightTabbedPane);
-        splitPane.setDividerLocation(240);
+        splitPane.setDividerLocation(300);
 
         getContentPane().add(splitPane, BorderLayout.CENTER);
 
@@ -101,7 +154,7 @@ public class AlignApplet extends JApplet {
                 String seq2 = sequences[j];
 
                 int d = Integer.parseInt((String)gapCreationPenalty.getSelectedItem());
-                int e = Integer.parseInt((String)gapExtensionPenalty.getSelectedItem());
+   //             int e = Integer.parseInt((String)gapExtensionPenalty.getSelectedItem());
 
                 Scores scores = (Scores)scoresComboBox.getSelectedItem();
 
@@ -109,9 +162,11 @@ public class AlignApplet extends JApplet {
                 int selected = alignmentComboBox.getSelectedIndex();
                 switch (selected) {
                     case 0:
-                        align = new SmithWatermanLinearSpaceAffine(scores,d, e); break;
+                        align = new SmithWatermanLinearSpace(scores,d);
+                        break;
                     case 1:
-                        align = new NeedlemanWunschAffine(scores,d, e); break;
+                        align = new NeedlemanWunschLinearSpace(scores,d);
+                        break;
                     default:
                         align = new MaximalSegmentPair(scores); break;
                 }
@@ -127,8 +182,8 @@ public class AlignApplet extends JApplet {
                 if (selected < 2) {
                     message.append(", ");
                     message.append("d=").append(d);
-                    message.append(", ");
-                    message.append("e=").append(e);
+//                    message.append(", ");
+//                    message.append("e=").append(e);
                 }
                 message.append("]");
 
@@ -151,39 +206,40 @@ public class AlignApplet extends JApplet {
 
         JTable jTable = new JTable();
 
-        public SequencePanel(final String[] names, final String[] sequences) {
+        public SequencePanel() {
 
             assert names.length == sequences.length;
 
-            jTable.setModel(new DefaultTableModel() {
-
-                public int getRowCount() { return sequences.length; }
-
-                public int getColumnCount() { return 2; }
-
-                public String getColumnName(int i) {
-                    if (i == 0) return "Names";
-                    else return "Sequences";
-                }
-
-                public Class getColumnClass(int i) { return String.class; }
-
-                public boolean isCellEditable(int row, int column) { return false;  }
-
-                public Object getValueAt(int row, int column) {
-                    if (column == 0) {
-                        return names[row];
-                    }
-                    else {
-                        return sequences[row];
-                    }
-                }
-            });
+            jTable.setModel(new SequenceTableModel());
 
             JScrollPane scrollPane = new JScrollPane(jTable);
 
             setLayout(new BorderLayout());
             add(scrollPane,BorderLayout.CENTER);
+        }
+
+        class SequenceTableModel extends DefaultTableModel {
+            public int getRowCount() { return sequences.length; }
+
+            public int getColumnCount() { return 2; }
+
+            public String getColumnName(int i) {
+                if (i == 0) return "Names";
+                else return "Sequences";
+            }
+
+            public Class getColumnClass(int i) { return String.class; }
+
+            public boolean isCellEditable(int row, int column) { return false;  }
+
+            public Object getValueAt(int row, int column) {
+                if (column == 0) {
+                    return names[row];
+                }
+                else {
+                    return sequences[row];
+                }
+            }
         }
     }
 
@@ -209,8 +265,8 @@ public class AlignApplet extends JApplet {
             pane.add(Box.createRigidArea(new Dimension(10,10)));
             addComponent(new JLabel("Gap creation ",JLabel.LEFT));
             addComponent(gapCreationPenalty);
-            addComponent(new JLabel("Gap extension ",JLabel.LEFT));
-            addComponent(gapExtensionPenalty);
+  //         addComponent(new JLabel("Gap extension ",JLabel.LEFT));
+  //          addComponent(gapExtensionPenalty);
             pane.add(Box.createRigidArea(new Dimension(10,10)));
             addComponent(alignmentComboBox);
             pane.add(Box.createRigidArea(new Dimension(10,10)));

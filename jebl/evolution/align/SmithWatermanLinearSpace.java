@@ -78,4 +78,17 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
         nwls1.doAlignment(subseq1, subseq2);
         return nwls1.getMatch();
     }
+
+    public void traceback(TracebackPlotter plotter) {
+        String subseq1 = seq1.substring(start1, end1);
+        String subseq2 = seq2.substring(start2, end2);
+        // The optimal local alignment between seq1 and seq2 is the
+        // optimal global alignment between subseq1 and subseq2:
+        NeedlemanWunschLinearSpace nwls1 = new NeedlemanWunschLinearSpace(sub, d);
+        nwls1.doAlignment(subseq1, subseq2);
+        nwls1.traceback(plotter, start1, start2, seq1, seq2);
+    }
+
+
+
 }

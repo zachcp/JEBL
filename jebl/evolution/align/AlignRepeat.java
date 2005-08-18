@@ -86,7 +86,8 @@ abstract class AlignRepeat extends Align {
     public void printf(Output out) {
 
         for (int j=0; j<=m; j++) {
-            for (float[] f : F) {
+            for (int i = 0; i < F.length; i++) {
+                float[] f = F[i];
                 out.print(padLeft(formatScore(f[j]), 5));
             }
             out.println();
