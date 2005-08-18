@@ -99,7 +99,6 @@ abstract class Align {
         out.println("matchs=" + counts[0] + " mismatchs=" + counts[1] + " gaps=" + counts[2]);
         out.println("percent identity=" + Math.round((double)counts[0]*1000 / match[0].length())/10.0 + "%");
 
-        out.println();
     }
 
     private int[] matchCounts(String[] match) {

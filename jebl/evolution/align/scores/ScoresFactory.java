@@ -19,7 +19,7 @@ public class ScoresFactory {
 		String name = nameVal.substring(0, i);
 		String val = nameVal.substring(i, nameVal.length());
 		try {
-			if(val.contains("."))
+			if(val.indexOf(".") != -1)
 				sub = generateScores(name, Float.parseFloat(val));
 			else
 				sub = generateScores(name, Integer.parseInt(val));

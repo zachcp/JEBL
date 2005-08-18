@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.*;
 import java.util.List;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.awt.*;
 
 /**
  *
@@ -13,23 +16,43 @@ import java.io.*;
  */
 public class FastaPanel extends JPanel {
 
-    private JTextArea fastaText;
+    private JComboBox urlComboBox;
+    private URL[] urls;
+    private JButton button;
     List names, sequences;
 
-    public FastaPanel(JButton button) {
+    public FastaPanel(URL[] urls) {
 
-        fastaText = new JTextArea(20, 40);
-        fastaText.setLineWrap(true);
-        fastaText.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(fastaText,
-                                                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
 
-        setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
+        button = new JButton();
+        button.setAlignmentX(0.0f);
 
-        add(new JLabel("Fasta format:"));
-        add(scrollPane);
-        add(button);
+        String[] names = new String[urls.length];
+        for (int i = 0; i < urls.length; i++) {
+            names[i] = urls[i].getFile();
+            int pos = names[i].lastIndexOf(File.separatorChar);
+            names[i] = names[i].substring(pos+1);
+        }
+
+        urlComboBox = new JComboBox(names);
+        urlComboBox.setAlignmentX(0.0f);
+
+        JLabel label = new JLabel("Get fasta format:");
+        label.setAlignmentX(0.0f);
+
+        panel.add(label);
+        panel.add(Box.createRigidArea(new Dimension(10,10)));
+        panel.add(urlComboBox);
+        panel.add(Box.createRigidArea(new Dimension(10,10)));
+        panel.add(button);
+        panel.add(Box.createGlue());
+
+        this.urls = urls;
+
+        setLayout(new BorderLayout());
+        add(panel,BorderLayout.WEST);
     }
 
     public void importSequences() {
@@ -37,9 +60,11 @@ public class FastaPanel extends JPanel {
         names = new ArrayList();
         sequences = new ArrayList();
 
-        ImportHelper helper = new ImportHelper(new StringReader(getFastaText()));
-
         try {
+
+            InputStream is = urls[urlComboBox.getSelectedIndex()].openStream();
+
+            ImportHelper helper = new ImportHelper(new InputStreamReader(is));
 
             int ch = helper.read();
             while (ch != '>') {
@@ -61,12 +86,15 @@ public class FastaPanel extends JPanel {
 
             } while(ch == '>');
 
-
-        } catch (Exception e) { }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        catch (EOFException e) {
+        }
+        catch (IOException e) {
+            // Show dialog box explaining the problem
+        }
     }
-
-
-    public void setText(String text) { fastaText.setText(text); }
 
     public String[] getNames() {
 
@@ -79,6 +107,10 @@ public class FastaPanel extends JPanel {
 
     public String[] getSequences() {
         return (String[])sequences.toArray(new String[]{});
+    }
+
+    public void setAction(Action action) {
+        button.setAction(action);
     }
 
     class ImportHelper {
@@ -582,10 +614,5 @@ public class FastaPanel extends JPanel {
         private char lineComment = (char)-1;
         private char writeComment = (char)-1;
 
-    }
-
-
-    public String getFastaText() {
-        return fastaText.getText();
     }
 }
