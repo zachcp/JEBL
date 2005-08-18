@@ -21,8 +21,6 @@ public class TracebackPlot extends JComponent implements TracebackPlotter {
 
     List tracebacks = new ArrayList();
     int m, n;
-    int scale = 1;
-    static final int TARGET_SIZE = 400;
 
     public TracebackPlot() {}
 
@@ -30,8 +28,6 @@ public class TracebackPlot extends JComponent implements TracebackPlotter {
 
         m = sequence1.length();
         n = sequence2.length();
-
-        while (Math.max(m,n)*scale < TARGET_SIZE) { scale += 1; }
 
         tracebacks.clear();
     }
@@ -93,8 +89,4 @@ public class TracebackPlot extends JComponent implements TracebackPlotter {
     }
 
     public int getPointCount() { return tracebacks.size(); }
-
-    public Dimension getPreferredSize() {
-        return new Dimension(m*scale,n*scale);
-    }
 }

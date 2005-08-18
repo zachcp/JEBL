@@ -93,7 +93,30 @@ abstract class Align {
         String[] match = getMatch();
         out.println(match[0]);
         out.println(match[1]);
+
+        int[] counts = matchCounts(match);
+
+        out.println("matchs=" + counts[0] + " mismatchs=" + counts[1] + " gaps=" + counts[2]);
+        out.println("percent identity=" + Math.round((double)counts[0]*1000 / match[0].length())/10.0 + "%");
+
         out.println();
+    }
+
+    private int[] matchCounts(String[] match) {
+        int[] matchCounts = new int[3];
+        for (int i = 0; i < match[0].length(); i++) {
+            char c1 = match[0].charAt(i);
+            char c2 = match[1].charAt(i);
+
+            if (c1 == c2) {
+                matchCounts[0] += 1;
+            } else if (c1 != '-' && c2 != '-') {
+                matchCounts[1] += 1;
+            } else {
+                matchCounts[2] += 1;
+            }
+        }
+        return matchCounts;
     }
 
     public void traceback(TracebackPlotter plotter) {
