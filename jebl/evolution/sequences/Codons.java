@@ -20,7 +20,7 @@ public final class Codons {
 	public static final String NAME = "codon";
 
     public static final int CANONICAL_STATE_COUNT = 64;
-    public static final int AMBIGUOUS_STATE_COUNT = 66;
+    public static final int STATE_COUNT = 66;
 
     public static final CodonState[] CANONICAL_STATES;
     public static final CodonState[] STATES;
@@ -42,14 +42,16 @@ public final class Codons {
 
     }
 
-    public static final CodonState UNKNOWN_STATE = new CodonState("?", "???", 15, CANONICAL_STATES);
-    public static final CodonState GAP_STATE = new CodonState("-", "---", 16, CANONICAL_STATES);
+    public static final CodonState UNKNOWN_STATE = new CodonState("?", "???", 64, CANONICAL_STATES);
+    public static final CodonState GAP_STATE = new CodonState("-", "---", 65, CANONICAL_STATES);
 
-	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
+    public static int getStateCount() { return STATE_COUNT; }
 
-	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
+    public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
 
-	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
+    public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
+
+    public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static CodonState getState(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3) {
 		if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
@@ -64,8 +66,13 @@ public final class Codons {
 	    return statesByCode.get(code);
 	}
 
-	public static CodonState getState(String code) {
-	    return statesByCode.get(code);
+    /**
+     * Gets the state object for the given code. Returns null if the code is illegal.
+     * @param code
+     * @return the state
+     */
+    public static CodonState getState(String code) {
+        return statesByCode.get(code);
 	}
 
 	public static CodonState getState(int index) {
@@ -101,7 +108,7 @@ public final class Codons {
 
     // now create the complete codon state array
     static {
-        STATES = new CodonState[AMBIGUOUS_STATE_COUNT];
+        STATES = new CodonState[STATE_COUNT];
         for (int i = 0; i < 64; i++) {
             STATES[i] = CANONICAL_STATES[i];
         }

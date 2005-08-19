@@ -32,8 +32,13 @@ public class BasicSequence implements Sequence {
 	    this.sequenceType = sequenceType;
         this.taxon = taxon;
         this.sequence = new int[sequenceString.length()];
-        for (int i = 0; i < sequence.length; i++) {
-            sequence[i] = sequenceType.getState(sequenceString.substring(i, i + 1)).getIndex();
+        int k = 0;
+        for (int i = 0; i < sequenceString.length(); i++) {
+            State state = sequenceType.getState(sequenceString.substring(i, i + 1));
+            if (state != null) {
+                sequence[k] = state.getIndex();
+                k++;
+            }
         }
     }
 
@@ -83,6 +88,14 @@ public class BasicSequence implements Sequence {
      */
     public State getState(int site) {
         return sequenceType.getState(sequence[site]);
+    }
+
+    /**
+     * Returns the length of the sequence
+     * @return the length
+     */
+    public int getLength() {
+        return sequence.length;
     }
 
     /**

@@ -22,18 +22,11 @@ import java.util.*;
 public interface SequenceType {
 
     /**
-     * Get number of unique states
-     *
-     * @return number of unique states
-     */
-    int getStateCount();
-
-    /**
      * Get number of states including ambiguous states
      *
-     * @return number of ambiguous states
+     * @return number of states
      */
-    int getAmbiguousStateCount();
+    int getStateCount();
 
     /**
      * Get a list of states ordered by their indices.
@@ -41,6 +34,20 @@ public interface SequenceType {
      * @return a list of states
      */
     List<State> getStates();
+
+    /**
+     * Get number of canonical states
+     *
+     * @return number of states
+     */
+    int getCanonicalStateCount();
+
+    /**
+     * Get a list of canonical states ordered by their indices.
+     *
+     * @return a list of states
+     */
+    List<State> getCanonicalStates();
 
     /**
      * Get state corresponding to a string code
@@ -105,8 +112,9 @@ public interface SequenceType {
 
 	public static final SequenceType NUCLEOTIDE = new SequenceType() {
 		public int getStateCount() { return Nucleotides.getStateCount(); }
-		public int getAmbiguousStateCount() { return Nucleotides.getAmbiguousStateCount(); }
 		public List<State> getStates() { return Nucleotides.getStates(); }
+        public int getCanonicalStateCount() { return Nucleotides.getCanonicalStateCount(); }
+        public List<State> getCanonicalStates() { return Nucleotides.getCanonicalStates(); }
 		public State getState(String code) { return Nucleotides.getState(code); }
 		public State getState(int index) { return Nucleotides.getState(index); }
 		public State getUnknownState() { return Nucleotides.getUnknownState(); }
@@ -119,9 +127,10 @@ public interface SequenceType {
 	};
 
 	public static final SequenceType AMINO_ACID = new SequenceType() {
-		public int getStateCount() { return AminoAcids.getStateCount(); }
-		public int getAmbiguousStateCount() { return AminoAcids.getAmbiguousStateCount(); }
-		public List<State> getStates() { return AminoAcids.getStates(); }
+        public int getStateCount() { return AminoAcids.getStateCount(); }
+        public List<State> getStates() { return AminoAcids.getStates(); }
+        public int getCanonicalStateCount() { return AminoAcids.getCanonicalStateCount(); }
+        public List<State> getCanonicalStates() { return AminoAcids.getCanonicalStates(); }
 		public State getState(String code) { return AminoAcids.getState(code); }
 		public State getState(int index) { return AminoAcids.getState(index); }
 		public State getUnknownState() { return AminoAcids.getUnknownState(); }
@@ -134,9 +143,10 @@ public interface SequenceType {
 	};
 
 	public static final SequenceType CODON = new SequenceType() {
-		public int getStateCount() { return Codons.getStateCount(); }
-		public int getAmbiguousStateCount() { return Codons.getAmbiguousStateCount(); }
-		public List<State> getStates() { return Codons.getStates(); }
+        public int getStateCount() { return Codons.getStateCount(); }
+        public List<State> getStates() { return Codons.getStates(); }
+        public int getCanonicalStateCount() { return Codons.getCanonicalStateCount(); }
+        public List<State> getCanonicalStates() { return Codons.getCanonicalStates(); }
 		public State getState(String code) { return Codons.getState(code); }
 		public State getState(int index) { return Codons.getState(index); }
 		public State getUnknownState() { return Codons.getUnknownState(); }

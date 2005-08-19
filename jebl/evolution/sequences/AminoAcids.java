@@ -20,7 +20,7 @@ public final class AminoAcids {
 	public static final String NAME = "amino acid";
 
     public static final int CANONICAL_STATE_COUNT = 20;
-    public static final int AMBIGUOUS_STATE_COUNT = 25;
+    public static final int STATE_COUNT = 26;
 
     public static final AminoAcidState A_STATE = new AminoAcidState("A", "A", 0);
     public static final AminoAcidState C_STATE = new AminoAcidState("C", "C", 1);
@@ -83,11 +83,13 @@ public final class AminoAcids {
           "Trp",  "Tyr",  "Asx",  "Glx",  " X ",  " * ",  " ? ",  " - "
     };
 
-	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
+    public static int getStateCount() { return STATE_COUNT; }
 
-	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
+    public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
 
-	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
+    public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
+
+    public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static AminoAcidState getState(char code) {
 	    return statesByCode[code];
@@ -129,14 +131,9 @@ public final class AminoAcids {
 
     static {
         statesByCode = new AminoAcidState[128];
-        for (int i = 0; i < STATES.length; i++) {
-            if (i >= 'A' && i <= 'z') {
-                // Undefined letters are mapped to UNKOWN_STATE
-                statesByCode[i] = AminoAcids.UNKNOWN_STATE;
-            } else {
-                // Undefined punctuations are mapped to GAP_STATE
-                statesByCode[i] = AminoAcids.GAP_STATE;
-            }
+        for (int i = 0; i < statesByCode.length; i++) {
+            // Undefined characters are mapped to null
+            statesByCode[i] = null;
         }
 
         for (AminoAcidState state : STATES) {

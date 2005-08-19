@@ -20,7 +20,7 @@ public final class Nucleotides {
 	public static final String NAME = "nucleotide";
 
     public static final int CANONICAL_STATE_COUNT = 4;
-    public static final int AMBIGUOUS_STATE_COUNT = 17;
+    public static final int STATE_COUNT = 17;
 
     public static final NucleotideState A_STATE = new NucleotideState("A", "A", 0);
     public static final NucleotideState C_STATE = new NucleotideState("C", "C", 1);
@@ -62,11 +62,13 @@ public final class Nucleotides {
 
 	// Static utility functions
 
-	public static int getStateCount() { return CANONICAL_STATE_COUNT; }
+	public static int getStateCount() { return STATE_COUNT; }
 
-	public static int getAmbiguousStateCount() { return AMBIGUOUS_STATE_COUNT; }
+    public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
 
-	public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
+	public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
+
+	public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
 	public static NucleotideState getState(char code) {
 	    return statesByCode[code];
@@ -111,13 +113,8 @@ public final class Nucleotides {
     static {
         statesByCode = new NucleotideState[128];
         for (int i = 0; i < statesByCode.length; i++) {
-            if (i >= 'A' && i <= 'z') {
-                // Undefined letters are mapped to UNKOWN_STATE
-                statesByCode[i] = Nucleotides.UNKNOWN_STATE;
-            } else {
-                // Undefined punctuations are mapped to GAP_STATE
-                statesByCode[i] = Nucleotides.GAP_STATE;
-            }
+            // Undefined characters are mapped to null
+            statesByCode[i] = null;
         }
 
         for (NucleotideState state : STATES) {

@@ -62,6 +62,17 @@ public abstract class FilteredSequence implements Sequence {
         return sequence[site];
     }
 
+    /**
+     * Returns the length of the sequence
+     * @return the length
+     */
+    public int getLength() {
+        if (sequence == null) {
+            sequence = filterSequence(source);
+        }
+        return sequence.length;
+    }
+
 	protected abstract State[] filterSequence(Sequence source);
 
 	/**

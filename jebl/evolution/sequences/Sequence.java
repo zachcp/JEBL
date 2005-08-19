@@ -45,4 +45,6 @@ public interface Sequence extends Attributable, Comparable {
      * @return the state at site.
      */
     State getState(int site);
+
+    int getLength();
 }
