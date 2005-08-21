@@ -1,5 +1,14 @@
 package jebl.evolution.align.scores;
 
+/**
+ * Base class for all score matrices in the package.
+ *
+ * @author Alexei Drummond
+ *
+ * @version $Id$
+ *
+ * Based on code originally by Peter Setsoft. See package.html.
+ */
 public abstract class Scores implements ScoreMatrix {
 
     public float[][] score;
