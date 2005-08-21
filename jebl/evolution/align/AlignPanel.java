@@ -23,13 +23,12 @@ import java.net.URL;
 public class AlignPanel extends JPanel {
 
     String[] penalties = new String[] {
-        "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"
+        "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","25", "30", "35", "40", "45", "50"
     };
 
     Scores[] scores = new Scores[] {
+            new NucleotideScores(10,-9),
             new NucleotideScores(5,-4),
-            new NucleotideScores(4,-5),
-            new NucleotideScores(3,-6),
             new Blosum45(),
             new Blosum50(),
             new Blosum60(),
@@ -209,7 +208,7 @@ public class AlignPanel extends JPanel {
                 if (shuffleCheckBox.isSelected()) {
                     // shuffle
 
-                    final int numShuffles = 100;
+                    final int numShuffles = 200;
 
                     final ProgressMonitor monitor = new ProgressMonitor(AlignPanel.this,"Shuffling","",0,numShuffles);
 
