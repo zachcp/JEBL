@@ -1,12 +1,12 @@
 package jebl.evolution.align.scores;
 
-public abstract class Scores {
+public abstract class Scores implements ScoreMatrix {
 
     public float[][] score;
 
     void buildScores(float[][] scores) {
 
-        String states = getStates();
+        String states = getAlphabet();
         // Allow lowercase and uppercase states (ASCII code <= 127):
         score = new float[127][127];
         for (int i=0; i<states.length(); i++) {
@@ -22,7 +22,9 @@ public abstract class Scores {
         }
     }
 
-    abstract public String getStates();
+    public final float getScore(char x, char y) {
+        return score[x][y];
+    }
 
     public String toString() {
         String name = getClass().getName();

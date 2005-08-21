@@ -194,7 +194,7 @@ abstract class Align {
     String strip(String s) {
 
         boolean[] valid = new boolean[127];
-        String residues = sub.getStates();
+        String residues = sub.getAlphabet();
         for (int i=0; i<residues.length(); i++) {
             char c = residues.charAt(i);
             if (c < 96) {

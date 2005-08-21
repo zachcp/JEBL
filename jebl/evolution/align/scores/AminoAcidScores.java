@@ -9,6 +9,6 @@ public class AminoAcidScores extends Scores {
 
     private String residues = "ARNDCQEGHILKMFPSTWYV";
 
-    public final String getStates() { return residues; }
+    public final String getAlphabet() { return residues; }
 
 }

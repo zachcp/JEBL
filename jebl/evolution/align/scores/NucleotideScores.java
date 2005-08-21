@@ -28,7 +28,7 @@ public class NucleotideScores extends Scores {
         this.match = match;
         this.mismatch = mismatch;
 
-        int states = getStates().length();
+        int states = getAlphabet().length();
         float[][] scores = new float[states][states];
 
         for (int i = 0; i < states; i++) {
@@ -46,7 +46,7 @@ public class NucleotideScores extends Scores {
 
     private String residues = "ACGT";
 	
-	public final String getStates() { return residues; }
+	public final String getAlphabet() { return residues; }
 
     public String toString() {
         return match + "/" + mismatch;
