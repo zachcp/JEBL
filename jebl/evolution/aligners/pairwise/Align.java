@@ -24,7 +24,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 
-abstract class AbstractAligner implements Aligner {
+abstract class AbstractAligner implements PairwiseAligner {
 
     private final Scores scores;    // scores matrix
     Sequence sequence1 = null;

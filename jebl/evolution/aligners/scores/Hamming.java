@@ -21,7 +21,7 @@ public class Hamming extends AbstractScores {
             tmpScores[i] = new float[i + 1];
             for (int j = 0; j <= i; j++) {
                 if (i == j) {
-                    tmpScores[i][j] = 0.0F;
+                    tmpScores[i][j] = 1.0F;
                 } else {
                     tmpScores[i][j] = -1.0F;
                 }
