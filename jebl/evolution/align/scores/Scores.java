@@ -13,7 +13,7 @@ public abstract class Scores implements ScoreMatrix {
 
     public float[][] score;
 
-    void buildScores(float[][] scores) {
+    protected void buildScores(float[][] scores) {
 
         String states = getAlphabet();
         // Allow lowercase and uppercase states (ASCII code <= 127):

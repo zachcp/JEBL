@@ -157,4 +157,16 @@ public interface SequenceType {
 		public State[] toStateArray(String sequenceString) { return Codons.toStateArray(sequenceString); }
 		public State[] toStateArray(int[] indexArray) { return Codons.toStateArray(indexArray); }
 	};
+
+    public class Utils {
+
+        public static String getAlphabet(SequenceType sequenceType) {
+
+            StringBuffer buffer = new StringBuffer();
+            for (State state : sequenceType.getCanonicalStates()) {
+                buffer.append(state.getCode());
+            }
+            return buffer.toString();
+        }
+    }
 }
