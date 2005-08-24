@@ -12,7 +12,6 @@
 package jebl.evolution.aligners.pairwise;
 
 import jebl.evolution.aligners.scores.*;
-import jebl.evolution.aligners.Aligner;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.BasicSequence;

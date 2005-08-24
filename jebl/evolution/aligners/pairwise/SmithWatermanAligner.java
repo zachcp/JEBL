@@ -12,7 +12,6 @@
 package jebl.evolution.aligners.pairwise;
 
 import jebl.evolution.aligners.scores.Scores;
-import jebl.evolution.aligners.pairwise.SimpleAligner;
 import jebl.evolution.sequences.Sequence;
 
 public class SmithWatermanAligner extends SimpleAligner {

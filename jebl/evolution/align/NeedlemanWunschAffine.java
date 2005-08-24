@@ -4,7 +4,7 @@ import jebl.evolution.align.scores.Scores;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 
-class NeedlemanWunschAffine extends AlignAffine {
+public class NeedlemanWunschAffine extends AlignAffine {
 
 	public NeedlemanWunschAffine(Scores sub, float d, float e) {
 		super(sub, d, e);
