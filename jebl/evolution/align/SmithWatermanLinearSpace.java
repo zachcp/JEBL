@@ -25,6 +25,9 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
         float[][] score = sub.score;
         start = new TracebackSimple[2][sq2.length() + 1];
         
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
+
         maxval = Float.NEGATIVE_INFINITY;
         // Initialize first column (i=0):
         for (int j=0; j<=m; j++) {
@@ -37,7 +40,7 @@ class SmithWatermanLinearSpace extends AlignLinearSpace {
             // Initialize first row (j=0):
             start[1][0] = new TracebackSimple(i, 0);
             for (int j=1; j<=m; j++) {
-                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float s = score[s1[i-1]][s2[j-1]];
                 float val = max(0, F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
                 F[1][j] = val;
                 if (val == 0) {          // Best alignment starts (and ends) here

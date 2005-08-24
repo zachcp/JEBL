@@ -27,6 +27,9 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
 
         super.prepareAlignment(sq1, sq2);
 
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
+
         int n = this.n, m = this.m;
         u = n/2;
         c = new int[2][m+1];
@@ -34,13 +37,14 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
         for (int j=0; j<=m; j++) {
             F[1][j] = -d * j;
         }
+        float s, val;
         for (int i=1; i<=n; i++) {
             swap01(F); swap01(c);
             // F[1] represents (new) column i and F[0] represents (old) column i-1
             F[1][0] = -d * i;
             for (int j=1; j<=m; j++) {
-                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                float val = max(F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
+                s = score[s1[i-1]][s2[j-1]];
+                val = max(F[0][j-1]+s, F[0][j]-d, F[1][j-1]-d);
                 F[1][j] = val;
                 if (i == u) {
                     c[1][j] = j;

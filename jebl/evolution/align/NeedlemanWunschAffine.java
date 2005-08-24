@@ -18,6 +18,9 @@ public class NeedlemanWunschAffine extends AlignAffine {
     	
     	prepareAlignment(sq1, sq2);
     	
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
+
         int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
@@ -45,7 +48,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
         for (int i=1; i<=n; i++) {
 
             for (int j=1; j<=m; j++) {
-                s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                s = score[s1[i-1]][s2[j-1]];
                 a = M[i-1][j-1]+s;
                 b = Ix[i-1][j-1]+s;
                 c = Iy[i-1][j-1]+s;

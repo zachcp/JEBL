@@ -3,7 +3,6 @@ package jebl;
 import jebl.evolution.align.*;
 import jebl.evolution.align.scores.Blosum45;
 import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.AminoAcids;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
@@ -20,14 +19,14 @@ public class TestAligners {
     /*
     Performance characteristics (ms, 1.8 GHz PowerPC G5 iMac with 1Gb RAM, reps=500)
 
-    NeedlemanWunschAligner	5492
-    NeedlemanWunsch	4302
-    NeedlemanWunschAligner	5314
-    NeedlemanWunsch	3673
-    NeedlemanWunschAffine	9311
-    NeedlemanWunschLinearSpace	3379
-    SmithWaterman	4141
-    SmithWatermanLinearSpaceAffine	7491
+    NeedlemanWunschAligner	5684
+    NeedlemanWunsch	2994
+    NeedlemanWunschAligner	5507
+    NeedlemanWunsch	2927
+    NeedlemanWunschAffine	8996
+    NeedlemanWunschLinearSpace	2767
+    SmithWaterman	4369
+    SmithWatermanLinearSpaceAffine	6913
 
     */
 
@@ -45,7 +44,6 @@ public class TestAligners {
 
         Sequence sequence1 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("A"),seq1);
         Sequence sequence2 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("B"),seq2);
-
 
         int reps = 500;
 

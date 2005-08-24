@@ -23,6 +23,9 @@ public class NeedlemanWunsch extends AlignSimple {
 
         prepareAlignment(sq1, sq2);
 
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
+
         int n = this.n, m = this.m;
         float[][] score = sub.score;
 
@@ -34,10 +37,11 @@ public class NeedlemanWunsch extends AlignSimple {
             F[prev][j] = -d * j;
             B[0][j].setTraceback(0, j-1);
         }
+        float s, val;
         for (int i=1; i<=n; i++) {
             for (int j=1; j<=m; j++) {
-                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
-                float val = max(F[prev][j-1]+s, F[prev][j]-d, F[curr][j-1]-d);
+                s = score[s1[i-1]][s2[j-1]];
+                val = max(F[prev][j-1]+s, F[prev][j]-d, F[curr][j-1]-d);
                 F[curr][j] = val;
                 if (val == F[prev][j-1]+s) {
                     B[i][j].setTraceback(i-1, j-1);
