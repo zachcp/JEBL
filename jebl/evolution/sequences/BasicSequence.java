@@ -83,12 +83,16 @@ public class BasicSequence implements Sequence {
 	    return sequenceType.toStateArray(sequence);
 	}
 
-    /**
-     * @return the state at site.
-     */
-    public State getState(int site) {
-        return sequenceType.getState(sequence[site]);
-    }
+	public int[] getStateIndices() {
+		return sequence;
+	}
+
+	/**
+	 * @return the state at site.
+	 */
+	public State getState(int site) {
+	    return sequenceType.getState(sequence[site]);
+	}
 
     /**
      * Returns the length of the sequence

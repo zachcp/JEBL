@@ -41,6 +41,11 @@ public interface Sequence extends Attributable, Comparable {
 	 */
 	State[] getStates();
 
+	/**
+	 * @return an array of state indices.
+	 */
+	int[] getStateIndices();
+
     /**
      * @return the state at site.
      */

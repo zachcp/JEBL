@@ -12,7 +12,6 @@
 package jebl.evolution.aligners.pairwise;
 
 import jebl.evolution.aligners.scores.Scores;
-import jebl.evolution.aligners.pairwise.SimpleAligner;
 import jebl.evolution.sequences.Sequence;
 
 public class NeedlemanWunschAligner extends SimpleAligner {
@@ -34,6 +33,9 @@ public class NeedlemanWunschAligner extends SimpleAligner {
         int n = sequence1.getLength();
         int m = sequence2.getLength();
 
+	    int[] seq1 = sequence1.getStateIndices();
+	    int[] seq2 = sequence2.getStateIndices();
+
         float d = getGapCost();
         Scores scores = getScores();
 
@@ -47,7 +49,7 @@ public class NeedlemanWunschAligner extends SimpleAligner {
         }
         for (int i=1; i<=n; i++) {
             for (int j=1; j<=m; j++) {
-                float s = scores.getScore(sequence1.getState(i-1), sequence2.getState(j-1));
+	            float s = scores.getScore(seq1[i-1], seq2[j-1]);
                 float val = max(F[prev][j-1]+s, F[prev][j]-d, F[curr][j-1]-d);
                 F[curr][j] = val;
                 if (val == F[prev][j-1]+s) {

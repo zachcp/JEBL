@@ -1,7 +1,6 @@
 package jebl.evolution.aligners.pairwise;
 
 import jebl.evolution.aligners.scores.Scores;
-import jebl.evolution.aligners.pairwise.AffineAligner;
 import jebl.evolution.sequences.Sequence;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
@@ -21,6 +20,8 @@ public class NeedlemanWunschAffineAligner extends AffineAligner {
         int n = sequence1.getLength();
         int m = sequence2.getLength();
 
+	    int[] seq1 = sequence1.getStateIndices();
+	    int[] seq2 = sequence2.getStateIndices();
         float d = getGapOpen();
         float e = getGapExtend();
         Scores scores = getScores();
@@ -50,7 +51,7 @@ public class NeedlemanWunschAffineAligner extends AffineAligner {
         for (int i=1; i<=n; i++) {
 
             for (int j=1; j<=m; j++) {
-                s = scores.getScore(sequence1.getState(i-1), sequence2.getState(j-1));
+	            s = scores.getScore(seq1[i-1], seq2[j-1]);
                 a = M[i-1][j-1]+s;
                 b = Ix[i-1][j-1]+s;
                 c = Iy[i-1][j-1]+s;

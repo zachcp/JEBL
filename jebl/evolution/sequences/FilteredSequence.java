@@ -52,6 +52,19 @@ public abstract class FilteredSequence implements Sequence {
 	    return sequence;
 	}
 
+	public int[] getStateIndices() {
+		if (sequence == null) {
+			sequence = filterSequence(source);
+		}
+		int[] stateIndices = new int[sequence.length];
+		int i = 0;
+		for (State state : sequence) {
+			stateIndices[i] = state.getIndex();
+			i++;
+		}
+		return stateIndices;
+	}
+
     /**
      * @return the state at site.
      */

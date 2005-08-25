@@ -27,7 +27,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     private final Scores scores;    // scores matrix
     Sequence sequence1 = null;
-    Sequence sequence2 = null;           // the sequences
+    Sequence sequence2 = null;      // the sequences
     Traceback B0;                	// the starting point of the traceback
 
     AbstractAligner(Scores scores) {
@@ -53,7 +53,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Aligns a pair of sequences.
-     * 
+     *
      * @param sequence1
      * @param sequence2
      */
@@ -81,7 +81,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Initialises the matrices for the alignment.
-     * 
+     *
      * @param sequence1
      * @param sequence2
      */
@@ -117,7 +117,7 @@ abstract class AbstractAligner implements PairwiseAligner {
     }
 
     /**
-     * 
+     *
      * @param val
      * @return float value of string val
      */
@@ -127,7 +127,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Print the score, the F matrix, and the alignment
-     * 
+     *
      * @param out output to print to
      * @param msg message printed at start
      * @param outputFMatrix print the score matrix
@@ -148,7 +148,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Print the score and the alignment
-     * 
+     *
      * @param out output to print to
      * @param msg msg printed at the start
      */
@@ -156,7 +156,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Get the next state in the traceback
-     * 
+     *
      * @param tb current Traceback
      * @return next Traceback
      */
@@ -169,7 +169,7 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     /**
      * Print the matrix (matrices) used to compute the alignment
-     * 
+     *
      * @param out output to print to
      */
     public abstract void printMatrix(PrintStream out);
@@ -183,7 +183,7 @@ abstract class AbstractAligner implements PairwiseAligner {
     static float max(float x1, float x2, float x3, float x4) { return max(max(x1, x2), max(x3, x4)); }
 
     /**
-     * 
+     *
      * @param s string to pad
      * @param width width to pad to
      * @return string padded to specified width with space chars.

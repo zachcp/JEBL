@@ -6,7 +6,7 @@ import jebl.evolution.sequences.State;
 import java.util.List;
 import java.util.Set;
 
-public class AbstractScores implements Scores {
+public abstract class AbstractScores implements Scores {
 
     /**
      * This function takes a string which gives the order of amino acids and a lower
@@ -66,5 +66,9 @@ public class AbstractScores implements Scores {
         return scores[state1.getIndex()][state2.getIndex()];
     }
 
-    private float[][] scores;
+	public float getScore(int stateIndex1, int stateIndex2) {
+		return scores[stateIndex1][stateIndex2];
+	}
+
+	private float[][] scores;
 }
