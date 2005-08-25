@@ -65,9 +65,13 @@ public class BasicAlignment implements Alignment {
         return new ArrayList<Sequence>(sequences.values());
     }
 
-    public Sequence getSequence(Taxon taxon) {
-        return sequences.get(taxon);
-    }
+	public SequenceType getSequenceType() {
+		return sequenceType;
+	}
+
+	public Sequence getSequence(Taxon taxon) {
+	    return sequences.get(taxon);
+	}
 
     public List<Pattern> getSitePatterns() {
         return patterns;
@@ -150,7 +154,25 @@ public class BasicAlignment implements Alignment {
             return states;
         }
 
-        private final List<State> states;
+	    /**
+	     * Get the most frequent state in this pattern.
+	     * @return the most frequent state
+	     */
+	    public State getMostFrequentState() {
+		    int maxCount = 0;
+		    State mostFrequentState = null;
+		    int[] counts = new int[sequenceType.getStateCount()];
+		    for (State state : states) {
+				counts[state.getIndex()] += 1;
+			    if (counts[state.getIndex()] > maxCount) {
+				    maxCount = counts[state.getIndex()];
+				    mostFrequentState = state;
+			    }
+		    }
+		    return mostFrequentState;
+	    }
+
+	    private final List<State> states;
     }
 
 }

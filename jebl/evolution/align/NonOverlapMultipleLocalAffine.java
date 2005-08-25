@@ -8,7 +8,7 @@ import java.util.*;
  * into two subsequences either side of the local alignment and aligning those.
  * Uses SmithWatermanLinearSpaceAffine. Stores all of the local alignments and their scores.
  * Threshold T is the minimum score that an alignment must be for inclusion.
- * 
+ *
  * @author Richard Moir
  *
  * @version $Id$
@@ -16,20 +16,20 @@ import java.util.*;
  */
 
 public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
-	
+
 	private ArrayList localAligns = new ArrayList();
 	private SmithWatermanLinearSpaceAffine swlsa;
-	
+
 	public NonOverlapMultipleLocalAffine(Scores sub, float d, float e, int T) {
 		super(sub, d, e, T);
 	}
-	
+
 	/**
      * @param sq1
      * @param sq2
      */
 	public void doAlignment(String sq1, String sq2) {
-		
+
 		if(sq1.length() < sq2.length())	{			//sq2 is the shorter seq (is not dissected).
 			String temp = sq2;
 			sq2 = sq1;
@@ -37,37 +37,37 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 		}
 		this.seq1 = sq1;
 		this.seq2 = sq2;
-		
+
 		swlsa = new SmithWatermanLinearSpaceAffine(sub, d, e);
 		swlsa.doAlignment(sq1, sq2);
-		
+
 		String[] match = swlsa.getMatch();
 		if(swlsa.getScore() >= T) {
 			localAligns.add(new LocalAlignment(match[0],match[1],swlsa.start1,swlsa.end1 - 1,swlsa.getScore()));
-			if(swlsa.start1 != 0) 
+			if(swlsa.start1 != 0)
 				recurseAlignment(sq1.substring(0, swlsa.start1), 0);
 			if(swlsa.end1 != sq1.length())
 				recurseAlignment(sq1.substring(swlsa.end1, sq1.length()), swlsa.end1);
 		}
 	}
-	
+
 	public void recurseAlignment(String sq1, int leftIndex) {
-		
+
 		swlsa.doAlignment(sq1, seq2);
-		
+
 		String match[] = swlsa.getMatch();
 		if(swlsa.getScore() >= T) {
 			localAligns.add(new LocalAlignment(match[0],match[1],swlsa.start1 + leftIndex,swlsa.end1 - 1 + leftIndex,swlsa.getScore()));
 		}
 		else return;
-		
-		if(swlsa.start1 != 0) 
+
+		if(swlsa.start1 != 0)
 			recurseAlignment(sq1.substring(0, swlsa.start1), leftIndex);
 		if(swlsa.end1 != sq1.length())
 			recurseAlignment(sq1.substring(swlsa.end1, sq1.length()), leftIndex + swlsa.end1);
-		
+
 	}
-	
+
 	/**
      * @return two-element array containing all of the local alignments separated by " - ";
      */
@@ -81,7 +81,7 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
         }
 		return new String[] {sq1.substring(0,sq1.length() - 3), sq2.substring(0,sq1.length() - 3)};
 	}
-	
+
 	/**
 	 * @param width length to trim lines to. -1 = infinite width.
 	 * @return String containing all local alignments with the score next to them.
@@ -117,7 +117,7 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
         }
 		return matchScores;
 	}
-	
+
 	/**
      * @return the score of the best alignment
      */
@@ -129,10 +129,10 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
         }
 		return score;
 	}
-	
+
 	/**
 	 * The indices for these correspond to those for the getAlignments() matrix.
-	 * 
+	 *
 	 * @return a matrix of scores for all the alignments.
 	 */
 	public float[] getScores() {
@@ -145,10 +145,10 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
         }
 		return scores;
 	}
-	
+
 	/**
-	 * The indices for these correspond to those for the getScores() matrix.
-	 * 
+	 * The indices for these correspond to those for the getScoreMatrix() matrix.
+	 *
 	 * @return a 2d matrix of alignments. first index is the alignment number. second is the sequence number (0 or 1)
 	 */
 	public String[][] getAlignments() {
@@ -162,10 +162,10 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
         }
 		return aligns;
 	}
-	
+
 	/**
      * Print matrix used to calculate this alignment.
-     * 
+     *
      * @param out Output to print to.
      */
     public void printf(Output out) {
@@ -177,13 +177,13 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
  *  Class used to store all of the local alignments.
  */
 class LocalAlignment {
-	
+
 	public String sq1;
 	public String sq2;
 	public int start;
 	public int end;
 	public float score;
-	
+
 	public LocalAlignment(String sq1, String sq2, int start, int end, float score) {
 		this.sq1 = sq1;
 		this.sq2 = sq2;

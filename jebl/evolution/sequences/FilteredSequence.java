@@ -39,7 +39,7 @@ public abstract class FilteredSequence implements Sequence {
         for (State aSequence : sequence) {
             buffer.append(aSequence.getCode());
         }
-		return source.getString();
+		return buffer.toString();
 	}
 
 	/**

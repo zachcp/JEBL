@@ -9,15 +9,15 @@ public class NeedlemanWunschAffine extends AlignAffine {
 	public NeedlemanWunschAffine(Scores sub, float d, float e) {
 		super(sub, d, e);
 	}
-	
+
 	/**
 	 * @param sq1
 	 * @param sq2
 	 */
     public void doAlignment(String sq1, String sq2) {
-    	
+
     	prepareAlignment(sq1, sq2);
-    	
+
         char[] s1 = sq1.toCharArray();
         char[] s2 = sq2.toCharArray();
 

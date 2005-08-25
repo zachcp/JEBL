@@ -8,8 +8,7 @@
  */
 package jebl.evolution.alignments;
 
-import jebl.evolution.sequences.Sequences;
-import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.*;
 
 import java.util.List;
 
@@ -22,4 +21,6 @@ import java.util.List;
 public interface Alignment extends Sequences, SitePatterns {
 
     List<Sequence> getSequenceList();
+
+	SequenceType getSequenceType();
 }

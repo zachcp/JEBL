@@ -84,4 +84,13 @@ public class Utils {
 		return reverseComplemented;
 	}
 
+	public static int[] getStateIndices(final State[] sequence) {
+		int[] indices = new int[sequence.length];
+		int i = 0;
+		for (State state : sequence) {
+			indices[i] = state.getIndex();
+		}
+
+		return indices;
+	}
 }

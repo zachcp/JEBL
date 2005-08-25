@@ -38,4 +38,6 @@ public interface Pattern {
      * @return the list of state values of this pattern.
      */
     List<State> getStates();
+
+	State getMostFrequentState();
 }
