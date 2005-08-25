@@ -22,7 +22,8 @@ abstract class AlignLinearSpaceAffine extends AlignAffine {
     
     public void prepareAlignment(String sq1, String sq2) {
     	this.n = sq1.length(); this.m = sq2.length();
-		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+		this.seq1 = sq1;
+        this.seq2 = sq2;
     	F = new float[3][2][m+1];
     }
 

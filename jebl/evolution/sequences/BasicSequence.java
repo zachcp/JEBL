@@ -70,8 +70,8 @@ public class BasicSequence implements Sequence {
      */
     public String getString() {
         StringBuffer buffer = new StringBuffer();
-        for (int i = 0; i < sequence.length; i++) {
-            buffer.append(sequenceType.getState(sequence[i]).getCode());
+        for (int i : sequence) {
+            buffer.append(sequenceType.getState(i).getCode());
         }
         return buffer.toString();
     }

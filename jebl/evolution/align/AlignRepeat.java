@@ -22,11 +22,13 @@ abstract class AlignRepeat extends Align {
     public abstract void doAlignment(String sq1, String sq2);
     
     public void prepareAlignment(String sq1, String sq2) {
-    	
-    	//first time running this alignment. Create all new matrices.
+
+        this.n = sq1.length(); this.m = sq2.length();
+        this.seq1 = sq1;
+        this.seq2 = sq2;
+
+        //first time running this alignment. Create all new matrices.
     	if(F == null) {
-    		this.n = sq1.length(); this.m = sq2.length();
-    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
     		F = new float[n+1][m+1];
     		B = new TracebackSimple[n+1][m+1];
     		for(int i = 0; i < n+1; i ++) {
@@ -35,17 +37,9 @@ abstract class AlignRepeat extends Align {
     		}
     	}
     	
-    	//alignment already been run and existing matrix is big enough to reuse.
-    	else if(sq1.length() <= n && sq2.length() <= m) {
-    		this.n = sq1.length(); this.m = sq2.length();
-    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
-    	}
-    	
-    	//alignment already been run but matrices not big enough for new alignment.
-    	//create all new matrices.
-    	else {
-    		this.n = sq1.length(); this.m = sq2.length();
-    		this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+        //alignment already been run but matrices not big enough for new alignment.
+        //create all new matrices.
+    	else if(sq1.length() > n || sq2.length() > m) {
     		F = new float[n+1][m+1];
     		B = new TracebackSimple[n+1][m+1];
     		for(int i = 0; i < n+1; i ++) {
@@ -86,8 +80,7 @@ abstract class AlignRepeat extends Align {
     public void printf(Output out) {
 
         for (int j=0; j<=m; j++) {
-            for (int i = 0; i < F.length; i++) {
-                float[] f = F[i];
+            for (float[] f : F) {
                 out.print(padLeft(formatScore(f[j]), 5));
             }
             out.println();

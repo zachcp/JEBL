@@ -28,10 +28,14 @@ abstract class AlignAffine extends Align {
     
     public void prepareAlignment(String sq1, String sq2) {
     	
+
+        n = sq1.length();
+        m = sq2.length();
+        this.seq1 = sq1;
+        this.seq2 = sq2;
+
     	//first time running this alignment. Create all new matrices.
     	if(F == null) {
-    		this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
     		F = new float[3][n+1][m+1];
     		B = new TracebackAffine[3][n+1][m+1];
     		for(int k = 0; k < 3; k++) {
@@ -42,17 +46,9 @@ abstract class AlignAffine extends Align {
     		}
     	}
     	
-    	//alignment already been run and existing matrix is big enough to reuse.
-    	else if(sq1.length() <= n && sq2.length() <= m) {
-    		this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
-    	}
-    	
-    	//alignment already been run but matrices not big enough for new alignment.
-    	//create all new matrices.
-    	else {
-    		this.n = sq1.length(); this.m = sq2.length();
-			this.seq1 = strip(sq1); this.seq2 = strip(sq2);
+        //alignment already been run but matrices not big enough for new alignment.
+        //create all new matrices.
+    	else if(sq1.length() > n || sq2.length() > m) {
     		F = new float[3][n+1][m+1];
     		B = new TracebackAffine[3][n+1][m+1];
     		for(int k = 0; k < 3; k++) {

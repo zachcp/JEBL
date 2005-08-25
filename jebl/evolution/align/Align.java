@@ -44,6 +44,10 @@ abstract class Align {
      * @return two-element array containing an alignment with maximal score
      */
     public String[] getMatch() {
+
+        char[] sq1 = seq1.toCharArray();
+        char[] sq2 = seq2.toCharArray();
+
         StringBuffer res1 = new StringBuffer();
         StringBuffer res2 = new StringBuffer();
         Traceback tb = B0;
@@ -53,12 +57,12 @@ abstract class Align {
             if (i == tb.i) {
                 res1.append('-');
             } else {
-                res1.append(seq1.charAt(i-1));
+                res1.append(sq1[i-1]);
             }
             if (j == tb.j) {
                 res2.append('-');
             } else {
-                res2.append(seq2.charAt(j-1));
+                res2.append(sq2[j-1]);
             }
             i = tb.i; j = tb.j;
         }

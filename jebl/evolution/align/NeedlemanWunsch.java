@@ -64,7 +64,7 @@ public class NeedlemanWunsch extends AlignSimple {
 
     List tracebackList(int startx, int starty) {
 
-        List tracebacks = new ArrayList();
+        List<TracebackSimple> tracebacks = new ArrayList<TracebackSimple>();
 
         Traceback tb = B0;
         while (tb != null) {

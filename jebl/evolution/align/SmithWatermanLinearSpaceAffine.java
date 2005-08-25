@@ -25,6 +25,9 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
     public void doAlignment(String sq1, String sq2) {
     	
     	prepareAlignment(sq1, sq2);
+
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
     	
         int n = this.n, m = this.m;
         float[][] score = sub.score;
@@ -41,7 +44,7 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
             // Initialize first row (j=0):
             start[1][0] = new TracebackSimple(i, 0);
             for (int j=1; j<=m; j++) {
-                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float s = score[s1[i-1]][s2[j-1]];
                 float val, valm, valix, valiy;
                 valm  = M[1][j]  = max(0, M[0][j-1]+s, Ix[0][j-1]+s, Iy[0][j-1]+s);
                 valix = Ix[1][j] = max(M[0][j]-d, Ix[0][j]-e);

@@ -59,58 +59,61 @@ public class TestAligners {
         start = System.currentTimeMillis();
         for (int i = 0; i < reps; i++) {
             nw.doAlignment(seq1, seq2);
+            nw.getMatch();
         }
         System.out.print("NeedlemanWunsch\t");
         System.out.println((System.currentTimeMillis() - start));
 
-//        NeedlemanWunschAligner nwan2 = new NeedlemanWunschAligner(new jebl.evolution.aligners.scores.Blosum45(), 10);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            nwan2.alignSequences(sequence1, sequence2);
-//        }
-//        System.out.print("NeedlemanWunschAligner\t");
-//        System.out.println((System.currentTimeMillis() - start));
-//
-//        NeedlemanWunsch nw2 = new NeedlemanWunsch(new Blosum45(), 10);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            nw2.doAlignment(seq1, seq2);
-//        }
-//        System.out.print("NeedlemanWunsch\t");
-//        System.out.println((System.currentTimeMillis() - start));
-//
-//        NeedlemanWunschAffine nwa = new NeedlemanWunschAffine(new Blosum45(), 10, 4);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            nwa.doAlignment(seq1, seq2);
-//        }
-//        System.out.print("NeedlemanWunschAffine\t");
-//        System.out.println((System.currentTimeMillis() - start));
-//
-//        NeedlemanWunschLinearSpace nwls = new NeedlemanWunschLinearSpace(new Blosum45(), 10);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            nwls.doAlignment(seq1, seq2);
-//        }
-//        System.out.print("NeedlemanWunschLinearSpace\t");
-//        System.out.println((System.currentTimeMillis() - start));
-//
-//
-//        SmithWaterman sw = new SmithWaterman(new Blosum45(), 10);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            sw.doAlignment(seq1, seq2);
-//        }
-//        System.out.print("SmithWaterman\t");
-//        System.out.println((System.currentTimeMillis() - start));
-//
-//        SmithWatermanLinearSpaceAffine swlsa = new SmithWatermanLinearSpaceAffine(new Blosum45(), 10, 4);
-//        start = System.currentTimeMillis();
-//        for (int i = 0; i < reps; i++) {
-//            swlsa.doAlignment(seq1, seq2);
-//        }
-//        System.out.print("SmithWatermanLinearSpaceAffine\t");
-//        System.out.println((System.currentTimeMillis() - start));
+/*
+        NeedlemanWunschAligner nwan2 = new NeedlemanWunschAligner(new jebl.evolution.aligners.scores.Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nwan2.alignSequences(sequence1, sequence2);
+        }
+        System.out.print("NeedlemanWunschAligner\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunsch nw2 = new NeedlemanWunsch(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nw2.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunsch\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunschAffine nwa = new NeedlemanWunschAffine(new Blosum45(), 10, 4);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nwa.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunschAffine\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        NeedlemanWunschLinearSpace nwls = new NeedlemanWunschLinearSpace(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            nwls.doAlignment(seq1, seq2);
+        }
+        System.out.print("NeedlemanWunschLinearSpace\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+
+        SmithWaterman sw = new SmithWaterman(new Blosum45(), 10);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            sw.doAlignment(seq1, seq2);
+        }
+        System.out.print("SmithWaterman\t");
+        System.out.println((System.currentTimeMillis() - start));
+
+        SmithWatermanLinearSpaceAffine swlsa = new SmithWatermanLinearSpaceAffine(new Blosum45(), 10, 4);
+        start = System.currentTimeMillis();
+        for (int i = 0; i < reps; i++) {
+            swlsa.doAlignment(seq1, seq2);
+        }
+        System.out.print("SmithWatermanLinearSpaceAffine\t");
+        System.out.println((System.currentTimeMillis() - start));
+*/
 
     }
 }
