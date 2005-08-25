@@ -16,13 +16,16 @@ public class SmithWaterman extends AlignSimple {
     	
     	super.prepareAlignment(sq1, sq2);
 
+        char[] s1 = sq1.toCharArray();
+        char[] s2 = sq2.toCharArray();
+
         int n = this.n, m = this.m;
         float[][] score = sub.score;
         int maxi = n, maxj = m;
         float maxval = Float.NEGATIVE_INFINITY;
         for (int i=1; i<=n; i++) {
             for (int j=1; j<=m; j++) {
-                float s = score[seq1.charAt(i-1)][seq2.charAt(j-1)];
+                float s = score[s1[i-1]][s2[j-1]];
                 float val = max(0, F[i-1][j-1]+s, F[i-1][j]-d, F[i][j-1]-d);
                 F[i][j] = val;
                 if (val == 0) {
