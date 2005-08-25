@@ -17,7 +17,7 @@ import java.util.*;
 
 public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 
-	private ArrayList localAligns = new ArrayList();
+	private ArrayList<LocalAlignment> localAligns = new ArrayList<LocalAlignment>();
 	private SmithWatermanLinearSpaceAffine swlsa;
 
 	public NonOverlapMultipleLocalAffine(Scores sub, float d, float e, int T) {
@@ -74,10 +74,9 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public String[] getMatch() {
 		String sq1 = "";
 		String sq2 = "";
-        for (Iterator it = localAligns.iterator(); it.hasNext();) {
-            LocalAlignment la = (LocalAlignment) it.next();
-            sq1 += la.sq1 + " - ";
-            sq2 += la.sq2 + " - ";
+        for (LocalAlignment localAlign : localAligns) {
+            sq1 += localAlign.sq1 + " - ";
+            sq2 += localAlign.sq2 + " - ";
         }
 		return new String[] {sq1.substring(0,sq1.length() - 3), sq2.substring(0,sq1.length() - 3)};
 	}
@@ -91,8 +90,7 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 		String sq2;
 		float score;
 		String matchScores = "";
-        for (Iterator it = localAligns.iterator(); it.hasNext();) {
-            LocalAlignment la = (LocalAlignment) it.next();
+        for (LocalAlignment la : localAligns) {
             sq1 = la.sq1;
             sq2 = la.sq2;
             score = la.score;
@@ -123,8 +121,7 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
      */
 	public float getScore() {
 		float score = 0;
-        for (Iterator it = localAligns.iterator(); it.hasNext();) {
-            LocalAlignment la = (LocalAlignment) it.next();
+        for (LocalAlignment la : localAligns) {
             score += la.score;
         }
 		return score;
@@ -138,8 +135,7 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public float[] getScores() {
 		float[] scores = new float[localAligns.size()];
 		int i = 0;
-        for (Iterator it = localAligns.iterator(); it.hasNext();) {
-            LocalAlignment la = (LocalAlignment) it.next();
+        for (LocalAlignment la : localAligns) {
             scores[i] = la.score;
             i++;
         }
@@ -154,8 +150,8 @@ public class NonOverlapMultipleLocalAffine extends AlignRepeatAffine {
 	public String[][] getAlignments() {
 		String[][] aligns = new String[localAligns.size()][2];
 		int i = 0;
-        for (Iterator it = localAligns.iterator(); it.hasNext();) {
-            LocalAlignment la = (LocalAlignment) it.next();
+        for (Object localAlign : localAligns) {
+            LocalAlignment la = (LocalAlignment) localAlign;
             aligns[i][0] = la.sq1;
             aligns[i][2] = la.sq2;
             i++;
