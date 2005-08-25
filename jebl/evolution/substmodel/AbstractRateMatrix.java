@@ -5,7 +5,6 @@
 // This package may be distributed under the
 // terms of the Lesser GNU General Public License (LGPL)
 
-
 package jebl.evolution.substmodel;
 
 import jebl.evolution.sequences.SequenceType;
@@ -55,66 +54,11 @@ abstract public class AbstractRateMatrix implements RateMatrix
     private transient MatrixExponential matrixExp_;
 
     /* The following is set to true in parameterChange(), and reset to false
-      * in setDistance()
-      */
+     * in setDistance()
+     */
     private transient boolean rebuildModel_ = false;
 
     private double[] parameterStore_ = null;
-
-    //
-    // Serialization code
-    //
-    private static final long serialVersionUID=7726654175983028192L;
-
-    //serialver -classpath ./classes pal.substmodel.AbstractRateMatrix
-
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        out.writeByte(4); //Version number
-        out.writeObject(frequency);
-        out.writeObject(rate);
-        out.writeObject(sequenceType);
-        out.writeObject(parameterStore_);
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException{
-        byte version = in.readByte();
-        switch(version) {
-            case 1 : {
-                frequency = (double[])in.readObject();
-                dimension = frequency.length;
-                rate = (double[][])in.readObject();
-                sequenceType = (SequenceType)in.readObject();
-                matrixExp_ = (MatrixExponential)in.readObject();
-                rebuildModel_ = true;
-                this.parameterStore_ = null;
-                break;
-            }
-            case 2 :
-            case 3 : {
-                frequency = (double[])in.readObject();
-                dimension = frequency.length;
-                rate = (double[][])in.readObject();
-                sequenceType = (SequenceType)in.readObject();
-                matrixExp_ = null;
-                rebuildModel_ = true;
-                this.parameterStore_ = null;
-                break;
-            }
-            default : {
-                if(version!=4) {
-                    System.err.println("Warning: unknown matrix version:"+version);
-                }
-                frequency = (double[])in.readObject();
-                dimension = frequency.length;
-                rate = (double[][])in.readObject();
-                sequenceType = (SequenceType)in.readObject();
-                matrixExp_ = null;
-                rebuildModel_ = true;
-                this.parameterStore_ = (double[])in.readObject();
-                break;
-            }
-        }
-    }
 
     // Constructor
     protected AbstractRateMatrix(int dim) {
@@ -131,8 +75,8 @@ abstract public class AbstractRateMatrix implements RateMatrix
     public int getDimension() {   return dimension;  }
 
     /**
-        * @return stationary frequencies (sum = 1.0)
-        */
+     * @return stationary frequencies (sum = 1.0)
+     */
     public double[] getEquilibriumFrequencies() {  return frequency;  }
 
     /**
@@ -149,10 +93,11 @@ abstract public class AbstractRateMatrix implements RateMatrix
      */
     public double[][] getRelativeRates() {  return rate;  }
 
-    /** Returns the probability of going from one state to another
-     *       	given the current distance
-     *       	@param fromState The state from which we are starting
-     *       	@param toState The resulting state
+    /**
+     * @return the probability of going from one state to another
+     * given the current distance
+     * @param fromState The state from which we are starting
+     * @param toState The resulting state
      */
     public double getTransitionProbability(int fromState, int toState) {
         return matrixExp_.getTransitionProbability(fromState,toState);
@@ -177,7 +122,6 @@ abstract public class AbstractRateMatrix implements RateMatrix
         handleRebuild();
         matrixExp_.setDistance(distance);
     }
-
 
     /** Sets the distance (such as time/branch length) used when calculating
      *  the probabilities. The resulting transition probabilities will be in reverse
@@ -211,7 +155,6 @@ abstract public class AbstractRateMatrix implements RateMatrix
         rebuildModel_ = false;
         return result;
     }
-
 
     /** Computes normalized rate matrix from Q matrix (general reversible model)
      * - Q_ii = 0

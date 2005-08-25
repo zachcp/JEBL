@@ -11,7 +11,6 @@ import java.io.*;
 
 import jebl.evolution.sequences.SequenceType;
 
-
 /**
  * abstract base class for all rate matrices
  *
@@ -62,8 +61,9 @@ public interface RateMatrix extends  Cloneable, Serializable {
      */
     double getTransitionProbability(int fromState, int toState);
 
-    /** A utility method for speed, transfers trans prob information quickly
-     *	into store
+    /**
+     * A utility method for speed, transfers trans prob information quickly
+     * into store.
      */
     void getTransitionProbabilities(double[][] probabilityStore);
 
@@ -71,15 +71,4 @@ public interface RateMatrix extends  Cloneable, Serializable {
      *	the probabilities. This method may well take the most time!
      */
     void setDistance(double distance);
-
-    /** Sets the distance (such as time/branch length) used when calculating
-     *	the probabilities. The resulting transition probabilities will be in reverse
-     *  (that is in the matrix instead of [from][to] it's [to][from])
-     */
-    void setDistanceTranspose(double distance);
-
-    public double setParametersNoScale(double[] parameters);
-
-    public void scale(double scaleValue);
-
 }
