@@ -37,7 +37,8 @@ public class NeedlemanWunschAligner extends SimpleAligner {
 	    int[] seq2 = sequence2.getStateIndices();
 
         float d = getGapCost();
-        Scores scores = getScores();
+
+        float[][] scoreMatrix = getScores().getScoreMatrix();
 
         F[curr][0] = -d;
         for (int i=1; i<=n; i++) {
@@ -49,7 +50,7 @@ public class NeedlemanWunschAligner extends SimpleAligner {
         }
         for (int i=1; i<=n; i++) {
             for (int j=1; j<=m; j++) {
-	            float s = scores.getScore(seq1[i-1], seq2[j-1]);
+	            float s = scoreMatrix[seq1[i-1]][seq2[j-1]];
                 float val = max(F[prev][j-1]+s, F[prev][j]-d, F[curr][j-1]-d);
                 F[curr][j] = val;
                 if (val == F[prev][j-1]+s) {
@@ -69,6 +70,7 @@ public class NeedlemanWunschAligner extends SimpleAligner {
         }
         B0 = new TracebackSimple(n, m);
         maxScore = F[curr][m];
+
     }
 
     /**

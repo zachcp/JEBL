@@ -62,9 +62,13 @@ public abstract class AbstractScores implements Scores {
     }
 
 
-    public float getScore(State state1, State state2) {
-        return scores[state1.getIndex()][state2.getIndex()];
-    }
+	public float[][] getScoreMatrix() {
+		return scores;
+	}
+
+	public float getScore(State state1, State state2) {
+	    return scores[state1.getIndex()][state2.getIndex()];
+	}
 
 	public float getScore(int stateIndex1, int stateIndex2) {
 		return scores[stateIndex1][stateIndex2];
