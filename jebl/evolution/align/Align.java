@@ -1,7 +1,6 @@
 package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
-import jebl.evolution.align.scores.Blosum45;
 
 abstract class Align {
 

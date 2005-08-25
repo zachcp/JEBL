@@ -12,7 +12,6 @@ import java.io.*;
  * @version $Id$
  *
  */
-
 public class AlignCommand {
 	
 	private boolean relaunch = true;	//run command interface again

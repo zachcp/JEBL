@@ -2,6 +2,11 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
+/**
+ * @author Alexei Drummond
+ *
+ * @version $Id$
+ */
 public class MaximalSegmentPair extends AlignSimple {
 	
 	public MaximalSegmentPair(Scores sub) {
@@ -12,7 +17,7 @@ public class MaximalSegmentPair extends AlignSimple {
 	 * @param sq1
 	 * @param sq2
 	 */
-    public void doAlignment(String sq1, String sq2) {
+    public final void doAlignment(String sq1, String sq2) {
     	
     	super.prepareAlignment(sq1, sq2);
 
@@ -40,7 +45,7 @@ public class MaximalSegmentPair extends AlignSimple {
         B0 = new TracebackSimple(maxi, maxj);
     }
 
-    public Traceback next(Traceback tb) {
+    public final Traceback next(Traceback tb) {
 
         Traceback next = super.next(tb);
         if (next != null) {
