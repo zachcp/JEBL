@@ -7,10 +7,11 @@ import jebl.evolution.align.scores.Scores;
 // uses linear space.
 
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
+    private float finalScore;
 
-	public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
-		super(sub, d, e);
-	}
+    public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
+        super(sub, d, e);
+    }
 
     String[] matchResult;
     private static final int TYPE_ANY = 0;
@@ -64,6 +65,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         if (n< 6 || m<6) {
             NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
             align.doAlignment(sq1,sq2);
+            setScore ( align.getScore());
             return align.getMatch();
         }
 
@@ -185,9 +187,24 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         int v= C [ bestk][1][m];
         int vtype = Ctype [ bestk][1][m];
+        float finalScore = F [ bestk][1][m];
 
         String[] match1= doAlignment(sq1.substring(0,u),sq2.substring(0,v),startType,vtype );
+        float match1Score= getScore();
         String[] match2= doAlignment(sq1.substring(u),sq2.substring(v),vtype, endType );
+        float match2Score = getScore();
+        if (match1Score+ match2Score != finalScore) {
+            throw new Error ("final score doesn't match (" + match1Score + "+" + match2Score + "!=" + finalScore+ ")");
+        }
+        setScore (finalScore);
         return new String[] {match1[0]+ match2[0], match1[1]+ match2[1]};
+    }
+
+    @Override public float getScore() {
+        return finalScore;
+    }
+
+    private void setScore(float finalScore) {
+        this.finalScore=finalScore;
     }
 }
