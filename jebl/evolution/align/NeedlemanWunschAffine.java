@@ -15,6 +15,13 @@ public class NeedlemanWunschAffine extends AlignAffine {
 	 * @param sq2
 	 */
     public void doAlignment(String sq1, String sq2) {
+        doAlignment (sq1,sq2, TYPE_ANY, TYPE_ANY);
+        //the type_... parameters should generally only be used by the
+        //NeedlemanWunschLinearSpaceAffine algorithm to handle it's base
+        //recursion case.
+    }
+
+    public void doAlignment(String sq1, String sq2, int startType, int endType) {
 
     	prepareAlignment(sq1, sq2);
 
@@ -27,8 +34,16 @@ public class NeedlemanWunschAffine extends AlignAffine {
         float val;
         float s, a, b, c;
 
+        M[0][0]= 0;
+        Ix[0][0]= 0;
+        Iy[0][0]= 0;
+
         for (int i=1; i<=n; i++) {
-            Ix[i][0] = -d - e * (i-1);
+            float base =d;
+            if (startType == TYPE_X)
+                base = e;//if startType IS TYPE_X then we were already in a
+            // gap, so we can use gap extension penalty rather than gap starting penalty
+            Ix[i][0] = -base - e * (i-1);
             B[1][i][0].setTraceback(1, i-1, 0);
         }
 
@@ -37,7 +52,12 @@ public class NeedlemanWunschAffine extends AlignAffine {
         }
 
         for (int j=1; j<=m; j++) {
-            Iy[0][j] = -d - e * (j-1);
+            float base = d;
+            if (startType == TYPE_Y)
+                base = e;//if startType IS TYPE_Y then we were already in a
+            // gap, so we can use gap extension penalty rather than gap starting penalty
+
+            Iy[0][j] = -base - e * (j-1);
             B[2][0][j].setTraceback(2, 0, j-1);
         }
 
@@ -103,6 +123,16 @@ public class NeedlemanWunschAffine extends AlignAffine {
                 maxk = k;
             }
         }
+        if (endType == TYPE_X)
+            maxk= 1;
+        if (endType == TYPE_Y)
+            maxk= 2;
+
         B0 = new TracebackAffine(maxk, n, m);
     }
+
+    private static final int TYPE_ANY = 0;
+    private static final int TYPE_X = 1;
+    private static final int TYPE_Y = 2;
+
 }

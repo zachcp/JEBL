@@ -73,7 +73,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         if (n< 6 || m<6) {
             NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
-            align.doAlignment(sq1,sq2);
+//            align.doAlignment(sq1,sq2);
+            align.doAlignment(sq1,sq2, startType, endType);
             setScore ( align.getScore());
             return align.getMatch();
         }
@@ -162,18 +163,18 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                 c = Ix[1][j-1]-d;
                 val = Iy[1][j] = max(a, b, c);
                 if (i == u) {
-                    cm[1][j] = j;
-                    cmtype[1][j] = TYPE_ANY;
+                    cy[1][j] = j;
+                    cytype[1][j] = TYPE_ANY;
                 } else if (i > u) {
                     if (val == a) {
                         cy[1][j] = cm[1][j - 1];
                         cytype[1][j] = cmtype[1][j - 1];
                     } else if (val == b) {
-                        cy[1][j] = cx[1][j - 1];
-                        cytype[1][j] = cxtype[1][j - 1];
-                    } else if (val == c) {
                         cy[1][j] = cy[1][j - 1];
                         cytype[1][j] = cytype[1][j - 1];
+                    } else if (val == c) {
+                        cy[1][j] = cx[1][j - 1];
+                        cytype[1][j] = cxtype[1][j - 1];
                     } else {
                         throw new Error("NWAffine 3");
                     }
@@ -198,17 +199,48 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         int vtype = Ctype [ bestk][1][m];
         float finalScore = F [ bestk][1][m];
 
-        String[] match1= doAlignment(sq1.substring(0,u),sq2.substring(0,v),startType,vtype );
-        float match1Score= getScore();
-        String[] match2= doAlignment(sq1.substring(u),sq2.substring(v),vtype, endType );
-        float match2Score = getScore();
-        if (match1Score+ match2Score != finalScore) {
 
-//            String message = "final score doesn't match (" + match1Score + "+" + match2Score + "=" + (match2Score + match1Score)+ "!=" + finalScore + ")";
-//            System.out.println (message);
-            //throw new Error (message);
+        String sequence1a = sq1.substring(0, u);
+        String sequence2a = sq2.substring(0, v);
+        String[] match1= doAlignment(sequence1a,sequence2a,startType,vtype );
+        float match1Score= getScore();
+        String sequence1b = sq1.substring(u);
+        String sequence2b = sq2.substring(v);
+        String[] match2= doAlignment(sequence1b,sequence2b,vtype, endType );
+        float match2Score = getScore();
+        float combineScore = match1Score + match2Score;
+
+        //I thought the following would be a good idea to test how well it is working,
+        //  but in practice
+        // the floatingpoint error builds up to exceed small amounts
+        // even on my test caseof only a few hundred characters
+        /*
+        if (Math.abs(combineScore - finalScore)> 0.0001f) {
+            System.out.println (sequence1a+ "+" + sequence1b);
+            System.out.println (sequence2a+ "+" + sequence2b);
+
+            String message = "final score doesn't match (" + match1Score + "+" + match2Score + "=" + (match2Score + match1Score)+ "!=" + finalScore + ")";
+            System.out.println (message);
+            System.out.println (match1[0]);
+            System.out.println (match1[1]);
+            System.out.println (match2[0]);
+            System.out.println (match2[1]);
+            NeedlemanWunschAffine align = new NeedlemanWunschAffine(sub, d, e);
+            align.doAlignment(sq1, sq2, startType, endType);
+            System.out.println ("score from quadratic algorithm =" +align.getScore());
+            String[] match3=align.getMatch();
+            System.out.println(match3[0]);
+            System.out.println(match1[0] + match2[0]);
+            System.out.println(match3[1]);
+            System.out.println(match1[1]+match2[1]);
+
+
+            throw new Error (message);
         }
+        */
         setScore (finalScore);
+
+//        setScore (combineScore);
         return new String[] {match1[0]+ match2[0], match1[1]+ match2[1]};
     }
 
@@ -248,15 +280,19 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         NeedlemanWunschAffine align2 =new NeedlemanWunschAffine(scores, d,e);
         align2.doAlignment(sequence1, sequence2);
 
-        String[] results2 = align.getMatch() ;
+        String[] results2 = align2.getMatch() ;
         System.out.println(results[0]);
         System.out.println(results2[0]);
         System.out.println(results[1]);
         System.out.println (results2[1]);
+        float score = align.getScore();
+        float score2= align2.getScore() ;
         if (results[0].equals (results2[0])&& results[1].equals ( results2[1]))
             System.out.println ("results are the same");
         else
             System.out.println ("results are different");
+        System.out.println ("score 1 =" + score);
+        System.out.println ("score 2 =" + score2);
     }
 }
 
