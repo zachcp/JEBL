@@ -72,11 +72,12 @@ public class AlignCommand {
 		System.out.println( "7.SmithWatermanLinearSpace");
 		System.out.println( "8.SmithWatermanLinearSpaceAffine");
 		System.out.println( "9.NonOverlapMultipleAlign");
-		
-		int input = 0;
+        System.out.println("10.NeedlemanWunschLinearSpaceAffine (still under development)");
+
+        int input = 0;
 		try {
 			input = Integer.parseInt(readInput("? "));
-			if(input < 1 || input > 9) throw new Exception("must be 1 to 8");
+			if(input < 1 || input > 10) throw new Exception("must be 1 to 10");
 		}
 		catch(Exception e) {
 			System.out.println("invalid entry\n" + e);
@@ -117,7 +118,10 @@ public class AlignCommand {
 			case 9:
 				ara = new NonOverlapMultipleLocalAffine(null, 0, 0, 0);
 				break;
-		}
+            case 10:
+                aa = new NeedlemanWunschLinearSpaceAffine(null, 0, 0);
+                break;
+        }
 		
 		//choose alignment parameters
 		System.out.println("Enter gap open penalty:");

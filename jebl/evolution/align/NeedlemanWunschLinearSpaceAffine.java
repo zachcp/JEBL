@@ -2,6 +2,11 @@ package jebl.evolution.align;
 // Do not use yet. Implementation not complete !!!
 
 import jebl.evolution.align.scores.Scores;
+import jebl.evolution.align.scores.ScoresFactory;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.taxa.Taxon;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 // uses linear space.
@@ -103,7 +108,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                 b = Ix[0][j-1]+s;
                 c = Iy[0][j-1]+s;
 
-                val = M[i][j] = max(a, b, c);
+                val = M[1][j] = max(a, b, c);
                 if (i == u) {
                     cm[1][j]=j;
                     cmtype[1][j]= TYPE_ANY;
@@ -125,10 +130,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                     }
                 }
 
-                a = M[i-1][j]-d;
-                b = Ix[i-1][j]-e;
-                c = Iy[i-1][j]-d;
-                val = Ix[i][j] = max(a, b, c);
+                a = M[0][j]-d;
+                b = Ix[0][j]-e;
+                c = Iy[0][j]-d;
+                val = Ix[1][j] = max(a, b, c);
                 if (i == u) {
                     cx[1][j] = j;
                     cxtype[1][j] = TYPE_X;
@@ -148,10 +153,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                 }
 
 
-                a = M[i][j-1]-d;
-                b = Iy[i][j-1]-e;
-                c = Ix[i][j-1]-d;
-                val = Iy[i][j] = max(a, b, c);
+                a = M[1][j-1]-d;
+                b = Iy[1][j-1]-e;
+                c = Ix[1][j-1]-d;
+                val = Iy[1][j] = max(a, b, c);
                 if (i == u) {
                     cm[1][j] = j;
                     cmtype[1][j] = TYPE_ANY;
@@ -207,4 +212,31 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private void setScore(float finalScore) {
         this.finalScore=finalScore;
     }
+
+
+    public static void main(String[] arguments) {
+        Scores scores = ScoresFactory.generateScores("Blosum45");
+        Sequence seq1 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("sequence1"),
+                "PLQMKKTAFTLLLFIALTLTTSPLVNGSEKSEEINEKDLRKKSELQGTALGNLKQIYYYNEKAKTENKES" +
+                        "HDQFLQHTILFKGFFTDHSWYNDLLVDFDSKDIVDKYKGKKVDLYGAYYGYQCAGGTPNKTACMYGGVTL" +
+                        "HDNNRLTEEKKVPINLWLDGKQNTVPLETVKTNKKNVTVQELDLQARRYLQEKYNLYNSDVFDGKVQRGL" +
+                        "IVFHTSTEPSVNYDLFGAQGQYSNTLLRIYRDNKTISSENMHIDIYLYTSY");
+
+        Sequence seq2 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("sequence2"),
+                "MYKRLFISHVILIFALILVISTPNVLAESQPDPKPDELHKSSKFTGLMENMKVLYDDNHVSAINVKSIDQ" +
+                        "FLYFDLIYSIKDTKLGNYDNVRVEFKNKDLADKYKDKYVDVFGANYYYQCYFSKKTNDINSHQTDKRKTC" +
+                        "MYGGVTEHNGNQLDKYRSITVRVFEDGKNLLSFDVQTNKKKVTAQELDYLTRHYLVKNKKLYEFNNSPYE" +
+                        "TGYIKFIENENSFWYDMMPAPGDKFDQSKYLMMYNDNKMVDSKDVKIEVYLTTKKK");
+        String sequence1= seq1. getString();
+        String sequence2= seq2.getString();
+
+        float e= 0.1f;
+        float d= 1.0f;
+
+
+        NeedlemanWunschLinearSpaceAffine align =new NeedlemanWunschLinearSpaceAffine(scores, d,e);
+        align.doAlignment(sequence1, sequence2);
+    }
 }
+
+
