@@ -12,7 +12,9 @@ abstract class AlignAffine extends Align {
     float e;                        	// gap extension cost
     float[][][] F = null;               // the matrices used to compute the alignment
     TracebackAffine[][][] B = null;     // the traceback matrix
-    
+    private int oldn = 0;
+    private int oldm = 0;
+
     public AlignAffine(Scores sub, float d, float e) {
     	super(sub, d);
         setGapExtend(e);
@@ -27,7 +29,6 @@ abstract class AlignAffine extends Align {
     public abstract void doAlignment(String seq1, String seq2);
     
     public void prepareAlignment(String sq1, String sq2) {
-    	
 
         n = sq1.length();
         m = sq2.length();
@@ -44,20 +45,27 @@ abstract class AlignAffine extends Align {
     					B[k][i][j] = new TracebackAffine(0,0,0);
     			}
     		}
-    	}
-    	
+            oldn = n;
+            oldm = m;
+        }
+
         //alignment already been run but matrices not big enough for new alignment.
         //create all new matrices.
-    	else if(sq1.length() > n || sq2.length() > m) {
-    		F = new float[3][n+1][m+1];
-    		B = new TracebackAffine[3][n+1][m+1];
+    	else if(sq1.length() > oldn || sq2.length() > oldm) {
+            int extram = 5;
+            int extran = 5;
+//            System.out.println ("creating new arrays "+n+ "," +m+ " was " + oldn+ "," + oldm);
+            F = new float[3][n+1+extran][m+1+extram];
+    		B = new TracebackAffine[3][n+1+extran][m+1+extram];
     		for(int k = 0; k < 3; k++) {
-    			for(int i = 0; i < n+1; i ++) {
-    				for(int j = 0; j < m+1; j++)
+    			for(int i = 0; i < n+1+extran; i ++) {
+    				for(int j = 0; j < m+1+extram;j++)
     					B[k][i][j] = new TracebackAffine(0,0,0);
     			}
     		}
-    	}
+            oldn = n + extran;
+            oldm = m + extram;
+        }
     }
 
     public void setGapExtend(float e) {

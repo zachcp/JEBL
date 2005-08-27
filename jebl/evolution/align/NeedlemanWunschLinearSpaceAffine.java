@@ -16,14 +16,18 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
         super(sub, d, e);
+         quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
 
+    private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
+    //  algorithm to calculate the alignment as the base recursion case.
     String[] matchResult;
     private static final int TYPE_ANY = 0;
     private static final int TYPE_X = 1;
     private static final int TYPE_Y= 2;
     private int C[][][];
     private int Ctype[][][];
+    private int previousm= 0, previousn= 0;
 
     /**
 	 * @param sq1
@@ -37,9 +41,13 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         prepareAlignment (sq1,sq2);
         //we initialise the following arrays here rather than in prepareAlignment
         //so that we do not have to create them again during recursion.
-        F = new float[3][2][m + 1];
-        C = new int [3] [ 2] [m+1];
-        Ctype = new int [3] [3] [m+1];
+        if (n> previousn||m> previousm) {
+            F = new float[3][2][m + 1];
+            C = new int [3] [ 2] [m+1];
+            Ctype = new int [3] [3] [m+1];
+            previousn=n;
+            previousm=m;
+        }
         matchResult =doAlignment (sq1,sq2, TYPE_ANY, TYPE_ANY);
     }
 
@@ -72,11 +80,14 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         int u=n/2;
 
         if (n< 6 || m<6) {
-            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
+//            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
+            quadraticAlign.setScores(sub);
+            quadraticAlign.setGapOpen(d);
+            quadraticAlign.setGapExtend(e);
 //            align.doAlignment(sq1,sq2);
-            align.doAlignment(sq1,sq2, startType, endType);
-            setScore ( align.getScore());
-            return align.getMatch();
+            quadraticAlign.doAlignment(sq1,sq2, startType, endType);
+            setScore (quadraticAlign.getScore());
+            return quadraticAlign.getMatch();
         }
 
         //all that the remainder of this function does is to calculate the midpoint
@@ -273,26 +284,57 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         float d= 1.0f;
 
 
-        NeedlemanWunschLinearSpaceAffine align =new NeedlemanWunschLinearSpaceAffine(scores, d,e);
-        align.doAlignment(sequence1, sequence2);
+        long start;
+        long end;
+        final int repeat = 10;
 
-        String[] results = align.getMatch() ;
-        NeedlemanWunschAffine align2 =new NeedlemanWunschAffine(scores, d,e);
-        align2.doAlignment(sequence1, sequence2);
+        start = System.currentTimeMillis();
+        String[] results2= null, results= null, results3= null;
+        NeedlemanWunschAffine align2= null;
+        NeedlemanWunschLinearSpaceAffine align= null;
+        OldNeedlemanWunschAffine align3= null;
 
-        String[] results2 = align2.getMatch() ;
+        align2 = new NeedlemanWunschAffine(scores, d, e);
+        for(int i= 0; i<repeat;i++) {
+            align2.doAlignment(sequence1, sequence2);
+
+            results2 = align2.getMatch() ;
+        }
+        end = System.currentTimeMillis();
+        System.out.println("quadratic space took " + (end - start) + " milliseconds");
+
+        start = System.currentTimeMillis();
+        align = new NeedlemanWunschLinearSpaceAffine(scores, d, e);
+        for (int i = 0; i < repeat; i++) {
+            align.doAlignment(sequence1, sequence2);
+            results = align.getMatch();
+        }
+        end = System.currentTimeMillis();
+        System.out.println("linear space took " + (end - start) + " milliseconds");
+
+        start = System.currentTimeMillis();
+        for (int i = 0; i < repeat; i++) {
+            align3 =new OldNeedlemanWunschAffine(scores, d,e);
+            align3.doAlignment(sequence1, sequence2);
+
+            results3 = align3.getMatch() ;
+        }
+        end = System.currentTimeMillis();
+        System.out.println("old quadratic space took " + (end - start) + " milliseconds");
         System.out.println(results[0]);
-        System.out.println(results2[0]);
+        System.out.println(results3[0]);
+//        System.out.println(results3[0]);
         System.out.println(results[1]);
-        System.out.println (results2[1]);
+        System.out.println (results3[1]);
+//        System.out.println (results3[1]);
         float score = align.getScore();
-        float score2= align2.getScore() ;
-        if (results[0].equals (results2[0])&& results[1].equals ( results2[1]))
+        float score3= align3.getScore() ;
+        if (results[0].equals (results3[0])&& results[1].equals ( results3[1]))
             System.out.println ("results are the same");
         else
             System.out.println ("results are different");
         System.out.println ("score 1 =" + score);
-        System.out.println ("score 2 =" + score2);
+        System.out.println ("score 2 =" + score3);
     }
 }
 
