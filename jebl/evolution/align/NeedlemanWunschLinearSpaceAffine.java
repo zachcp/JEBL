@@ -294,8 +294,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         NeedlemanWunschLinearSpaceAffine align= null;
         OldNeedlemanWunschAffine align3= null;
 
-        align2 = new NeedlemanWunschAffine(scores, d, e);
         for(int i= 0; i<repeat;i++) {
+            align2 = new NeedlemanWunschAffine(scores, d, e);
             align2.doAlignment(sequence1, sequence2);
 
             results2 = align2.getMatch() ;
@@ -304,8 +304,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         System.out.println("quadratic space took " + (end - start) + " milliseconds");
 
         start = System.currentTimeMillis();
-        align = new NeedlemanWunschLinearSpaceAffine(scores, d, e);
         for (int i = 0; i < repeat; i++) {
+            align = new NeedlemanWunschLinearSpaceAffine(scores, d, e);
             align.doAlignment(sequence1, sequence2);
             results = align.getMatch();
         }
@@ -314,7 +314,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         start = System.currentTimeMillis();
         for (int i = 0; i < repeat; i++) {
-            align3 =new OldNeedlemanWunschAffine(scores, d,e);
+            align3 = new OldNeedlemanWunschAffine(scores, d, e);
             align3.doAlignment(sequence1, sequence2);
 
             results3 = align3.getMatch() ;
