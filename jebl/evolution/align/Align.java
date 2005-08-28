@@ -164,6 +164,7 @@ abstract class Align {
     // auxillary static functions
 
     static float max(float x1, float x2) { return (x1 > x2 ? x1 : x2); }
+    static int maxi(int x1, int x2) { return (x1 > x2 ? x1 : x2); }
 
     static float max(float x1, float x2, float x3) { return max(x1, max(x2, x3)); }
 

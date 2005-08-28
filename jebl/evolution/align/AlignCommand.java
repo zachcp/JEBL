@@ -72,7 +72,7 @@ public class AlignCommand {
 		System.out.println( "7.SmithWatermanLinearSpace");
 		System.out.println( "8.SmithWatermanLinearSpaceAffine");
 		System.out.println( "9.NonOverlapMultipleAlign");
-        System.out.println("10.NeedlemanWunschLinearSpaceAffine (still under development)");
+        System.out.println("10.NeedlemanWunschLinearSpaceAffine");
 
         int input = 0;
 		try {

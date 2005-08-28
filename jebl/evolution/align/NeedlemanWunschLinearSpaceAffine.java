@@ -13,6 +13,7 @@ import jebl.evolution.taxa.Taxon;
 
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private float finalScore;
+    static final int RECURSION_THRESHOLD = 6;
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
         super(sub, d, e);
@@ -79,7 +80,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         float s, a, b, c;
         int u=n/2;
 
-        if (n< 6 || m<6) {
+        if (n< RECURSION_THRESHOLD || m<RECURSION_THRESHOLD) {
 //            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
             quadraticAlign.setScores(sub);
             quadraticAlign.setGapOpen(d);
@@ -286,7 +287,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         long start;
         long end;
-        final int repeat = 10;
+        final int repeat = 2;
 
         start = System.currentTimeMillis();
         String[] results2= null, results= null, results3= null;
