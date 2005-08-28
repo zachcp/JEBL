@@ -1,5 +1,4 @@
 package jebl.evolution.align;
-// Do not use yet. Implementation not complete !!!
 
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
