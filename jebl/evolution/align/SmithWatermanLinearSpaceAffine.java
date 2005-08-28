@@ -13,22 +13,22 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
     float maxval;           	// Score of best alignment
     int start1, start2;   		// Best alignment begins at (start1, start2)
     int end1, end2;       		// Best alignment ends at (end1, end2)
-    
+
     public SmithWatermanLinearSpaceAffine(Scores sub, float d, float e) {
     	super(sub, d, e);
     }
-    
+
     /**
 	 * @param sq1
 	 * @param sq2
 	 */
     public void doAlignment(String sq1, String sq2) {
-    	
+
     	prepareAlignment(sq1, sq2);
 
         char[] s1 = sq1.toCharArray();
         char[] s2 = sq2.toCharArray();
-    	
+
         int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
@@ -87,7 +87,7 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         // The optimal local alignment between seq1 and seq2 is the
         // optimal global alignment between subseq1 and subseq2:
-        NeedlemanWunschAffine nwa1 = new NeedlemanWunschAffine(sub, d, e);
+        NeedlemanWunschLinearSpaceAffine nwa1 = new NeedlemanWunschLinearSpaceAffine(sub, d, e);
         nwa1.doAlignment(subseq1, subseq2);
         return nwa1.getMatch();
     }

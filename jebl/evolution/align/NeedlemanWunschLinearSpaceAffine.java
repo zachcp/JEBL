@@ -368,6 +368,16 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             System.out.println ("results are different");
         System.out.println ("score 1 =" + score);
         System.out.println ("score 2 =" + score3);
+
+        SmithWatermanLinearSpaceAffine align4= null;
+        start = System.currentTimeMillis();
+        for (int i = 0; i < repeat; i++) {
+            align4 = new SmithWatermanLinearSpaceAffine(scores, d, e);
+            align4.doAlignment(sequence1, sequence2);
+            align4.getMatch();
+        }
+        end = System.currentTimeMillis();
+        System.out.println("SmithWaterman linear space affine space took " + (end - start) + " milliseconds");
     }
 }
 
