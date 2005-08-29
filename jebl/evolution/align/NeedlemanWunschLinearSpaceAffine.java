@@ -5,6 +5,7 @@ import jebl.evolution.align.scores.ScoresFactory;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.SequenceTester;
 import jebl.evolution.taxa.Taxon;
 
 import java.io.BufferedReader;
@@ -266,55 +267,15 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         this.finalScore=finalScore;
     }
 
-    public static String readSequence (String name) {
-        try {
-            BufferedReader br1 = new BufferedReader(new FileReader(name));
-            String sq1= "";
-
-            String line = br1.readLine();
-            if (!((line.substring(0, 1)).equals(">")))
-                sq1 += line;
-            line = br1.readLine();
-            while (line != null) {
-                if (line.substring(0, 1).equals(">")) break;
-                sq1 = sq1.concat(line.trim());
-                line = br1.readLine();
-            }
-            return sq1;
-        }
-        catch ( Exception e) {
-            return "";
-        }
-
-
-
-    }
-
     public static void main(String[] arguments) {
         Scores scores = ScoresFactory.generateScores("Blosum45");
-        Sequence seq1 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("sequence1"),
-                "PLQMKKTAFTLLLFIALTLTTSPLVNGSEKSEEINEKDLRKKSELQGTALGNLKQIYYYNEKAKTENKES" +
-                        "HDQFLQHTILFKGFFTDHSWYNDLLVDFDSKDIVDKYKGKKVDLYGAYYGYQCAGGTPNKTACMYGGVTL" +
-                        "HDNNRLTEEKKVPINLWLDGKQNTVPLETVKTNKKNVTVQELDLQARRYLQEKYNLYNSDVFDGKVQRGL" +
-                        "IVFHTSTEPSVNYDLFGAQGQYSNTLLRIYRDNKTISSENMHIDIYLYTSY");
-
-        Sequence seq2 = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("sequence2"),
-                "MYKRLFISHVILIFALILVISTPNVLAESQPDPKPDELHKSSKFTGLMENMKVLYDDNHVSAINVKSIDQ" +
-                        "FLYFDLIYSIKDTKLGNYDNVRVEFKNKDLADKYKDKYVDVFGANYYYQCYFSKKTNDINSHQTDKRKTC" +
-                        "MYGGVTEHNGNQLDKYRSITVRVFEDGKNLLSFDVQTNKKKVTAQELDYLTRHYLVKNKKLYEFNNSPYE" +
-                        "TGYIKFIENENSFWYDMMPAPGDKFDQSKYLMMYNDNKMVDSKDVKIEVYLTTKKK");
-        String sequence1= seq1. getString();
-        String sequence2= seq2.getString();
-
-        if (arguments.length> 1) {
-            sequence1= readSequence(arguments [0]);
-            sequence2= readSequence(arguments [1]);
-        }
+        String sequence1 = SequenceTester.getTestSequence1(arguments);
+        String sequence2 = SequenceTester.getTestSequence2(arguments);
+        float e = 0.1f;
+        float d = 1.0f;
 
         System.out.println ("aligning sequence of length " + sequence1.length()+ " with sequence of length " + sequence2.length());
 
-        float e= 0.1f;
-        float d= 1.0f;
 
 
         long start;

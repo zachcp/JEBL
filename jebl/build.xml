@@ -1,0 +1,57 @@
+<!--              ANT build file for JAM              -->
+
+<project name="jebl" default="all" basedir=".">
+  <description>
+    Build file for jebl
+  </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="."/>
+  <property name="build" location="build"/>
+
+  <property name="lib" location="lib"/>
+  <property name="dist" location="dist"/>
+
+  <property environment="env"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+	  <mkdir dir="${dist}"/>
+  </target>
+
+  <target name="all"
+	  depends="compile-all"
+	  description="Build all run-time stuff">
+  </target>
+
+  <target name="compile-all"
+	  depends="compile-jebl">
+  </target>
+
+  <target name="compile-jebl" depends="init">
+    <javac source="1.5" srcdir="${src}" destdir="${build}">
+      <include name="**"/>
+    </javac>
+  </target>
+
+    <target name="dist" depends="compile-all" description="generate the distribution">
+      <!-- Create the distribution directory -->
+      <mkdir dir="${dist}"/>
+
+      <jar jarfile="${dist}/jebl-${DSTAMP}.jar">
+          <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
+          <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
+      </jar>
+    </target>
+
+    <target name="to-iseek" depends="compile-all" description="generate the distribution in the iSeek directory">
+      <jar jarfile="../core/lib/jebl.jar">
+          <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
+          <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
+      </jar>
+    </target>
+
+
+</project>
