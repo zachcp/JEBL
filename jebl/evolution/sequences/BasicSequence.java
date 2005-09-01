@@ -76,6 +76,16 @@ public class BasicSequence implements Sequence {
         return buffer.toString();
     }
 
+    public String getCleanString() {
+        StringBuffer buffer = new StringBuffer();
+        for (int i : sequence) {
+            State state = sequenceType.getState(i);
+            if (state.isAmbiguous()|| state.isGap()) continue;
+            buffer.append(sequenceType.getState(i).getCode());
+        }
+        return buffer.toString();
+    }
+
 	/**
 	 * @return an array of state objects.
 	 */
