@@ -51,6 +51,7 @@
           <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
           <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
       </jar>
+        <copy file="../core/lib/jebl.jar" tofile="../iSeek/lib/jebl.jar"></copy>
     </target>
 
 
