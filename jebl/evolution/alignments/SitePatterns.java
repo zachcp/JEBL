@@ -8,6 +8,9 @@
  */
 package jebl.evolution.alignments;
 
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.taxa.Taxon;
+
 import java.util.List;
 
 /**
@@ -21,5 +24,17 @@ import java.util.List;
 public interface SitePatterns {
 
 	List<Pattern> getSitePatterns();
+
+	int getPatternLength();
+
+	/**
+	 * @return the list of taxa that the state values correspond to.
+	 */
+	List<Taxon> getTaxa();
+
+	/**
+	 * @return the data type of the states in these site patterns.
+	 */
+	SequenceType getSequenceType();
 
 }

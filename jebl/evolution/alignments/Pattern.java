@@ -34,10 +34,35 @@ public interface Pattern {
      */
     List<Taxon> getTaxa();
 
+	/**
+	 * Get the state for the ith taxon
+ 	 * @param index
+	 * @return the state
+	 */
+	State getState(int index);
+
     /**
      * @return the list of state values of this pattern.
      */
     List<State> getStates();
 
+	/**
+	 * Get the weight of this pattern
+	 * @return the weight
+	 */
+	double getWeight();
+
+	/**
+	 * Returns the most frequent state in this pattern
+	 * @return the most frequent state
+	 */
 	State getMostFrequentState();
+
+	/**
+	 * Returns the frequent of the given state in this pattern
+	 * @param state
+	 * @return the frequency
+	 */
+	double getStateFrequency(State state);
+
 }

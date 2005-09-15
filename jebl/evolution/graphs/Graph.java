@@ -22,7 +22,7 @@ public interface Graph {
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
-    Set getAdjacencies(Node node);
+    Set<Node> getAdjacencies(Node node);
 
     /**
      * @param node1
@@ -35,13 +35,13 @@ public interface Graph {
     /**
      * @return the set of all nodes in this graph.
      */
-    Set getNodes();
+    Set<Node> getNodes();
 
     /**
      * @param degree the number of edges connected to a node
      * @return a set containing all nodes in this graph of the given degree.
      */
-    Set getNodes(int degree);
+    Set<Node> getNodes(int degree);
 
     /**
      * This class is thrown by getEdgeLength(node1, node2) if node1 and node2

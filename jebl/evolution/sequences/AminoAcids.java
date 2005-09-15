@@ -111,6 +111,8 @@ public final class AminoAcids {
 
 	public static boolean isGap(AminoAcidState state) { return state == GAP_STATE; }
 
+	public static String getTripletCode(AminoAcidState state) { return AMINOACID_TRIPLETS[state.getIndex()]; }
+
 	public static AminoAcidState[] toStateArray(String sequenceString) {
 		AminoAcidState[] seq = new AminoAcidState[sequenceString.length()];
 		for (int i = 0; i < seq.length; i++) {

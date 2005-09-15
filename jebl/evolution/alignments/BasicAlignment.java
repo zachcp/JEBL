@@ -77,14 +77,25 @@ public class BasicAlignment implements Alignment {
         return patterns;
     }
 
-    /**
-     * Adds a sequence to this alignment
-     * @param sequence the new sequence.
-     */
-    public void addSequence(Sequence sequence) {
-        put(sequence);
-        constructPatterns();
-    }
+	public int getPatternLength() {
+		return taxonList.size();
+	}
+
+	/**
+	 * @return the list of taxa that the state values correspond to.
+	 */
+	public List<Taxon> getTaxa() {
+	    return taxonList;
+	}
+
+	/**
+	 * Adds a sequence to this alignment
+	 * @param sequence the new sequence.
+	 */
+	public void addSequence(Sequence sequence) {
+	    put(sequence);
+	    constructPatterns();
+	}
 
     private void put(Sequence sequence) {
         if (sequenceType == null) {
@@ -147,12 +158,20 @@ public class BasicAlignment implements Alignment {
             return taxonList;
         }
 
-        /**
-         * @return the list of state values of this pattern.
-         */
-        public List<State> getStates() {
-            return states;
-        }
+	    public State getState(int index) {
+		    return states.get(index);
+	    }
+
+	    /**
+	     * @return the list of state values of this pattern.
+	     */
+	    public List<State> getStates() {
+	        return states;
+	    }
+
+	    public double getWeight() {
+		    return 1.0;
+	    }
 
 	    /**
 	     * Get the most frequent state in this pattern.
@@ -170,6 +189,16 @@ public class BasicAlignment implements Alignment {
 			    }
 		    }
 		    return mostFrequentState;
+	    }
+
+	    public double getStateFrequency(State state) {
+		    double count = 0;
+		    for (State s : states) {
+			    if (s == state) {
+				    count += 1;
+			    }
+		    }
+		    return count / states.size();
 	    }
 
 	    private final List<State> states;
