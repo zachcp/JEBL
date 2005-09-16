@@ -28,4 +28,8 @@ public final class AminoAcidState extends State {
 	public boolean isGap() {
 		return this == AminoAcids.GAP_STATE;
 	}
+
+	public boolean isStop() {
+		return this == AminoAcids.STOP_STATE;
+	}
 }
