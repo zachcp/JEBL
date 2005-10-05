@@ -22,7 +22,8 @@ import jebl.util.Attributable;
 public interface Sequence extends Attributable, Comparable {
 
     /**
-     * @return that taxon that this sequence represents (primarily used to match sequences with tree nodes)
+     * @return that
+     *  taxon that this sequence represents (primarily used to match sequences with tree nodes)
      */
     Taxon getTaxon();
 
