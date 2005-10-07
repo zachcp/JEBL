@@ -94,6 +94,12 @@ public final class Taxon implements Attributable, Comparable {
      * @return the taxon
      */
     public static Taxon getTaxon(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Illegal null string for taxon name");
+        }
+        if (name.length() == 0) {
+            throw new IllegalArgumentException("Illegal empty string for taxon name");
+        }
         Taxon taxon = taxa.get(name);
 
         if (taxon == null) {

@@ -29,7 +29,13 @@ public class BasicSequence implements Sequence {
      */
     public BasicSequence(SequenceType sequenceType, Taxon taxon, String sequenceString) {
 
-	    this.sequenceType = sequenceType;
+        if (sequenceType == null) {
+            throw new IllegalArgumentException("sequenceType is not allowed to be null");
+        }
+        if (taxon == null) {
+            throw new IllegalArgumentException("taxon is not allowed to be null");
+        }
+        this.sequenceType = sequenceType;
         this.taxon = taxon;
         this.sequence = new int[sequenceString.length()];
         int k = 0;

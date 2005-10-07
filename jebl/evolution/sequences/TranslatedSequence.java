@@ -17,6 +17,13 @@ public class TranslatedSequence extends FilteredSequence {
 		return Utils.translate(source.getStates(), geneticCode);
 	}
 
+    /**
+     * @return the type of symbols that this sequence is made up of.
+     */
+    public SequenceType getSequenceType() {
+        return SequenceType.AMINO_ACID;
+    }
+
 	private final GeneticCode geneticCode;
 
 }
