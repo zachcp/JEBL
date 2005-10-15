@@ -71,7 +71,7 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
             }
         }
     }
-    
+
     /**
      * @return the score of the best alignment
      */
