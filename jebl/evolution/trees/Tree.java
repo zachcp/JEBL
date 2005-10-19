@@ -28,20 +28,20 @@ public interface Tree extends Graph {
      * @return a set of all nodes that have degree 1.
      * These nodes are often refered to as 'tips'.
      */
-    Set getExternalNodes();
+    Set<Node> getExternalNodes();
 
     /**
      * @return a set of all nodes that have degree 2 or more.
      * These nodes are often refered to as internal nodes.
      */
-    Set getInternalNodes();
+    Set<Node> getInternalNodes();
 
     /**
      * @return the set of taxa associated with the external
      * nodes of this tree. The size of this set should be the
      * same as the size of the external nodes set.
      */
-    Set getTaxa();
+    Set<Taxon> getTaxa();
 
     /**
      * @param node the node whose associated taxon is being requested.

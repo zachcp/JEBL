@@ -30,7 +30,7 @@ public interface RootedTree extends Tree {
      * @return the set of nodes that are the children of the given node.
      * The set may be empty for a terminal node (a tip).
      */
-    Set getChildren(Node node);
+    Set<Node> getChildren(Node node);
 
     /**
      * @param node the node whose height is being requested.

@@ -27,23 +27,30 @@ import jebl.evolution.taxa.Taxon;
 public interface TreeImporter {
 
 	/**
+     * This can be used to read one tree at a time in a loop:
+     * <code>
+     * List<Tree> trees = new ArrayList<Tree>();
+     *  while (hasTree()) {
+     *  trees.add(importNextTree());
+     *  }
+     * </code>
 	 * return whether another tree is available.
 	 */
 	boolean hasTree() throws IOException, ImportException;
 
-	/**
-	 * import the next tree.
-	 * return the tree or null if no more trees are available
-	 */
+    /**
+     * Import a single tree
+     * @return the tree
+     * @throws IOException
+     * @throws ImportException
+     */
 	Tree importNextTree() throws IOException, ImportException;
 
-	/**
-	 * import a single tree.
-	 */
-	Tree importTree(Set<Taxon> taxa) throws IOException, ImportException;
-
-	/**
-	 * import a list of all trees.
-	 */
-	List<Tree> importTrees(Set<Taxon> taxa) throws IOException, ImportException;
+    /**
+     * Import all the trees
+     * @return the list of trees
+     * @throws IOException
+     * @throws ImportException
+     */
+	List<Tree> importTrees() throws IOException, ImportException;
 }
