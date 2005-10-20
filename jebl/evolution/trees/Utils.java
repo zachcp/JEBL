@@ -53,7 +53,7 @@ public class Utils {
         Set externalNodes = rootedTree.getExternalNodes();
         for (Object externalNode : externalNodes) {
             Node node = (Node) externalNode;
-            if (rootedTree.getNodeHeight(node) != 0.0) return false;
+            if (rootedTree.getHeight(node) != 0.0) return false;
         }
         return true;
     }

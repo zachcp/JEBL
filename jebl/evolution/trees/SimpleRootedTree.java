@@ -60,8 +60,20 @@ public class SimpleRootedTree implements RootedTree {
      * @param node the node whose height is being set
      * @param height the height
      */
-    public void setNodeHeight(Node node, double height) {
+    public void setHeight(Node node, double height) {
+        lengthsKnown = false;
+        heightsKnown = true;
         ((SimpleNode)node).setHeight(height);
+    }
+
+    /**
+     * @param node the node whose branch length (to its parent) is being set
+     * @param length the length
+     */
+    public void setLength(Node node, double length) {
+        heightsKnown = false;
+        lengthsKnown = true;
+        ((SimpleNode)node).setLength(length);
     }
 
     /**
@@ -78,8 +90,18 @@ public class SimpleRootedTree implements RootedTree {
      * @return the height of the given node. The height will be
      *         less than the parent's height and greater than it children's heights.
      */
-    public double getNodeHeight(Node node) {
+    public double getHeight(Node node) {
+        if (!heightsKnown) calculateNodeHeights();
         return ((SimpleNode)node).getHeight();
+    }
+
+    /**
+     * @param node the node whose branch length (to its parent) is being requested.
+     * @return the length of the branch to the parent node (0.0 if the node is the root).
+     */
+    public double getLength(Node node) {
+        if (!lengthsKnown) calculateBranchLengths();
+        return ((SimpleNode)node).getLength();
     }
 
     /**
@@ -140,7 +162,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return true if the node is of degree 1.
      */
     public boolean isExternal(Node node) {
-        return ((SimpleNode)node).getChildren() == null;
+        return ((SimpleNode)node).getChildren().size() == 0;
     }
 
     /**
@@ -202,48 +224,88 @@ public class SimpleRootedTree implements RootedTree {
     }
 
     /**
-     * This function gets the maximum height of the node above its tips, when
-     * the heights actually stored at the nodes are really branch lengths.
-     * @param tree
-     * @param node
-     * @return the maximum height
+     * Set the node heights from the current branch lengths.
      */
-    private double getMaximumHeight(SimpleRootedTree tree, Node node) {
+    private void calculateNodeHeights() {
+
+        if (!lengthsKnown) {
+            throw new IllegalArgumentException("Can't calculate node heights because branch lengths not known");
+        }
+
+        nodeLengthsToHeights(rootNode, 0.0);
+
         double maxHeight = 0.0;
-
-        if (!tree.isExternal(node)) {
-
-            for (Node child : tree.getChildren(node)) {
-                double height = getMaximumHeight(tree, child);
-                if (height > maxHeight) maxHeight = height;
+        SimpleNode node;
+        for (Node externalNode : getExternalNodes()) {
+            if (((SimpleNode)externalNode).getHeight() > maxHeight) {
+                maxHeight = ((SimpleNode)externalNode).getHeight();
             }
         }
 
-        return maxHeight + tree.getNodeHeight(node);
+        for (Node node1 : getNodes()) {
+            ((SimpleNode)node1).setHeight(maxHeight - ((SimpleNode)node1).getHeight());
+        }
+
+        heightsKnown = true;
     }
 
-    private double setNodeHeights(SimpleRootedTree tree, Node node) {
-        double maxHeight = 0.0;
+    /**
+     * Set the node heights from the current node branch lengths. Actually
+     * sets distance from root so the heights then need to be reversed.
+     */
+    private void nodeLengthsToHeights(SimpleNode node, double height) {
 
-        if (!tree.isExternal(node)) {
+        double newHeight = height;
 
-            for (Node child : tree.getChildren(node)) {
-                double height = getMaximumHeight(tree, child);
-                if (height > maxHeight) maxHeight = height;
-            }
+        if (node.getLength() > 0.0) {
+            newHeight += node.getLength();
         }
 
-        return maxHeight + tree.getNodeHeight(node);
+        node.setHeight(newHeight);
+
+        for (Node child : node.getChildren()) {
+            nodeLengthsToHeights((SimpleNode)child, newHeight);
+        }
+    }
+
+    /**
+     * Calculate branch lengths from the current node heights.
+     */
+    protected void calculateBranchLengths() {
+
+        if (!lengthsKnown) {
+            throw new IllegalArgumentException("Can't calculate branch lengths because node heights not known");
+        }
+
+        nodeHeightsToLengths(rootNode, getHeight(rootNode));
+
+        lengthsKnown = true;
+    }
+
+    /**
+     * Calculate branch lengths from the current node heights.
+     */
+    private void nodeHeightsToLengths(SimpleNode node, double height) {
+
+        node.setLength(height - node.getHeight());
+
+        for (Node child : node.getChildren()) {
+            nodeHeightsToLengths((SimpleNode)child, node.getHeight());
+        }
+
     }
 
     private SimpleNode rootNode = null;
     private final Set<Node> internalNodes = new HashSet<Node>();
     private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
 
+    private boolean heightsKnown = false;
+    private boolean lengthsKnown = false;
+
     private class SimpleNode extends Node {
 
         public SimpleNode(Taxon taxon) {
-            this.children = null;
+            this.children = Collections.emptySet();
             this.taxon = taxon;
         }
 

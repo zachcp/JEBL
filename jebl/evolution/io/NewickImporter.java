@@ -66,15 +66,10 @@ public class NewickImporter implements TreeImporter {
 
     private Tree lastTree = null;
 
-
     private Tree readTree() throws IOException, ImportException {
         SimpleRootedTree tree = new SimpleRootedTree();
 
         readInternalNode(tree);
-
-        double maxHeight = getMaximumHeight(tree, tree.getRootNode());
-
-        setNodeHeights(tree, tree.getRootNode());
 
         return tree;
     }
@@ -104,7 +99,7 @@ public class NewickImporter implements TreeImporter {
 
         // This is a bit dirty... we are setting the lengths as node heights and
         // will then go back over the tree to set the real heights.
-        tree.setNodeHeight(branch, length);
+        tree.setLength(branch, length);
 
         return branch;
     }
@@ -148,7 +143,7 @@ public class NewickImporter implements TreeImporter {
     /**
      * Reads an external node in.
      */
-    private Node readExternalNode(SimpleRootedTree tree) throws IOException, ImportException
+    private Node readExternalNode(SimpleRootedTree tree) throws IOException
     {
         String label = helper.readToken(":(),;");
         return tree.createExternalNode(Taxon.getTaxon(label));

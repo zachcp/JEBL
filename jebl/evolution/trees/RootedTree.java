@@ -37,8 +37,14 @@ public interface RootedTree extends Tree {
      * @return the height of the given node. The height will be
      * less than the parent's height and greater than it children's heights.
      */
-    double getNodeHeight(Node node);
+    double getHeight(Node node);
 
+    /**
+     * @param node the node whose branch length (to its parent) is being requested.
+     * @return the length of the branch to the parent node (0.0 if the node is the root).
+     */
+    double getLength(Node node);
+    
     /**
      * @param node the node whose parent is requested
      * @return the parent node of the given node, or null
