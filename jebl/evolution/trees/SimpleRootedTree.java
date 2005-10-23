@@ -191,12 +191,17 @@ public class SimpleRootedTree implements RootedTree {
      */
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
         if (((SimpleNode)node1).getParent() == node2) {
-
-            return ((SimpleNode)node2).getHeight() - ((SimpleNode)node1).getHeight();
+	        if (heightsKnown) {
+		        return ((SimpleNode)node2).getHeight() - ((SimpleNode)node1).getHeight();
+	        } else {
+		        return ((SimpleNode)node1).getLength();
+	        }
         } else if (((SimpleNode)node2).getParent() == node1) {
-
-            return ((SimpleNode)node1).getHeight() - ((SimpleNode)node2).getHeight();
-
+            if (heightsKnown) {
+	            return ((SimpleNode)node1).getHeight() - ((SimpleNode)node2).getHeight();
+            } else {
+	            return ((SimpleNode)node2).getLength();
+            }
         } else {
             throw new NoEdgeException();
         }
@@ -235,15 +240,14 @@ public class SimpleRootedTree implements RootedTree {
         nodeLengthsToHeights(rootNode, 0.0);
 
         double maxHeight = 0.0;
-        SimpleNode node;
         for (Node externalNode : getExternalNodes()) {
             if (((SimpleNode)externalNode).getHeight() > maxHeight) {
                 maxHeight = ((SimpleNode)externalNode).getHeight();
             }
         }
 
-        for (Node node1 : getNodes()) {
-            ((SimpleNode)node1).setHeight(maxHeight - ((SimpleNode)node1).getHeight());
+        for (Node node : getNodes()) {
+            ((SimpleNode)node).setHeight(maxHeight - ((SimpleNode)node).getHeight());
         }
 
         heightsKnown = true;
