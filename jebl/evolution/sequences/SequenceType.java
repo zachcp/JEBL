@@ -58,6 +58,12 @@ public interface SequenceType {
     State getState(String code);
 
     /**
+     * @return the length, in characters, of a state, when encoded as a string.
+     * i.e. 1 for Nucleotides and AminoAcids and 3 for Codons.
+     */
+    int getCodeLength();
+
+    /**
      * Get state corresponding to a state index
      *
      * @param index a state index
@@ -96,7 +102,7 @@ public interface SequenceType {
      */
     String getName();
 
-	/**
+    /**
 	 * Converts a string of state codes into an array of State objects for this SequenceType
 	 * @param sequenceString
 	 * @return the State array
@@ -116,7 +122,8 @@ public interface SequenceType {
         public int getCanonicalStateCount() { return Nucleotides.getCanonicalStateCount(); }
         public List<State> getCanonicalStates() { return Nucleotides.getCanonicalStates(); }
 		public State getState(String code) { return Nucleotides.getState(code); }
-		public State getState(int index) { return Nucleotides.getState(index); }
+		public int getCodeLength() { return 1;}
+        public State getState(int index) { return Nucleotides.getState(index); }
 		public State getUnknownState() { return Nucleotides.getUnknownState(); }
 		public State getGapState() { return Nucleotides.getGapState(); }
 		public boolean isUnknown(State state) { return Nucleotides.isUnknown((NucleotideState)state); }
@@ -132,6 +139,7 @@ public interface SequenceType {
         public int getCanonicalStateCount() { return AminoAcids.getCanonicalStateCount(); }
         public List<State> getCanonicalStates() { return AminoAcids.getCanonicalStates(); }
 		public State getState(String code) { return AminoAcids.getState(code); }
+        public int getCodeLength() { return 1;}
 		public State getState(int index) { return AminoAcids.getState(index); }
 		public State getUnknownState() { return AminoAcids.getUnknownState(); }
 		public State getGapState() { return AminoAcids.getGapState(); }
@@ -148,6 +156,7 @@ public interface SequenceType {
         public int getCanonicalStateCount() { return Codons.getCanonicalStateCount(); }
         public List<State> getCanonicalStates() { return Codons.getCanonicalStates(); }
 		public State getState(String code) { return Codons.getState(code); }
+        public int getCodeLength() { return 3;}
 		public State getState(int index) { return Codons.getState(index); }
 		public State getUnknownState() { return Codons.getUnknownState(); }
 		public State getGapState() { return Codons.getGapState(); }
