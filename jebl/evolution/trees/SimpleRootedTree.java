@@ -78,11 +78,11 @@ public class SimpleRootedTree implements RootedTree {
 
     /**
      * @param node the node whose children are being requested.
-     * @return the set of nodes that are the children of the given node.
-     *         The set may be empty for a terminal node (a tip).
+     * @return the list of nodes that are the children of the given node.
+     *         The list may be empty for a terminal node (a tip).
      */
-    public Set<Node> getChildren(Node node) {
-        return new HashSet<Node>(((SimpleNode)node).getChildren());
+    public List<Node> getChildren(Node node) {
+        return new ArrayList<Node>(((SimpleNode)node).getChildren());
     }
 
     /**

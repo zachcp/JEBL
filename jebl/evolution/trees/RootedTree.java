@@ -11,6 +11,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Node;
 
 import java.util.Set;
+import java.util.List;
 
 /**
  * A tree with a root (node with maximum height). This interface
@@ -27,10 +28,10 @@ public interface RootedTree extends Tree {
 
     /**
      * @param node the node whose children are being requested.
-     * @return the set of nodes that are the children of the given node.
+     * @return the list of nodes that are the children of the given node.
      * The set may be empty for a terminal node (a tip).
      */
-    Set<Node> getChildren(Node node);
+    List<Node> getChildren(Node node);
 
     /**
      * @param node the node whose height is being requested.
@@ -44,7 +45,7 @@ public interface RootedTree extends Tree {
      * @return the length of the branch to the parent node (0.0 if the node is the root).
      */
     double getLength(Node node);
-    
+
     /**
      * @param node the node whose parent is requested
      * @return the parent node of the given node, or null
