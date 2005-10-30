@@ -10,10 +10,7 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 
-import java.util.Set;
-import java.util.Iterator;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A collection of utility functions for trees.
@@ -109,7 +106,7 @@ public class Utils {
             }
 
             public boolean equals(Node node1, Node node2) {
-                return getExternalNodeCount(tree, node1) == getExternalNodeCount(tree, node2);
+	            return compare(node1, node2) == 0;
             }
         };
     }
