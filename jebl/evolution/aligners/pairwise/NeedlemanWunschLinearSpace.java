@@ -75,6 +75,7 @@ public class NeedlemanWunschLinearSpace extends LinearSpaceAligner {
 	        }
 	    }
 
+	    B0 = new TracebackSimple(n, m);
 	    maxScore = c[1][m];
     }
 
