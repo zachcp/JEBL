@@ -12,7 +12,7 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.State;
 import jebl.evolution.taxa.Taxon;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * An interface representing a list of states for a list of taxa.
@@ -24,27 +24,32 @@ import java.util.List;
  */
 public interface Pattern {
 
-    /**
-     * @return the data type of the states in this pattern.
-     */
-    SequenceType getSequenceType();
+	/**
+	 * @return the data type of the states in this pattern.
+	 */
+	SequenceType getSequenceType();
 
-    /**
-     * @return the list of taxa that the state values correspond to.
-     */
-    List<Taxon> getTaxa();
+	/**
+	 * @return the list of taxa that the state values correspond to.
+	 */
+	List<Taxon> getTaxa();
 
 	/**
 	 * Get the state for the ith taxon
- 	 * @param index
+	 * @param index
 	 * @return the state
 	 */
 	State getState(int index);
 
-    /**
-     * @return the list of state values of this pattern.
-     */
-    List<State> getStates();
+	/**
+	 * @return the list of state values of this pattern.
+	 */
+	List<State> getStates();
+
+	/**
+	 * @return the set of state values of this pattern.
+	 */
+	Set<State> getStateSet();
 
 	/**
 	 * Get the weight of this pattern

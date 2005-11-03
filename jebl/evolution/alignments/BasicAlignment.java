@@ -169,6 +169,13 @@ public class BasicAlignment implements Alignment {
 	        return states;
 	    }
 
+	    /**
+	     * @return the set of state values of this pattern.
+	     */
+	    public Set<State> getStateSet() {
+	        return new HashSet<State>(states);
+	    }
+
 	    public double getWeight() {
 		    return 1.0;
 	    }
