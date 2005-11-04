@@ -20,7 +20,7 @@ import java.util.*;
  *
  * @version $Id$
  */
-public class Utils {
+public final class Utils {
 
     /**
      * @param tree the tree
@@ -28,7 +28,7 @@ public class Utils {
      * @param node2
      * @return the path length between the two nodes
      */
-    public double getPathLength(Tree tree, Node node1, Node node2) {
+    public static double getPathLength(Tree tree, Node node1, Node node2) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -37,7 +37,7 @@ public class Utils {
      * @return true if all internal nodes in the given tree are of degree 3, except the root
      * which must have a degree of 2.
      */
-    public final boolean isBinary(RootedTree rootedTree) {
+    public static final boolean isBinary(RootedTree rootedTree) {
 
         return (rootedTree.getNodes(3).size() == (rootedTree.getInternalNodes().size() - 1))
                 && (Tree.Utils.getDegree(rootedTree, rootedTree.getRootNode()) == 2);
@@ -47,7 +47,7 @@ public class Utils {
      * @param rootedTree the rooted tree
      * @return true if all the external nodes in the tree have a height of 0.0
      */
-    public boolean isUltrametric(RootedTree rootedTree) {
+    public static boolean isUltrametric(RootedTree rootedTree) {
 
         Set externalNodes = rootedTree.getExternalNodes();
         for (Object externalNode : externalNodes) {

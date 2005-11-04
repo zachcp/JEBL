@@ -23,9 +23,15 @@ import java.util.List;
  */
 public interface SitePatterns {
 
-	List<Pattern> getSitePatterns();
+    int getPatternCount();
 
-	int getPatternLength();
+    int getPatternLength();
+
+    /**
+     * Get a list of all the patterns
+     * @return the list
+     */
+    List<Pattern> getSitePatterns();
 
 	/**
 	 * @return the list of taxa that the state values correspond to.

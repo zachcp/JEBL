@@ -73,13 +73,17 @@ public class BasicAlignment implements Alignment {
 	    return sequences.get(taxon);
 	}
 
-    public List<Pattern> getSitePatterns() {
-        return patterns;
+    public int getPatternCount() {
+        return patterns.size();
     }
 
 	public int getPatternLength() {
 		return taxonList.size();
 	}
+
+    public List<Pattern> getSitePatterns() {
+        return patterns;
+    }
 
 	/**
 	 * @return the list of taxa that the state values correspond to.
