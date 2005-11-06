@@ -1,12 +1,11 @@
 /*
  * NexusImporter.java
  *
- * (c) 2002-2005 BEAST Development Core Team
+ * (c) 2002-2005 JEBL development team
  *
  * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
-
 package jebl.evolution.io;
 
 import jebl.evolution.alignments.Alignment;
@@ -38,13 +37,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		UNALIGNED,
 		DISTANCES,
 		TREES
-	};
+	}
 
 	// NEXUS specific ImportException classes
 	public static class MissingBlockException extends ImportException {
 		public MissingBlockException() { super(); }
 		public MissingBlockException(String message) { super(message); }
-	};
+	}
 
 	/**
 	 * Constructor
