@@ -164,7 +164,12 @@ public class FitchParsimony implements ParsimonyCriterion {
             int i = 0;
             for (Pattern pattern : patterns.getSitePatterns()) {
 
-                State state = pattern.getState(taxa.indexOf(tree.getTaxon(node)));
+	            Taxon taxon = tree.getTaxon(node);
+	            int index = taxa.indexOf(taxon);
+
+	            if (index == -1) throw new IllegalArgumentException("Unknown taxon, " + taxon.getName() + " in tree");
+
+                State state = pattern.getState(index);
 
                 if (gapsAreStates && state.isGap()) {
                     stateSet[i][stateCount - 1] = true;

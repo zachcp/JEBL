@@ -225,7 +225,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 	private boolean isReadingTreesBlock = false;
 	private List<Taxon> treeTaxonList = null;
-	private Map<String, Taxon> translationList = Collections.EMPTY_MAP;
+	private Map<String, Taxon> translationList = Collections.emptyMap();
 	private Tree nextTree = null;
 	private String[] lastToken = new String[1];
 
@@ -485,7 +485,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private List<Sequence> readSequenceData(List<Taxon> taxonList) throws ImportException, IOException
 	{
-		int n, i;
+		int i;
 		String firstSequence = null;
 
 		List<Sequence> sequences = new ArrayList<Sequence>();

@@ -8,8 +8,6 @@
  */
 package jebl.evolution.parsimony;
 
-import dr.evolution.tree.Tree;
-import dr.evolution.tree.NodeRef;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.sequences.State;
