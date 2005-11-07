@@ -20,7 +20,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
         super(sub, d, e);
-         quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
+        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
 
     private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
@@ -33,12 +33,31 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private int Ctype[][][];
     private int previousm= 0, previousn= 0;
 
-    /**
-	 * @param sq1
-	 * @param sq2
-	 */
+    private AlignmentProgressListener progress;
+    private long totalProgress;
+    private long currentProgress;
+    private boolean cancelled;
+    
+
+    private boolean addProgress(long value) {
+        currentProgress += value;
+        if(progress !=null) {
+            double fraction =((double) currentProgress)/totalProgress;
+            cancelled =progress.setProgress(fraction);
+        }
+        return cancelled;
+    }
+
 
     public void doAlignment(String sq1, String sq2) {
+        doAlignment(sq1,sq2, null);
+    }
+
+
+    public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress) {
+        this.progress =progress;
+
+
         sq1 = strip(sq1);
         sq2 = strip(sq2);
 
@@ -52,6 +71,9 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             previousn=n;
             previousm=m;
         }
+        totalProgress =n*m*2;
+        currentProgress= 0;
+        cancelled = false;
         matchResult =doAlignment (sq1,sq2, TYPE_ANY, TYPE_ANY);
     }
 
@@ -90,6 +112,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             quadraticAlign.setGapExtend(e);
 //            align.doAlignment(sq1,sq2);
             quadraticAlign.doAlignment(sq1,sq2, startType, endType);
+            if(addProgress(n*m)) return null;
             setScore (quadraticAlign.getScore());
             return quadraticAlign.getMatch();
         }
@@ -123,6 +146,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             if (startType == TYPE_X) base =e;
             Ix[1][0] = - base -e*(i- 1);
             for (int j=1; j<=m; j++) {
+                if(cancelled) return null;
                 s = score[s1[i-1]][s2[j-1]];
                 a = M[0][j-1]+s;
                 b = Ix[0][j-1]+s;
@@ -196,6 +220,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                 }
 
             }
+            if(addProgress(m)) return null;
         }
         // Find maximal score
         int bestk = 0;
@@ -218,10 +243,12 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         String sequence1a = sq1.substring(0, u);
         String sequence2a = sq2.substring(0, v);
         String[] match1= doAlignment(sequence1a,sequence2a,startType,vtype );
+        if(cancelled) return null;
         float match1Score= getScore();
         String sequence1b = sq1.substring(u);
         String sequence2b = sq2.substring(v);
         String[] match2= doAlignment(sequence1b,sequence2b,vtype, endType );
+        if (cancelled) return null;
         float match2Score = getScore();
         float combineScore = match1Score + match2Score;
 
