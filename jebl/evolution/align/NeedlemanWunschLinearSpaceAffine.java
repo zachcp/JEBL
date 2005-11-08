@@ -147,7 +147,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             Ix[1][0] = - base -e*(i- 1);
             for (int j=1; j<=m; j++) {
                 if(cancelled) return null;
-                s = score[s1[i-1]][s2[j-1]];
+                char c1= s1[i - 1];
+                char c2= s2[j - 1];
+                
+                s = score[c1][c2];
                 a = M[0][j-1]+s;
                 b = Ix[0][j-1]+s;
                 c = Iy[0][j-1]+s;

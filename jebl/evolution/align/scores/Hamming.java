@@ -19,4 +19,8 @@ public class Hamming extends NucleotideScores {
             {  -1, -1,  -1,  0, 0}};
 
   public Hamming() { buildScores(residueScores); }
+
+    public String toString() {
+        return "Hamming (0/-1)";
+    }
 }

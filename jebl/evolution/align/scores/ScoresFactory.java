@@ -73,4 +73,16 @@ public class ScoresFactory {
 
 		return sub;
 	}
+
+    public static AminoAcidScores[] getAvailableAminoAcidScores () {
+        return new AminoAcidScores[] {new Blosum45(), new Blosum50(), new Blosum55 (), new Blosum60 (),
+        new Blosum62 (), new Blosum65 (), new Blosum70 (), new Blosum75 (), new Blosum80 (),
+        new Blosum85 (), new Blosum90 (), new Pam100(),new Pam110 (), new Pam120 (),
+        new Pam130(),new Pam140 (), new Pam150 (), new Pam160 (), new Pam170 (),
+        new Pam180(), new Pam190 (), new Pam200 (), new Pam210 (), new Pam220 (),
+        new Pam230 (), new Pam240 (), new Pam250 ()};
+    }
+    public static NucleotideScores[] getAvailableNucleotideScores () {
+        return new NucleotideScores[] {new NucleotideScores(5,-4),new Hamming()};
+    }
 }

@@ -13,7 +13,7 @@ public class NucleotideScores extends Scores {
     float match = 5;
     float mismatch = -4;
 
-    public NucleotideScores() {}    
+    public NucleotideScores() {}
 
     /**
      * @param m match score
