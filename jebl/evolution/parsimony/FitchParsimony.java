@@ -148,7 +148,7 @@ public class FitchParsimony implements ParsimonyCriterion {
         hasRecontructedStates = false;
 
         for (Node node : tree.getNodes()) {
-            boolean[][] stateSet = new boolean[patterns.getPatternCount()][patterns.getPatternLength()];
+            boolean[][] stateSet = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
             stateSets.put(node, stateSet);
 
             if (!tree.isExternal(node)) {
@@ -179,11 +179,12 @@ public class FitchParsimony implements ParsimonyCriterion {
                     }
 
                 }
+                i++;
             }
         }
 
-        union = new boolean[patterns.getPatternCount()][patterns.getPatternLength()];
-        intersection = new boolean[patterns.getPatternCount()][patterns.getPatternLength()];
+        union = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
+        intersection = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
 
     }
 
@@ -245,7 +246,8 @@ public class FitchParsimony implements ParsimonyCriterion {
             if (parentStates != null && nodeStateSet[i][parentStates[i].getIndex()]) {
                 nodeStates[i] = parentStates[i];
             } else {
-                nodeStates[i] = sequenceType.getState(firstIndexOf(nodeStateSet[i]));
+                int first = firstIndexOf(nodeStateSet[i]);
+                nodeStates[i] = sequenceType.getState(first);
             }
         }
 
