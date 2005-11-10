@@ -24,4 +24,5 @@ public class JukesCantor extends NucleotideScores {
 		
 		buildScores(match, mismatch);
 	}
+    
 }
