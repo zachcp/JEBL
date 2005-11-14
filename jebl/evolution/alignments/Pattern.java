@@ -29,6 +29,8 @@ public interface Pattern {
 	 */
 	SequenceType getSequenceType();
 
+    int getLength();
+
 	/**
 	 * @return the list of taxa that the state values correspond to.
 	 */

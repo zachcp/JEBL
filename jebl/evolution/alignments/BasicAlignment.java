@@ -62,7 +62,11 @@ public class BasicAlignment implements Alignment {
     }
 
     public List<Sequence> getSequenceList() {
-        return new ArrayList<Sequence>(sequences.values());
+        List<Sequence> seqs = new ArrayList<Sequence>();
+        for (Taxon taxon : taxonList) {
+            seqs.add(sequences.get(taxon));
+        }
+        return seqs;
     }
 
 	public SequenceType getSequenceType() {
@@ -153,6 +157,10 @@ public class BasicAlignment implements Alignment {
          */
         public SequenceType getSequenceType() {
             return sequenceType;
+        }
+
+        public int getLength() {
+            return states.size();
         }
 
         /**

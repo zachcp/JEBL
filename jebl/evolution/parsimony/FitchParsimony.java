@@ -43,20 +43,22 @@ public class FitchParsimony implements ParsimonyCriterion {
     private boolean[][] intersection;
 
     private RootedTree tree = null;
-    private final SitePatterns patterns;
+    private final List<Pattern> patterns;
+    private List<Taxon> taxa;
 
     private boolean hasCalculatedSteps = false;
     private boolean hasRecontructedStates = false;
 
     private final double[] siteScores;
 
-    public FitchParsimony(SitePatterns patterns, boolean gapsAreStates) {
-        if (patterns == null) {
-            throw new IllegalArgumentException("The patterns cannot be null");
+    public FitchParsimony(List<Pattern> patterns, boolean gapsAreStates) {
+        if (patterns == null || patterns.size() == 0) {
+            throw new IllegalArgumentException("The patterns cannot be null or empty");
         }
 
-        this.sequenceType = patterns.getSequenceType();
+        this.sequenceType = patterns.get(0).getSequenceType();
         this.gapsAreStates = gapsAreStates;
+        this.taxa = patterns.get(0).getTaxa();
 
         if (gapsAreStates) {
             stateCount = sequenceType.getCanonicalStateCount() + 1;
@@ -67,7 +69,11 @@ public class FitchParsimony implements ParsimonyCriterion {
 
         this.patterns = patterns;
 
-        this.siteScores = new double[patterns.getPatternCount()];
+        this.siteScores = new double[patterns.size()];
+    }
+
+    public FitchParsimony(SitePatterns patterns, boolean gapsAreStates) {
+        this(patterns.getSitePatterns(), gapsAreStates);
     }
 
     /**
@@ -116,7 +122,7 @@ public class FitchParsimony implements ParsimonyCriterion {
         double score = 0;
 
         int i = 0;
-        for (Pattern pattern : patterns.getSitePatterns()) {
+        for (Pattern pattern : patterns) {
             score += siteScores[i] * pattern.getWeight();
             i++;
         }
@@ -140,7 +146,8 @@ public class FitchParsimony implements ParsimonyCriterion {
             hasRecontructedStates = true;
         }
 
-        return states.get(node);
+        State[] s = states.get(node);
+        return s;
     }
 
     private void initialize() {
@@ -148,28 +155,27 @@ public class FitchParsimony implements ParsimonyCriterion {
         hasRecontructedStates = false;
 
         for (Node node : tree.getNodes()) {
-            boolean[][] stateSet = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
+            boolean[][] stateSet = new boolean[patterns.size()][stateCount];
             stateSets.put(node, stateSet);
 
-            if (!tree.isExternal(node)) {
-                State[] stateArray = new State[patterns.getPatternCount()];
-                states.put(node, stateArray);
-            }
+            State[] stateArray = new State[patterns.size()];
+            states.put(node, stateArray);
         }
 
-        List<Taxon> taxa = patterns.getTaxa();
         for (Node node : tree.getExternalNodes()) {
-            boolean stateSet[][] = stateSets.get(node);
+            boolean[][] stateSet = stateSets.get(node);
+            State[] stateArray = states.get(node);
 
             int i = 0;
-            for (Pattern pattern : patterns.getSitePatterns()) {
+            for (Pattern pattern : patterns) {
 
-	            Taxon taxon = tree.getTaxon(node);
-	            int index = taxa.indexOf(taxon);
+                Taxon taxon = tree.getTaxon(node);
+                int index = taxa.indexOf(taxon);
 
-	            if (index == -1) throw new IllegalArgumentException("Unknown taxon, " + taxon.getName() + " in tree");
+                if (index == -1) throw new IllegalArgumentException("Unknown taxon, " + taxon.getName() + " in tree");
 
                 State state = pattern.getState(index);
+                stateArray[i] = state;
 
                 if (gapsAreStates && state.isGap()) {
                     stateSet[i][stateCount - 1] = true;
@@ -183,8 +189,8 @@ public class FitchParsimony implements ParsimonyCriterion {
             }
         }
 
-        union = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
-        intersection = new boolean[patterns.getPatternCount()][sequenceType.getCanonicalStateCount()];
+        union = new boolean[patterns.size()][stateCount];
+        intersection = new boolean[patterns.size()][stateCount];
 
     }
 
@@ -194,7 +200,9 @@ public class FitchParsimony implements ParsimonyCriterion {
      * is required then the second pass is not necessary.
      * @param node
      */
-    private void calculateSteps(Node node) {
+    private boolean[][] calculateSteps(Node node) {
+
+        boolean[][] nodeStateSet = stateSets.get(node);
 
         List<Node> children = tree.getChildren(node);
         if (children.size() > 0) {
@@ -202,24 +210,26 @@ public class FitchParsimony implements ParsimonyCriterion {
             Iterator<Node> iter = children.iterator();
 
             Node child = iter.next();
-            boolean[][] stateSet = stateSets.get(child);
-            for (int i = 0; i < patterns.getPatternCount(); i++) {
+
+            boolean[][] stateSet = calculateSteps(child);
+
+            for (int i = 0; i < patterns.size(); i++) {
                 copyOf(stateSet[i], union[i]);
                 copyOf(stateSet[i], intersection[i]);
             }
 
             while (iter.hasNext()) {
                 child = iter.next();
-                stateSet = stateSets.get(child);
 
-                for (int i = 0; i < patterns.getPatternCount(); i++) {
+                stateSet = calculateSteps(child);
+
+                for (int i = 0; i < patterns.size(); i++) {
                     unionOf(union[i], stateSet[i], union[i]);
                     intersectionOf(intersection[i], stateSet[i], intersection[i]);
                 }
             }
 
-            boolean[][] nodeStateSet = stateSets.get(node);
-            for (int i = 0; i < patterns.getPatternCount(); i++) {
+            for (int i = 0; i < patterns.size(); i++) {
                 if (sizeOf(intersection[i]) > 0) {
                     copyOf(intersection[i], nodeStateSet[i]);
                 } else {
@@ -227,7 +237,9 @@ public class FitchParsimony implements ParsimonyCriterion {
                     siteScores[i] ++;
                 }
             }
+
         }
+        return nodeStateSet;
     }
 
     /**
@@ -238,21 +250,23 @@ public class FitchParsimony implements ParsimonyCriterion {
      */
     private void reconstructStates(Node node, State[] parentStates) {
 
-        boolean[][] nodeStateSet = stateSets.get(node);
-        State[] nodeStates = states.get(node);
+        if (!tree.isExternal(node)) {
+            boolean[][] nodeStateSet = stateSets.get(node);
+            State[] nodeStates = states.get(node);
 
-        for (int i = 0; i < patterns.getPatternCount(); i++) {
+            for (int i = 0; i < patterns.size(); i++) {
 
-            if (parentStates != null && nodeStateSet[i][parentStates[i].getIndex()]) {
-                nodeStates[i] = parentStates[i];
-            } else {
-                int first = firstIndexOf(nodeStateSet[i]);
-                nodeStates[i] = sequenceType.getState(first);
+                if (parentStates != null && nodeStateSet[i][parentStates[i].getIndex()]) {
+                    nodeStates[i] = parentStates[i];
+                } else {
+                    int first = firstIndexOf(nodeStateSet[i]);
+                    nodeStates[i] = sequenceType.getState(first);
+                }
             }
-        }
 
-        for (Node child : tree.getChildren(node)) {
-            reconstructStates(child, nodeStates);
+            for (Node child : tree.getChildren(node)) {
+                reconstructStates(child, nodeStates);
+            }
         }
     }
 
