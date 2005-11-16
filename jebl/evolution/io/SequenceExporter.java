@@ -1,6 +1,5 @@
 package jebl.evolution.io;
 
-import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Sequence;
 
 import java.io.IOException;

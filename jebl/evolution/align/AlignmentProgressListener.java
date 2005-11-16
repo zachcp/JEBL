@@ -2,6 +2,7 @@ package jebl.evolution.align;
 
 /**
  * @author Matt
+ *
  * @version $Id$
  */
 public interface AlignmentProgressListener {

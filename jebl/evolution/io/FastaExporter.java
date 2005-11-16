@@ -1,17 +1,16 @@
 /*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
+ * Copyright (c) 2005 JEBL Development team. All Rights Reserved.
  */
 
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.*;
-import jebl.evolution.taxa.Taxon;
 
 import java.io.*;
 import java.util.*;
 
 /**
- * Class for importing PHYLIP sequential file format
+ * Class for exporting a fasta file format.
  *
  * @version $Id$
  *
@@ -28,7 +27,7 @@ public class FastaExporter implements SequenceExporter {
     }
 
 	/**
-	 * importAlignment.
+	 * export alignment.
 	 */
 	public void exportSequences(List<Sequence> sequences) throws IOException {
 
