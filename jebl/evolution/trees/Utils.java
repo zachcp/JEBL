@@ -9,6 +9,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Graph;
 
 import java.util.*;
 
@@ -21,6 +22,45 @@ import java.util.*;
  * @version $Id$
  */
 public final class Utils {
+
+    /**
+     * @param tree
+     * @return the rooted tree as a newick format string
+     */
+    public static String toNewick(RootedTree tree) {
+        StringBuffer buffer = new StringBuffer();
+        toNewick(tree,tree.getRootNode(), buffer);
+        return buffer.toString();
+    }
+
+    private static void toNewick(RootedTree tree, Node node, StringBuffer buffer) {
+        if (tree.isExternal(node)) {
+            buffer.append(tree.getTaxon(node).getName());
+            buffer.append(':');
+            double edgeLength = 0.0;
+            try {
+                edgeLength = tree.getEdgeLength(node, tree.getParent(node));
+            } catch (Graph.NoEdgeException e) {
+            }
+            buffer.append(edgeLength);
+        } else {
+            buffer.append('(');
+            List<Node> children = tree.getChildren(node);
+            for (int i = 0; i < children.size()-1; i++) {
+                toNewick(tree, children.get(i), buffer);
+                buffer.append(',');
+            }
+            toNewick(tree, children.get(children.size()-1), buffer);
+            buffer.append("):");
+            double edgeLength = 0.0;
+            if (tree.getParent(node) != null) {
+                try {
+                    edgeLength = tree.getEdgeLength(node, tree.getParent(node));
+                } catch (Graph.NoEdgeException e) {}
+            }
+            buffer.append(edgeLength);
+        }
+    }
 
     /**
      * @param tree the tree
@@ -37,7 +77,7 @@ public final class Utils {
      * @return true if all internal nodes in the given tree are of degree 3, except the root
      * which must have a degree of 2.
      */
-    public static final boolean isBinary(RootedTree rootedTree) {
+    public static boolean isBinary(RootedTree rootedTree) {
 
         return (rootedTree.getNodes(3).size() == (rootedTree.getInternalNodes().size() - 1))
                 && (Tree.Utils.getDegree(rootedTree, rootedTree.getRootNode()) == 2);
@@ -63,7 +103,7 @@ public final class Utils {
      * @param node
      * @return the number of external nodes under this node.
      */
-    public static final int getExternalNodeCount(RootedTree tree, Node node) {
+    public static int getExternalNodeCount(RootedTree tree, Node node) {
 
         List<Node> children = tree.getChildren(node);
         if (children.size() == 0) return 1;
