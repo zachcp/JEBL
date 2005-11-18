@@ -1,7 +1,7 @@
 /*
  * ParsimonyCriterion.java
  *
- * (c) 2002-2005 BEAST Development Core Team
+ * (c) 2005 JEBL Development Core Team
  *
  * This package may be distributed under the
  * Lesser Gnu Public Licence (LGPL)
@@ -14,8 +14,12 @@ import jebl.evolution.sequences.State;
 
 /**
  * @author rambaut
- *         Date: Jun 20, 2005
- *         Time: 4:56:34 PM
+ * @author Alexei Drummond
+ *
+ * Date: Jun 20, 2005
+ * Time: 4:56:34 PM
+ *
+ * @version $Id$
  */
 public interface ParsimonyCriterion {
 

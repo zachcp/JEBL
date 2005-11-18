@@ -15,6 +15,7 @@ import jebl.evolution.sequences.*;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.RootedTree;
 
 import java.io.*;
 import java.util.*;
@@ -753,7 +754,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return translationList;
 	}
 
-	private Tree readNextTree(String[] lastToken) throws ImportException, IOException
+	private RootedTree readNextTree(String[] lastToken) throws ImportException, IOException
     {
         try {
             SimpleRootedTree tree = null;
@@ -892,7 +893,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				throw new ImportException.UnknownTaxonException("Taxon in tree, '" + label + "' is unknown");
 			}
 		}
-	    return tree.createExternalNode(Taxon.getTaxon(label));
+	    return tree.createExternalNode(taxon);
 	}
 
 
