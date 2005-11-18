@@ -9,7 +9,6 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.graphs.Graph;
 
 import java.util.*;
 
@@ -37,12 +36,7 @@ public final class Utils {
         if (tree.isExternal(node)) {
             buffer.append(tree.getTaxon(node).getName());
             buffer.append(':');
-            double edgeLength = 0.0;
-            try {
-                edgeLength = tree.getEdgeLength(node, tree.getParent(node));
-            } catch (Graph.NoEdgeException e) {
-            }
-            buffer.append(edgeLength);
+            buffer.append(tree.getLength(node));
         } else {
             buffer.append('(');
             List<Node> children = tree.getChildren(node);
@@ -54,9 +48,7 @@ public final class Utils {
             buffer.append("):");
             double edgeLength = 0.0;
             if (tree.getParent(node) != null) {
-                try {
-                    edgeLength = tree.getEdgeLength(node, tree.getParent(node));
-                } catch (Graph.NoEdgeException e) {}
+                edgeLength = tree.getLength(node);
             }
             buffer.append(edgeLength);
         }
