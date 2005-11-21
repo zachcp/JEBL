@@ -40,19 +40,15 @@
       <!-- Create the distribution directory -->
       <mkdir dir="${dist}"/>
 
-      <jar jarfile="${dist}/jebl-${DSTAMP}.jar">
+      <jar jarfile="${dist}/jebl.jar">
           <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
           <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
       </jar>
+        <copy file="${dist}/jebl.jar" tofile="${dist}/jebl-${DSTAMP}.jar" overwrite="true"/>
+
     </target>
 
-    <target name="to-iseek" depends="compile-all" description="generate the distribution in the iSeek directory">
-      <jar jarfile="../core/lib/jebl.jar">
-          <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
-          <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
-      </jar>
-        <copy file="../core/lib/jebl.jar" tofile="../iSeek/lib/jebl.jar"></copy>
-    </target>
+
 
 
 </project>
