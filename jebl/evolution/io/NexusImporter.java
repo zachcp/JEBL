@@ -16,6 +16,8 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.distances.BasicDistanceMatrix;
 
 import java.io.*;
 import java.util.*;
@@ -28,17 +30,17 @@ import java.util.*;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  */
-public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeImporter {
+public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeImporter, DistanceMatrixImporter {
 
-	public enum NexusBlock {
-		UNKNOWN,
-		TAXA,
-		CHARACTERS,
-		DATA,
-		UNALIGNED,
-		DISTANCES,
-		TREES
-	}
+    public enum NexusBlock {
+        UNKNOWN,
+        TAXA,
+        CHARACTERS,
+        DATA,
+        UNALIGNED,
+        DISTANCES,
+        TREES
+    }
 
 	// NEXUS specific ImportException classes
 	public static class MissingBlockException extends ImportException {
@@ -305,6 +307,57 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		return false;
 	}
+
+    // **************************************************************
+    // DistanceMatrixImporter IMPLEMENTATION
+    // **************************************************************
+
+    /**
+     * importDistances.
+     */
+    public List<DistanceMatrix> importDistanceMatrices() throws IOException, ImportException {
+        boolean done = false;
+
+        List<Taxon> taxonList = null;
+        List<DistanceMatrix> distanceMatrices = new ArrayList<DistanceMatrix>();
+
+        while (!done) {
+            try {
+
+                NexusBlock block = findNextBlock();
+
+                if (block == NexusBlock.TAXA) {
+
+                    taxonList = readTaxaBlock();
+
+                } else if (block == NexusBlock.DISTANCES) {
+
+                    if (taxonList == null) {
+                        throw new MissingBlockException("TAXA block is missing");
+                    }
+
+                    DistanceMatrix distanceMatrix = readDistancesBlock(taxonList);
+                    distanceMatrices.add(distanceMatrix);
+
+                } else {
+                    // Ignore the block..
+                }
+
+            } catch (EOFException ex) {
+                done = true;
+            }
+        }
+
+        if (distanceMatrices == null) {
+            throw new MissingBlockException("DISTANCES block is missing");
+        }
+
+        return distanceMatrices;
+    }
+
+    // **************************************************************
+    // PRIVATE Methods
+    // **************************************************************
 
 	/**
 	 * Finds the end of the current block.
@@ -676,6 +729,136 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		return sequences;
 	}
+
+    private enum Triangle { LOWER, UPPER, BOTH };
+
+    /**
+     * Reads a 'DISTANCES' block.
+     */
+    private DistanceMatrix readDistancesBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        if (taxonList == null) {
+            throw new ImportException.BadFormatException("Missing Taxa for reading distances");
+        }
+
+        Triangle triangle = Triangle.LOWER;
+        boolean diagonal = false;
+        boolean labels = false;
+
+        boolean ttl = false, fmt = false;
+
+        String token = helper.readToken();
+        while ( !token.equalsIgnoreCase("MATRIX") ) {
+
+            if ( token.equalsIgnoreCase("TITLE") ) {
+                if (ttl) {
+                    throw new ImportException.DuplicateFieldException("TITLE");
+                }
+
+                ttl = true;
+            } else if ( token.equalsIgnoreCase("FORMAT") ) {
+
+                if (fmt) {
+                    throw new ImportException.DuplicateFieldException("FORMAT");
+                }
+
+                sequenceType = null;
+
+                do {
+                    String token2 = helper.readToken("=;");
+
+                    if (token2.equalsIgnoreCase("TRIANGLE")) {
+
+                        if (helper.getLastDelimiter() != '=') {
+                            throw new ImportException.BadFormatException("Expecting '=' after TRIANGLE subcommand in FORMAT command");
+                        }
+
+                        String token3 = helper.readToken(";");
+                        if (token3.equalsIgnoreCase("LOWER")) {
+                            triangle = Triangle.LOWER;
+                        } else if (token3.equalsIgnoreCase("UPPER")) {
+                            triangle = Triangle.UPPER;
+                        } else if (token3.equalsIgnoreCase("BOTH")) {
+                            triangle = Triangle.BOTH;
+                        }
+                    } else if (token2.equalsIgnoreCase("DIAGONAL")) {
+                        diagonal = true;
+                    } else if (token2.equalsIgnoreCase("LABELS")) {
+                        labels = true;
+                    }
+
+                } while (helper.getLastDelimiter() != ';');
+
+                fmt = true;
+            }
+        }
+
+        double[][] distances = new double[taxonList.size()][taxonList.size()];
+
+        for (int i = 0; i < taxonList.size(); i++) {
+            token = helper.readToken();
+
+            Taxon taxon = Taxon.getTaxon(token);
+
+            int index = taxonList.indexOf(taxon);
+
+            if (index < 0) {
+                // taxon not found in taxon list...
+                // ...perhaps it is a numerical taxon reference?
+                throw new ImportException.UnknownTaxonException(token);
+            }
+
+            if (index != i) {
+                throw new ImportException.BadFormatException("The taxon labels are in a different order to those in the TAXA block");
+            }
+
+            if (triangle == Triangle.LOWER) {
+                for (int j = 0; j < i + 1; j++) {
+                    if (i != j) {
+                        distances[i][j] = helper.readDouble();
+                        distances[j][i] = distances[i][j];
+                    } else {
+                        if (diagonal) {
+                            distances[i][j] = helper.readDouble();
+                        }
+                    }
+                }
+            } else if (triangle == Triangle.LOWER) {
+                for (int j = i; j < taxonList.size(); j++) {
+                    if (i != j) {
+                        distances[i][j] = helper.readDouble();
+                        distances[j][i] = distances[i][j];
+                    } else {
+                        if (diagonal) {
+                            distances[i][j] = helper.readDouble();
+                        }
+                    }
+                }
+            } else {
+                for (int j = 0; j < taxonList.size(); j++) {
+                    if (i != j || diagonal) {
+                        distances[i][j] = helper.readDouble();
+                    } else {
+                        distances[i][j] = 0.0;
+                    }
+                }
+            }
+
+
+            if (helper.getLastDelimiter() == ';' && i < taxonList.size() - 1) {
+                throw new ImportException.TooFewTaxaException();
+            }
+        }
+
+        if (helper.getLastDelimiter() != ';') {
+            throw new ImportException.BadFormatException("Expecting ';' after sequences data");
+        }
+
+
+        findEndBlock();
+
+        return new BasicDistanceMatrix(taxonList, distances);
+    }
 
 
 	/**
