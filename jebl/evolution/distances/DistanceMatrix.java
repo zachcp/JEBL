@@ -46,4 +46,10 @@ public interface DistanceMatrix {
      * @return the new submatrix
      */
     DistanceMatrix getSubmatrix(Collection<Taxon> taxa);
+
+    /**
+     * Gets a 2-dimensional array containing the distances
+     * @return the distances
+     */
+    double[][] getDistances();
 }

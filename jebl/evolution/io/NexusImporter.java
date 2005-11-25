@@ -730,8 +730,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return sequences;
 	}
 
-    private enum Triangle { LOWER, UPPER, BOTH };
-
     /**
      * Reads a 'DISTANCES' block.
      */

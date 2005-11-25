@@ -12,6 +12,8 @@ import java.io.IOException;
  */
 public interface DistanceMatrixImporter {
 
+    enum Triangle { LOWER, UPPER, BOTH };
+
     /**
      * importDistances.
      */

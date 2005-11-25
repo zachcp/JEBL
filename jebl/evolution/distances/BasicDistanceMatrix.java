@@ -110,6 +110,15 @@ public class BasicDistanceMatrix implements DistanceMatrix {
         return new BasicDistanceMatrix(taxonSubset, newDistances);
     }
 
+    /**
+     * Gets a 2-dimensional array containing the distances
+     *
+     * @return the distances
+     */
+    public double[][] getDistances() {
+        return distances;
+    }
+
     private final List<Taxon> taxa;
     private final double[][] distances;
 }
