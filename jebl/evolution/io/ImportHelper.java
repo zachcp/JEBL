@@ -54,6 +54,15 @@ class ImportHelper {
 		this.lineComment = line;
 	}
 
+	public void setCommentDelimiters(char start, char stop, char line, char write, char meta) {
+		hasComments = true;
+		this.startComment = start;
+		this.stopComment = stop;
+		this.lineComment = line;
+		this.writeComment = write;
+		this.metaComment = meta;
+	}
+
 	public void setCommentWriter(Writer commentWriter) {
 		this.commentWriter = new BufferedWriter(commentWriter);
 	}
@@ -459,17 +468,25 @@ class ImportHelper {
 		char ch;
 		int n=1;
 		boolean write = false;
+		StringBuffer meta = null;
 
 		if (nextCharacter() == writeComment) {
 			read();
 			write = true;
+		} else if (nextCharacter() == metaComment) {
+			read();
+			meta = new StringBuffer();
 		}
+
+		lastMetaComment = null;
 
 		if (delimiter == lineComment) {
 			String line = readLine();
 			if (write && commentWriter != null) {
 				commentWriter.write(line, 0, line.length());
 				commentWriter.newLine();
+			} else if (meta != null) {
+				meta.append(line);
 			}
 		} else {
 			do {
@@ -483,8 +500,15 @@ class ImportHelper {
 					n--;
 				} else if (write && commentWriter != null) {
 					commentWriter.write(ch);
+				} else if (meta != null) {
+					meta.append(ch);
 				}
 			} while (n > 0);
+
+		}
+
+		if (meta != null) {
+			lastMetaComment = meta.toString();
 		}
 	}
 
@@ -561,6 +585,10 @@ class ImportHelper {
 		return ch;
 	}
 
+	public String getLastMetaComment() {
+		return lastMetaComment;
+	}
+
 	// Private stuff
 
 	private LineNumberReader reader;
@@ -574,5 +602,8 @@ class ImportHelper {
 	private char stopComment = (char)-1;
 	private char lineComment = (char)-1;
 	private char writeComment = (char)-1;
+	private char metaComment = (char)-1;
+
+	private String lastMetaComment = null;
 
 }

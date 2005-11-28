@@ -97,8 +97,6 @@ public class NewickImporter implements TreeImporter {
             length = helper.readDouble(",():;");
         }
 
-        // This is a bit dirty... we are setting the lengths as node heights and
-        // will then go back over the tree to set the real heights.
         tree.setLength(branch, length);
 
         return branch;

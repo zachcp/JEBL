@@ -2,6 +2,7 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.AttributableHelper;
 
 import java.util.*;
 
@@ -299,6 +300,40 @@ public class SimpleRootedTree implements RootedTree {
 
     }
 
+	// Attributable IMPLEMENTATION
+
+	public void setAttribute(String name, Object value) {
+		if (helper == null) {
+			helper = new AttributableHelper();
+		}
+		helper.setAttribute(name, value);
+	}
+
+	public Object getAttribute(String name) {
+		if (helper == null) {
+			return null;
+		}
+		return helper.getAttribute(name);
+	}
+
+	public Set<String> getAttributeNames() {
+		if (helper == null) {
+			return Collections.emptySet();
+		}
+		return helper.getAttributeNames();
+	}
+
+	public Map<String, Object> getAttributeMap() {
+		if (helper == null) {
+			return Collections.emptyMap();
+		}
+		return helper.getAttributeMap();
+	}
+
+	// PRIVATE members
+
+	private AttributableHelper helper = null;
+
     private SimpleNode rootNode = null;
     private final Set<Node> internalNodes = new HashSet<Node>();
     private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
@@ -356,12 +391,46 @@ public class SimpleRootedTree implements RootedTree {
             return degree;
         }
 
+	    // Attributable IMPLEMENTATION
+
         public Set<Node> getAdjacencies() {
             Set<Node> adjacencies = new HashSet<Node>();
             if (children != null) adjacencies.addAll(children);
             if (parent != null) adjacencies.add(parent);
             return adjacencies;
         }
+
+	    public void setAttribute(String name, Object value) {
+		    if (helper == null) {
+			    helper = new AttributableHelper();
+		    }
+		    helper.setAttribute(name, value);
+	    }
+
+	    public Object getAttribute(String name) {
+		    if (helper == null) {
+			    return null;
+		    }
+		    return helper.getAttribute(name);
+	    }
+
+	    public Set<String> getAttributeNames() {
+		    if (helper == null) {
+			    return Collections.emptySet();
+		    }
+		    return helper.getAttributeNames();
+	    }
+
+	    public Map<String, Object> getAttributeMap() {
+		    if (helper == null) {
+			    return Collections.emptyMap();
+		    }
+		    return helper.getAttributeMap();
+	    }
+
+	    // PRIVATE members
+
+	    private AttributableHelper helper = null;
 
         private Node parent;
         private final Set<Node> children;

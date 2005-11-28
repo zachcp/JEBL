@@ -92,6 +92,26 @@ public class SortedRootedTree implements RootedTree {
         return source.getNodes(degree);
     }
 
-    private final RootedTree source;
+	// Attributable IMPLEMENTATION
+
+	public void setAttribute(String name, Object value) {
+		source.setAttribute(name, value);
+	}
+
+	public Object getAttribute(String name) {
+		return source.getAttribute(name);
+	}
+
+	public Set<String> getAttributeNames() {
+		return source.getAttributeNames();
+	}
+
+	public Map<String, Object> getAttributeMap() {
+		return source.getAttributeMap();
+	}
+
+	// PRIVATE members
+
+	private final RootedTree source;
     private final Comparator<Node> comparator;
 }

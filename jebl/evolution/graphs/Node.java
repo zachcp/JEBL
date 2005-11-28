@@ -8,6 +8,8 @@
  */
 package jebl.evolution.graphs;
 
+import jebl.util.Attributable;
+
 /**
  * Represents a node in a graph or tree. In general it is
  * used only as a handle to traverse a graph or tree structure and
@@ -18,10 +20,11 @@ package jebl.evolution.graphs;
  *
  * @version $Id$
  */
-public class Node {
+public abstract class Node implements Attributable {
 
     /**
      * empty constructor
      */
     public Node() {}
+
 }

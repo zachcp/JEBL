@@ -38,6 +38,11 @@ public interface Attributable {
 	 */
     Set<String> getAttributeNames();
 
+	/**
+	 * Gets the entire attribute map.
+	 * @return an unmodifiable map
+	 */
+	Map<String, Object> getAttributeMap();
 }
 
 

@@ -113,6 +113,10 @@ public abstract class FilteredSequence implements Sequence {
 		return source.getAttributeNames();
 	}
 
+	public Map<String, Object> getAttributeMap() {
+		return source.getAttributeMap();
+	}
+
 	// private members
 
 	private final Sequence source;

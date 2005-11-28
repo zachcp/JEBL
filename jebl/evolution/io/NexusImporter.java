@@ -53,7 +53,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	public NexusImporter(Reader reader) {
 		helper = new ImportHelper(reader);
-		helper.setCommentDelimiters('[', ']', '\0');
+
+		// ! defines a comment to be written out to a log file
+		// & defines a meta comment
+		helper.setCommentDelimiters('[', ']', '\0', '!', '&');
 	}
 
 	/**
@@ -1011,12 +1014,38 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	        branch = readExternalNode(tree);
 	    }
 
+		if (helper.getLastMetaComment() != null) {
+			// There was a meta-comment which should be in the form:
+			// \[&label=value[,label=value>[,/..]]\]
+			String[] pairs = helper.getLastMetaComment().split("[,\\s]+");
+			for (String pair : pairs) {
+				String[] parts = pair.split("[=\\s]+");
+				if (parts.length != 2 || parts[0].length() == 0 || parts[1].length() == 0) {
+					throw new ImportException.BadFormatException("Badly formatted attribute pair: '"+pair+"'");
+				}
+				// Attempt to format the value as a number
+				Number number = null;
+				try {
+					number = Integer.parseInt(parts[1]);
+				} catch (NumberFormatException nfe1) {
+					try {
+						number = Double.parseDouble(parts[1]);
+					} catch (NumberFormatException nfe2) {
+
+					}
+				}
+				if (number != null) {
+					branch.setAttribute(parts[0], number);
+				} else {
+					branch.setAttribute(parts[0], parts[1]);
+				}
+			}
+		}
+
 	    if (helper.getLastDelimiter() == ':') {
 	        length = helper.readDouble(",():;");
 	    }
 
-	    // This is a bit dirty... we are setting the lengths as node heights and
-	    // will then go back over the tree to set the real heights.
 	    tree.setLength(branch, length);
 
 	    return branch;

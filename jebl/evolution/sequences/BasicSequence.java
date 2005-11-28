@@ -9,6 +9,7 @@
 package jebl.evolution.sequences;
 
 import jebl.evolution.taxa.Taxon;
+import jebl.util.AttributableHelper;
 
 import java.util.*;
 
@@ -134,28 +135,37 @@ public class BasicSequence implements Sequence {
         return taxon.compareTo(((Sequence)o).getTaxon());
     }
 
-	// Attributable implementation
+	// Attributable IMPLEMENTATION
 
 	public void setAttribute(String name, Object value) {
-		if (attributeMap == null) {
-			attributeMap = new HashMap<String, Object>();
+		if (helper == null) {
+			helper = new AttributableHelper();
 		}
-		attributeMap.put(name, value);
+		helper.setAttribute(name, value);
 	}
 
 	public Object getAttribute(String name) {
-		if (attributeMap == null) {
+		if (helper == null) {
 			return null;
 		}
-		return attributeMap.get(name);
+		return helper.getAttribute(name);
 	}
 
 	public Set<String> getAttributeNames() {
-		if (attributeMap == null) {
+		if (helper == null) {
 			return Collections.emptySet();
 		}
-		return attributeMap.keySet();
+		return helper.getAttributeNames();
 	}
+
+	public Map<String, Object> getAttributeMap() {
+		if (helper == null) {
+			return Collections.emptyMap();
+		}
+		return helper.getAttributeMap();
+	}
+
+	private AttributableHelper helper = null;
 
 	// private members
 

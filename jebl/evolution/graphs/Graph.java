@@ -8,6 +8,8 @@
  */
 package jebl.evolution.graphs;
 
+import jebl.util.Attributable;
+
 import java.util.Set;
 
 /**
@@ -16,7 +18,7 @@ import java.util.Set;
  *
  * @version $Id$
  */
-public interface Graph {
+public interface Graph extends Attributable {
 
     /**
      * @param node
