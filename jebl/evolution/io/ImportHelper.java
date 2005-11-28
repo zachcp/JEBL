@@ -589,7 +589,11 @@ class ImportHelper {
 		return lastMetaComment;
 	}
 
-	// Private stuff
+    public void clearLastMetaComment() {
+        lastMetaComment = null;
+    }
+    
+    // Private stuff
 
 	private LineNumberReader reader;
 	private BufferedWriter commentWriter = null;

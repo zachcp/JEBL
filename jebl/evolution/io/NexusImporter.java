@@ -1014,6 +1014,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	        branch = readExternalNode(tree);
 	    }
 
+        if (helper.getLastDelimiter() == ':') {
+            length = helper.readDouble(",():;");
+        }
+
 		if (helper.getLastMetaComment() != null) {
 			// There was a meta-comment which should be in the form:
 			// \[&label=value[,label=value>[,/..]]\]
@@ -1040,11 +1044,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					branch.setAttribute(parts[0], parts[1]);
 				}
 			}
-		}
-
-	    if (helper.getLastDelimiter() == ':') {
-	        length = helper.readDouble(",():;");
-	    }
+            helper.clearLastMetaComment();
+        }
 
 	    tree.setLength(branch, length);
 
@@ -1103,7 +1104,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				throw new ImportException.UnknownTaxonException("Taxon in tree, '" + label + "' is unknown");
 			}
 		}
-	    return tree.createExternalNode(taxon);
+
+        return tree.createExternalNode(taxon);
 	}
 
 
