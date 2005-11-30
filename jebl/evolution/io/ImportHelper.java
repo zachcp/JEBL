@@ -21,7 +21,7 @@ import java.io.*;
  *
  * @version $Id$
  */
-class ImportHelper {
+public class ImportHelper {
 
 	/**
 	 * Constructor

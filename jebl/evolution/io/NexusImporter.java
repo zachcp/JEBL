@@ -963,6 +963,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         throw new ImportException.BadFormatException("Missing tree definition in TREE command of TREES block");
                     }
 
+                    helper.clearLastMetaComment();
+
 	                tree = new SimpleRootedTree();
 	                readInternalNode(tree);
 
@@ -1005,6 +1007,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	    double length = 0.0;
 	    Node branch;
 
+        helper.clearLastMetaComment();
 	    if (helper.nextCharacter() == '(') {
 	        // is an internal node
 	        branch = readInternalNode(tree);
