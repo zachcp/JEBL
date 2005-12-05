@@ -118,7 +118,7 @@ public class TabDelimitedImporter implements DistanceMatrixImporter {
                     }
                     j++;
                 }
-            } else if (triangle == Triangle.LOWER) {
+            } else if (triangle == Triangle.UPPER) {
                 int j = i;
                 for (Double distance : row) {
                     if (j >= distances[i].length) {
