@@ -77,6 +77,10 @@ public class BasicAlignment implements Alignment {
 	    return sequences.get(taxon);
 	}
 
+	public int getSiteCount() {
+	    return patterns.size();
+	}
+
     public int getPatternCount() {
         return patterns.size();
     }
@@ -85,7 +89,7 @@ public class BasicAlignment implements Alignment {
 		return taxonList.size();
 	}
 
-    public List<Pattern> getSitePatterns() {
+    public List<Pattern> getPatterns() {
         return patterns;
     }
 

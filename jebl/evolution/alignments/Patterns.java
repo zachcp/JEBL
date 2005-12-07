@@ -1,5 +1,5 @@
 /*
- * SitePatterns.java
+ * Patterns.java
  *
  * (c) 2005 JEBL Development Team
  *
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @version $Id$
  */
-public interface SitePatterns {
+public interface Patterns {
 
     int getPatternCount();
 
@@ -31,7 +31,7 @@ public interface SitePatterns {
      * Get a list of all the patterns
      * @return the list
      */
-    List<Pattern> getSitePatterns();
+    List<Pattern> getPatterns();
 
 	/**
 	 * @return the list of taxa that the state values correspond to.

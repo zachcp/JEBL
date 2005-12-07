@@ -85,9 +85,9 @@ public abstract class ConsensusSequence implements Sequence {
     }
 
 	public static State[] constructConsensus(Alignment source) {
-		State[] consensus = new State[source.getSitePatterns().size()];
+		State[] consensus = new State[source.getPatterns().size()];
 		int i = 0;
-		for (Pattern pattern : source.getSitePatterns()) {
+		for (Pattern pattern : source.getPatterns()) {
 			consensus[i] = pattern.getMostFrequentState();
 			i++;
 		}

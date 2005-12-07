@@ -13,7 +13,7 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Utils;
 import jebl.evolution.alignments.Pattern;
-import jebl.evolution.alignments.SitePatterns;
+import jebl.evolution.alignments.Patterns;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.SequenceType;
@@ -72,8 +72,8 @@ public class FitchParsimony implements ParsimonyCriterion {
         this.siteScores = new double[patterns.size()];
     }
 
-    public FitchParsimony(SitePatterns patterns, boolean gapsAreStates) {
-        this(patterns.getSitePatterns(), gapsAreStates);
+    public FitchParsimony(Patterns patterns, boolean gapsAreStates) {
+        this(patterns.getPatterns(), gapsAreStates);
     }
 
     /**

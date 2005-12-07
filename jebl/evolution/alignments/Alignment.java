@@ -18,9 +18,11 @@ import java.util.List;
  *
  * @version $Id$
  */
-public interface Alignment extends Sequences, SitePatterns {
+public interface Alignment extends Sequences, Patterns {
 
     List<Sequence> getSequenceList();
 
 	SequenceType getSequenceType();
+
+	int getSiteCount();
 }
