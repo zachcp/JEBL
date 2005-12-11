@@ -93,4 +93,46 @@ public class Utils {
 
 		return indices;
 	}
+
+	/**
+	 * Gets the site location index for this sequence excluding
+	 * any gaps. The location is indexed from 0.
+	 * @param sequence the sequence
+	 * @param gappedLocation the location including gaps
+	 * @return the location without gaps.
+	 */
+	public static int getGaplessLocation(Sequence sequence, int gappedLocation) {
+		int gapless = 0;
+		int gapped = 0;
+		for (State state : sequence.getStates()) {
+			if (gapped == gappedLocation) return gapless;
+			if (!state.isGap()) {
+				gapless ++;
+			}
+			gapped ++;
+		}
+		return gapless;
+	}
+
+	/**
+	 * Gets the site location index for this sequence that corresponds
+	 * to a location given excluding all gaps. The first non-gapped site
+	 * in the sequence has a gaplessLocation of 0.
+	 * @param sequence the sequence
+	 * @param gaplessLocation
+	 * @return the site location including gaps
+	 */
+	public static int getGappedLocation(Sequence sequence, int gaplessLocation) {
+		int gapless = 0;
+		int gapped = 0;
+		for (State state : sequence.getStates()) {
+			if (gapless == gaplessLocation) return gapped;
+			if (!state.isGap()) {
+				gapless ++;
+			}
+			gapped ++;
+		}
+		return gapped;
+	}
+
 }
