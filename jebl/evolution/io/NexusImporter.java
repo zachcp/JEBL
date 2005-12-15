@@ -1024,29 +1024,29 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		if (helper.getLastMetaComment() != null) {
 			// There was a meta-comment which should be in the form:
 			// \[&label=value[,label=value>[,/..]]\]
-			String[] pairs = helper.getLastMetaComment().split("[,\\s]+");
+			String[] pairs = helper.getLastMetaComment().split(",");
 			for (String pair : pairs) {
-				String[] parts = pair.split("[=\\s]+");
-				if (parts.length != 2 || parts[0].length() == 0 || parts[1].length() == 0) {
-					throw new ImportException.BadFormatException("Badly formatted attribute pair: '"+pair+"'");
-				}
-				// Attempt to format the value as a number
-				Number number = null;
-				try {
-					number = Integer.parseInt(parts[1]);
-				} catch (NumberFormatException nfe1) {
-					try {
-						number = Double.parseDouble(parts[1]);
-					} catch (NumberFormatException nfe2) {
+				String[] parts = pair.split("=");
+                if (parts.length == 1) {
+                    String label = parts[0].trim();
 
-					}
-				}
-				if (number != null) {
-					branch.setAttribute(parts[0], number);
-				} else {
-					branch.setAttribute(parts[0], parts[1]);
-				}
-			}
+                    if (label.length() == 0) {
+                        throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
+                    }
+                    labelNode(branch, label, "true");
+                } else if (parts.length == 2) {
+                    String label = parts[0].trim();
+                    String value = parts[1].trim();
+
+                    if (label.length() == 0 || value.length() == 0) {
+                        throw new ImportException.BadFormatException("Badly formatted attribute pair: '"+pair+"'");
+                    }
+                    labelNode(branch, label, value);
+                } else {
+                    throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
+                }
+                
+            }
             helper.clearLastMetaComment();
         }
 
@@ -1085,13 +1085,40 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	        throw new ImportException.BadFormatException("Missing closing ')' in tree");
 	    }
 
-	    // find the next delimiter
-	    helper.readToken(":(),;");
+        Node node = tree.createInternalNode(children);
 
-	    return tree.createInternalNode(children);
+        // find the next delimiter
+	    String token = helper.readToken(":(),;").trim();
+
+        // if there is a token before the branch lenght, treat it as a node label
+        // and store it as an attribute of the node...
+        if (token.length() > 0) {
+            labelNode(node, "label", token);
+        }
+
+        return node;
 	}
 
-	/**
+    private void labelNode(Node node, String label, String value) {
+        // Attempt to format the value as a number
+        Number number = null;
+        try {
+            number = Integer.parseInt(value);
+        } catch (NumberFormatException nfe1) {
+            try {
+                number = Double.parseDouble(value);
+            } catch (NumberFormatException nfe2) {
+
+            }
+        }
+        if (number != null) {
+            node.setAttribute(label, number);
+        } else {
+            node.setAttribute(label, value);
+        }
+    }
+
+    /**
 	 * Reads an external node in.
 	 */
 	private Node readExternalNode(SimpleRootedTree tree) throws ImportException, IOException
