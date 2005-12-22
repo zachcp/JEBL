@@ -132,28 +132,6 @@ public class BasicTaxonLabelPainter extends AbstractPainter implements TaxonLabe
         panel.add(panel1);
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-
-        JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel2.add(new JLabel("Colour taxa by:"));
-        final JComboBox combo1 = new JComboBox();
-        combo1.addItem("None");
-//        for (AnnotationDefinition annotation : annotations) {
-//            combo1.addItem(annotation);
-//        }
-//        combo1.addItemListener(new ItemListener() {
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                Object item = combo1.getSelectedItem();
-//                if (item instanceof AnnotationDefinition) {
-//                    setTaxonDecorator(new AnnotationTaxonDecorator((AnnotationDefinition)item));
-//                } else {
-//                    setBranchDecorator(null);
-//                }
-//            }
-//        });
-        panel2.add(combo1);
-        panel.add(panel2);
-        panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         return panel;
     }
 
