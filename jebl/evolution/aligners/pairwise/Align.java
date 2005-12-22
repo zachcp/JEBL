@@ -1,3 +1,12 @@
+/*
+ * AbstractAligner.java
+ *
+ * (c) 2005 JEBL Development Team
+ *
+ * This package is distributed under the
+ * Lesser Gnu Public Licence (LGPL)
+ */
+
 // Implementation of some algorithms for pairwise alignment from
 // Durbin et al: Biological Sequence Analysis, CUP 1998, chapter 2.
 // Peter Sestoft, sestoft@dina.kvl.dk 1999-09-25, 2003-04-20 version 1.4
