@@ -76,10 +76,13 @@ public class TreeViewer extends JPanel {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-        controlPanel = new JPanel();
+        controlPanel = new JToolBar();
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
         controlPanel.setPreferredSize(new Dimension(150,150));
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPanel);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(controlPanel, BorderLayout.NORTH);
+
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, panel);
         splitPane.setContinuousLayout(true);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(1.0);
@@ -374,16 +377,16 @@ public class TreeViewer extends JPanel {
         return treePane;
     }
 
-    private TreeLayout treeLayout = null;
+    protected TreeLayout treeLayout = null;
 
-    private RootedTree tree = null;
+    protected RootedTree tree = null;
 
-    private TreePane treePane;
-    private TreePaneSelector treePaneSelector;
+    protected TreePane treePane;
+    protected TreePaneSelector treePaneSelector;
 
-    private JViewport viewport;
-    private JSplitPane splitPane;
-    private JPanel controlPanel;
+    protected JViewport viewport;
+    protected JSplitPane splitPane;
+    protected JToolBar controlPanel;
 
     static public void main(String[] args) {
 
