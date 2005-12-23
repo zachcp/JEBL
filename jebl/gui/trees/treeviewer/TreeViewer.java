@@ -44,6 +44,8 @@ public class TreeViewer extends JPanel {
         RADIAL
     };
 
+    final private String[] layoutNames = {"Rectangle", "Polar", "Radial"};
+
     public enum SearchType {
         CONTAINS("Contains"),
         STARTS_WITH("Starts with"),
@@ -104,8 +106,11 @@ public class TreeViewer extends JPanel {
     public void setTree(Tree tree) {
         setTree(tree, 6);
     }
-    
+
+    private TreeLayoutType currentLayout = null;
+
     public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
+        currentLayout = treeLayoutType;
         switch (treeLayoutType) {
             case RECTILINEAR: treeLayout = new RectilinearTreeLayout(); break;
             case POLAR: treeLayout = new PolarTreeLayout(); break;
@@ -202,6 +207,26 @@ public class TreeViewer extends JPanel {
         panel2.add(spinner2);
         cp3.add(panel2);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel3.add(new JLabel("Layout:"));
+
+        final JComboBox layoutsBox = new JComboBox();
+        for( TreeLayoutType i : TreeLayoutType.values() ) {
+            layoutsBox.addItem(i);
+        }
+        if( currentLayout != null ) {
+           layoutsBox.setSelectedItem(currentLayout);
+        }
+        layoutsBox.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setTreeLayoutType((TreeLayoutType)layoutsBox.getSelectedItem());
+            }
+        } );
+
+        panel3.add(layoutsBox);
+        cp3.add(panel3);
+        panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         controlPanel.add(cp3);
         cp3.setAlignmentX(Component.LEFT_ALIGNMENT);
