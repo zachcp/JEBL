@@ -86,7 +86,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		panel2.add(new JLabel("Label Position:"));
 		final JComboBox combo1 = new JComboBox();
 		for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
-			combo1.addItem(position);
+            if( position != TaxonLabelPosition.HORIZONTAL ) // not implemented yet
+              combo1.addItem(position);
 		}
 		combo1.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
@@ -223,9 +224,11 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 				calloutPaths.put(node, calloutPath);
 
 			} else if (taxonLabelPosition == TaxonLabelPosition.HORIZONTAL) {
+                // this option disabled in getControlPanel (JH)
 				throw new UnsupportedOperationException("Not implemented yet");
 			} else {
-				throw new IllegalArgumentException("Unrecognized enum value");
+                // this is a bug
+                throw new IllegalArgumentException("Unrecognized enum value");
 			}
 
 			taxonLabelPaths.put(node, taxonLabelPath);
