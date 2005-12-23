@@ -370,7 +370,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
 			Taxon taxon = tree.getTaxon(node);
 
-			if (taxonLabelPainter != null) {
+			if (taxonLabelPainter != null && showingTaxonLabels ) {
 
 				AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
 				Painter.LabelAlignment taxonLabelAlignment = taxonLabelAlignments.get(taxon);
@@ -447,7 +447,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		double labelWidth = 0;
         Rectangle2D labelBounds = null;
 
-		if (taxonLabelPainter != null) {
+		if (taxonLabelPainter != null && showingTaxonLabels) {
 			taxonLabelPainter.calibrate(g2);
 			labelHeight = taxonLabelPainter.getPreferredHeight();
 			labelWidth = taxonLabelPainter.getPreferredWidth();

@@ -15,10 +15,16 @@ import java.awt.geom.Rectangle2D;
  *         Time: 10:23:17 PM
  */
 public class BasicTaxonLabelPainter extends AbstractPainter implements TaxonLabelPainter {
+    private int defaultFontSize;
+
+    public BasicTaxonLabelPainter(Tree tree, int defaultSize) {
+        this.defaultFontSize = defaultSize;
+        taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
+        this.tree = tree;
+    }
 
     public BasicTaxonLabelPainter(Tree tree) {
-        taxonLabelFont = new Font("sansserif", Font.PLAIN, 6);
-	    this.tree = tree;
+        this(tree, 6);
     }
 
     public void calibrate(Graphics2D g2) {
@@ -121,7 +127,7 @@ public class BasicTaxonLabelPainter extends AbstractPainter implements TaxonLabe
 
         JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel1.add(new JLabel("Font Size:"));
-        final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(6, 1, 48, 1));
+        final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 1, 48, 1));
 
         spinner1.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {

@@ -92,15 +92,19 @@ public class TreeViewer extends JPanel {
         treePaneSelector = new TreePaneSelector(treePane);
     }
 
-    public void setTree(Tree tree) {
+    public void setTree(Tree tree, int defaultLabelSize) {
         this.tree = (RootedTree)tree;
 //        treePane.setTree(new SortedRootedTree((RootedTree)tree, Utils.createNodeDensityComparator((RootedTree)tree)));
         treePane.setTree(new SortedRootedTree((RootedTree)tree));
-        treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree));
+        treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree, defaultLabelSize));
 
         setupControlPanel();
     }
 
+    public void setTree(Tree tree) {
+        setTree(tree, 6);
+    }
+    
     public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
         switch (treeLayoutType) {
             case RECTILINEAR: treeLayout = new RectilinearTreeLayout(); break;
