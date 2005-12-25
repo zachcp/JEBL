@@ -9,13 +9,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 
-import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
-import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
-
 /**
- * @author rambaut
- *         Date: Oct 22, 2005
- *         Time: 1:57:29 PM
+ * @author Andrew Rambaut
+ * @version $Id$
  */
 public abstract class AbstractTreeLayout implements TreeLayout {
     public void setTree(Tree tree) {

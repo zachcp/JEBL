@@ -10,31 +10,26 @@
 package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.*;
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.io.TreeImporter;
 import jebl.evolution.io.NexusImporter;
-import jebl.evolution.io.ImportException;
+import jebl.evolution.io.TreeImporter;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.*;
+import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
+import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.treelayouts.*;
-import jebl.gui.trees.treeviewer.decorators.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
-import java.awt.event.*;
 import java.awt.*;
-import java.util.*;
-import java.io.FileReader;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileReader;
 
 /**
- * A panel that displays correlation plots of 2 traces
- *
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public class TreeViewer extends JPanel {
@@ -76,13 +71,14 @@ public class TreeViewer extends JPanel {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-        controlPanel = new JToolBar();
+	    controlPanel = new JPanel();
+//        controlPanel = new JToolBar();
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
         controlPanel.setPreferredSize(new Dimension(150,150));
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(controlPanel, BorderLayout.NORTH);
+//        JPanel panel = new JPanel(new BorderLayout());
+//        panel.add(controlPanel, BorderLayout.NORTH);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, panel);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPanel);
         splitPane.setContinuousLayout(true);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(1.0);
@@ -250,6 +246,10 @@ public class TreeViewer extends JPanel {
         treePane.setBranchDecorator(branchDecorator);
     }
 
+	public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
+	    treePane.setNodeLabelPainter(nodeLabelPainter);
+	}
+
     public void setZoom(double zoom) {
         setZoom(zoom, zoom);
     }
@@ -386,7 +386,7 @@ public class TreeViewer extends JPanel {
 
     protected JViewport viewport;
     protected JSplitPane splitPane;
-    protected JToolBar controlPanel;
+    protected JPanel controlPanel;
 
     static public void main(String[] args) {
 

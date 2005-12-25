@@ -5,10 +5,9 @@ import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
-public abstract class AbstractPainter implements Painter {
+public abstract class AbstractPainter<T> implements Painter<T> {
     public void addPainterListener(PainterListener listener) {
         listeners.add(listener);
     }

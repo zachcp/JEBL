@@ -9,7 +9,6 @@ import java.awt.geom.*;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public interface TreeLayout {

@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public class PolarTreeLayout extends AbstractTreeLayout {
@@ -199,6 +198,11 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 				i++;
 			}
 
+			Line2D nodeLabelPath = new Line2D.Double(
+							transform(maxXPosition, nodePoint.getY()),
+							transform(maxXPosition + 1.0, nodePoint.getY()));
+
+			nodeLabelPaths.put(node, nodeLabelPath);
 		} else {
 
 			nodePoint = new Point2D.Double(xPosition, yPosition);

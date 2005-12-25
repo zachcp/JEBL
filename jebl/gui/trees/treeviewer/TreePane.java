@@ -17,7 +17,6 @@ import java.util.*;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
@@ -176,7 +175,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
-	public void setTaxonLabelPainter(TaxonLabelPainter taxonLabelPainter) {
+	public void setTaxonLabelPainter(Painter<Taxon> taxonLabelPainter) {
         if (this.taxonLabelPainter != null) {
             this.taxonLabelPainter.removePainterListener(this);
         }
@@ -186,8 +185,22 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
-    public TaxonLabelPainter getTaxonLabelPainter() {
+    public Painter<Taxon> getTaxonLabelPainter() {
         return taxonLabelPainter;
+    }
+
+	public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
+        if (this.nodeLabelPainter != null) {
+            this.nodeLabelPainter.removePainterListener(this);
+        }
+        this.nodeLabelPainter = nodeLabelPainter;
+        this.nodeLabelPainter.addPainterListener(this);
+		calibrated = false;
+		repaint();
+	}
+
+    public Painter<Node> getNodeLabelPainter() {
+        return nodeLabelPainter;
     }
 
     public void setBranchDecorator(BranchDecorator branchDecorator) {
@@ -376,7 +389,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				Painter.LabelAlignment taxonLabelAlignment = taxonLabelAlignments.get(taxon);
 				g2.transform(taxonTransform);
 
-				taxonLabelPainter.paintTaxonLabel(g2, taxon, taxonLabelAlignment, new Insets(0, 0, 0, 0));
+				taxonLabelPainter.paint(g2, taxon, taxonLabelAlignment, new Insets(0, 0, 0, 0));
 
 				g2.setTransform(oldTransform);
 
@@ -412,6 +425,19 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 					g2.setPaint(Color.BLACK);
 				}
 				g2.draw(branchPath);
+
+				if (nodeLabelPainter != null) {
+
+					AffineTransform nodeTransform = nodeLabelTransforms.get(node);
+					Painter.LabelAlignment nodeLabelAlignment = nodeLabelAlignments.get(node);
+					g2.transform(nodeTransform);
+
+					nodeLabelPainter.paint(g2, node, nodeLabelAlignment, new Insets(0, 0, 0, 0));
+
+					g2.setTransform(oldTransform);
+
+				}
+
 			}
 		}
 
@@ -545,6 +571,38 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
+		// Clear the map of individual node label bounds and transforms
+        nodeLabelBounds.clear();
+		nodeLabelTransforms.clear();
+		nodeLabelAlignments.clear();
+
+		if (nodeLabelPainter != null) {
+			// Iterate though the external nodes
+			for (Node node : tree.getNodes()) {
+
+				// Get the line that represents the path for the taxon label
+				Line2D labelPath = treeLayout.getNodeLabelPath(node);
+
+				if (labelPath != null) {
+					// Work out how it is rotated and create a transform that matches that
+					AffineTransform taxonTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight);
+
+					// Store the transformed bounds in the map for use when selecting
+					nodeLabelBounds.put(node, taxonTransform.createTransformedShape(labelBounds));
+
+					// Store the transform in the map for use when drawing
+					nodeLabelTransforms.put(node, taxonTransform);
+
+					// Store the alignment in the map for use when drawing
+					if (labelPath.getX1() < labelPath.getX2()) {
+						nodeLabelAlignments.put(node, Painter.LabelAlignment.LEFT);
+					} else {
+						nodeLabelAlignments.put(node, Painter.LabelAlignment.RIGHT);
+					}
+				}
+			}
+		}
+
         calloutPaths.clear();
 
 		calibrated = true;
@@ -610,7 +668,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private BranchDecorator branchDecorator = null;
 
 	private float labelXOffset = 5.0F;
-	private TaxonLabelPainter taxonLabelPainter = null;
+	private Painter<Taxon> taxonLabelPainter = null;
+	private Painter<Node> nodeLabelPainter = null;
 
 	private Stroke branchLineStroke = new BasicStroke(1.0F);
 	private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[] { 0.5f, 2.0f }, 0.0f);
@@ -627,6 +686,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Map<Taxon, AffineTransform> taxonLabelTransforms = new HashMap<Taxon, AffineTransform>();
 	private Map<Taxon, Shape> taxonLabelBounds = new HashMap<Taxon, Shape>();
 	private Map<Taxon, Painter.LabelAlignment> taxonLabelAlignments = new HashMap<Taxon, Painter.LabelAlignment>();
+
+	private Map<Node, AffineTransform> nodeLabelTransforms = new HashMap<Node, AffineTransform>();
+	private Map<Node, Shape> nodeLabelBounds = new HashMap<Node, Shape>();
+	private Map<Node, Painter.LabelAlignment> nodeLabelAlignments = new HashMap<Node, Painter.LabelAlignment>();
 
 	private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
 

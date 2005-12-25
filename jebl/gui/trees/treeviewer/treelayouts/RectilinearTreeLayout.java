@@ -11,7 +11,6 @@ import java.util.List;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public class RectilinearTreeLayout extends AbstractTreeLayout {
@@ -162,6 +161,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
             }
+
+	        Line2D nodeLabelPath = new Line2D.Double(
+				        nodePoint.getX(), nodePoint.getY(),
+				        nodePoint.getX() + 1.0, nodePoint.getY());
+
+	        nodeLabelPaths.put(node, nodeLabelPath);
 
         } else {
 

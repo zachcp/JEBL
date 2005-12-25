@@ -6,7 +6,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public interface TaxonDecorator {

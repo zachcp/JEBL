@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * @author Andrew Rambaut
- * @author Alexei Drummond
  * @version $Id$
  */
 public class RadialTreeLayout extends AbstractTreeLayout {
@@ -93,6 +92,10 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 i++;
             }
 
+	        Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)), yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+
+	        Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
+	        nodeLabelPaths.put(node, nodeLabelPath);
         } else {
 
             Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)), yPosition + ((length + 1.0) * Math.sin(branchAngle)));
