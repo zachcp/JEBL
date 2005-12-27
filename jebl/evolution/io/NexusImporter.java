@@ -79,8 +79,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	public NexusBlock findBlockName(String blockName)
 	{
-		nextBlock = NexusBlock.valueOf(blockName.toUpperCase());
-		if (nextBlock == null) {
+	    try {
+          nextBlock = NexusBlock.valueOf(blockName.toUpperCase());
+        } catch( IllegalArgumentException e ) {
+          // handle unknown blocks. java 1.5 throws an exception in valueOf
+          nextBlock = null;
+        }
+
+        if (nextBlock == null) {
 			nextBlock = NexusBlock.UNKNOWN;
 		}
 		return nextBlock;
