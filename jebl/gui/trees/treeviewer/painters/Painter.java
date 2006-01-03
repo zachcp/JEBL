@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import javax.swing.*;
+import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
+
 import java.awt.*;
 
 /**
@@ -9,8 +10,8 @@ import java.awt.*;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public interface Painter<T> {
-	
+public interface Painter<T> extends ControlsProvider {
+
     public enum Orientation {
         TOP,
         LEFT,
@@ -28,8 +29,6 @@ public interface Painter<T> {
 	void calibrate(Graphics2D g2);
 
 	void paint(Graphics2D g2, T item, LabelAlignment labelAlignment, Insets insets);
-
-	JPanel getControlPanel();
 
     double getPreferredWidth();
     double getPreferredHeight();

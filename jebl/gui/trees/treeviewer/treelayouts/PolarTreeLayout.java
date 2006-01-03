@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -10,6 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.*;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
@@ -35,11 +37,19 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		return true;
 	}
 
-	public JPanel getControlPanel() {
+	public List<Controls> getControls() {
+
+		List<Controls> controls = new ArrayList<Controls>();
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		panel.add(new JLabel("Root Angle:"));
+
+		JLabel label = new JLabel("Root Angle:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+		panel.add(label);
+
 		final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
 		slider1.setValue((int)(180.0 - (rootAngle * 10)));
 		slider1.setPaintTicks(true);
@@ -53,7 +63,11 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		});
 		panel.add(slider1);
 
-		panel.add(new JLabel("Root Length:"));
+		label = new JLabel("Root Length:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+		panel.add(label);
+
 		final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
 		slider2.setValue((int)(rootLength * 10000));
 		slider2.setPaintTicks(true);
@@ -67,7 +81,11 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		});
 		panel.add(slider2);
 
-		panel.add(new JLabel("Angular Range:"));
+		label = new JLabel("Angular Range:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+		panel.add(label);
+
 		final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
 		slider3.setValue((int)(360.0 - (angularRange * 10)));
 		slider3.setPaintTicks(true);
@@ -82,7 +100,10 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		panel.add(slider3);
 
 		JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		panel2.add(new JLabel("Label Position:"));
+		label = new JLabel("Label Position:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.RIGHT);
+		panel2.add(label);
 		final JComboBox combo1 = new JComboBox();
 		for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
             if( position != TaxonLabelPosition.HORIZONTAL ) // not implemented yet
@@ -98,7 +119,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		panel.add(panel2);
 		panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		return panel;
+		controls.add(new Controls("Layout", panel));
+	    return controls;
 	}
 
 	public void setRootAngle(double rootAngle) {
@@ -228,7 +250,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 				calloutPaths.put(node, calloutPath);
 
 			} else if (taxonLabelPosition == TaxonLabelPosition.HORIZONTAL) {
-                // this option disabled in getControlPanel (JH)
+                // this option disabled in getControls (JH)
 				throw new UnsupportedOperationException("Not implemented yet");
 			} else {
                 // this is a bug

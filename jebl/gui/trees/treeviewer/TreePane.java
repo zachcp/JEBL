@@ -4,22 +4,28 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.*;
+import jebl.gui.trees.treeviewer.painters.Painter;
+import jebl.gui.trees.treeviewer.painters.PainterListener;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.print.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreePane extends JComponent implements PainterListener, Printable {
+public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
 	public TreePane() {
 	}
@@ -295,7 +301,72 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return null;
 	}
 
-    private final Set<TreeSelectionListener> treeSelectionListeners = new HashSet<TreeSelectionListener>();
+	public List<Controls> getControls() {
+
+		List<Controls> controls = new ArrayList<Controls>();
+
+		controls.addAll(treeLayout.getControls());
+
+		if (controlsPanel == null) {
+			controlsPanel = new JPanel();
+			Box box = Box.createVerticalBox();
+
+			final JCheckBox checkBox1 = new JCheckBox("Show Taxon Labels");
+			checkBox1.setFont(checkBox1.getFont().deriveFont(11.0f));
+			checkBox1.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(checkBox1);
+
+			checkBox1.setSelected(isShowingTaxonLabels());
+			checkBox1.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					setShowingTaxonLabels(checkBox1.isSelected());
+				}
+			});
+
+			final JCheckBox checkBox2 = new JCheckBox("Show Root Branch");
+			checkBox2.setFont(checkBox2.getFont().deriveFont(11.0f));
+			checkBox2.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(checkBox2);
+
+			checkBox2.setSelected(isShowingRootBranch());
+			checkBox2.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					setShowingRootBranch(checkBox2.isSelected());
+
+				}
+			});
+
+			JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JLabel label = new JLabel("Line Weight:");
+			label.setFont(label.getFont().deriveFont(11.0f));
+			panel2.add(label);
+			final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
+
+			spinner2.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					setBranchLineWeight(((Double)spinner2.getValue()).floatValue());
+				}
+			});
+			panel2.add(spinner2);
+			panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(panel2);
+		}
+		controls.add(new Controls("Formatting", controlsPanel));
+
+		if (getTaxonLabelPainter() != null) {
+			controls.addAll(getTaxonLabelPainter().getControls());
+		}
+
+		if (getNodeLabelPainter() != null) {
+			controls.addAll(getNodeLabelPainter().getControls());
+		}
+
+	    return controls;
+    }
+
+	private JPanel controlsPanel = null;
+
+	private final Set<TreeSelectionListener> treeSelectionListeners = new HashSet<TreeSelectionListener>();
 
     public void addTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
         treeSelectionListeners.add(treeSelectionListener);

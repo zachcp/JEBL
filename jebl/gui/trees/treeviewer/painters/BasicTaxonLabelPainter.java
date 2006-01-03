@@ -40,5 +40,9 @@ public class BasicTaxonLabelPainter extends AbstractLabelPainter<Taxon> {
 		return taxon.getName();
 	}
 
+	public String getTitle() {
+		return "Taxon Labels";
+	}
+
 	private final Tree tree;
 }

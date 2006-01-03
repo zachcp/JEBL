@@ -14,25 +14,27 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.treelayouts.*;
+import jebl.gui.utils.IconUtils;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreeViewer extends JPanel {
+public class TreeViewer extends JPanel implements ControlsProvider {
     public enum TreeLayoutType {
         RECTILINEAR,
         POLAR,
@@ -71,26 +73,28 @@ public class TreeViewer extends JPanel {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-	    controlPanel = new JPanel();
-//        controlPanel = new JToolBar();
-        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
-        controlPanel.setPreferredSize(new Dimension(150,150));
+	    controlPanel = new ControlPanel(200);
 //        JPanel panel = new JPanel(new BorderLayout());
 //        panel.add(controlPanel, BorderLayout.NORTH);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPanel);
-        splitPane.setContinuousLayout(true);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(1.0);
-        splitPane.setDividerLocation(0.95);
+//        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPanel);
+//        splitPane.setContinuousLayout(true);
+//        splitPane.setOneTouchExpandable(true);
+//        splitPane.setResizeWeight(1.0);
+//        splitPane.setDividerLocation(0.95);
+//
+//        add(splitPane, BorderLayout.CENTER);
 
-        add(splitPane, BorderLayout.CENTER);
-
+        add(scrollPane, BorderLayout.CENTER);
+	    add(controlPanel, BorderLayout.EAST);
         setTreeLayoutType(TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
         treePaneSelector = new TreePaneSelector(treePane);
+
+        controlPanel.addControlsProvider(this);
+        controlPanel.addControlsProvider(treePane);
     }
 
     public void setTree(Tree tree, int defaultLabelSize) {
@@ -118,128 +122,115 @@ public class TreeViewer extends JPanel {
         }
 
         treePane.setTreeLayout(treeLayout);
-
-        setupControlPanel();
+	    setupControlPanel();
     }
 
     public void setupControlPanel() {
-        controlPanel.removeAll();
-
-        JPanel cp1 = new JPanel();
-        cp1.setLayout(new BoxLayout(cp1, BoxLayout.PAGE_AXIS));
-
-        cp1.add(new JLabel("Zoom:"));
-        final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
-        zoomSlider.setPaintTicks(true);
-        zoomSlider.setPaintLabels(true);
-
-        zoomSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                setZoom(((double)zoomSlider.getValue()) / 100.0);
-            }
-        });
-        cp1.add(zoomSlider);
-
-        JLabel label = new JLabel("Vertical Expansion:");
-        cp1.add(label);
-        final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
-        verticalExpansionSlider.setPaintTicks(true);
-        verticalExpansionSlider.setPaintLabels(true);
-
-        verticalExpansionSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
-            }
-        });
-
-        label.setEnabled(!treeLayout.maintainAspectRatio());
-        verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
-
-        cp1.add(verticalExpansionSlider);
-        controlPanel.add(cp1);
-
-        controlPanel.add(new JSeparator());
-
-        JPanel cp2 = treeLayout.getControlPanel();
-        controlPanel.add(cp2);
-        controlPanel.add(new JSeparator());
-
-        JPanel cp3 = new JPanel();
-        cp3.setLayout(new BoxLayout(cp3, BoxLayout.PAGE_AXIS));
-
-        final JCheckBox checkBox1 = new JCheckBox("Show Taxon Labels");
-        cp3.add(checkBox1);
-        checkBox1.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        checkBox1.setSelected(treePane.isShowingTaxonLabels());
-        checkBox1.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                treePane.setShowingTaxonLabels(checkBox1.isSelected());
-            }
-        });
-
-        if (treePane.getTaxonLabelPainter() != null) {
-            cp3.add(treePane.getTaxonLabelPainter().getControlPanel());
-        }
-
-        final JCheckBox checkBox2 = new JCheckBox("Show Root Branch");
-        cp3.add(checkBox2);
-        checkBox2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        checkBox2.setSelected(treePane.isShowingRootBranch());
-        checkBox2.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                treePane.setShowingRootBranch(checkBox2.isSelected());
-
-            }
-        });
-
-        JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel2.add(new JLabel("Line Weight:"));
-        final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
-
-        spinner2.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                treePane.setBranchLineWeight(((Double)spinner2.getValue()).floatValue());
-
-            }
-        });
-        panel2.add(spinner2);
-        cp3.add(panel2);
-        panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel3.add(new JLabel("Layout:"));
-
-        final JComboBox layoutsBox = new JComboBox();
-        for( TreeLayoutType i : TreeLayoutType.values() ) {
-            layoutsBox.addItem(i);
-        }
-        if( currentLayout != null ) {
-           layoutsBox.setSelectedItem(currentLayout);
-        }
-        layoutsBox.addActionListener( new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setTreeLayoutType((TreeLayoutType)layoutsBox.getSelectedItem());
-            }
-        } );
-
-        panel3.add(layoutsBox);
-        cp3.add(panel3);
-        panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        controlPanel.add(cp3);
-        cp3.setAlignmentX(Component.LEFT_ALIGNMENT);
+        controlPanel.setupControls();
 
         validate();
-        repaint();
+	    repaint();
     }
 
+	public java.util.List<Controls> getControls() {
+
+		List<Controls> controls = new ArrayList<Controls>();
+
+		if (controlsPanel == null) {
+			controlsPanel = new JPanel();
+			Box box = Box.createVerticalBox();
+
+			JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+			Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
+			Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
+			Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
+			final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
+			final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
+			final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
+			toggle1.putClientProperty( "Quaqua.Button.style", "toggleWest");
+			toggle2.putClientProperty( "Quaqua.Button.style", "toggleCenter");
+			toggle3.putClientProperty( "Quaqua.Button.style", "toggleEast");
+			ButtonGroup buttonGroup = new ButtonGroup();
+			buttonGroup.add(toggle1);
+			buttonGroup.add(toggle2);
+			buttonGroup.add(toggle3);
+			toggle1.setSelected(true);
+			toggle1.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					if (toggle1.isSelected())
+						setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
+				}
+			});
+			toggle2.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					if (toggle2.isSelected())
+						setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
+				}
+			});
+			toggle3.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					if (toggle3.isSelected())
+						setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
+				}
+			});
+			panel1.add(toggle1);
+			panel1.add(toggle2);
+			panel1.add(toggle3);
+
+			panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(panel1);
+
+			JLabel label = new JLabel("Zoom:");
+			label.setFont(label.getFont().deriveFont(11.0f));
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+			label.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(label);
+
+			final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
+			zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+			zoomSlider.setPaintTicks(true);
+			zoomSlider.setPaintLabels(true);
+
+			zoomSlider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					setZoom(((double)zoomSlider.getValue()) / 100.0);
+				}
+			});
+			zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(zoomSlider);
+
+			label = new JLabel("Vertical Expansion:");
+			label.setFont(label.getFont().deriveFont(11.0f));
+			label.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(label);
+
+			final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
+			verticalExpansionSlider.setPaintTicks(true);
+			verticalExpansionSlider.setPaintLabels(true);
+
+			verticalExpansionSlider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent changeEvent) {
+					setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
+				}
+			});
+
+			label.setEnabled(!treeLayout.maintainAspectRatio());
+			verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
+			verticalExpansionSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+			box.add(verticalExpansionSlider);
+
+			controlsPanel.add(box);
+		}
+		controls.add(new Controls("General", controlsPanel));
+
+		return controls;
+	}
+	private JPanel controlsPanel = null;
+
     public void setControlPanelVisible(boolean visible) {
-        if (visible) {
-            splitPane.setDividerLocation(splitPane.getLastDividerLocation());
-        } else {
-            splitPane.setDividerLocation(Integer.MAX_VALUE);
-        }
+        controlsPanel.setVisible(visible);
     }
 
     public void setBranchDecorator(BranchDecorator branchDecorator) {
@@ -386,7 +377,7 @@ public class TreeViewer extends JPanel {
 
     protected JViewport viewport;
     protected JSplitPane splitPane;
-    protected JPanel controlPanel;
+    private ControlPanel controlPanel;
 
     static public void main(String[] args) {
 

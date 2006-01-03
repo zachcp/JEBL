@@ -2,16 +2,17 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
+import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public interface TreeLayout {
+public interface TreeLayout extends ControlsProvider {
 
     enum AxisType {
         CONTINUOUS,
@@ -37,6 +38,4 @@ public interface TreeLayout {
     Line2D getNodeLabelPath(Node node);
 
 	Shape getCalloutPath(Node node);
-
-    JPanel getControlPanel();
 }

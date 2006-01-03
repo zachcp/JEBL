@@ -49,6 +49,10 @@ public class BasicNodeLabelPainter extends AbstractLabelPainter<Node> {
 		return null;
 	}
 
+	public String getTitle() {
+		return "Node Labels";
+	}
+
 	private final Tree tree;
 	private final String attribute;
 }

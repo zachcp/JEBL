@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -8,6 +9,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
@@ -27,11 +29,18 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
-    public JPanel getControlPanel() {
+	public List<Controls> getControls() {
+
+		List<Controls> controls = new ArrayList<Controls>();
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        panel.add(new JLabel("Root Length:"));
+		JLabel label = new JLabel("Root Length:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+		panel.add(label);
+
         final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
         slider1.setValue((int)(rootLength * 10000));
         slider1.setPaintTicks(true);
@@ -45,7 +54,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         });
         panel.add(slider1);
 
-        panel.add(new JLabel("Curviture:"));
+		label = new JLabel("Curvature:");
+		label.setFont(label.getFont().deriveFont(11.0f));
+		label.setHorizontalAlignment(SwingConstants.LEFT);
+		panel.add(label);
+
         final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
         slider2.setPaintTicks(true);
         slider2.setPaintLabels(true);
@@ -59,6 +72,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         panel.add(slider2);
 
 	    final JCheckBox checkBox1 = new JCheckBox("Align Taxon Labels");
+		checkBox1.setFont(checkBox1.getFont().deriveFont(11.0f));
 	    panel.add(checkBox1);
 	    checkBox1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -69,8 +83,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	        }
 	    });
 
-        return panel;
-    }
+		controls.add(new Controls("Layout", panel));
+	    return controls;
+
+	}
 
     public void setRootLength(double rootLength) {
         this.rootLength = rootLength;

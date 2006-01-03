@@ -2,10 +2,12 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
 
 import javax.swing.*;
 import java.awt.geom.*;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
@@ -25,11 +27,14 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return true;
     }
 
-    public JPanel getControlPanel() {
+	public List<Controls> getControls() {
+
+		List<Controls> controls = new ArrayList<Controls>();
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        return panel;
+		controls.add(new Controls("Layout", panel));
+	    return controls;
     }
 
     protected void validate() {

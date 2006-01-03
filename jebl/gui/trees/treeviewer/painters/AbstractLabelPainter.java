@@ -1,10 +1,14 @@
 package jebl.gui.trees.treeviewer.painters;
 
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
@@ -114,7 +118,9 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
 
 	protected abstract String getLabel(T item);
 
-    public JPanel getControlPanel() {
+    public List<Controls> getControls() {
+
+	    List<Controls> controls = new ArrayList<Controls>();
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -132,8 +138,11 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         panel.add(panel1);
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        return panel;
+	    controls.add(new Controls(getTitle(), panel));
+        return controls;
     }
+
+	public abstract String getTitle();
 
 	private Paint foreground = Color.BLACK;
     private Paint background = null;
