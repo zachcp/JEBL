@@ -97,21 +97,32 @@ public class ControlPanel extends JToolBar {
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		add(panel);
 
+		final Dimension size = panel2.getPreferredSize();
+
 		button.addDisclosureListener(new DisclosureListener() {
 			public void opening() {
+				panel2.setSize(size.width, size.height / 2);
+				panel2.setVisible(true);
+				panel2.invalidate();
+				revalidate();
 			}
 
 			public void opened() {
-				panel2.setVisible(true);
-				panel.invalidate();
+				panel2.setSize(size);
+				panel2.invalidate();
+				revalidate();
 			}
 
 			public void closing() {
+				panel2.setSize(size.width, size.height / 2);
+				panel2.invalidate();
+				revalidate();
 			}
 
 			public void closed() {
-				panel2.setVisible(false);
-				panel.invalidate();
+				panel2.setSize(size.width, 0);
+				panel2.invalidate();
+				revalidate();
 			}
 		});
 
