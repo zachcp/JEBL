@@ -18,6 +18,7 @@ import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
+import jebl.gui.trees.treeviewer.painters.BasicNodeLabelPainter;
 import jebl.gui.trees.treeviewer.treelayouts.*;
 import jebl.gui.utils.IconUtils;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
@@ -35,7 +36,7 @@ import java.util.List;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreeViewer extends JPanel implements ControlsProvider {
+public class TreeViewer extends JPanel {
     public enum TreeLayoutType {
         RECTILINEAR,
         POLAR,
@@ -94,8 +95,16 @@ public class TreeViewer extends JPanel implements ControlsProvider {
         // It installs itself within the constructor.
         treePaneSelector = new TreePaneSelector(treePane);
 
-        controlPanel.addControlsProvider(this);
+        controlPanel.addControlsProvider(controlsProvider);
         controlPanel.addControlsProvider(treePane);
+
+        controlPanel.addControlPanelListener(new ControlPanelListener() {
+            public void controlsChanged() {
+                controlPanel.setupControls();
+                validate();
+                repaint();
+            }
+        });
     }
 
     public void setTree(Tree tree, int defaultLabelSize) {
@@ -103,8 +112,7 @@ public class TreeViewer extends JPanel implements ControlsProvider {
 //        treePane.setTree(new SortedRootedTree((RootedTree)tree, Utils.createNodeDensityComparator((RootedTree)tree)));
         treePane.setTree(new SortedRootedTree((RootedTree)tree));
         treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree, defaultLabelSize));
-
-        setupControlPanel();
+        treePane.setNodeLabelPainter(new BasicNodeLabelPainter("node heights", tree));
     }
 
     public void setTree(Tree tree) {
@@ -123,101 +131,100 @@ public class TreeViewer extends JPanel implements ControlsProvider {
         }
 
         treePane.setTreeLayout(treeLayout);
-        setupControlPanel();
     }
 
     public ControlPanel getControlPanel() {
         return controlPanel;
     }
 
-    public void setupControlPanel() {
-        controlPanel.setupControls();
+    private ControlsProvider controlsProvider = new ControlsProvider() {
 
-        validate();
-        repaint();
-    }
-
-    public java.util.List<Controls> getControls() {
-
-        List<Controls> controls = new ArrayList<Controls>();
-
-        if (optionsPanel == null) {
-            optionsPanel = new OptionsPanel();
-
-            JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
-            Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
-            Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
-            final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
-            final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
-            final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
-            toggle1.putClientProperty( "Quaqua.Button.style", "toggleWest");
-            toggle2.putClientProperty( "Quaqua.Button.style", "toggleCenter");
-            toggle3.putClientProperty( "Quaqua.Button.style", "toggleEast");
-            ButtonGroup buttonGroup = new ButtonGroup();
-            buttonGroup.add(toggle1);
-            buttonGroup.add(toggle2);
-            buttonGroup.add(toggle3);
-            toggle1.setSelected(true);
-            toggle1.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    if (toggle1.isSelected())
-                        setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
-                }
-            });
-            toggle2.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    if (toggle2.isSelected())
-                        setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
-                }
-            });
-            toggle3.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    if (toggle3.isSelected())
-                        setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
-                }
-            });
-            panel1.add(toggle1);
-            panel1.add(toggle2);
-            panel1.add(toggle3);
-
-            optionsPanel.addSpanningComponent(panel1);
-
-            final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
-            zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            zoomSlider.setPaintTicks(true);
-            zoomSlider.setPaintLabels(true);
-
-            zoomSlider.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    setZoom(((double)zoomSlider.getValue()) / 100.0);
-                }
-            });
-
-            optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
-
-            final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
-            verticalExpansionSlider.setPaintTicks(true);
-            verticalExpansionSlider.setPaintLabels(true);
-
-            verticalExpansionSlider.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
-                }
-            });
-
-            JLabel label = new JLabel("Expansion:");
-            label.setEnabled(!treeLayout.maintainAspectRatio());
-            verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
-
-            optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
+        public void setControlPanel(ControlPanel controlPanel) {
+            // do nothing
         }
-        controls.add(new Controls("General", optionsPanel));
 
-        return controls;
-    }
-    private OptionsPanel optionsPanel = null;
+        public java.util.List<Controls> getControls() {
+
+            List<Controls> controls = new ArrayList<Controls>();
+
+            if (optionsPanel == null) {
+                optionsPanel = new OptionsPanel();
+
+                JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+                Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
+                Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
+                Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
+                final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
+                final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
+                final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
+                toggle1.putClientProperty( "Quaqua.Button.style", "toggleWest");
+                toggle2.putClientProperty( "Quaqua.Button.style", "toggleCenter");
+                toggle3.putClientProperty( "Quaqua.Button.style", "toggleEast");
+                ButtonGroup buttonGroup = new ButtonGroup();
+                buttonGroup.add(toggle1);
+                buttonGroup.add(toggle2);
+                buttonGroup.add(toggle3);
+                toggle1.setSelected(true);
+                toggle1.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        if (toggle1.isSelected())
+                            setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
+                    }
+                });
+                toggle2.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        if (toggle2.isSelected())
+                            setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
+                    }
+                });
+                toggle3.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        if (toggle3.isSelected())
+                            setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
+                    }
+                });
+                panel1.add(toggle1);
+                panel1.add(toggle2);
+                panel1.add(toggle3);
+
+                optionsPanel.addSpanningComponent(panel1);
+
+                final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
+                zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                zoomSlider.setPaintTicks(true);
+                zoomSlider.setPaintLabels(true);
+
+                zoomSlider.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        setZoom(((double)zoomSlider.getValue()) / 100.0);
+                    }
+                });
+
+                optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
+
+                final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
+                verticalExpansionSlider.setPaintTicks(true);
+                verticalExpansionSlider.setPaintLabels(true);
+
+                verticalExpansionSlider.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
+                    }
+                });
+
+                JLabel label = new JLabel("Expansion:");
+                label.setEnabled(!treeLayout.maintainAspectRatio());
+                verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
+
+                optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
+            }
+            controls.add(new Controls("General", optionsPanel));
+
+            return controls;
+        }
+        private OptionsPanel optionsPanel = null;
+    };
 
     public void setControlPanelVisible(boolean visible) {
         controlPanel.setVisible(visible);
@@ -229,7 +236,6 @@ public class TreeViewer extends JPanel implements ControlsProvider {
 
     public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
         treePane.setNodeLabelPainter(nodeLabelPainter);
-        setupControlPanel();
     }
 
     public void setZoom(double zoom) {

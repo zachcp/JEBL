@@ -28,11 +28,11 @@ public class OptionsPanel extends JPanel {
         this.hGap = hGap;
         this.vGap = vGap;
 
-        setBorder(BorderFactory.createEmptyBorder(0,6,0,6));
+        setBorder(BorderFactory.createEmptyBorder(3,6,6,6));
         setLayout(gridbag);
         setOpaque(false);
 
-        setBorder(BorderFactory.createLineBorder(Color.RED));
+        //setBorder(BorderFactory.createLineBorder(Color.RED));
     }
 
     public void addLabel(String text) {

@@ -2,6 +2,8 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.RootedTree;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -24,29 +26,18 @@ public class BasicNodeLabelPainter extends AbstractLabelPainter<Node> {
 		this.tree = tree;
 	}
 
-	protected double getMaxLabelWidth(Graphics2D g2) {
-		double maxLabelWidth = 0.0;
-
-		FontMetrics fm = g2.getFontMetrics();
-		for (Node node : tree.getNodes()) {
-			String label = getLabel(node);
-			if (label != null) {
-				Rectangle2D rect = fm.getStringBounds(label, g2);
-				if (rect.getWidth() > maxLabelWidth) {
-				    maxLabelWidth = rect.getWidth();
-				}
-			}
-		}
-
-		return maxLabelWidth;
-	}
-
 	protected String getLabel(Node node) {
-		Object value = node.getAttribute(attribute);
-		if (value != null) {
-			return value.toString();
-		}
-		return null;
+        if (attribute.equals("node heights") && tree instanceof RootedTree) {
+            return Double.toString(((RootedTree)tree).getHeight(node));
+        } else if (attribute.equals("branch lengths") && tree instanceof RootedTree) {
+                return Double.toString(((RootedTree)tree).getLength(node));
+        } else {
+            Object value = node.getAttribute(attribute);
+            if (value != null) {
+                return value.toString();
+            }
+        }
+        return null;
 	}
 
 	public String getTitle() {
@@ -55,4 +46,5 @@ public class BasicNodeLabelPainter extends AbstractLabelPainter<Node> {
 
 	private final Tree tree;
 	private final String attribute;
+
 }

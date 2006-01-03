@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.treelayouts;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
 
 import javax.swing.*;
 import java.awt.geom.*;
@@ -25,6 +26,10 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
     public boolean maintainAspectRatio() {
         return true;
+    }
+
+    public void setControlPanel(ControlPanel controlPanel) {
+        // do nothing...
     }
 
 	public List<Controls> getControls() {

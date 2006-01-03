@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.treelayouts;
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -39,9 +40,13 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		return true;
 	}
 
+    public void setControlPanel(ControlPanel controlPanel) {
+        // do nothing...
+    }
+
     public List<Controls> getControls() {
 
-	    List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controls = new ArrayList<Controls>();
 
         if (optionsPanel == null) {
             optionsPanel = new OptionsPanel();
@@ -99,7 +104,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             optionsPanel.addComponentWithLabel("Label Position:", combo1);
         }
 
-		controls.add(new Controls("Layout", optionsPanel));
+        controls.add(new Controls("Layout", optionsPanel));
 
         return controls;
     }

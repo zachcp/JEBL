@@ -2,6 +2,8 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.evolution.graphs.Node;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -10,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
@@ -27,14 +30,14 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         this(6);
     }
 
-    public void calibrate(Graphics2D g2) {
+    public void calibrate(Graphics2D g2, Collection<T> items) {
         Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
 
         FontMetrics fm = g2.getFontMetrics();
         double labelHeight = fm.getHeight();
 
-        width = getMaxLabelWidth(g2);
+        width = getMaxLabelWidth(g2, items);
         height = labelHeight;
 
         yOffset = (float)(fm.getAscent());
@@ -42,7 +45,23 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         g2.setFont(oldFont);
     }
 
-	protected abstract double getMaxLabelWidth(Graphics2D g2);
+    private double getMaxLabelWidth(Graphics2D g2, Collection<T> items) {
+        double maxLabelWidth = 0.0;
+
+        FontMetrics fm = g2.getFontMetrics();
+        for (T item : items) {
+            String label = getLabel(item);
+            if (label != null) {
+                Rectangle2D rect = fm.getStringBounds(label, g2);
+                if (rect.getWidth() > maxLabelWidth) {
+                    maxLabelWidth = rect.getWidth();
+                }
+            }
+        }
+
+        return maxLabelWidth;
+    }
+
 
     public double getPreferredWidth() {
         return width;
@@ -73,7 +92,7 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         firePainterChanged();
     }
 
-    public void paint(Graphics2D g2, T item, LabelAlignment labelAlignment, Insets insets) {
+    public void paint(Graphics2D g2, T item, Justification justification, Insets insets) {
         Font oldFont = g2.getFont();
 
         if (background != null) {
@@ -90,38 +109,42 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         g2.setPaint(foreground);
         g2.setFont(taxonLabelFont);
 
-	    String label = getLabel(item);
-	    if (label != null) {
+        String label = getLabel(item);
+        if (label != null) {
 
-		    Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
+            Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
-		    float xOffset;
-		    switch (labelAlignment) {
-			    case CENTER:
-				    xOffset = (float)(insets.left + (width - rect.getWidth()) / 2.0);
-				    break;
-			    case FLUSH:
-			    case LEFT:
-				    xOffset = (float)insets.left;
-				    break;
-			    case RIGHT:
-				    xOffset = (float)(insets.left + width - rect.getWidth());
-				    break;
-			    default:
-				    throw new IllegalArgumentException("Unrecognized alignment enum option");
-		    }
+            float xOffset;
+            switch (justification) {
+                case CENTER:
+                    xOffset = (float)(insets.left + (width - rect.getWidth()) / 2.0);
+                    break;
+                case FLUSH:
+                case LEFT:
+                    xOffset = (float)insets.left;
+                    break;
+                case RIGHT:
+                    xOffset = (float)(insets.left + width - rect.getWidth());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unrecognized alignment enum option");
+            }
 
-		    g2.drawString(label, xOffset, yOffset + insets.top);
-	    }
+            g2.drawString(label, xOffset, yOffset + insets.top);
+        }
 
         g2.setFont(oldFont);
     }
 
-	protected abstract String getLabel(T item);
+    protected abstract String getLabel(T item);
+
+    public void setControlPanel(ControlPanel controlPanel) {
+        // nothing to do
+    }
 
     public List<Controls> getControls() {
 
-	    List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controls = new ArrayList<Controls>();
 
         if (optionsPanel == null) {
             optionsPanel = new OptionsPanel();
@@ -136,15 +159,15 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
             optionsPanel.addComponentWithLabel("Font Size:", spinner1);
         }
 
-	    controls.add(new Controls(getTitle(), optionsPanel));
+        controls.add(new Controls(getTitle(), optionsPanel));
 
         return controls;
     }
     private OptionsPanel optionsPanel = null;
-   
-	public abstract String getTitle();
 
-	private Paint foreground = Color.BLACK;
+    public abstract String getTitle();
+
+    private Paint foreground = Color.BLACK;
     private Paint background = null;
     private Paint borderPaint = null;
     private Stroke borderStroke = null;

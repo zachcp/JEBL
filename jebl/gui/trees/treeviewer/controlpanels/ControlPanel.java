@@ -35,17 +35,35 @@ public class ControlPanel extends JToolBar {
 	}
 
 	public void addControlsProvider(ControlsProvider provider) {
-		providers.add(provider);
+        provider.setControlPanel(this);
+        providers.add(provider);
 	}
 
-	public void setupControls() {
+    public void fireControlsChanged() {
+        for (ControlPanelListener listener : listeners) {
+            listener.controlsChanged();
+        }
+    }
+
+    public void addControlPanelListener(ControlPanelListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeControlPanelListener(ControlPanelListener listener) {
+        listeners.remove(listener);
+    }
+
+    private final List<ControlPanelListener> listeners = new ArrayList<ControlPanelListener>();
+
+    public void setupControls() {
 		removeAll();
 		for (ControlsProvider provider : providers) {
 			for (Controls controls : provider.getControls()) {
 				addControls(controls);
 			}
 		}
-	}
+        add(Box.createVerticalStrut(Integer.MAX_VALUE));
+    }
 
 	private void addControls(Controls controls) {
 		final JPanel panel = new JPanel(new BorderLayout());
