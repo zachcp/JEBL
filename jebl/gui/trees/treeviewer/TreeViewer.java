@@ -18,10 +18,8 @@ import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
-import jebl.gui.trees.treeviewer.painters.BasicNodeLabelPainter;
 import jebl.gui.trees.treeviewer.treelayouts.*;
 import jebl.gui.utils.IconUtils;
-import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -112,7 +110,7 @@ public class TreeViewer extends JPanel {
 //        treePane.setTree(new SortedRootedTree((RootedTree)tree, Utils.createNodeDensityComparator((RootedTree)tree)));
         treePane.setTree(new SortedRootedTree((RootedTree)tree));
         treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree, defaultLabelSize));
-        treePane.setNodeLabelPainter(new BasicNodeLabelPainter("node heights", tree));
+        //treePane.setNodeLabelPainter(new BasicNodeLabelPainter("node heights", tree));
     }
 
     public void setTree(Tree tree) {

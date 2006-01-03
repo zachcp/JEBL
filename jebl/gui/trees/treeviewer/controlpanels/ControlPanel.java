@@ -101,28 +101,17 @@ public class ControlPanel extends JToolBar {
 
 		button.addDisclosureListener(new DisclosureListener() {
 			public void opening() {
-				panel2.setSize(size.width, size.height / 2);
-				panel2.setVisible(true);
-				panel2.invalidate();
-				revalidate();
 			}
 
 			public void opened() {
-				panel2.setSize(size);
-				panel2.invalidate();
-				revalidate();
+				panel2.setVisible(true);
 			}
 
 			public void closing() {
-				panel2.setSize(size.width, size.height / 2);
-				panel2.invalidate();
-				revalidate();
 			}
 
 			public void closed() {
-				panel2.setSize(size.width, 0);
-				panel2.invalidate();
-				revalidate();
+				panel2.setVisible(false);
 			}
 		});
 

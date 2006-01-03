@@ -4,21 +4,15 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
-import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
-import jebl.gui.trees.treeviewer.controlpanels.Controls;
-import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.Painter;
-import jebl.gui.trees.treeviewer.painters.PainterListener;
-import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
-import jebl.gui.trees.treeviewer.painters.BasicNodeLabelPainter;
+import jebl.gui.trees.treeviewer.painters.*;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.print.*;
@@ -198,6 +192,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				repaint();
 			}
 		});
+		controlPanel.fireControlsChanged();
 		calibrated = false;
 		invalidate();
 		repaint();
@@ -713,7 +708,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		transform.translate(xOffset + insets.left, yOffset + insets.top);
 		transform.scale(xScale, yScale);
 
-        treeBounds = transform.createTransformedShape(treeBounds).getBounds2D();
+//        treeBounds = transform.createTransformedShape(treeBounds).getBounds2D();
 
         // Clear the map of individual taxon label bounds and transforms
         taxonLabelBounds.clear();
