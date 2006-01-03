@@ -2,11 +2,15 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.awt.geom.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -29,64 +33,54 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
-	public List<Controls> getControls() {
+    public List<Controls> getControls() {
 
-		List<Controls> controls = new ArrayList<Controls>();
+	    List<Controls> controls = new ArrayList<Controls>();
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        if (optionsPanel == null) {
+            optionsPanel = new OptionsPanel();
 
-		JLabel label = new JLabel("Root Length:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		panel.add(label);
+            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
+            slider1.setValue((int)(rootLength * 10000));
+            slider1.setPaintTicks(true);
+            slider1.setPaintLabels(true);
 
-        final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
-        slider1.setValue((int)(rootLength * 10000));
-        slider1.setPaintTicks(true);
-        slider1.setPaintLabels(true);
+            slider1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = slider1.getValue();
+                    setRootLength(value / 10000.0);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
 
-        slider1.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                double value = slider1.getValue();
-                setRootLength(value / 10000.0);
-            }
-        });
-        panel.add(slider1);
+            final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
+            slider2.setPaintTicks(true);
+            slider2.setPaintLabels(true);
 
-		label = new JLabel("Curvature:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		panel.add(label);
+            slider2.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = 1.0 - (((double)slider2.getValue()) / 100.0);
+                    setBranchCurveProportion(value, value);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Curvature:", slider2, true);
 
-        final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
-        slider2.setPaintTicks(true);
-        slider2.setPaintLabels(true);
+            final JCheckBox checkBox1 = new JCheckBox("Align Taxon Labels");
 
-        slider2.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                double value = 1.0 - (((double)slider2.getValue()) / 100.0);
-                setBranchCurveProportion(value, value);
-            }
-        });
-        panel.add(slider2);
+            checkBox1.setSelected(alignTaxonLabels);
+            checkBox1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setAlignTaxonLabels(checkBox1.isSelected());
+                }
+            });
+            optionsPanel.addComponent(checkBox1);
+        }
 
-	    final JCheckBox checkBox1 = new JCheckBox("Align Taxon Labels");
-		checkBox1.setFont(checkBox1.getFont().deriveFont(11.0f));
-	    panel.add(checkBox1);
-	    checkBox1.setAlignmentX(Component.LEFT_ALIGNMENT);
+		controls.add(new Controls("Layout", optionsPanel));
 
-	    checkBox1.setSelected(alignTaxonLabels);
-	    checkBox1.addChangeListener(new ChangeListener() {
-	        public void stateChanged(ChangeEvent changeEvent) {
-	            setAlignTaxonLabels(checkBox1.isSelected());
-	        }
-	    });
-
-		controls.add(new Controls("Layout", panel));
-	    return controls;
-
-	}
+        return controls;
+    }
+    private OptionsPanel optionsPanel = null;
 
     public void setRootLength(double rootLength) {
         this.rootLength = rootLength;

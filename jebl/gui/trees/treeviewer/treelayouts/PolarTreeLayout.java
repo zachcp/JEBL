@@ -2,8 +2,10 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -37,91 +39,71 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		return true;
 	}
 
-	public List<Controls> getControls() {
+    public List<Controls> getControls() {
 
-		List<Controls> controls = new ArrayList<Controls>();
+	    List<Controls> controls = new ArrayList<Controls>();
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        if (optionsPanel == null) {
+            optionsPanel = new OptionsPanel();
 
+            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+            slider1.setValue((int)(180.0 - (rootAngle * 10)));
+            slider1.setPaintTicks(true);
+            slider1.setPaintLabels(true);
 
-		JLabel label = new JLabel("Root Angle:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		panel.add(label);
+            slider1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = 180 + (slider1.getValue() / 10.0);
+                    setRootAngle(value % 360);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
 
-		final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-		slider1.setValue((int)(180.0 - (rootAngle * 10)));
-		slider1.setPaintTicks(true);
-		slider1.setPaintLabels(true);
+            final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
+            slider2.setValue((int)(rootLength * 10000));
+            slider2.setPaintTicks(true);
+            slider2.setPaintLabels(true);
 
-		slider1.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent changeEvent) {
-				double value = 180 + (slider1.getValue() / 10.0);
-				setRootAngle(value % 360);
-			}
-		});
-		panel.add(slider1);
+            slider2.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = slider2.getValue();
+                    setRootLength(value / 10000.0);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Root Length:", slider2, true);
 
-		label = new JLabel("Root Length:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		panel.add(label);
+            final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+            slider3.setValue((int)(360.0 - (angularRange * 10)));
+            slider3.setPaintTicks(true);
+            slider3.setPaintLabels(true);
 
-		final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
-		slider2.setValue((int)(rootLength * 10000));
-		slider2.setPaintTicks(true);
-		slider2.setPaintLabels(true);
+            slider3.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = 360.0 - (slider3.getValue() / 10.0);
+                    setAngularRange(value);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Angle Range:", slider3, true);
 
-		slider2.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent changeEvent) {
-				double value = slider2.getValue();
-				setRootLength(value / 10000.0);
-			}
-		});
-		panel.add(slider2);
+            final JComboBox combo1 = new JComboBox();
+            for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
+                if( position != TaxonLabelPosition.HORIZONTAL ) // not implemented yet
+                  combo1.addItem(position);
+            }
+            combo1.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent itemEvent) {
+                    setTaxonLabelPosition((TaxonLabelPosition)combo1.getSelectedItem());
 
-		label = new JLabel("Angular Range:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.LEFT);
-		panel.add(label);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Label Position:", combo1);
+        }
 
-		final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-		slider3.setValue((int)(360.0 - (angularRange * 10)));
-		slider3.setPaintTicks(true);
-		slider3.setPaintLabels(true);
+		controls.add(new Controls("Layout", optionsPanel));
 
-		slider3.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent changeEvent) {
-				double value = 360.0 - (slider3.getValue() / 10.0);
-				setAngularRange(value);
-			}
-		});
-		panel.add(slider3);
-
-		JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		label = new JLabel("Label Position:");
-		label.setFont(label.getFont().deriveFont(11.0f));
-		label.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel2.add(label);
-		final JComboBox combo1 = new JComboBox();
-		for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
-            if( position != TaxonLabelPosition.HORIZONTAL ) // not implemented yet
-              combo1.addItem(position);
-		}
-		combo1.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				setTaxonLabelPosition((TaxonLabelPosition)combo1.getSelectedItem());
-
-			}
-		});
-		panel2.add(combo1);
-		panel.add(panel2);
-		panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		controls.add(new Controls("Layout", panel));
-	    return controls;
-	}
+        return controls;
+    }
+    private OptionsPanel optionsPanel = null;
 
 	public void setRootAngle(double rootAngle) {
 		this.rootAngle = rootAngle;

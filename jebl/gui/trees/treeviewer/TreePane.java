@@ -6,6 +6,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.PainterListener;
@@ -307,14 +308,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 		controls.addAll(treeLayout.getControls());
 
-		if (controlsPanel == null) {
-			controlsPanel = new JPanel();
-			Box box = Box.createVerticalBox();
+		if (optionsPanel == null) {
+			optionsPanel = new OptionsPanel();
 
 			final JCheckBox checkBox1 = new JCheckBox("Show Taxon Labels");
-			checkBox1.setFont(checkBox1.getFont().deriveFont(11.0f));
-			checkBox1.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(checkBox1);
+			optionsPanel.addComponent(checkBox1);
 
 			checkBox1.setSelected(isShowingTaxonLabels());
 			checkBox1.addChangeListener(new ChangeListener() {
@@ -324,9 +322,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			});
 
 			final JCheckBox checkBox2 = new JCheckBox("Show Root Branch");
-			checkBox2.setFont(checkBox2.getFont().deriveFont(11.0f));
-			checkBox2.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(checkBox2);
+            optionsPanel.addComponent(checkBox2);
 
 			checkBox2.setSelected(isShowingRootBranch());
 			checkBox2.addChangeListener(new ChangeListener() {
@@ -336,22 +332,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				}
 			});
 
-			JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			JLabel label = new JLabel("Line Weight:");
-			label.setFont(label.getFont().deriveFont(11.0f));
-			panel2.add(label);
-			final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
+			final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
 
-			spinner2.addChangeListener(new ChangeListener() {
+			spinner.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent changeEvent) {
-					setBranchLineWeight(((Double)spinner2.getValue()).floatValue());
+					setBranchLineWeight(((Double)spinner.getValue()).floatValue());
 				}
 			});
-			panel2.add(spinner2);
-			panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(panel2);
-		}
-		controls.add(new Controls("Formatting", controlsPanel));
+            optionsPanel.addComponentWithLabel("Line Weight:", spinner);
+        }
+		controls.add(new Controls("Formatting", optionsPanel));
 
 		if (getTaxonLabelPainter() != null) {
 			controls.addAll(getTaxonLabelPainter().getControls());
@@ -364,7 +354,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	    return controls;
     }
 
-	private JPanel controlsPanel = null;
+    private OptionsPanel optionsPanel = null;
 
 	private final Set<TreeSelectionListener> treeSelectionListeners = new HashSet<TreeSelectionListener>();
 

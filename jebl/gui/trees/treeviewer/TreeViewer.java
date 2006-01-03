@@ -20,6 +20,7 @@ import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.treelayouts.*;
 import jebl.gui.utils.IconUtils;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -73,7 +74,7 @@ public class TreeViewer extends JPanel implements ControlsProvider {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-	    controlPanel = new ControlPanel(200);
+        controlPanel = new ControlPanel(200, false);
 //        JPanel panel = new JPanel(new BorderLayout());
 //        panel.add(controlPanel, BorderLayout.NORTH);
 
@@ -86,7 +87,7 @@ public class TreeViewer extends JPanel implements ControlsProvider {
 //        add(splitPane, BorderLayout.CENTER);
 
         add(scrollPane, BorderLayout.CENTER);
-	    add(controlPanel, BorderLayout.EAST);
+        add(controlPanel, BorderLayout.WEST);
         setTreeLayoutType(TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
@@ -122,124 +123,114 @@ public class TreeViewer extends JPanel implements ControlsProvider {
         }
 
         treePane.setTreeLayout(treeLayout);
-	    setupControlPanel();
+        setupControlPanel();
+    }
+
+    public ControlPanel getControlPanel() {
+        return controlPanel;
     }
 
     public void setupControlPanel() {
         controlPanel.setupControls();
 
         validate();
-	    repaint();
+        repaint();
     }
 
-	public java.util.List<Controls> getControls() {
+    public java.util.List<Controls> getControls() {
 
-		List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controls = new ArrayList<Controls>();
 
-		if (controlsPanel == null) {
-			controlsPanel = new JPanel();
-			Box box = Box.createVerticalBox();
+        if (optionsPanel == null) {
+            optionsPanel = new OptionsPanel();
 
-			JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
+            Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
+            Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
+            final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
+            final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
+            final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
+            toggle1.putClientProperty( "Quaqua.Button.style", "toggleWest");
+            toggle2.putClientProperty( "Quaqua.Button.style", "toggleCenter");
+            toggle3.putClientProperty( "Quaqua.Button.style", "toggleEast");
+            ButtonGroup buttonGroup = new ButtonGroup();
+            buttonGroup.add(toggle1);
+            buttonGroup.add(toggle2);
+            buttonGroup.add(toggle3);
+            toggle1.setSelected(true);
+            toggle1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    if (toggle1.isSelected())
+                        setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
+                }
+            });
+            toggle2.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    if (toggle2.isSelected())
+                        setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
+                }
+            });
+            toggle3.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    if (toggle3.isSelected())
+                        setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
+                }
+            });
+            panel1.add(toggle1);
+            panel1.add(toggle2);
+            panel1.add(toggle3);
 
-			Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
-			Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
-			Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
-			final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
-			final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
-			final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
-			toggle1.putClientProperty( "Quaqua.Button.style", "toggleWest");
-			toggle2.putClientProperty( "Quaqua.Button.style", "toggleCenter");
-			toggle3.putClientProperty( "Quaqua.Button.style", "toggleEast");
-			ButtonGroup buttonGroup = new ButtonGroup();
-			buttonGroup.add(toggle1);
-			buttonGroup.add(toggle2);
-			buttonGroup.add(toggle3);
-			toggle1.setSelected(true);
-			toggle1.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					if (toggle1.isSelected())
-						setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
-				}
-			});
-			toggle2.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					if (toggle2.isSelected())
-						setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
-				}
-			});
-			toggle3.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					if (toggle3.isSelected())
-						setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
-				}
-			});
-			panel1.add(toggle1);
-			panel1.add(toggle2);
-			panel1.add(toggle3);
+            optionsPanel.addSpanningComponent(panel1);
 
-			panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(panel1);
+            final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
+            zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-			JLabel label = new JLabel("Zoom:");
-			label.setFont(label.getFont().deriveFont(11.0f));
-			label.setHorizontalAlignment(SwingConstants.LEFT);
-			label.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(label);
+            zoomSlider.setPaintTicks(true);
+            zoomSlider.setPaintLabels(true);
 
-			final JSlider zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
-			zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+            zoomSlider.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setZoom(((double)zoomSlider.getValue()) / 100.0);
+                }
+            });
 
-			zoomSlider.setPaintTicks(true);
-			zoomSlider.setPaintLabels(true);
+            optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
-			zoomSlider.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					setZoom(((double)zoomSlider.getValue()) / 100.0);
-				}
-			});
-			zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(zoomSlider);
+            final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
+            verticalExpansionSlider.setPaintTicks(true);
+            verticalExpansionSlider.setPaintLabels(true);
 
-			label = new JLabel("Vertical Expansion:");
-			label.setFont(label.getFont().deriveFont(11.0f));
-			label.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(label);
+            verticalExpansionSlider.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
+                }
+            });
 
-			final JSlider verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
-			verticalExpansionSlider.setPaintTicks(true);
-			verticalExpansionSlider.setPaintLabels(true);
+            JLabel label = new JLabel("Expansion:");
+            label.setEnabled(!treeLayout.maintainAspectRatio());
+            verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
 
-			verticalExpansionSlider.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					setVerticalExpansion(((double)verticalExpansionSlider.getValue()) / 100.0);
-				}
-			});
+            optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
+        }
+        controls.add(new Controls("General", optionsPanel));
 
-			label.setEnabled(!treeLayout.maintainAspectRatio());
-			verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
-			verticalExpansionSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
-			box.add(verticalExpansionSlider);
-
-			controlsPanel.add(box);
-		}
-		controls.add(new Controls("General", controlsPanel));
-
-		return controls;
-	}
-	private JPanel controlsPanel = null;
+        return controls;
+    }
+    private OptionsPanel optionsPanel = null;
 
     public void setControlPanelVisible(boolean visible) {
-        controlsPanel.setVisible(visible);
+        controlPanel.setVisible(visible);
     }
 
     public void setBranchDecorator(BranchDecorator branchDecorator) {
         treePane.setBranchDecorator(branchDecorator);
     }
 
-	public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
-	    treePane.setNodeLabelPainter(nodeLabelPainter);
-	}
+    public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
+        treePane.setNodeLabelPainter(nodeLabelPainter);
+        setupControlPanel();
+    }
 
     public void setZoom(double zoom) {
         setZoom(zoom, zoom);

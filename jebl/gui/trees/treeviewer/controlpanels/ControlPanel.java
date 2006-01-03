@@ -15,10 +15,15 @@ import java.util.List;
 public class ControlPanel extends JToolBar {
 
 	public ControlPanel(int preferredWidth) {
-		super(JToolBar.VERTICAL);
-		this.preferredWidth = preferredWidth;
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		this(preferredWidth, false);
 	}
+
+    public ControlPanel(int preferredWidth, boolean initiallyClosed) {
+        super(JToolBar.VERTICAL);
+        this.preferredWidth = preferredWidth;
+        this.initiallyClosed = initiallyClosed;
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+    }
 
 
 	public Dimension getPreferredSize() {
@@ -62,9 +67,16 @@ public class ControlPanel extends JToolBar {
 
 		final JPanel panel2 = controls.getPanel();
 		panel.add(panel2, BorderLayout.CENTER);
-		panel2.setVisible(false);
 
-		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        if (initiallyClosed) {
+            button.setSelected(false);
+            panel2.setVisible(false);
+        } else {
+            button.setSelected(true);
+            panel2.setVisible(true);
+        }
+
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		add(panel);
 
 		button.addDisclosureListener(new DisclosureListener() {
@@ -84,10 +96,12 @@ public class ControlPanel extends JToolBar {
 				panel.invalidate();
 			}
 		});
+
 	}
 
 	private int preferredWidth;
-	private List<ControlsProvider> providers = new ArrayList<ControlsProvider>();
+    private boolean initiallyClosed;
+    private List<ControlsProvider> providers = new ArrayList<ControlsProvider>();
 
 	private static BufferedImage background = null;
 

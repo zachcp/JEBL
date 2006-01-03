@@ -58,7 +58,17 @@ public class DisclosureButton extends JToggleButton {
 		}
 	}
 
-	private void startAnimation() {
+    /**
+     * This overridden because when the button is programmatically selected,
+     * we want to skip the animation and jump straight to the final icon.
+     * @param isSelected
+     */
+    public void setSelected(boolean isSelected) {
+        super.setSelected(isSelected);
+        setupIcon();
+    }
+
+    private void startAnimation() {
 		if (disclosureIcons == null) return;
 
 		timer = new Timer(150, listener);

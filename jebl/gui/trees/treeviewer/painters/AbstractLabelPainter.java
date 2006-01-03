@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.painters;
 
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -122,26 +123,25 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
 
 	    List<Controls> controls = new ArrayList<Controls>();
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        if (optionsPanel == null) {
+            optionsPanel = new OptionsPanel();
 
-        JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel1.add(new JLabel("Font Size:"));
-        final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 1, 48, 1));
+            final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 1, 48, 1));
 
-        spinner1.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                setFontSize((Integer)spinner1.getValue());
-            }
-        });
-        panel1.add(spinner1);
-        panel.add(panel1);
-        panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
+            spinner1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setFontSize((Integer)spinner1.getValue());
+                }
+            });
+            optionsPanel.addComponentWithLabel("Font Size:", spinner1);
+        }
 
-	    controls.add(new Controls(getTitle(), panel));
+	    controls.add(new Controls(getTitle(), optionsPanel));
+
         return controls;
     }
-
+    private OptionsPanel optionsPanel = null;
+   
 	public abstract String getTitle();
 
 	private Paint foreground = Color.BLACK;
