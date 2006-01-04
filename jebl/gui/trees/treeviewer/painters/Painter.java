@@ -5,6 +5,7 @@ import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 import java.util.List;
 import java.util.Collection;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -29,9 +30,9 @@ public interface Painter<T> extends ControlsProvider {
         CENTER
     }
 
-    void calibrate(Graphics2D g2, Collection<T> items);
+    void calibrate(Graphics2D g2, T item);
 
-    void paint(Graphics2D g2, T item, Justification justification, Insets insets);
+    void paint(Graphics2D g2, T item, Justification justification, Rectangle2D bounds);
 
     double getPreferredWidth();
     double getPreferredHeight();

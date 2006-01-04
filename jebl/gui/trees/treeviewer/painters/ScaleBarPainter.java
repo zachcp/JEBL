@@ -5,6 +5,7 @@ import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
 import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.utils.RealNumberField;
+import jebl.evolution.trees.RootedTree;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -25,7 +26,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private double scaleRange;
 
     public ScaleBarPainter() {
-        this(0.1, 12);
+        this(0.0, 12);
     }
 
     public ScaleBarPainter(double scaleRange) {
@@ -33,7 +34,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     }
 
     public ScaleBarPainter(int defaultSize) {
-        this(0.1, defaultSize);
+        this(0.0, defaultSize);
     }
 
     public ScaleBarPainter(double scaleRange, int defaultSize) {
@@ -42,69 +43,77 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         scaleFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
     }
 
-    public void calibrate(Graphics2D g2, Collection<TreePane> treePanes) {
-        TreePane treePane = treePanes.toArray(new TreePane[1])[0];
-
+    public void calibrate(Graphics2D g2, TreePane treePane) {
         Font oldFont = g2.getFont();
         g2.setFont(scaleFont);
 
         FontMetrics fm = g2.getFontMetrics();
         double labelHeight = fm.getHeight();
 
-        width = treePane.getTreeBounds().getWidth();
-        height = labelHeight + 10;
+        if (scaleRange == 0.0) {
+            RootedTree tree = treePane.getTree();
+            scaleRange = tree.getHeight(tree.getRootNode()) / 10.0;
+        }
 
-        yOffset = (float)(fm.getAscent()) + 10;
+        preferredWidth = treePane.getTreeScale() * scaleRange;
+        preferredHeight = labelHeight + 4 + scaleBarStroke.getLineWidth();
+
+        yOffset = (float)(fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
     }
 
-    public void paint(Graphics2D g2, TreePane treePane, Justification justification, Insets insets) {
+    public void paint(Graphics2D g2, TreePane treePane, Justification justification, Rectangle2D bounds) {
         Font oldFont = g2.getFont();
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
 
         if (background != null) {
             g2.setPaint(background);
-            g2.fill(new Rectangle2D.Double(0.0, 0.0, width, height));
+            g2.fill(bounds);
         }
 
         if (borderPaint != null && borderStroke != null) {
             g2.setPaint(borderPaint);
             g2.setStroke(borderStroke);
-            g2.draw(new Rectangle2D.Double(0.0, 0.0, width, height));
+            g2.draw(bounds);
+        }
+
+        g2.setFont(scaleFont);
+
+        String label = Double.toString(scaleRange);
+
+        Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
+
+        double x1, x2;
+        float xOffset;
+        switch (justification) {
+            case CENTER:
+                xOffset = (float)(bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+                x1 = (bounds.getX() + (bounds.getWidth() - preferredWidth) / 2.0);
+                x2 = x1 + preferredWidth;
+                break;
+            case FLUSH:
+            case LEFT:
+                xOffset = (float)bounds.getX();
+                x1 = bounds.getX();
+                x2 = x1 + preferredWidth;
+                break;
+            case RIGHT:
+                xOffset = (float)(bounds.getX() + bounds.getWidth() - rect.getWidth());
+                x2 = bounds.getX() + bounds.getWidth();
+                x1 = x2 - preferredWidth;
+                break;
+            default:
+                throw new IllegalArgumentException("Unrecognized alignment enum option");
         }
 
         g2.setPaint(foreground);
         g2.setStroke(scaleBarStroke);
 
-        g2.draw(new Line2D.Double(0.0, 0.0, width, 0.0));
+        g2.draw(new Line2D.Double(x1, bounds.getY(), x2, bounds.getY()));
 
-        g2.setFont(scaleFont);
-
-        String label = Double.toString(scaleRange);
-	    if (label != null) {
-
-		    Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
-
-		    float xOffset;
-		    switch (justification) {
-			    case CENTER:
-				    xOffset = (float)(insets.left + (width - rect.getWidth()) / 2.0);
-				    break;
-			    case FLUSH:
-			    case LEFT:
-				    xOffset = (float)insets.left;
-				    break;
-			    case RIGHT:
-				    xOffset = (float)(insets.left + width - rect.getWidth());
-				    break;
-			    default:
-				    throw new IllegalArgumentException("Unrecognized alignment enum option");
-		    }
-
-		    g2.drawString(label, xOffset, yOffset + insets.top);
-	    }
+        g2.drawString(label, xOffset, yOffset + (float)bounds.getY());
 
         g2.setFont(oldFont);
         g2.setPaint(oldPaint);
@@ -112,11 +121,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     }
 
     public double getPreferredWidth() {
-        return width;
+        return preferredWidth;
     }
 
     public double getPreferredHeight() {
-        return height;
+        return preferredHeight;
     }
 
     public void setScaleRange(double scaleRange) {
@@ -145,13 +154,8 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         firePainterChanged();
     }
 
-    public void setScaleBarStroke(Stroke scaleBarStroke) {
-        this.scaleBarStroke = scaleBarStroke;
-        firePainterChanged();
-    }
-
     public void setLineWeight(float weight) {
-        this.scaleBarStroke = new BasicStroke(weight);
+        this.scaleBarStroke = new BasicStroke(weight, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
         firePainterChanged();
     }
 
@@ -167,10 +171,14 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             optionsPanel = new OptionsPanel();
 
             final RealNumberField text1 = new RealNumberField(0.0, Double.MAX_VALUE);
-
+            text1.setValue(scaleRange);
+            
             text1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setScaleRange(text1.getValue().doubleValue());
+                    Double value = text1.getValue();
+                    if (value != null) {
+                        setScaleRange(value.doubleValue());
+                    }
                 }
             });
             optionsPanel.addComponentWithLabel("Scale Range:", text1, true);
@@ -204,10 +212,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private Paint background = null;
     private Paint borderPaint = null;
     private Stroke borderStroke = null;
-    private Stroke scaleBarStroke = new BasicStroke(1.0f);
+    private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
     private Font scaleFont;
-    private double width;
-    private double height;
+    private double preferredHeight;
+    private double preferredWidth;
+
     private float yOffset;
 }

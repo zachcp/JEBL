@@ -9,10 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 
 /**
- * @author rambaut
- *         Date: May 25, 2005
- *         Time: 8:27:54 PM
- *
+ * @author Andrew Rambaut
  * @version $Id$
  */
 public class DisclosureButton extends JToggleButton {
