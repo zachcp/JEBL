@@ -51,6 +51,7 @@ public interface TreeImporter {
      * @return the list of trees
      * @throws IOException
      * @throws ImportException
+     * Any type of tree is fine.
      */
-	List<Tree> importTrees() throws IOException, ImportException;
+	List<? extends Tree> importTrees() throws IOException, ImportException;
 }

@@ -24,12 +24,16 @@ public class MultipleTreeViewer extends TreeViewer {
 		setCurrentTree(tree);
 	}
 
-	public void setTrees(Collection<Tree> trees) {
-		this.trees = new ArrayList<Tree>(trees);
-		super.setTree(this.trees.get(0));
+	public void setTrees(Collection<? extends Tree> trees) {
+		setTrees(trees,  6);
 	}
 
-	private void setCurrentTree(Tree tree) {
+    public void setTrees(Collection<? extends Tree> trees, int defaultLabelSize) {
+        this.trees = new ArrayList<Tree>(trees);
+        super.setTree(this.trees.get(0), defaultLabelSize);
+    }
+
+    private void setCurrentTree(Tree tree) {
 		super.setTree(tree);
 	}
 

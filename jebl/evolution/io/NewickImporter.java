@@ -2,6 +2,7 @@ package jebl.evolution.io;
 
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.RootedTree;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Node;
 
@@ -39,8 +40,8 @@ public class NewickImporter implements TreeImporter {
         return true;
     }
 
-    public Tree importNextTree() throws IOException, ImportException {
-        Tree tree = null;
+    public RootedTree importNextTree() throws IOException, ImportException {
+        RootedTree tree = null;
 
         try {
             helper.skipUntil("(");
@@ -54,8 +55,8 @@ public class NewickImporter implements TreeImporter {
         return tree;
     }
 
-    public List<Tree> importTrees() throws IOException, ImportException {
-        List<Tree> trees = new ArrayList<Tree>();
+    public List<RootedTree> importTrees() throws IOException, ImportException {
+        List<RootedTree> trees = new ArrayList<RootedTree>();
 
         while (hasTree()) {
             trees.add(importNextTree());
@@ -66,7 +67,7 @@ public class NewickImporter implements TreeImporter {
 
     private Tree lastTree = null;
 
-    private Tree readTree() throws IOException, ImportException {
+    private RootedTree readTree() throws IOException, ImportException {
         SimpleRootedTree tree = new SimpleRootedTree();
 
         readInternalNode(tree);
@@ -82,6 +83,7 @@ public class NewickImporter implements TreeImporter {
     private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
     {
         double length = 0.0;
+        
         Node branch;
 
         if (helper.nextCharacter() == '(') {

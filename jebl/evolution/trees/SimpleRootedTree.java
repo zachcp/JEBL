@@ -373,10 +373,12 @@ public class SimpleRootedTree implements RootedTree {
             return height;
         }
 
+        // height above latest tip
         public void setHeight(double height) {
             this.height = height;
         }
 
+        // length of branch to parent
         public double getLength() {
             return length;
         }

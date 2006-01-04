@@ -119,7 +119,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Parses a 'TREES' block.
 	 */
-	public List<Tree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+	public List<RootedTree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
 		return readTreesBlock(taxonList);
 	}
@@ -279,7 +279,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return tree;
 	}
 
-	public List<Tree> importTrees() throws IOException, ImportException {
+	public List<RootedTree> importTrees() throws IOException, ImportException {
 		isReadingTreesBlock = false;
 		if (!startReadingTrees()) {
 			throw new MissingBlockException("TREES block is missing");
@@ -871,9 +871,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Reads a 'TREES' block.
 	 */
-	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+	private List<RootedTree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
-		List<Tree> trees = new ArrayList<Tree>();
+		List<RootedTree> trees = new ArrayList<RootedTree>();
 
 		String[] lastToken = new String[1];
 		translationList = readTranslationList(taxonList, lastToken);
@@ -881,7 +881,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		boolean done = false;
 		do {
 
-			Tree tree = readNextTree(lastToken);
+			RootedTree tree = readNextTree(lastToken);
 
 			if (tree != null) {
 				trees.add(tree);
@@ -969,6 +969,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         throw new ImportException.BadFormatException("Missing tree definition in TREE command of TREES block");
                     }
 
+                    // Save tree comment and attach it later
+                    final String comment = helper.getLastMetaComment();
                     helper.clearLastMetaComment();
 
 	                tree = new SimpleRootedTree();
@@ -981,6 +983,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         throw new ImportException.BadFormatException("Expecting ';' after tree, '" + token2 + "', TREE command of TREES block");
                     }
 
+                    if  (comment != null) {
+                        // if '[W number]' (MrBayes), set weight attribute
+                        if( comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) {
+                            tree.setAttribute("weight", new Float(comment.substring(2)) );
+                        } else {
+                            // set generic comment attribute
+                            tree.setAttribute("comment", comment);
+                        }
+                    }
                 } catch (EOFException e) {
                     // If we reach EOF we may as well return what we have?
                     return tree;
