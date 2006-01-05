@@ -54,6 +54,108 @@ public final class Utils {
         }
     }
 
+    private static void branchesMinMax(RootedTree tree, Node node, double[] bounds) {
+        if (tree.isExternal(node)) {
+            return;
+        }
+
+        final List<Node> children = tree.getChildren(node);
+        for( Node n : children ) {
+            final double len = tree.getLength(n);
+            bounds[0] = Math.min(bounds[0], len);
+            bounds[1] = Math.max(bounds[1], len);
+            branchesMinMax(tree, n, bounds);
+        }
+    }
+
+   private static String[] asText(RootedTree tree, Node node, final double factor) {
+          if (tree.isExternal(node)) {
+             String name = tree.getTaxon(node).getName();
+             return new String[] { ' ' + name };
+          }
+
+         final List<Node> children = tree.getChildren(node);
+         List< String[] > a = new ArrayList< String[] >(children.size());
+         int[] branches = new int[children.size()];
+         int tot = 0;
+         int maxHeight = -1;
+
+         int k = 0;
+         for( Node n : children ) {
+             String[] s = asText(tree, n, factor);
+             tot += s.length;
+             final double len = tree.getLength(n);
+             // set 1 as lower bound for branch since the vertical connector (which theoretically has zero
+             // width) takes one line.
+             final int branchLen = Math.max((int)Math.round(len * factor), 1);
+             branches[k] = branchLen; ++k;
+             maxHeight = Math.max(maxHeight, s[0].length() + branchLen);
+             a.add(s);
+         }
+         // one empty line between sub trees
+         tot += children.size() - 1;
+         int ltop = a.get(0).length;
+         int lbot = a.get(a.size()-1).length;
+
+         ArrayList<String> x = new ArrayList<String>(tot);
+         for(int i = 0; i < a.size(); ++i) {
+             String[] s = a.get(i);
+             int branchIndex = s.length / 2;
+             boolean isLast = i == a.size()-1;
+             for(int j = 0; j < s.length; ++j) {
+                 char c = (j == branchIndex) ? '=' : ' ';
+                 char l = ( i == 0 && j < branchIndex || isLast && j > branchIndex ) ? ' ' :
+                         (j == branchIndex ? '+' : '|');
+                 String l1 = l + rep(c, branches[i]-1) + s[j];
+                 x.add( l1 + rep(' ', maxHeight - l1.length()));
+             }
+             if( !isLast ) {
+                 x.add( '|' + rep(' ', maxHeight-1) );
+             }
+         }
+
+         for( String ss : x ) {
+             assert(ss.length() == x.get(0).length() );
+         }
+
+         return x.toArray(new String[]{});
+
+    }
+
+     private static String rep(char c, int count) {
+         StringBuffer b = new StringBuffer();
+         while( count > 0 ) {
+             b.append(c);
+             --count;
+         }
+         return b.toString();
+     }
+
+     public static String[] asText(RootedTree tree, int widthGuide) {
+         Node root = tree.getRootNode();
+         double[] bounds = new double[2];
+         bounds[0] = java.lang.Double.MAX_VALUE;
+         bounds[1] = -1;
+
+         branchesMinMax(tree, root, bounds);
+         double lowBound = 2 / bounds[0];
+         double treeHeight = tree.getHeight(root);
+         double treeHieghtWithLowBound = treeHeight * lowBound;
+
+         double scale;
+         if( treeHieghtWithLowBound > widthGuide ) {
+            scale = widthGuide / treeHeight;
+         } else {
+            lowBound = (5 / bounds[0]);
+            if( treeHeight * lowBound <= widthGuide ) {
+                scale = lowBound;
+            } else {
+                scale = widthGuide / treeHeight;
+            }
+         }
+         return asText(tree, root, scale);
+     }
+
     /**
      * @param tree the tree
      * @param node1
