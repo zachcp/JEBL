@@ -106,7 +106,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return Whether this tree has node heights available
      */
     public boolean hasHeights() {
-        return true;
+        return hasHeights;
     }
 
     /**
@@ -124,7 +124,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return Whether this tree has branch lengths available
      */
     public boolean hasLengths() {
-        return true;
+        return hasLengths;
     }
 
     /**

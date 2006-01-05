@@ -1,20 +1,17 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.controlpanels.Controls;
-import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut

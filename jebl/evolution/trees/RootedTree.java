@@ -10,7 +10,6 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 
-import java.util.Set;
 import java.util.List;
 
 /**

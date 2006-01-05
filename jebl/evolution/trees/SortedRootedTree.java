@@ -1,6 +1,5 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Node;
 
 import java.util.*;
@@ -10,23 +9,55 @@ import java.util.*;
  * @author Alexei Drummond
  * @version $Id$
  */
-public class SortedRootedTree implements RootedTree {
+public class SortedRootedTree extends FilteredRootedTree {
 
-    public SortedRootedTree(final RootedTree source) {
-        this.source = source;
-        this.comparator = new Comparator<Node>() {
-            public int compare(Node node1, Node node2) {
-                return jebl.evolution.trees.Utils.getExternalNodeCount(source, node2) - jebl.evolution.trees.Utils.getExternalNodeCount(source, node1);
-            }
+	public enum BranchOrdering {
+		INCREASING_NODE_DENSITY("increasing"),
+		DECREASING_NODE_DENSITY("decreasing");
 
-            public boolean equals(Node node1, Node node2) {
-                return compare(node1, node2) == 0;
-            }
-        };
+		BranchOrdering(String name) {
+			this.name = name;
+		}
+
+		public String toString() { return name; }
+
+		private String name;
+	}
+
+    public SortedRootedTree(final RootedTree source, BranchOrdering branchOrdering) {
+        super(source);
+	    switch (branchOrdering) {
+		    case INCREASING_NODE_DENSITY:
+			    this.comparator = new Comparator<Node>() {
+			        public int compare(Node node1, Node node2) {
+			            return jebl.evolution.trees.Utils.getExternalNodeCount(source, node1) -
+					            jebl.evolution.trees.Utils.getExternalNodeCount(source, node2);
+			        }
+
+			        public boolean equals(Node node1, Node node2) {
+			            return compare(node1, node2) == 0;
+			        }
+			    };
+			break;
+		    case DECREASING_NODE_DENSITY:
+			    this.comparator = new Comparator<Node>() {
+			        public int compare(Node node1, Node node2) {
+			            return jebl.evolution.trees.Utils.getExternalNodeCount(source, node2) -
+					            jebl.evolution.trees.Utils.getExternalNodeCount(source, node1);
+			        }
+
+			        public boolean equals(Node node1, Node node2) {
+			            return compare(node1, node2) == 0;
+			        }
+			    };
+			break;
+		    default:
+			    throw new IllegalArgumentException("Unknown enum value");
+	    }
     }
 
     public SortedRootedTree(RootedTree source, Comparator<Node> comparator) {
-        this.source = source;
+	    super(source);
         this.comparator = comparator;
     }
 
@@ -36,90 +67,7 @@ public class SortedRootedTree implements RootedTree {
         return sourceList;
     }
 
-    public boolean hasHeights() {
-        return source.hasHeights();
-    }
-
-    public double getHeight(Node node) {
-        return source.getHeight(node);
-    }
-
-    public boolean hasLengths() {
-        return source.hasLengths();
-    }
-
-    public double getLength(Node node) {
-        return source.getLength(node);
-    }
-
-    public Node getParent(Node node) {
-        return source.getParent(node);
-    }
-
-    public Node getRootNode() {
-        return source.getRootNode();
-    }
-
-    public Set<Node> getExternalNodes() {
-        return source.getExternalNodes();
-    }
-
-    public Set<Node> getInternalNodes() {
-        return source.getInternalNodes();
-    }
-
-    public Node getNode(Taxon taxon) {
-        return source.getNode(taxon);
-    }
-
-    public Set<Taxon> getTaxa() {
-        return source.getTaxa();
-    }
-
-    public Taxon getTaxon(Node node) {
-        return source.getTaxon(node);
-    }
-
-    public boolean isExternal(Node node) {
-        return source.isExternal(node);
-    }
-
-    public Set<Node> getAdjacencies(Node node) {
-        return source.getAdjacencies(node);
-    }
-
-    public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-        return source.getEdgeLength(node1, node2);
-    }
-
-    public Set<Node> getNodes() {
-        return source.getNodes();
-    }
-
-    public Set<Node> getNodes(int degree) {
-        return source.getNodes(degree);
-    }
-
-	// Attributable IMPLEMENTATION
-
-	public void setAttribute(String name, Object value) {
-		source.setAttribute(name, value);
-	}
-
-	public Object getAttribute(String name) {
-		return source.getAttribute(name);
-	}
-
-	public Set<String> getAttributeNames() {
-		return source.getAttributeNames();
-	}
-
-	public Map<String, Object> getAttributeMap() {
-		return source.getAttributeMap();
-	}
-
 	// PRIVATE members
 
-	private final RootedTree source;
     private final Comparator<Node> comparator;
 }

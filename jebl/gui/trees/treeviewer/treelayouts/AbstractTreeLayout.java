@@ -16,6 +16,7 @@ import java.util.*;
 public abstract class AbstractTreeLayout implements TreeLayout {
     public void setTree(Tree tree) {
         this.tree = (RootedTree)tree;
+	    invalidate();
     }
 
     public void invalidate() {

@@ -109,9 +109,9 @@ public class TreeViewer extends JPanel {
 
     public void setTree(Tree tree, int defaultLabelSize) {
         this.tree = (RootedTree)tree;
-//        treePane.setTree(new SortedRootedTree((RootedTree)tree, Utils.createNodeDensityComparator((RootedTree)tree)));
-        treePane.setTree(new SortedRootedTree((RootedTree)tree));
-        
+
+        treePane.setTree(this.tree);
+
         treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree, defaultLabelSize));
 
         BasicNodeLabelPainter nodeLabelPainter = new BasicNodeLabelPainter("node heights", tree);

@@ -1034,14 +1034,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	        branch = readExternalNode(tree);
 	    }
 
-        double length = -1.0;
         if (helper.getLastDelimiter() == ':') {
-            length = helper.readDouble(",():;");
+            double length = helper.readDouble(",():;");
+	        tree.setLength(branch, length);
         }
 
 		if (helper.getLastMetaComment() != null) {
 			// There was a meta-comment which should be in the form:
-			// \[&label=value[,label=value>[,/..]]\]
+			// \[&label[=value][,label[=value]>[,/..]]\]
 			String[] pairs = helper.getLastMetaComment().split(",");
 			for (String pair : pairs) {
 				String[] parts = pair.split("=");
@@ -1063,12 +1063,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                 } else {
                     throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
                 }
-                
+
             }
             helper.clearLastMetaComment();
         }
 
-	    tree.setLength(branch, length);
 
 	    return branch;
 	}

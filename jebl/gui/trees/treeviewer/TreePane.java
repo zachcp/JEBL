@@ -2,8 +2,7 @@ package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.*;
@@ -14,6 +13,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.awt.geom.*;
 import java.awt.print.*;
 import java.util.*;
@@ -26,18 +27,35 @@ import java.util.List;
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
     public TreePane() {
-    }
+	    setBackground(Color.WHITE);
+	}
 
     public RootedTree getTree() {
         return tree;
     }
 
     public void setTree(Tree tree) {
-		this.tree = (RootedTree)tree;
+	    this.originalTree = (RootedTree)tree;
+	    if (!originalTree.hasLengths()) {
+		    transformBranches = true;
+	    }
+	    setupTree();
+	}
+
+	private void setupTree() {
+		tree = originalTree;
+
+		if (orderBranches) {
+			tree = new SortedRootedTree(tree, branchOrdering);
+		}
+
+		if (transformBranches || !this.tree.hasLengths()) {
+			tree = new TransformedRootedTree(tree, branchTransform);
+		}
+
 		treeLayout.setTree(tree);
 
-        setBackground(Color.WHITE);
-        calibrated = false;
+	    calibrated = false;
 		invalidate();
 		repaint();
 	}
@@ -59,6 +77,18 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         repaint();
     }
+
+	public void setBranchOrdering(boolean orderBranches, SortedRootedTree.BranchOrdering branchOrdering) {
+		this.orderBranches = orderBranches;
+		this.branchOrdering = branchOrdering;
+		setupTree();
+	}
+
+	public void setBranchTransform(boolean transformBranches, TransformedRootedTree.Transform branchTransform) {
+		this.transformBranches = transformBranches;
+		this.branchTransform = branchTransform;
+		setupTree();
+	}
 
 	public boolean isShowingRootBranch() {
 		return showingRootBranch;
@@ -350,6 +380,65 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		if (optionsPanel == null) {
 			optionsPanel = new OptionsPanel();
 
+			final JCheckBox checkBox1 = new JCheckBox("Transform branches");
+			optionsPanel.addComponent(checkBox1);
+
+			checkBox1.setSelected(transformBranches);
+			if (!originalTree.hasLengths()) {
+				checkBox1.setEnabled(false);
+			}
+
+			final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
+			combo1.setSelectedItem(branchTransform);
+			combo1.addItemListener(new ItemListener() {
+			    public void itemStateChanged(ItemEvent itemEvent) {
+			        setBranchTransform(true,
+					        (TransformedRootedTree.Transform)combo1.getSelectedItem());
+
+			    }
+			});
+			final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", combo1);
+			label1.setEnabled(checkBox1.isSelected());
+			combo1.setEnabled(checkBox1.isSelected());
+
+			checkBox1.addChangeListener(new ChangeListener() {
+			    public void stateChanged(ChangeEvent changeEvent) {
+			        label1.setEnabled(checkBox1.isSelected());
+				    combo1.setEnabled(checkBox1.isSelected());
+
+				    setBranchTransform(checkBox1.isSelected(),
+						    (TransformedRootedTree.Transform)combo1.getSelectedItem());
+			    }
+			});
+
+			final JCheckBox checkBox2 = new JCheckBox("Order branches");
+			optionsPanel.addComponent(checkBox2);
+
+			checkBox2.setSelected(orderBranches);
+
+			final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values());
+			combo2.setSelectedItem(branchOrdering);
+			combo2.addItemListener(new ItemListener() {
+			    public void itemStateChanged(ItemEvent itemEvent) {
+			        setBranchOrdering(true,
+					        (SortedRootedTree.BranchOrdering)combo2.getSelectedItem());
+
+			    }
+			});
+			final JLabel label2 = optionsPanel.addComponentWithLabel("Ordering:", combo2);
+			label2.setEnabled(checkBox2.isSelected());
+			combo2.setEnabled(checkBox2.isSelected());
+
+			checkBox2.addChangeListener(new ChangeListener() {
+			    public void stateChanged(ChangeEvent changeEvent) {
+			        label2.setEnabled(checkBox2.isSelected());
+				    combo2.setEnabled(checkBox2.isSelected());
+
+				    setBranchOrdering(checkBox2.isSelected(),
+						    (SortedRootedTree.BranchOrdering)combo2.getSelectedItem());
+			    }
+			});
+
 			final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
             optionsPanel.addComponent(checkBox3);
 
@@ -369,6 +458,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				}
 			});
             optionsPanel.addComponentWithLabel("Line Weight:", spinner);
+
+
         }
 		controls.add(new Controls("Formatting", optionsPanel));
 
@@ -823,8 +914,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		super.setSize(width, height);
 	}
 
+	private RootedTree originalTree = null;
 	private RootedTree tree = null;
 	private TreeLayout treeLayout = null;
+
+	private boolean orderBranches = false;
+	private SortedRootedTree.BranchOrdering branchOrdering = SortedRootedTree.BranchOrdering.INCREASING_NODE_DENSITY;
+
+	private boolean transformBranches = false;
+	private TransformedRootedTree.Transform branchTransform = TransformedRootedTree.Transform.CLADOGRAM;
 
     private Rectangle2D treeBounds = new Rectangle2D.Double();
     private double treeScale;
