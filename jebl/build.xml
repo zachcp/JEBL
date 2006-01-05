@@ -42,6 +42,7 @@
 
       <jar jarfile="${dist}/jebl.jar">
           <fileset dir="${build}" includes="jebl/**/*.class,*.properties"/>
+          <fileset dir=".." includes="jebl/gui/**/*.png"/>
           <!--<zipgroupfileset dir="${lib}" includes="**/*.jar"/>-->
       </jar>
         <copy file="${dist}/jebl.jar" tofile="${dist}/jebl-${DSTAMP}.jar" overwrite="true"/>
