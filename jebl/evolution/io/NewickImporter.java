@@ -48,7 +48,8 @@ public class NewickImporter implements TreeImporter {
             helper.unreadCharacter('(');
 
             tree = readTree();
-        } catch (EOFException e) { }
+        } catch (EOFException e) {
+         }
 
         lastTree = tree;
 
@@ -59,7 +60,10 @@ public class NewickImporter implements TreeImporter {
         List<RootedTree> trees = new ArrayList<RootedTree>();
 
         while (hasTree()) {
-            trees.add(importNextTree());
+            final RootedTree t = importNextTree();
+            if( t != null ) {
+              trees.add(t);
+            }
         }
 
         return trees;
@@ -82,7 +86,6 @@ public class NewickImporter implements TreeImporter {
      */
     private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
     {
-        double length = 0.0;
         
         Node branch;
 
@@ -95,6 +98,8 @@ public class NewickImporter implements TreeImporter {
             branch = readExternalNode(tree);
         }
 
+        double length = -1.0;
+		
         if (helper.getLastDelimiter() == ':') {
             length = helper.readDouble(",():;");
         }

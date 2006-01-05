@@ -1021,7 +1021,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
 	{
-	    double length = 0.0;
+
 	    Node branch;
 
         helper.clearLastMetaComment();
@@ -1034,6 +1034,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	        branch = readExternalNode(tree);
 	    }
 
+        double length = -1.0;
         if (helper.getLastDelimiter() == ':') {
             length = helper.readDouble(",():;");
         }

@@ -291,8 +291,8 @@ public class SimpleRootedTree implements RootedTree {
      * Calculate branch lengths from the current node heights.
      */
     private void nodeHeightsToLengths(SimpleNode node, double height) {
-
-        node.setLength(height - node.getHeight());
+        final double h = node.getHeight();
+        node.setLength(h >= 0 ? height - h : 1);
 
         for (Node child : node.getChildren()) {
             nodeHeightsToLengths((SimpleNode)child, node.getHeight());
