@@ -36,8 +36,16 @@ public class SortedRootedTree implements RootedTree {
         return sourceList;
     }
 
+    public boolean hasHeights() {
+        return source.hasHeights();
+    }
+
     public double getHeight(Node node) {
         return source.getHeight(node);
+    }
+
+    public boolean hasLengths() {
+        return source.hasLengths();
     }
 
     public double getLength(Node node) {

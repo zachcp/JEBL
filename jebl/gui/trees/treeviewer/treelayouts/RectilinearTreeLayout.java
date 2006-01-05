@@ -34,6 +34,18 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
+    public double getHeightOfPoint(Point2D point) {
+        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    }
+
+    public Line2D getHeightLine(double height) {
+        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    }
+
+    public Shape getHeightArea(double height1, double height2) {
+        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    }
+
     public void setControlPanel(ControlPanel controlPanel) {
         // do nothing...
     }

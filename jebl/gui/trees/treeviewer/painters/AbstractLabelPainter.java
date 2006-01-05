@@ -30,6 +30,15 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         this(6);
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        firePainterChanged();
+    }
+
     public void calibrate(Graphics2D g2, T item) {
         Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
@@ -135,20 +144,37 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         if (optionsPanel == null) {
             optionsPanel = new OptionsPanel();
 
-            final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 1, 48, 1));
+            final JCheckBox checkBox1 = new JCheckBox("Show " + getTitle());
+            optionsPanel.addComponent(checkBox1);
+
+            checkBox1.setSelected(isVisible());
+
+            final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
+
+            final JLabel label1 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
+            label1.setEnabled(checkBox1.isSelected());
+            spinner1.setEnabled(checkBox1.isSelected());
+
+            checkBox1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    label1.setEnabled(checkBox1.isSelected());
+                    spinner1.setEnabled(checkBox1.isSelected());
+                    setVisible(checkBox1.isSelected());
+                }
+            });
 
             spinner1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setFontSize((Integer)spinner1.getValue());
+                    setFontSize(((Double)spinner1.getValue()).floatValue());
                 }
             });
-            optionsPanel.addComponentWithLabel("Font Size:", spinner1);
         }
 
         controls.add(new Controls(getTitle(), optionsPanel));
 
         return controls;
     }
+
     private OptionsPanel optionsPanel = null;
 
     public abstract String getTitle();
@@ -162,4 +188,7 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
     private double preferredWidth;
     private double preferredHeight;
     private float yOffset;
+
+    private boolean visible = true;
+
 }

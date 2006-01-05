@@ -43,6 +43,15 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         scaleFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        firePainterChanged();
+    }
+
     public void calibrate(Graphics2D g2, TreePane treePane) {
         Font oldFont = g2.getFont();
         g2.setFont(scaleFont);
@@ -170,9 +179,14 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         if (optionsPanel == null) {
             optionsPanel = new OptionsPanel();
 
+            final JCheckBox checkBox1 = new JCheckBox("Show Scale Bar");
+            optionsPanel.addComponent(checkBox1);
+
+            checkBox1.setSelected(isVisible());
+
             final RealNumberField text1 = new RealNumberField(0.0, Double.MAX_VALUE);
             text1.setValue(scaleRange);
-            
+
             text1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     Double value = text1.getValue();
@@ -181,25 +195,46 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                     }
                 }
             });
-            optionsPanel.addComponentWithLabel("Scale Range:", text1, true);
+            final JLabel label1 = optionsPanel.addComponentWithLabel("Scale Range:", text1, true);
 
-            final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 1, 48, 1));
+            final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48.0, 1.0));
+
+            spinner1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setFontSize(((Double)spinner1.getValue()).floatValue());
+                }
+            });
+            final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
+
+            final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
 
             spinner2.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setFontSize((Integer)spinner2.getValue());
+                    setLineWeight(((Double)spinner2.getValue()).floatValue());
                 }
             });
-            optionsPanel.addComponentWithLabel("Font Size:", spinner2);
+            final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
 
-            final JSpinner spinner3 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
+            label1.setEnabled(checkBox1.isSelected());
+            text1.setEnabled(checkBox1.isSelected());
+            label2.setEnabled(checkBox1.isSelected());
+            spinner1.setEnabled(checkBox1.isSelected());
+            label3.setEnabled(checkBox1.isSelected());
+            spinner2.setEnabled(checkBox1.isSelected());
 
-            spinner3.addChangeListener(new ChangeListener() {
+            checkBox1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setLineWeight(((Double)spinner3.getValue()).floatValue());
+                    label1.setEnabled(checkBox1.isSelected());
+                    text1.setEnabled(checkBox1.isSelected());
+                    label2.setEnabled(checkBox1.isSelected());
+                    spinner1.setEnabled(checkBox1.isSelected());
+                    label3.setEnabled(checkBox1.isSelected());
+                    spinner2.setEnabled(checkBox1.isSelected());
+
+                    setVisible(checkBox1.isSelected());
                 }
             });
-            optionsPanel.addComponentWithLabel("Line Weight:", spinner3);
+
         }
 
         controls.add(new Controls("Scale Bar", optionsPanel));
@@ -207,6 +242,8 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         return controls;
     }
     private OptionsPanel optionsPanel = null;
+
+    private boolean visible = true;
 
     private Paint foreground = Color.BLACK;
     private Paint background = null;

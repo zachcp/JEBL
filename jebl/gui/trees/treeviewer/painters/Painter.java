@@ -30,6 +30,8 @@ public interface Painter<T> extends ControlsProvider {
         CENTER
     }
 
+    boolean isVisible();
+
     void calibrate(Graphics2D g2, T item);
 
     void paint(Graphics2D g2, T item, Justification justification, Rectangle2D bounds);

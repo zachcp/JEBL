@@ -70,22 +70,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		repaint();
 	}
 
-	public boolean isShowingTaxonLabels() {
-		return showingTaxonLabels;
-	}
-
-	public void setShowingTaxonLabels(boolean showingTaxonLabels) {
-		this.showingTaxonLabels = showingTaxonLabels;
-		calibrated = false;
-		repaint();
-	}
-
-    private void setShowingNodeLabels(boolean showingNodeLabels) {
-        this.showingNodeLabels = showingNodeLabels;
-        calibrated = false;
-        repaint();
-    }
-
     public boolean isShowingTaxonCallouts() {
 		return showingTaxonCallouts;
 	}
@@ -95,18 +79,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		calibrated = false;
 		repaint();
 	}
-
-    public boolean isShowingScaleBar() {
-        return scaleBarPainter != null;
-    }
-
-    private void setShowingScaleBar(boolean showingScaleBar) {
-        if (showingScaleBar) {
-            setScaleBarPainter(new ScaleBarPainter());
-        } else {
-            setScaleBarPainter(null);
-        }
-    }
 
 	public void setSelectedNode(Node selectedNode) {
 		selectedNodes.clear();
@@ -289,7 +261,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		calibrated = false;
 	}
 
-	public Node getNodeAt(Graphics2D g2, Point point) {
+    public double getHeightAt(Graphics2D graphics2D, Point2D point) {
+        try {
+            point = transform.inverseTransform(point, null);
+        } catch (NoninvertibleTransformException e) {
+            e.printStackTrace();
+        }
+        return treeLayout.getHeightOfPoint(point);
+    }
+
+    public Node getNodeAt(Graphics2D g2, Point point) {
 		Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
 		for (Node node : tree.getExternalNodes()) {
@@ -347,6 +328,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		repaint();
 	}
 
+    public void setRuler(double rulerHeight) {
+        this.rulerHeight = rulerHeight;
+    }
+
 	public void scrollPointToVisible(Point point) {
 		scrollRectToVisible(new Rectangle(point.x, point.y, 0, 0));
 	}
@@ -365,26 +350,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		if (optionsPanel == null) {
 			optionsPanel = new OptionsPanel();
 
-			final JCheckBox checkBox1 = new JCheckBox("Show Taxon Labels");
-			optionsPanel.addComponent(checkBox1);
-
-			checkBox1.setSelected(isShowingTaxonLabels());
-			checkBox1.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent changeEvent) {
-					setShowingTaxonLabels(checkBox1.isSelected());
-				}
-			});
-
-            final JCheckBox checkBox2 = new JCheckBox("Show Node Labels");
-            optionsPanel.addComponent(checkBox2);
-
-            checkBox2.setSelected(isShowingTaxonLabels());
-            checkBox2.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    setShowingNodeLabels(checkBox2.isSelected());
-                }
-            });
-
 			final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
             optionsPanel.addComponent(checkBox3);
 
@@ -395,17 +360,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 				}
 			});
-
-            final JCheckBox checkBox4 = new JCheckBox("Show Scale Bar");
-            optionsPanel.addComponent(checkBox4);
-
-            checkBox4.setSelected(isShowingScaleBar());
-            checkBox4.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    setShowingScaleBar(checkBox4.isSelected());
-
-                }
-            });
 
 			final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
 
@@ -523,7 +477,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
 			Taxon taxon = tree.getTaxon(node);
 
-			if (taxonLabelPainter != null && showingTaxonLabels ) {
+			if (taxonLabelPainter != null && taxonLabelPainter.isVisible() ) {
 
 				AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
 				Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
@@ -567,7 +521,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				}
 				g2.draw(branchPath);
 
-				if (nodeLabelPainter != null && showingNodeLabels) {
+				if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 
 					AffineTransform nodeTransform = nodeLabelTransforms.get(node);
 					Painter.Justification nodeLabelJustification = nodeLabelJustifications.get(node);
@@ -583,7 +537,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			}
 		}
 
-        if (scaleBarPainter != null) {
+        if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.paint(g2, this, Painter.Justification.CENTER, scaleBarBounds);
         }
 
@@ -616,7 +570,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 		Set<Node> externalNodes = tree.getExternalNodes();
 
-		if (taxonLabelPainter != null && showingTaxonLabels) {
+		if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
 
             taxonLabelWidth = 0.0;
 
@@ -648,7 +602,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
 		}
 
-        if (nodeLabelPainter != null && showingNodeLabels) {
+        if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
             // Iterate though the external nodes
             for (Node node : tree.getNodes()) {
 
@@ -670,7 +624,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        if (scaleBarPainter != null) {
+        if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.calibrate(g2, this);
             scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), bounds.getY() + bounds.getHeight(),
                     treeBounds.getWidth(), scaleBarPainter.getPreferredHeight());
@@ -746,7 +700,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		taxonLabelTransforms.clear();
 		taxonLabelJustifications.clear();
 
-		if (taxonLabelPainter != null) {
+		if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
             double labelHeight = taxonLabelPainter.getPreferredHeight();
             Rectangle2D labelBounds = new Rectangle2D.Double(0.0,  0.0, taxonLabelWidth, labelHeight);
 
@@ -780,7 +734,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		nodeLabelTransforms.clear();
 		nodeLabelJustifications.clear();
 
-		if (nodeLabelPainter != null && showingNodeLabels) {
+		if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 			// Iterate though the external nodes
 			for (Node node : tree.getNodes()) {
 
@@ -812,7 +766,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			}
 		}
 
-        if (scaleBarPainter != null) {
+        if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.calibrate(g2, this);
             scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), getHeight() - scaleBarPainter.getPreferredHeight(),
                     treeBounds.getWidth(), scaleBarPainter.getPreferredHeight());
@@ -881,7 +835,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Set<Node> selectedNodes = new HashSet<Node>();
 	private Set<Taxon> selectedTaxa = new HashSet<Taxon>();
 
-	private Rectangle2D dragRectangle = null;
+    private double rulerHeight = -1.0;
+    private Rectangle2D dragRectangle = null;
 
 	private BranchDecorator branchDecorator = null;
 
@@ -902,9 +857,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	private AffineTransform transform = null;
 
 	private boolean showingRootBranch = true;
-	private boolean showingTaxonLabels = true;
 	private boolean showingTaxonCallouts = true;
-    private boolean showingNodeLabels = true;
 
     private Map<Taxon, AffineTransform> taxonLabelTransforms = new HashMap<Taxon, AffineTransform>();
 	private Map<Taxon, Shape> taxonLabelBounds = new HashMap<Taxon, Shape>();

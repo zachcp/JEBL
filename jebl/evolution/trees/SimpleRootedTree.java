@@ -64,6 +64,14 @@ public class SimpleRootedTree implements RootedTree {
     public void setHeight(Node node, double height) {
         lengthsKnown = false;
         heightsKnown = true;
+
+        // If a single height of a single node is set then
+        // assume that all nodes have heights and by extension,
+        // branch lengths as well as these will be calculated
+        // from the heights
+        hasLengths = true;
+        hasHeights = true;
+
         ((SimpleNode)node).setHeight(height);
     }
 
@@ -74,6 +82,14 @@ public class SimpleRootedTree implements RootedTree {
     public void setLength(Node node, double length) {
         heightsKnown = false;
         lengthsKnown = true;
+
+        // If a single length of a single branch is set then
+        // assume that all branch have lengths and by extension,
+        // node heights as well as these will be calculated
+        // from the lengths
+        hasLengths = true;
+        hasHeights = true;
+
         ((SimpleNode)node).setLength(length);
     }
 
@@ -87,13 +103,28 @@ public class SimpleRootedTree implements RootedTree {
     }
 
     /**
+     * @return Whether this tree has node heights available
+     */
+    public boolean hasHeights() {
+        return true;
+    }
+
+    /**
      * @param node the node whose height is being requested.
      * @return the height of the given node. The height will be
      *         less than the parent's height and greater than it children's heights.
      */
     public double getHeight(Node node) {
+        if (!hasHeights) throw new IllegalArgumentException("This tree has no node heights");
         if (!heightsKnown) calculateNodeHeights();
         return ((SimpleNode)node).getHeight();
+    }
+
+    /**
+     * @return Whether this tree has branch lengths available
+     */
+    public boolean hasLengths() {
+        return true;
     }
 
     /**
@@ -101,6 +132,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return the length of the branch to the parent node (0.0 if the node is the root).
      */
     public double getLength(Node node) {
+        if (!hasLengths) throw new IllegalArgumentException("This tree has no branch lengths");
         if (!lengthsKnown) calculateBranchLengths();
         return ((SimpleNode)node).getLength();
     }
@@ -340,6 +372,9 @@ public class SimpleRootedTree implements RootedTree {
 
     private boolean heightsKnown = false;
     private boolean lengthsKnown = false;
+
+    private boolean hasHeights = false;
+    private boolean hasLengths = false;
 
     private class SimpleNode extends Node {
 

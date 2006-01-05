@@ -34,11 +34,21 @@ public interface RootedTree extends Tree {
     List<Node> getChildren(Node node);
 
     /**
+     * @return Whether this tree has node heights available
+     */
+    boolean hasHeights();
+
+    /**
      * @param node the node whose height is being requested.
      * @return the height of the given node. The height will be
      * less than the parent's height and greater than it children's heights.
      */
     double getHeight(Node node);
+
+    /**
+     * @return Whether this tree has branch lengths available
+     */
+    boolean hasLengths();
 
     /**
      * @param node the node whose branch length (to its parent) is being requested.
