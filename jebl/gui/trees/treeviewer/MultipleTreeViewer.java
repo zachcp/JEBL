@@ -54,7 +54,7 @@ public class MultipleTreeViewer extends TreeViewer {
 
 		        spinner1.addChangeListener(new ChangeListener() {
 		            public void stateChanged(ChangeEvent changeEvent) {
-		                setCurrentTree(trees.get((Integer)spinner1.getValue()));
+		                setCurrentTree(trees.get((Integer)spinner1.getValue() - 1));
 		            }
 		        });
 		        optionsPanel.addComponentWithLabel("Tree:", spinner1);
