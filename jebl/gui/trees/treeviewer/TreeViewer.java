@@ -13,14 +13,11 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.*;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.BasicTaxonLabelPainter;
-import jebl.gui.trees.treeviewer.painters.Painter;
-import jebl.gui.trees.treeviewer.painters.BasicNodeLabelPainter;
-import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
-import jebl.gui.trees.treeviewer.treelayouts.*;
+import jebl.gui.trees.treeviewer.painters.*;
 import jebl.gui.utils.IconUtils;
 
 import javax.swing.*;
@@ -37,13 +34,6 @@ import java.util.List;
  * @version $Id$
  */
 public class TreeViewer extends JPanel {
-    public enum TreeLayoutType {
-        RECTILINEAR,
-        POLAR,
-        RADIAL
-    };
-
-    final private String[] layoutNames = {"Rectangle", "Polar", "Radial"};
 
     public enum SearchType {
         CONTAINS("Contains"),
@@ -89,7 +79,7 @@ public class TreeViewer extends JPanel {
 
         add(scrollPane, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.WEST);
-        setTreeLayoutType(TreeLayoutType.RECTILINEAR);
+        treePane.setTreeLayoutType(TreePane.TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
@@ -125,20 +115,6 @@ public class TreeViewer extends JPanel {
         setTree(tree, 6);
     }
 
-    private TreeLayoutType currentLayout = null;
-
-    public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
-        currentLayout = treeLayoutType;
-        switch (treeLayoutType) {
-            case RECTILINEAR: treeLayout = new RectilinearTreeLayout(); break;
-            case POLAR: treeLayout = new PolarTreeLayout(); break;
-            case RADIAL: treeLayout = new RadialTreeLayout(); break;
-            default: throw new IllegalArgumentException("Unknown TreeLayoutType: " + treeLayoutType);
-        }
-
-        treePane.setTreeLayout(treeLayout);
-    }
-
     public ControlPanel getControlPanel() {
         return controlPanel;
     }
@@ -171,24 +147,6 @@ public class TreeViewer extends JPanel {
                 buttonGroup.add(toggle2);
                 buttonGroup.add(toggle3);
                 toggle1.setSelected(true);
-                toggle1.addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle1.isSelected())
-                            setTreeLayoutType(TreeViewer.TreeLayoutType.RECTILINEAR);
-                    }
-                });
-                toggle2.addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle2.isSelected())
-                            setTreeLayoutType(TreeViewer.TreeLayoutType.POLAR);
-                    }
-                });
-                toggle3.addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle3.isSelected())
-                            setTreeLayoutType(TreeViewer.TreeLayoutType.RADIAL);
-                    }
-                });
                 panel1.add(toggle1);
                 panel1.add(toggle2);
                 panel1.add(toggle3);
@@ -219,11 +177,35 @@ public class TreeViewer extends JPanel {
                     }
                 });
 
-                JLabel label = new JLabel("Expansion:");
-                label.setEnabled(!treeLayout.maintainAspectRatio());
-                verticalExpansionSlider.setEnabled(!treeLayout.maintainAspectRatio());
+                final JLabel label = new JLabel("Expansion:");
+	            optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
+                label.setEnabled(!treePane.maintainAspectRatio());
+                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
 
-                optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
+	            toggle1.addChangeListener(new ChangeListener() {
+	                public void stateChanged(ChangeEvent changeEvent) {
+	                    if (toggle1.isSelected())
+	                        treePane.setTreeLayoutType(TreePane.TreeLayoutType.RECTILINEAR);
+		                label.setEnabled(!treePane.maintainAspectRatio());
+		                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+	                }
+	            });
+	            toggle2.addChangeListener(new ChangeListener() {
+	                public void stateChanged(ChangeEvent changeEvent) {
+	                    if (toggle2.isSelected())
+	                        treePane.setTreeLayoutType(TreePane.TreeLayoutType.POLAR);
+		                label.setEnabled(!treePane.maintainAspectRatio());
+		                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+	                }
+	            });
+	            toggle3.addChangeListener(new ChangeListener() {
+	                public void stateChanged(ChangeEvent changeEvent) {
+	                    if (toggle3.isSelected())
+	                        treePane.setTreeLayoutType(TreePane.TreeLayoutType.RADIAL);
+		                label.setEnabled(!treePane.maintainAspectRatio());
+		                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+	                }
+	            });
             }
             controls.add(new Controls("General", optionsPanel));
 
@@ -370,8 +352,6 @@ public class TreeViewer extends JPanel {
     public JComponent getExportableComponent() {
         return treePane;
     }
-
-    protected TreeLayout treeLayout = null;
 
     protected RootedTree tree = null;
 

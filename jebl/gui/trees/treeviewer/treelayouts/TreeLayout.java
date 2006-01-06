@@ -44,21 +44,20 @@ public interface TreeLayout extends ControlsProvider {
 
     /**
      * Return whether the x axis is continuous or discrete
-     * @return
+     * @return the axis type
      */
     AxisType getXAxisType();
 
     /**
      * Return whether the y axis is continuous or discrete
-     * @return
+     * @return the axis type
      */
     AxisType getYAxisType();
-
 
     /**
      * Return whether the two axis scales should be maintained
      * relative to each other
-     * @return
+     * @return a boolean
      */
     boolean maintainAspectRatio();
 
@@ -67,7 +66,7 @@ public interface TreeLayout extends ControlsProvider {
      * 2d point. Some layouts won't be able to produce this and
      * may throw an UnsupportedOperationException.
      * @param point
-     * @return
+     * @return the height
      */
     double getHeightOfPoint(Point2D point);
 
