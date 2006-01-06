@@ -28,7 +28,7 @@ public class SimpleTree  implements Tree {
         * @return the created node reference
         */
        public Node createExternalNode(Taxon taxon) {
-           BaseNode node = new BaseNode(taxon);
+           SimpleNode node = new SimpleNode(taxon);
            externalNodes.put(taxon, node);
            return node;
        }
@@ -43,7 +43,7 @@ public class SimpleTree  implements Tree {
         * @return the created node reference
         */
        public Node createInternalNode(Set<Node> children) {
-           BaseNode node = new BaseNode(children);
+           SimpleNode node = new SimpleNode(children);
 
            internalNodes.add(node);
 
@@ -62,7 +62,7 @@ public class SimpleTree  implements Tree {
       * @return the set of nodes that are attached by edges to the given node.
       */
      public Set<Node> getAdjacencies(Node node) {
-         return ((BaseNode)node).getAdjacencies();
+         return ((SimpleNode)node).getAdjacencies();
      }
 
     private class Pair {
@@ -107,7 +107,7 @@ public class SimpleTree  implements Tree {
      *         if the node is an internal node.
      */
     public Taxon getTaxon(Node node) {
-        return ((BaseNode)node).getTaxon();
+        return ((SimpleNode)node).getTaxon();
     }
 
     /**
@@ -115,7 +115,7 @@ public class SimpleTree  implements Tree {
      * @return true if the node is of degree 1.
      */
     public boolean isExternal(Node node) {
-        return ((BaseNode)node).getDegree() == 1;
+        return ((SimpleNode)node).getDegree() == 1;
     }
 
     /**
@@ -159,7 +159,7 @@ public class SimpleTree  implements Tree {
      public Set<Node> getNodes(int degree) {
          Set<Node> nodes = new HashSet<Node>();
          for (Node node : getNodes()) {
-             if (((BaseNode)node).getDegree() == degree) nodes.add(node);
+             if (((SimpleNode)node).getDegree() == degree) nodes.add(node);
          }
          return nodes;
      }

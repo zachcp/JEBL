@@ -27,7 +27,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return the created node reference
      */
     public Node createExternalNode(Taxon taxon) {
-        SimpleNode node = new SimpleNode(taxon);
+        SimpleRootedNode node = new SimpleRootedNode(taxon);
         externalNodes.put(taxon, node);
         return node;
     }
@@ -44,10 +44,10 @@ public class SimpleRootedTree implements RootedTree {
      * @return the created node reference
      */
     public Node createInternalNode(Set<Node> children) {
-        SimpleNode node = new SimpleNode(children);
+        SimpleRootedNode node = new SimpleRootedNode(children);
 
         for (Node child : children) {
-            ((SimpleNode)child).setParent(node);
+            ((SimpleRootedNode)child).setParent(node);
         }
 
         internalNodes.add(node);
@@ -72,7 +72,7 @@ public class SimpleRootedTree implements RootedTree {
         hasLengths = true;
         hasHeights = true;
 
-        ((SimpleNode)node).setHeight(height);
+        ((SimpleRootedNode)node).setHeight(height);
     }
 
     /**
@@ -90,7 +90,7 @@ public class SimpleRootedTree implements RootedTree {
         hasLengths = true;
         hasHeights = true;
 
-        ((SimpleNode)node).setLength(length);
+        ((SimpleRootedNode)node).setLength(length);
     }
 
     /**
@@ -99,7 +99,7 @@ public class SimpleRootedTree implements RootedTree {
      *         The list may be empty for a terminal node (a tip).
      */
     public List<Node> getChildren(Node node) {
-        return new ArrayList<Node>(((SimpleNode)node).getChildren());
+        return new ArrayList<Node>(((SimpleRootedNode)node).getChildren());
     }
 
     /**
@@ -117,7 +117,7 @@ public class SimpleRootedTree implements RootedTree {
     public double getHeight(Node node) {
         if (!hasHeights) throw new IllegalArgumentException("This tree has no node heights");
         if (!heightsKnown) calculateNodeHeights();
-        return ((SimpleNode)node).getHeight();
+        return ((SimpleRootedNode)node).getHeight();
     }
 
     /**
@@ -134,7 +134,7 @@ public class SimpleRootedTree implements RootedTree {
     public double getLength(Node node) {
         if (!hasLengths) throw new IllegalArgumentException("This tree has no branch lengths");
         if (!lengthsKnown) calculateBranchLengths();
-        return ((SimpleNode)node).getLength();
+        return ((SimpleRootedNode)node).getLength();
     }
 
     /**
@@ -143,7 +143,7 @@ public class SimpleRootedTree implements RootedTree {
      *         if the node is the root node.
      */
     public Node getParent(Node node) {
-        return ((SimpleNode)node).getParent();
+        return ((SimpleRootedNode)node).getParent();
     }
 
     /**
@@ -187,7 +187,7 @@ public class SimpleRootedTree implements RootedTree {
      *         if the node is an internal node.
      */
     public Taxon getTaxon(Node node) {
-        return ((SimpleNode)node).getTaxon();
+        return ((SimpleRootedNode)node).getTaxon();
     }
 
     /**
@@ -195,7 +195,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return true if the node is of degree 1.
      */
     public boolean isExternal(Node node) {
-        return ((SimpleNode)node).getChildren().size() == 0;
+        return ((SimpleRootedNode)node).getChildren().size() == 0;
     }
 
     /**
@@ -212,7 +212,7 @@ public class SimpleRootedTree implements RootedTree {
      * @return the set of nodes that are attached by edges to the given node.
      */
     public Set<Node> getAdjacencies(Node node) {
-        return ((SimpleNode)node).getAdjacencies();
+        return ((SimpleRootedNode)node).getAdjacencies();
     }
 
     /**
@@ -223,17 +223,17 @@ public class SimpleRootedTree implements RootedTree {
      *          if the nodes are not directly connected by an edge.
      */
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-        if (((SimpleNode)node1).getParent() == node2) {
+        if (((SimpleRootedNode)node1).getParent() == node2) {
 	        if (heightsKnown) {
-		        return ((SimpleNode)node2).getHeight() - ((SimpleNode)node1).getHeight();
+		        return ((SimpleRootedNode)node2).getHeight() - ((SimpleRootedNode)node1).getHeight();
 	        } else {
-		        return ((SimpleNode)node1).getLength();
+		        return ((SimpleRootedNode)node1).getLength();
 	        }
-        } else if (((SimpleNode)node2).getParent() == node1) {
+        } else if (((SimpleRootedNode)node2).getParent() == node1) {
             if (heightsKnown) {
-	            return ((SimpleNode)node1).getHeight() - ((SimpleNode)node2).getHeight();
+	            return ((SimpleRootedNode)node1).getHeight() - ((SimpleRootedNode)node2).getHeight();
             } else {
-	            return ((SimpleNode)node2).getLength();
+	            return ((SimpleRootedNode)node2).getLength();
             }
         } else {
             throw new NoEdgeException();
@@ -256,7 +256,7 @@ public class SimpleRootedTree implements RootedTree {
     public Set<Node> getNodes(int degree) {
         Set<Node> nodes = new HashSet<Node>();
         for (Node node : getNodes()) {
-            if (((SimpleNode)node).getDegree() == degree) nodes.add(node);
+            if (((SimpleRootedNode)node).getDegree() == degree) nodes.add(node);
         }
         return nodes;
     }
@@ -274,13 +274,13 @@ public class SimpleRootedTree implements RootedTree {
 
         double maxHeight = 0.0;
         for (Node externalNode : getExternalNodes()) {
-            if (((SimpleNode)externalNode).getHeight() > maxHeight) {
-                maxHeight = ((SimpleNode)externalNode).getHeight();
+            if (((SimpleRootedNode)externalNode).getHeight() > maxHeight) {
+                maxHeight = ((SimpleRootedNode)externalNode).getHeight();
             }
         }
 
         for (Node node : getNodes()) {
-            ((SimpleNode)node).setHeight(maxHeight - ((SimpleNode)node).getHeight());
+            ((SimpleRootedNode)node).setHeight(maxHeight - ((SimpleRootedNode)node).getHeight());
         }
 
         heightsKnown = true;
@@ -290,7 +290,7 @@ public class SimpleRootedTree implements RootedTree {
      * Set the node heights from the current node branch lengths. Actually
      * sets distance from root so the heights then need to be reversed.
      */
-    private void nodeLengthsToHeights(SimpleNode node, double height) {
+    private void nodeLengthsToHeights(SimpleRootedNode node, double height) {
 
         double newHeight = height;
 
@@ -301,7 +301,7 @@ public class SimpleRootedTree implements RootedTree {
         node.setHeight(newHeight);
 
         for (Node child : node.getChildren()) {
-            nodeLengthsToHeights((SimpleNode)child, newHeight);
+            nodeLengthsToHeights((SimpleRootedNode)child, newHeight);
         }
     }
 
@@ -322,12 +322,12 @@ public class SimpleRootedTree implements RootedTree {
     /**
      * Calculate branch lengths from the current node heights.
      */
-    private void nodeHeightsToLengths(SimpleNode node, double height) {
+    private void nodeHeightsToLengths(SimpleRootedNode node, double height) {
         final double h = node.getHeight();
         node.setLength(h >= 0 ? height - h : 1);
 
         for (Node child : node.getChildren()) {
-            nodeHeightsToLengths((SimpleNode)child, node.getHeight());
+            nodeHeightsToLengths((SimpleRootedNode)child, node.getHeight());
         }
 
     }
@@ -366,7 +366,7 @@ public class SimpleRootedTree implements RootedTree {
 
 	private AttributableHelper helper = null;
 
-    private SimpleNode rootNode = null;
+    private SimpleRootedNode rootNode = null;
     private final Set<Node> internalNodes = new HashSet<Node>();
     private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
 

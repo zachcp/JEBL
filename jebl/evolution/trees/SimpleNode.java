@@ -4,82 +4,75 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 6/01/2006
- * Time: 10:19:33
+ * A simple implementation of Node that is used by SimpleTree.
  *
- * @author joseph
+ * This class is package private.
+ *
+ * @author Joseph Heled
+ * @author Andrew Rambaut
  * @version $Id$
+ *
  */
-class SimpleNode extends BaseNode {
+class SimpleNode extends Node {
 
     public SimpleNode(Taxon taxon) {
-        super(taxon);
+        this.adjacencies = Collections.emptySet();
+        this.taxon = taxon;
     }
 
-    // Bit of a hack. Use BaseNode adjacencies to store just the children.
-    public SimpleNode(Set<Node> children) {
-        super(children);
+    public SimpleNode(Set<Node> adjacencies) {
+        this.adjacencies = Collections.unmodifiableSet(adjacencies);
+        this.taxon = null;
     }
 
-    public Node getParent() {
-        return parent;
-    }
-
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
-    public Set<Node> getChildren() {
-        return super.getAdjacencies();
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    // height above latest tip
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    // length of branch to parent
-    public double getLength() {
-        return length >= 0 ? length : 1.0;
-    }
-
-    public void setLength(double length) {
-        this.length = length;
+    public Taxon getTaxon() {
+        return taxon;
     }
 
     public int getDegree() {
-        final int degree = (parent == null ? 0 : 1) + super.getDegree();
-        return degree;
+        return (adjacencies == null ? 0 : adjacencies.size());
     }
 
     public Set<Node> getAdjacencies() {
-        Set<Node> adjacencies = new HashSet<Node>();
-        Set<Node> children = super.getAdjacencies();
-        if (children != null) adjacencies.addAll(children);
-        if (parent != null) adjacencies.add(parent);
         return adjacencies;
     }
 
+    // Attributable IMPLEMENTATION
+
+    public void setAttribute(String name, Object value) {
+        if (helper == null) {
+            helper = new AttributableHelper();
+        }
+        helper.setAttribute(name, value);
+    }
+
+    public Object getAttribute(String name) {
+        if (helper == null) {
+            return null;
+        }
+        return helper.getAttribute(name);
+    }
+
+    public Set<String> getAttributeNames() {
+        if (helper == null) {
+            return Collections.emptySet();
+        }
+        return helper.getAttributeNames();
+    }
+
+    public Map<String, Object> getAttributeMap() {
+        if (helper == null) {
+            return Collections.emptyMap();
+        }
+        return helper.getAttributeMap();
+    }
+
     // PRIVATE members
-
-   // private AttributableHelper helper = null;
-
-    private Node parent;
-    //private final Set<Node> children;
-    //private final Taxon taxon;
-    private double height;
-    private double length;
+    private AttributableHelper helper = null;
+    private final Set<Node> adjacencies;
+    private final Taxon taxon;
 
 }
