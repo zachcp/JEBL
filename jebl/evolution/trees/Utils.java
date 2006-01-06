@@ -59,6 +59,11 @@ public final class Utils {
             return;
         }
 
+        if( ! tree.hasLengths() ) {
+           bounds[0] = bounds[1] = 1;
+            return;
+        }
+
         final List<Node> children = tree.getChildren(node);
         for( Node n : children ) {
             final double len = tree.getLength(n);
@@ -84,9 +89,9 @@ public final class Utils {
          for( Node n : children ) {
              String[] s = asText(tree, n, factor);
              tot += s.length;
-             final double len = tree.getLength(n);
-             // set 1 as lower bound for branch since the vertical connector (which theoretically has zero
-             // width) takes one line.
+             final double len = tree.hasLengths() ? tree.getLength(n) : 1.0;
+             // set 1 as lower bound for branch since the vertical connector
+             // (which theoretically has zero width) takes one line.
              final int branchLen = Math.max((int)Math.round(len * factor), 1);
              branches[k] = branchLen; ++k;
              maxHeight = Math.max(maxHeight, s[0].length() + branchLen);
@@ -131,6 +136,26 @@ public final class Utils {
          return b.toString();
      }
 
+    private static int nodeDistance(final RootedTree tree, final Node node) {
+        if( tree.isExternal(node) ) {
+            return 0;
+        }
+
+        int d = 0;
+        for( Node n : tree.getChildren(node) ) {
+            d = Math.max(d, nodeDistance(tree, n));
+        }
+        return d + 1;
+    }
+
+    private static double safeTreeHeight(RootedTree tree) {
+        final Node root = tree.getRootNode();
+        if( tree.hasHeights() )  {
+            return tree.getHeight(root);
+        }
+        return nodeDistance(tree, root);
+    }
+
      public static String[] asText(RootedTree tree, int widthGuide) {
          Node root = tree.getRootNode();
          double[] bounds = new double[2];
@@ -139,7 +164,7 @@ public final class Utils {
 
          branchesMinMax(tree, root, bounds);
          double lowBound = 2 / bounds[0];
-         double treeHeight = tree.getHeight(root);
+         double treeHeight = safeTreeHeight(tree);
          double treeHieghtWithLowBound = treeHeight * lowBound;
 
          double scale;
