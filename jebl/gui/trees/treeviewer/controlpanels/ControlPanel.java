@@ -23,6 +23,7 @@ public class ControlPanel extends JToolBar {
         this.preferredWidth = preferredWidth;
         this.initiallyClosed = initiallyClosed;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
     }
 
 
@@ -76,7 +77,7 @@ public class ControlPanel extends JToolBar {
 			}
 		};
 
-		DisclosureButton button = new DisclosureButton();
+		final DisclosureButton button = new DisclosureButton();
 
 		panel1.add(button);
 		panel1.add(new JLabel(controls.getTitle()));
@@ -115,6 +116,19 @@ public class ControlPanel extends JToolBar {
 			}
 		});
 
+		// This was an idea about having control panels open as the
+		// mouse is moved over them. Needs more work.
+//		panel.addMouseListener(new MouseAdapter() {
+//			public void mouseEntered(MouseEvent mouseEvent) {
+//				button.setSelected(true);
+//				panel2.setVisible(true);
+//			}
+//
+//			public void mouseExited(MouseEvent mouseEvent) {
+//				button.setSelected(false);
+//				panel2.setVisible(false);
+//			}
+//		});
 	}
 
 	private int preferredWidth;
