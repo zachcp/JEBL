@@ -1,20 +1,15 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.controlpanels.Controls;
-import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.geom.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -52,10 +47,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
     public List<Controls> getControls() {
 
-	    List<Controls> controls = new ArrayList<Controls>();
+	    List<Controls> controlsList = new ArrayList<Controls>();
 
-        if (optionsPanel == null) {
-            optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
             final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
             slider1.setValue((int)(rootLength * 10000));
@@ -91,13 +86,15 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 }
             });
             optionsPanel.addComponent(checkBox1);
+
+	        controls = new Controls("Layout", optionsPanel, true);
         }
 
-		controls.add(new Controls("Layout", optionsPanel));
+		controlsList.add(controls);
 
-        return controls;
+        return controlsList;
     }
-    private OptionsPanel optionsPanel = null;
+    private Controls controls = null;
 
     public void setRootLength(double rootLength) {
         this.rootLength = rootLength;

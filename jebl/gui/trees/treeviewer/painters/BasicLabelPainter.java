@@ -1,34 +1,76 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import jebl.gui.trees.treeviewer.controlpanels.Controls;
-import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
-    private int defaultFontSize;
+public class BasicLabelPainter extends AbstractPainter<Node> {
 
-    public AbstractLabelPainter(int defaultSize) {
-        this.defaultFontSize = defaultSize;
-        taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
-    }
+	public static final String TAXON_NAMES = "Taxon Names";
+	public static final String NODE_HEIGHTS = "Node Heights";
+	public static final String BRANCH_LENGTHS = "Branch Lengths";
 
-    public AbstractLabelPainter() {
-        this(6);
-    }
+	public BasicLabelPainter(String title, Tree tree) {
+	    this(title, tree, false, 6);
+	}
+
+	public BasicLabelPainter(String title, Tree tree, boolean includeTaxonNames, int defaultSize) {
+		this.title = title;
+
+		this.defaultFontSize = defaultSize;
+		taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
+
+		this.attribute = NODE_HEIGHTS;
+		this.tree = tree;
+
+		Set<String> names = new TreeSet<String>();
+		for (Node node : tree.getNodes()) {
+		    names.addAll(node.getAttributeNames());
+		}
+
+		List<String> sources = new ArrayList<String>();
+		if (includeTaxonNames) {
+			sources.add(TAXON_NAMES);
+		}
+		sources.add(NODE_HEIGHTS);
+		sources.add(BRANCH_LENGTHS);
+		sources.addAll(names);
+		this.attributes = new String[sources.size()];
+		sources.toArray(this.attributes);
+	}
+
+	protected String getLabel(Node node) {
+		if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
+		    return tree.getTaxon(node).getName();
+		} else if (attribute.equalsIgnoreCase(NODE_HEIGHTS) && tree instanceof RootedTree) {
+	        return Double.toString(((RootedTree)tree).getHeight(node));
+	    } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) && tree instanceof RootedTree) {
+	            return Double.toString(((RootedTree)tree).getLength(node));
+	    } else {
+	        Object value = node.getAttribute(attribute);
+	        if (value != null) {
+	            return value.toString();
+	        }
+	    }
+	    return null;
+	}
+
+	private int defaultFontSize;
 
     public boolean isVisible() {
         return visible;
@@ -39,7 +81,7 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         firePainterChanged();
     }
 
-    public void calibrate(Graphics2D g2, T item) {
+    public void calibrate(Graphics2D g2, Node item) {
         Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
 
@@ -87,7 +129,7 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         firePainterChanged();
     }
 
-    public void paint(Graphics2D g2, T item, Justification justification, Rectangle2D bounds) {
+    public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
         Font oldFont = g2.getFont();
 
         if (background != null) {
@@ -131,7 +173,14 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
         g2.setFont(oldFont);
     }
 
-    protected abstract String getLabel(T item);
+	public String[] getAttributes() {
+		return attributes;
+	}
+
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
+		firePainterChanged();
+	}
 
     public void setControlPanel(ControlPanel controlPanel) {
         // nothing to do
@@ -139,16 +188,25 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
 
     public List<Controls> getControls() {
 
-        List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controlsList = new ArrayList<Controls>();
 
-        if (optionsPanel == null) {
-            optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
             final JCheckBox checkBox1 = new JCheckBox("Show " + getTitle());
             optionsPanel.addComponent(checkBox1);
 
             checkBox1.setSelected(isVisible());
 
+	        final JComboBox combo1 = new JComboBox(getAttributes());
+	        combo1.addItemListener(new ItemListener() {
+	            public void itemStateChanged(ItemEvent itemEvent) {
+	                String attribute = (String)combo1.getSelectedItem();
+		            setAttribute(attribute);
+	            }
+	        });
+
+	        optionsPanel.addComponentWithLabel("Display:", combo1);
             final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
 
             final JLabel label1 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
@@ -168,16 +226,22 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
                     setFontSize(((Double)spinner1.getValue()).floatValue());
                 }
             });
+
+	        controls = new Controls(getTitle(), optionsPanel, false);
         }
 
-        controls.add(new Controls(getTitle(), optionsPanel));
+        controlsList.add(controls);
 
-        return controls;
+        return controlsList;
     }
 
-    private OptionsPanel optionsPanel = null;
+    private Controls controls = null;
 
-    public abstract String getTitle();
+	public String getTitle() {
+		return title;
+	}
+
+	private final String title;
 
     private Paint foreground = Color.BLACK;
     private Paint background = null;
@@ -191,4 +255,7 @@ public abstract class AbstractLabelPainter<T> extends AbstractPainter<T> {
 
     private boolean visible = true;
 
+	private final Tree tree;
+	protected String attribute;
+	protected String[] attributes;
 }

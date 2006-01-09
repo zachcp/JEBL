@@ -246,7 +246,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		return treeLayout.maintainAspectRatio();
 	}
 
-	public void setTaxonLabelPainter(Painter<Taxon> taxonLabelPainter) {
+	public void setTaxonLabelPainter(Painter taxonLabelPainter) {
 		if (this.taxonLabelPainter != null) {
 			this.taxonLabelPainter.removePainterListener(this);
 		}
@@ -259,11 +259,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		repaint();
 	}
 
-	public Painter<Taxon> getTaxonLabelPainter() {
+	public Painter<Node> getTaxonLabelPainter() {
 		return taxonLabelPainter;
 	}
 
-	public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
+	public void setNodeLabelPainter(Painter nodeLabelPainter) {
 		if (this.nodeLabelPainter != null) {
 			this.nodeLabelPainter.removePainterListener(this);
 		}
@@ -401,12 +401,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 	public List<Controls> getControls() {
 
-		List<Controls> controls = new ArrayList<Controls>();
+		List<Controls> controlsList = new ArrayList<Controls>();
 
-		controls.addAll(treeLayout.getControls());
+		controlsList.addAll(treeLayout.getControls());
 
-		if (optionsPanel == null) {
-			optionsPanel = new OptionsPanel();
+		if (controls == null) {
+			OptionsPanel optionsPanel = new OptionsPanel();
 
 			final JCheckBox checkBox1 = new JCheckBox("Transform branches");
 			optionsPanel.addComponent(checkBox1);
@@ -487,26 +487,26 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			});
 			optionsPanel.addComponentWithLabel("Line Weight:", spinner);
 
-
+			controls = new Controls("Formatting", optionsPanel, true);
 		}
-		controls.add(new Controls("Formatting", optionsPanel));
+		controlsList.add(controls);
 
 		if (getTaxonLabelPainter() != null) {
-			controls.addAll(getTaxonLabelPainter().getControls());
+			controlsList.addAll(getTaxonLabelPainter().getControls());
 		}
 
 		if (getNodeLabelPainter() != null) {
-			controls.addAll(getNodeLabelPainter().getControls());
+			controlsList.addAll(getNodeLabelPainter().getControls());
 		}
 
 		if (getScaleBarPainter() != null) {
-			controls.addAll(getScaleBarPainter().getControls());
+			controlsList.addAll(getScaleBarPainter().getControls());
 		}
 
-		return controls;
+		return controlsList;
 	}
 
-	private OptionsPanel optionsPanel = null;
+	private Controls controls = null;
 
 	private final Set<TreeSelectionListener> treeSelectionListeners = new HashSet<TreeSelectionListener>();
 
@@ -602,7 +602,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
 				g2.transform(taxonTransform);
 
-				taxonLabelPainter.paint(g2, taxon, taxonLabelJustification,
+				taxonLabelPainter.paint(g2, node, taxonLabelJustification,
 						new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, taxonLabelPainter.getPreferredHeight()));
 
 				g2.setTransform(oldTransform);
@@ -696,7 +696,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 			// Find the longest taxon label
 			for (Node node : externalNodes) {
 
-				taxonLabelPainter.calibrate(g2, tree.getTaxon(node));
+				taxonLabelPainter.calibrate(g2, node);
 				double labelWidth = taxonLabelPainter.getPreferredWidth();
 				if (labelWidth > taxonLabelWidth) {
 					taxonLabelWidth = labelWidth;
@@ -707,7 +707,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 			for (Node node : externalNodes) {
 
-				taxonLabelPainter.calibrate(g2, tree.getTaxon(node));
+				taxonLabelPainter.calibrate(g2, node);
 				Rectangle2D labelBounds = new Rectangle2D.Double(0.0,  0.0, taxonLabelWidth, labelHeight);
 
 				// Get the line that represents the path for the taxon label
@@ -967,7 +967,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	private BranchDecorator branchDecorator = null;
 
 	private float labelXOffset = 5.0F;
-	private Painter<Taxon> taxonLabelPainter = null;
+	private Painter<Node> taxonLabelPainter = null;
 	private double taxonLabelWidth;
 	private Painter<Node> nodeLabelPainter = null;
 

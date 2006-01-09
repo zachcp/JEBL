@@ -45,10 +45,10 @@ public class MultipleTreeViewer extends TreeViewer {
 
 	    public List<Controls> getControls() {
 
-	        List<Controls> controls = new ArrayList<Controls>();
+	        List<Controls> controlsList = new ArrayList<Controls>();
 
-	        if (optionsPanel == null) {
-	            optionsPanel = new OptionsPanel();
+	        if (controls == null) {
+	            OptionsPanel optionsPanel = new OptionsPanel();
 
 		        final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(1, 1, trees.size(), 1));
 
@@ -58,14 +58,16 @@ public class MultipleTreeViewer extends TreeViewer {
 		            }
 		        });
 		        optionsPanel.addComponentWithLabel("Tree:", spinner1);
+
+		        controls = new Controls("Current Tree", optionsPanel, true);
 	        }
 
-	        controls.add(new Controls("Current Tree", optionsPanel));
+	        controlsList.add(controls);
 
-	        return controls;
+	        return controlsList;
 	    }
 
-	    private OptionsPanel optionsPanel = null;
+	    private Controls controls = null;
 	};
 
 	private List<Tree> trees = null;

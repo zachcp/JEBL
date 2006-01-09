@@ -102,9 +102,11 @@ public class TreeViewer extends JPanel {
 
         treePane.setTree(this.tree);
 
-        treePane.setTaxonLabelPainter(new BasicTaxonLabelPainter(tree, defaultLabelSize));
+	    BasicLabelPainter taxonLabelPainter = new BasicLabelPainter("Tip Labels", tree, true, defaultLabelSize);
+	    taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
+        treePane.setTaxonLabelPainter(taxonLabelPainter);
 
-        BasicNodeLabelPainter nodeLabelPainter = new BasicNodeLabelPainter("node heights", tree);
+        BasicLabelPainter nodeLabelPainter = new BasicLabelPainter("Node Labels", tree);
         nodeLabelPainter.setVisible(false);
         treePane.setNodeLabelPainter(nodeLabelPainter);
 
@@ -127,10 +129,10 @@ public class TreeViewer extends JPanel {
 
         public java.util.List<Controls> getControls() {
 
-            List<Controls> controls = new ArrayList<Controls>();
+            List<Controls> controlsList = new ArrayList<Controls>();
 
-            if (optionsPanel == null) {
-                optionsPanel = new OptionsPanel();
+            if (controls == null) {
+                OptionsPanel optionsPanel = new OptionsPanel();
 
                 JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
@@ -206,12 +208,15 @@ public class TreeViewer extends JPanel {
 		                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
 	                }
 	            });
-            }
-            controls.add(new Controls("General", optionsPanel));
 
-            return controls;
+	            controls = new Controls("General", optionsPanel, true);
+            }
+
+            controlsList.add(controls);
+
+            return controlsList;
         }
-        private OptionsPanel optionsPanel = null;
+        private Controls controls = null;
     };
 
     public void setControlPanelVisible(boolean visible) {

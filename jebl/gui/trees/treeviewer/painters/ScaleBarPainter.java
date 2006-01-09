@@ -174,10 +174,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
     public List<Controls> getControls() {
 
-        List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controlsList = new ArrayList<Controls>();
 
-        if (optionsPanel == null) {
-            optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
             final JCheckBox checkBox1 = new JCheckBox("Show Scale Bar");
             optionsPanel.addComponent(checkBox1);
@@ -235,13 +235,14 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                 }
             });
 
+	        controls = new Controls("Scale Bar", optionsPanel, false);
         }
 
-        controls.add(new Controls("Scale Bar", optionsPanel));
+        controlsList.add(controls);
 
-        return controls;
+        return controlsList;
     }
-    private OptionsPanel optionsPanel = null;
+    private Controls controls = null;
 
     private boolean visible = true;
 

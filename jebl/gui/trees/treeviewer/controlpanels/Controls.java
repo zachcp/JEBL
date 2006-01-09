@@ -8,9 +8,10 @@ import javax.swing.*;
  */
 public class Controls {
 
-	public Controls(String title, JPanel panel) {
+	public Controls(String title, JPanel panel, boolean isVisible) {
 		this.title = title;
 		this.panel = panel;
+		this.isVisible = isVisible;
 	}
 
 	public String getTitle() {
@@ -21,6 +22,15 @@ public class Controls {
 		return panel;
 	}
 
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	public void setVisible(boolean visible) {
+		isVisible = visible;
+	}
+
 	private String title;
 	private JPanel panel;
+	private boolean isVisible;
 }

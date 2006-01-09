@@ -66,7 +66,7 @@ public class ControlPanel extends JToolBar {
         add(Box.createVerticalStrut(Integer.MAX_VALUE));
     }
 
-	private void addControls(Controls controls) {
+	private void addControls(final Controls controls) {
 		final JPanel panel = new JPanel(new BorderLayout());
 
 		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
@@ -87,7 +87,7 @@ public class ControlPanel extends JToolBar {
 		final JPanel panel2 = controls.getPanel();
 		panel.add(panel2, BorderLayout.CENTER);
 
-        if (initiallyClosed) {
+        if (initiallyClosed || !controls.isVisible()) {
             button.setSelected(false);
             panel2.setVisible(false);
         } else {
@@ -106,6 +106,7 @@ public class ControlPanel extends JToolBar {
 
 			public void opened() {
 				panel2.setVisible(true);
+				controls.setVisible(true);
 			}
 
 			public void closing() {
@@ -113,6 +114,7 @@ public class ControlPanel extends JToolBar {
 
 			public void closed() {
 				panel2.setVisible(false);
+				controls.setVisible(false);
 			}
 		});
 

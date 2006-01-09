@@ -2,14 +2,13 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.controlpanels.Controls;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.*;
 
-import javax.swing.*;
-import java.awt.geom.*;
 import java.awt.*;
-import java.util.List;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -47,13 +46,19 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
 	public List<Controls> getControls() {
 
-		List<Controls> controls = new ArrayList<Controls>();
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+	    List<Controls> controlsList = new ArrayList<Controls>();
 
-		controls.add(new Controls("Layout", panel));
-	    return controls;
-    }
+	    if (controls == null) {
+	        OptionsPanel optionsPanel = new OptionsPanel();
+	        
+		    controls = new Controls("Layout", optionsPanel, true);
+	    }
+
+	    controlsList.add(controls);
+
+	    return controlsList;
+	}
+	private Controls controls = null;
 
     protected void validate() {
         nodePoints.clear();

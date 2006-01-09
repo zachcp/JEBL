@@ -55,10 +55,10 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
     public List<Controls> getControls() {
 
-        List<Controls> controls = new ArrayList<Controls>();
+        List<Controls> controlsList = new ArrayList<Controls>();
 
-        if (optionsPanel == null) {
-            optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
             final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
             slider1.setValue((int)(180.0 - (rootAngle * 10)));
@@ -111,13 +111,15 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 }
             });
             optionsPanel.addComponentWithLabel("Label Position:", combo1);
+
+	        controls = new Controls("Layout", optionsPanel, true);
         }
 
-        controls.add(new Controls("Layout", optionsPanel));
+        controlsList.add(controls);
 
-        return controls;
+        return controlsList;
     }
-    private OptionsPanel optionsPanel = null;
+    private Controls controls = null;
 
 	public void setRootAngle(double rootAngle) {
 		this.rootAngle = rootAngle;
