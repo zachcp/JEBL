@@ -8,9 +8,9 @@
  */
 package jebl.evolution.parsimony;
 
-import jebl.evolution.trees.Tree;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.sequences.State;
+import jebl.evolution.trees.Tree;
 
 /**
  * @author rambaut

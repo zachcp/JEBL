@@ -7,9 +7,9 @@
 
 package jebl.evolution.substmodel;
 
-import java.io.*;
-
 import jebl.evolution.sequences.SequenceType;
+
+import java.io.Serializable;
 
 /**
  * abstract base class for all rate matrices

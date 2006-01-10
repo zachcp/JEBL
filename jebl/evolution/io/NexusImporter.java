@@ -10,16 +10,20 @@ package jebl.evolution.io;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
+import jebl.evolution.distances.BasicDistanceMatrix;
+import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.sequences.*;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.distances.DistanceMatrix;
-import jebl.evolution.distances.BasicDistanceMatrix;
 
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 
 /**

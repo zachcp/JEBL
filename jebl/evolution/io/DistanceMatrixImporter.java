@@ -2,8 +2,8 @@ package jebl.evolution.io;
 
 import jebl.evolution.distances.DistanceMatrix;
 
-import java.util.List;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut

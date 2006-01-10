@@ -2,12 +2,10 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.util.AttributableHelper;
 
 import java.util.Collections;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Set;
 
 
 /**

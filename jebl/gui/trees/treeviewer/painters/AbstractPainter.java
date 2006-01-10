@@ -1,7 +1,7 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut

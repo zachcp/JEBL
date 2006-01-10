@@ -1,9 +1,11 @@
 package jebl.gui.utils;
 
-import javax.swing.*;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.RescaleOp;
 import java.io.IOException;
 
 

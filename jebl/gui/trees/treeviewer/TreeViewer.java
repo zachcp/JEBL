@@ -18,7 +18,9 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.*;
+import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
+import jebl.gui.trees.treeviewer.painters.Painter;
+import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
 import jebl.gui.utils.IconUtils;
 
 import javax.swing.*;

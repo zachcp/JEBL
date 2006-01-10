@@ -8,9 +8,9 @@
  */
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.Set;
 

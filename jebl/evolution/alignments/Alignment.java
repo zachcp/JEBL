@@ -8,7 +8,9 @@
  */
 package jebl.evolution.alignments;
 
-import jebl.evolution.sequences.*;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.Sequences;
 
 import java.util.List;
 

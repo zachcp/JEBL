@@ -8,8 +8,8 @@
  */
 package jebl.evolution.trees.gui;
 
-import jebl.evolution.trees.RootedTree;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
 
 import javax.swing.*;
 import java.awt.*;

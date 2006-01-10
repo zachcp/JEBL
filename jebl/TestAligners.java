@@ -1,12 +1,12 @@
 package jebl;
 
-import jebl.evolution.align.*;
+import jebl.evolution.align.NeedlemanWunsch;
 import jebl.evolution.align.scores.Blosum45;
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.aligners.pairwise.NeedlemanWunschAligner;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.taxa.Taxon;
 
 /**
  *

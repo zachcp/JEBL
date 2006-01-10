@@ -8,8 +8,8 @@
  */
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Graph;
+import jebl.evolution.graphs.Node;
 
 import java.util.*;
 

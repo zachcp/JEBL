@@ -9,8 +9,8 @@
 package jebl.evolution.alignments;
 
 import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;

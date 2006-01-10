@@ -9,17 +9,20 @@
 
 package jebl.evolution.parsimony;
 
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.Utils;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.alignments.Patterns;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class for reconstructing characters using Fitch parsimony. This is intended to be much faster

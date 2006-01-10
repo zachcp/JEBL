@@ -9,12 +9,10 @@
 
 package jebl.evolution.io;
 
+import jebl.evolution.trees.Tree;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
-
-import jebl.evolution.trees.Tree;
-import jebl.evolution.taxa.Taxon;
 
 /**
  * Interface for importers that do trees

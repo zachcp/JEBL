@@ -1,8 +1,8 @@
 package jebl.evolution.trees;
 
-import jebl.util.AttributableHelper;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.AttributableHelper;
 
 import java.util.*;
 

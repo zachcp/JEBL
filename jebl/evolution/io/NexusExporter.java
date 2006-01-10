@@ -2,18 +2,18 @@ package jebl.evolution.io;
 
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.Utils;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.Writer;
-import java.io.PrintWriter;
 
 /**
  * Created by IntelliJ IDEA.

@@ -9,7 +9,7 @@
 
 package jebl.evolution.sequences;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Interface for sequences data types.

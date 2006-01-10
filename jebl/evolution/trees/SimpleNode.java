@@ -2,9 +2,10 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.util.AttributableHelper;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A simple implementation of Node that is used by SimpleTree.

@@ -1,11 +1,11 @@
 package jebl.gui.trees.treeviewer.decorators;
 
-import jebl.evolution.trees.Tree;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Tree;
 
 import java.awt.*;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Andrew Rambaut

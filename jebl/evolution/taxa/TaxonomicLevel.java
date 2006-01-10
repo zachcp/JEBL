@@ -8,10 +8,10 @@
  */
 package jebl.evolution.taxa;
 
-import java.util.Set;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Andrew Rambaut

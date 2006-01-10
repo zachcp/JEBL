@@ -1,10 +1,13 @@
 package jebl.evolution.sequences;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
+import jebl.evolution.taxa.Taxon;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author rambaut

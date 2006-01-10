@@ -9,7 +9,8 @@
 
 package jebl.util;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for associating attributes with an object.

@@ -2,7 +2,9 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut

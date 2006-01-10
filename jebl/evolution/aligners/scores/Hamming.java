@@ -1,7 +1,7 @@
 package jebl.evolution.aligners.scores;
 
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
 
 /**
  * This is a simple hamming distance score matrix.

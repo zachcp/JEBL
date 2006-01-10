@@ -1,18 +1,18 @@
 package jebl.evolution.io;
 
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 
-import java.io.IOException;
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Andrew Rambaut

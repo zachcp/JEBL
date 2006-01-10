@@ -4,10 +4,12 @@
 
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.*;
+import jebl.evolution.sequences.Sequence;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.List;
 
 /**
  * Class for exporting a fasta file format.

@@ -1,19 +1,19 @@
 package jebl.gui.trees.treeviewer.painters;
 
+import jebl.evolution.trees.RootedTree;
+import jebl.gui.trees.treeviewer.TreePane;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
-import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.utils.RealNumberField;
-import jebl.evolution.trees.RootedTree;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
-import java.util.*;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**

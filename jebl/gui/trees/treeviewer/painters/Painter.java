@@ -2,8 +2,6 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 
-import java.util.List;
-import java.util.Collection;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 

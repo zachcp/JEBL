@@ -2,20 +2,29 @@ package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.*;
-import jebl.gui.trees.treeviewer.controlpanels.*;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SortedRootedTree;
+import jebl.evolution.trees.TransformedRootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.*;
+import jebl.gui.trees.treeviewer.painters.Painter;
+import jebl.gui.trees.treeviewer.painters.PainterListener;
 import jebl.gui.trees.treeviewer.treelayouts.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.geom.*;
-import java.awt.print.*;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.util.*;
 import java.util.List;
 

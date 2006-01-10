@@ -1,12 +1,17 @@
 package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.trees.Tree;
-import jebl.gui.trees.treeviewer.controlpanels.*;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.Controls;
+import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
+import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
