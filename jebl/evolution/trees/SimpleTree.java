@@ -7,68 +7,93 @@ import jebl.util.AttributableHelper;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 6/01/2006
- * Time: 10:40:03
+ * A basic implementation on an unrooted tree.
  *
- * @author joseph
+ * @author Joseph Heled
+ *
  * @version $Id$
  *
  */
-public class SimpleTree  implements Tree {
 
-    public SimpleTree() {
-       }
+public class SimpleTree implements Tree {
 
-       /**
-        * Creates a new external node with the given taxon. See createInternalNode
-        * for a description of how to use these methods.
-        * @param taxon the taxon associated with this node
-        * @return the created node reference
-        */
-       public Node createExternalNode(Taxon taxon) {
-           SimpleNode node = new SimpleNode(taxon);
-           externalNodes.put(taxon, node);
-           return node;
-       }
+    public SimpleTree() {}
 
-       /**
-        * Once a SimpleTree has been created, the node stucture can be created by
-        * calling createExternalNode and createInternalNode. First of all createExternalNode
-        * is called giving Taxon objects for the external nodes. Then these are put into
-        * sets and passed to createInternalNode to create a xxxxxxxxxxxxxxx.
-        *
-        * @param children the child nodes of this nodes
-        * @return the created node reference
-        */
-       public Node createInternalNode(Set<Node> children) {
-           SimpleNode node = new SimpleNode(children);
+    /**
+     * Creates a new external node with the given taxon. See createInternalNode
+     * for a description of how to use these methods.
+     * @param taxon the taxon associated with this node
+     * @return the created node reference
+     */
+    public Node createExternalNode(Taxon taxon) {
+        SimpleNode node = new SimpleNode(taxon);
+        externalNodes.put(taxon, node);
+        return node;
+    }
 
-           internalNodes.add(node);
+    /**
+     * Once a SimpleTree has been created, the node stucture can be created by
+     * calling createExternalNode and createInternalNode. First of all createExternalNode
+     * is called giving Taxon objects for the external nodes. Then these are put into
+     * sets and passed to createInternalNode to create new internal nodes.
+     *
+     * It is the caller responsibility to insure no cycles are created.
+     *
+     * @param children the child nodes of this nodes
+     * @return the created node.
+     */
+    public Node createInternalNode(Set<Node> children) {
+        SimpleNode node = new SimpleNode(children);
 
-           for( Node c : children ) {
-               ((SimpleNode)c).addAdacency(node);
-           }
-           return node;
-       }
+        internalNodes.add(node);
 
-       public void setEdge(Node node1, Node node2, double distance) {
-         edges.put(new HashPair(node1, node2), distance);
-         edges.put(new HashPair(node2, node1), distance);
-       }
+        for( Node c : children ) {
+            ((SimpleNode)c).addAdacency(node);
+        }
+        return node;
+    }
+
+    /**
+     * A mapping between edges and edge length.
+     */
+    Map<HashPair, Double> edges = new HashMap<HashPair, Double>();
+
+    /**
+     * Set edge distance between two nodes.
+     * @param node1
+     * @param node2
+     * @param distance
+     */
+    public void setEdge(Node node1, Node node2, double distance) {
+        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1);
+
+        edges.put(new HashPair<Node>(node1, node2), distance);
+        edges.put(new HashPair<Node>(node2, node1), distance);
+    }
+
+    /**
+     * Add a new edge between two existing nodes.
+     * @param node1
+     * @param node2
+     * @param distance
+     */
+    public void addEdge(Node node1, Node node2, double distance) {
+        assert !getAdjacencies(node1).contains(node2);
+
+        ((SimpleNode)node1).addAdacency(node2);
+        ((SimpleNode)node2).addAdacency(node1);
+        setEdge(node1, node2, distance);
+    }
 
     /* Graph IMPLEMENTATION */
 
     /**
-      * @param node
-      * @return the set of nodes that are attached by edges to the given node.
-      */
-     public Set<Node> getAdjacencies(Node node) {
-         return ((SimpleNode)node).getAdjacencies();
-     }
-
-    Map<HashPair, Double> edges = new HashMap<HashPair, Double>();
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
+    public Set<Node> getAdjacencies(Node node) {
+        return ((SimpleNode)node).getAdjacencies();
+    }
 
     /**
      * @return a set of all nodes that have degree 1.
@@ -94,7 +119,7 @@ public class SimpleTree  implements Tree {
     public Set<Taxon> getTaxa() {
         return new HashSet<Taxon>(externalNodes.keySet());
     }
-     /**
+    /**
      * @param node the node whose associated taxon is being requested.
      * @return the taxon object associated with the given node, or null
      *         if the node is an internal node.
@@ -120,42 +145,41 @@ public class SimpleTree  implements Tree {
         return externalNodes.get(taxon);
     }
 
-     /**
-      * @param node1
-      * @param node2
-      * @return the length of the edge connecting node1 and node2.
-      * @throws jebl.evolution.graphs.Graph.NoEdgeException
-      *          if the nodes are not directly connected by an edge.
-      */
-     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-         Double e = edges.get(new HashPair(node1, node2));
-         if( e == null ) {
-             // not connected
-             throw new NoEdgeException();
-         }
-         return e;
-     }
+    /**
+     * @param node1
+     * @param node2
+     * @return the length of the edge connecting node1 and node2.
+     * @throws NoEdgeException if the nodes are not directly connected by an edge.
+     */
+    public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
+        Double e = edges.get(new HashPair<Node>(node1, node2));
+        if( e == null ) {
+            // not connected
+            throw new NoEdgeException();
+        }
+        return e;
+    }
 
-     /**
-      * @return the set of all nodes in this graph.
-      */
-     public Set<Node> getNodes() {
-         Set<Node> nodes = new HashSet<Node>(internalNodes);
-         nodes.addAll(externalNodes.values());
-         return nodes;
-     }
+    /**
+     * @return the set of all nodes in this graph.
+     */
+    public Set<Node> getNodes() {
+        Set<Node> nodes = new HashSet<Node>(internalNodes);
+        nodes.addAll(externalNodes.values());
+        return nodes;
+    }
 
-     /**
-      * @param degree the number of edges connected to a node
-      * @return a set containing all nodes in this graph of the given degree.
-      */
-     public Set<Node> getNodes(int degree) {
-         Set<Node> nodes = new HashSet<Node>();
-         for (Node node : getNodes()) {
-             if (((SimpleNode)node).getDegree() == degree) nodes.add(node);
-         }
-         return nodes;
-     }
+    /**
+     * @param degree the number of edges connected to a node
+     * @return a set containing all nodes in this graph of the given degree.
+     */
+    public Set<Node> getNodes(int degree) {
+        Set<Node> nodes = new HashSet<Node>();
+        for (Node node : getNodes()) {
+            if (((SimpleNode)node).getDegree() == degree) nodes.add(node);
+        }
+        return nodes;
+    }
 
     // Attributable IMPLEMENTATION
 

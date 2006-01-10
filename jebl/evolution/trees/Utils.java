@@ -234,11 +234,6 @@ public final class Utils {
 
       try {
           HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
-           /* for( Node e : tree.getExternalNodes() ) {
-                for( Node n : tree.getAdjacencies(e) ) {
-                    dist(tree, e, n, dists);
-                }
-            }*/
 
             double minOfMaxes = Double.MAX_VALUE;
             HashPair<Node> best = null;
@@ -260,7 +255,6 @@ public final class Utils {
                 }
             }
 
-
             Node second = null;
             double distToSecond = -Double.MAX_VALUE;
             for( Node n : tree.getAdjacencies(best.first) ) {
@@ -273,12 +267,13 @@ public final class Utils {
                 }
             }
 
-            if( Graph.Utils.getDegree(tree, best.first) < 3  || Graph.Utils.getDegree(tree, second) < 3 ) {
+            double d = (minOfMaxes - distToSecond) / 2;
+            if( d >= tree.getEdgeLength(best.first, best.second) ||
+                Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) < 3 ) {
                return new RootedFromUnrooted(tree, best.first);
             }
 
-            double d = (minOfMaxes - distToSecond) / 2;
-            return new RootedFromUnrooted(tree, best.first, second, d);
+            return new RootedFromUnrooted(tree, best.first, best.second, d);
        } catch (Graph.NoEdgeException e1) {
             return null; // bug
        }

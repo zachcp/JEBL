@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 abstract class ClusteringTreeBuilder {
-    private SimpleTree tree;
+    protected SimpleTree tree;
 
     /**
      * constructor ClusteringTree
@@ -54,10 +54,15 @@ abstract class ClusteringTreeBuilder {
         return tree;
     }
 
-    // Find next two clusters to join. set shared best{i,j} and ab{i,j}
+    /**
+     * Find next two clusters to join. set shared best{i,j} and ab{i,j}
+     */
     protected abstract void findNextPair();
 
-    // [besti - dist , bestj dist]
+    /**
+     * compute branch distances to new internal node
+     * @return [besti - dist , bestj dist]
+     */
     protected abstract double[] newNodeDistance();
 
     /**

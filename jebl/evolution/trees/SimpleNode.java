@@ -19,17 +19,29 @@ import java.util.Set;
  */
 class SimpleNode extends BaseNode {
 
+    /**
+     * A tip having a taxon
+     * @param taxon
+     */
     public SimpleNode(Taxon taxon) {
         this.adjacencies = Collections.emptySet();
         this.taxon = taxon;
     }
 
+    /**
+     * An internal node.
+     * @param adjacencies set of adjacent noeds
+     */
     public SimpleNode(Set<Node> adjacencies) {
         this.adjacencies = Collections.unmodifiableSet(adjacencies);
         this.taxon = null;
     }
 
-    public void addAdacency(SimpleNode node) {
+    /**
+     * Add an adjacency.
+     * @param node
+     */
+    public void addAdacency(Node node) {
         Set<Node> a = new HashSet<Node>(adjacencies);
         a.add(node);
         adjacencies = a;

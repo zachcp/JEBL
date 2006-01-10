@@ -11,7 +11,7 @@ import jebl.evolution.distances.DistanceMatrix;
  * @author Alexei Drummond
  * @author Joseph Heled
  *
- * Adapted from Alexei Drummond BEAST code.
+ * Adapted from BEAST code.
  */
 
 class UPGMATreeBuilder extends ClusteringTreeBuilder {

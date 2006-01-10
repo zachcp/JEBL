@@ -85,5 +85,4 @@ class SimpleRootedNode extends BaseNode {
     private Node parent;
     private double height;
     private double length;
-
 }

@@ -72,5 +72,4 @@ public interface Pattern {
 	 * @return the frequency
 	 */
 	double getStateFrequency(State state);
-
 }

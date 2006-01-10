@@ -16,17 +16,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 10/01/2006
- * Time: 11:16:13
- *
- * @author joseph
- * @version $Id$
- *
  * Export sequences and trees to Nexus format.
  *
+ * @author Joseph Heled
+ *
+ * @version $Id$
  */
+
 public class NexusExporter implements SequenceExporter {
     /**
      *

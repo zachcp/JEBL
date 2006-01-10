@@ -6,17 +6,14 @@ import jebl.evolution.taxa.Taxon;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 9/01/2006
- * Time: 10:50:35
+ * Root an unrooted tree. This class works as a wrapper over any tree which roots the tree. There are two
+ * constructors, one which roots the tree at any internal node, the other roots the tree between any two
+ * internal nodes. Be aware that rooting between nodes where one of them has less than 3 adjacencies may
+ * be problematic when convering back from the newick format.
  *
- * @author joseph
+ * @author Joseph Heled
+ *
  * @version $Id$
- *
- * A wrapper over any tree which roots the tree. There are two constructors, one which roots the tree at
- * any internal node, the other roots the tree between any two internal nodes. Be aware that rooting between nodes
- * where one of them has less than 3 adjacencies may be problematic when convering back from the newick format.
  *
  */
 

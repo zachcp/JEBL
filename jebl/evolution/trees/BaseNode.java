@@ -15,7 +15,7 @@ import java.util.Set;
  * Date: 7/01/2006
  * Time: 07:26:35
  *
- * @author joseph
+ * @author Joseph Heled
  * @version $Id$
  *
  */

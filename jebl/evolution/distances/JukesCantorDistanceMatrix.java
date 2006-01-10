@@ -5,26 +5,27 @@ import jebl.evolution.alignments.Pattern;
 import jebl.evolution.sequences.State;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 10/01/2006
- * Time: 16:02:44
+ * Compute jukes-cantor corrected distance matrix for a set of aligned sequences.
+ * Adapted from BEAST code by joseph.
  *
- * @author joseph
+ * @author Andrew Rambaut
+ * @author Korbinian Strimmer
+ * @author Joseph Heled
+ *
  * @version $Id$
- *          To change this template use File | Settings | File Templates.
  */
+
 public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
     public JukesCantorDistanceMatrix(Alignment alignment) {
-        super(alignment.getTaxa(), getDist(alignment));
+        super(alignment.getTaxa(), getDistances(alignment));
     }
 
     // Helpers during construction
     private static double const1;
     private static double const2;
     private static Alignment alignment;
-    public static final double MAX_DISTANCE = 1000.0;
+    private static final double MAX_DISTANCE = 1000.0;
 
     /**
      * Calculate number of substitution between sequences as a ratio.
@@ -55,33 +56,31 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
 
     /**
-     * Calculate a pairwise distance
+     * Calculate a pairwise distance between the i'th and j'th taxons/sequences
      */
-    static private double calculatePairwiseDistance( int i, int j) {
-        double obsDist = anySubstitutionRatio(i, j);
+    static private double calculatePairwiseDistance(int taxon1, int taxon2) {
+        double obsDist = anySubstitutionRatio(taxon1, taxon2);
 
         if (obsDist == 0.0) return 0.0;
 
+        // protect against log(negative number)
         if (obsDist >= const1) {
             return MAX_DISTANCE;
         }
 
         double expDist = -const1 * Math.log(1.0 - (const2 * obsDist));
 
-        if (expDist < MAX_DISTANCE) {
-            return expDist;
-        } else {
-            return MAX_DISTANCE;
-        }
+        return Math.min(expDist, MAX_DISTANCE);
     }
 
-    static double[][] getDist(Alignment alignment) {
+    synchronized static double[][] getDistances(Alignment alignment) {
         JukesCantorDistanceMatrix.alignment = alignment;
 
-        int stateCount = alignment.getSequenceType().getStateCount();
+        // ASK Alexei
+        int stateCount = alignment.getSequenceType().getCanonicalStateCount(); // getStateCount();
 
         const1 = ((double)stateCount - 1) / stateCount;
-        const2 = ((double)stateCount) / (stateCount - 1) ;
+        const2 = 1.0/const1; // ((double)stateCount) / (stateCount - 1) ;
 
         int dimension = alignment.getTaxa().size();
         double[][] distances = new double[dimension][dimension];
@@ -91,8 +90,8 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
                 distances[i][j] = calculatePairwiseDistance(i, j);
                 distances[j][i] = distances[i][j];
             }
-
         }
+
         return distances;
     }
 }

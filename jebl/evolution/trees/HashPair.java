@@ -1,16 +1,13 @@
 package jebl.evolution.trees;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 9/01/2006
- * Time: 16:46:23
+ * A pair suitable for use in a HashMap.
  *
- * @author joseph
+ * @author Joseph Heled
+ *
  * @version $Id$
- *
- *  A pair suitable for use in a HashMap.
  */
+
 class HashPair<T> {
     HashPair(T a, T b) {
         first = a;
