@@ -15,6 +15,7 @@ import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.controlpanels.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.*;
@@ -98,7 +99,11 @@ public class TreeViewer extends JPanel {
     }
 
     public void setTree(Tree tree, int defaultLabelSize) {
-        this.tree = (RootedTree)tree;
+        if( tree instanceof RootedTree ) {
+          this.tree = (RootedTree)tree;
+        } else {
+            this.tree = Utils.rootTheTree(tree);
+        }
 
         treePane.setTree(this.tree);
 

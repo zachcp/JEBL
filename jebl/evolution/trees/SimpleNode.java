@@ -16,7 +16,7 @@ import java.util.*;
  * @version $Id$
  *
  */
-class SimpleNode extends Node {
+class SimpleNode extends BaseNode {
 
     public SimpleNode(Taxon taxon) {
         this.adjacencies = Collections.emptySet();
@@ -26,6 +26,12 @@ class SimpleNode extends Node {
     public SimpleNode(Set<Node> adjacencies) {
         this.adjacencies = Collections.unmodifiableSet(adjacencies);
         this.taxon = null;
+    }
+
+    public void addAdacency(SimpleNode node) {
+        Set<Node> a = new HashSet<Node>(adjacencies);
+        a.add(node);
+        adjacencies = a;
     }
 
     public Taxon getTaxon() {
@@ -40,39 +46,7 @@ class SimpleNode extends Node {
         return adjacencies;
     }
 
-    // Attributable IMPLEMENTATION
-
-    public void setAttribute(String name, Object value) {
-        if (helper == null) {
-            helper = new AttributableHelper();
-        }
-        helper.setAttribute(name, value);
-    }
-
-    public Object getAttribute(String name) {
-        if (helper == null) {
-            return null;
-        }
-        return helper.getAttribute(name);
-    }
-
-    public Set<String> getAttributeNames() {
-        if (helper == null) {
-            return Collections.emptySet();
-        }
-        return helper.getAttributeNames();
-    }
-
-    public Map<String, Object> getAttributeMap() {
-        if (helper == null) {
-            return Collections.emptyMap();
-        }
-        return helper.getAttributeMap();
-    }
-
     // PRIVATE members
-    private AttributableHelper helper = null;
-    private final Set<Node> adjacencies;
+    private Set<Node> adjacencies;
     private final Taxon taxon;
-
 }

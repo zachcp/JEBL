@@ -47,12 +47,15 @@ public class SimpleTree  implements Tree {
 
            internalNodes.add(node);
 
+           for( Node c : children ) {
+               ((SimpleNode)c).addAdacency(node);
+           }
            return node;
        }
 
-       public void SetEdge(Node node1, Node node2, double distance) {
-         edges.put(new Pair(node1, node2), distance);
-         edges.put(new Pair(node2, node1), distance);
+       public void setEdge(Node node1, Node node2, double distance) {
+         edges.put(new HashPair(node1, node2), distance);
+         edges.put(new HashPair(node2, node1), distance);
        }
 
     /* Graph IMPLEMENTATION */
@@ -65,17 +68,7 @@ public class SimpleTree  implements Tree {
          return ((SimpleNode)node).getAdjacencies();
      }
 
-    private class Pair {
-        Pair(Node a, Node b) {
-            one = a;
-            two = b;
-        }
-        public final Node one;
-        public final Node two;
-    }
-
-    Map<Pair, Double> edges = new HashMap<Pair, Double>();
-
+    Map<HashPair, Double> edges = new HashMap<HashPair, Double>();
 
     /**
      * @return a set of all nodes that have degree 1.
@@ -135,12 +128,12 @@ public class SimpleTree  implements Tree {
       *          if the nodes are not directly connected by an edge.
       */
      public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-         Double e = edges.get(new Pair(node1, node2));
+         Double e = edges.get(new HashPair(node1, node2));
          if( e == null ) {
-         // not connected
-         throw new NoEdgeException();
+             // not connected
+             throw new NoEdgeException();
          }
-          return e;
+         return e;
      }
 
      /**

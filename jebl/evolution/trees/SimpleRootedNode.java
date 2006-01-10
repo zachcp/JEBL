@@ -20,7 +20,7 @@ import java.util.Map;
  * @version $Id$
  *
  */
-class SimpleRootedNode extends Node {
+class SimpleRootedNode extends BaseNode {
     public SimpleRootedNode(Taxon taxon) {
         this.children = Collections.emptySet();
         this.taxon = taxon;
@@ -80,38 +80,6 @@ class SimpleRootedNode extends Node {
     public Taxon getTaxon() {
         return taxon;
     }
-
-    public void setAttribute(String name, Object value) {
-        if (helper == null) {
-            helper = new AttributableHelper();
-        }
-        helper.setAttribute(name, value);
-    }
-
-    public Object getAttribute(String name) {
-        if (helper == null) {
-            return null;
-        }
-        return helper.getAttribute(name);
-    }
-
-    public Set<String> getAttributeNames() {
-        if (helper == null) {
-            return Collections.emptySet();
-        }
-        return helper.getAttributeNames();
-    }
-
-    public Map<String, Object> getAttributeMap() {
-        if (helper == null) {
-            return Collections.emptyMap();
-        }
-        return helper.getAttributeMap();
-    }
-
-    // PRIVATE members
-
-    private AttributableHelper helper = null;
 
     private final Set<Node> children;
     private final Taxon taxon;

@@ -375,5 +375,4 @@ public class SimpleRootedTree implements RootedTree {
 
     private boolean hasHeights = false;
     private boolean hasLengths = false;
-
 }

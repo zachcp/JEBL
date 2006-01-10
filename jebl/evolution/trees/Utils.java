@@ -9,6 +9,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Graph;
 
 import java.util.*;
 
@@ -28,7 +29,7 @@ public final class Utils {
      */
     public static String toNewick(RootedTree tree) {
         StringBuffer buffer = new StringBuffer();
-        toNewick(tree,tree.getRootNode(), buffer);
+        toNewick(tree, tree.getRootNode(), buffer);
         return buffer.toString();
     }
 
@@ -45,12 +46,14 @@ public final class Utils {
                 buffer.append(',');
             }
             toNewick(tree, children.get(children.size()-1), buffer);
-            buffer.append("):");
-            double edgeLength = 0.0;
-            if (tree.getParent(node) != null) {
-                edgeLength = tree.getLength(node);
+            buffer.append(")");
+
+            Node parent = tree.getParent(node);
+            // Don't write root length. This is ignored elsewhere and the nexus importer fails
+            // whet it is present.
+            if( parent != null ) {
+                buffer.append( ":" + tree.getLength(node) );
             }
-            buffer.append(edgeLength);
         }
     }
 
@@ -99,8 +102,8 @@ public final class Utils {
          }
          // one empty line between sub trees
          tot += children.size() - 1;
-         int ltop = a.get(0).length;
-         int lbot = a.get(a.size()-1).length;
+         //int ltop = a.get(0).length;
+         //int lbot = a.get(a.size()-1).length;
 
          ArrayList<String> x = new ArrayList<String>(tot);
          for(int i = 0; i < a.size(); ++i) {
@@ -136,6 +139,7 @@ public final class Utils {
          return b.toString();
      }
 
+    // NUmber of branches from node to most remote tip.
     private static int nodeDistance(final RootedTree tree, final Node node) {
         if( tree.isExternal(node) ) {
             return 0;
@@ -148,7 +152,7 @@ public final class Utils {
         return d + 1;
     }
 
-    private static double safeTreeHeight(RootedTree tree) {
+    private static double safeTreeHeight(final RootedTree tree) {
         final Node root = tree.getRootNode();
         if( tree.hasHeights() )  {
             return tree.getHeight(root);
@@ -156,30 +160,129 @@ public final class Utils {
         return nodeDistance(tree, root);
     }
 
-     public static String[] asText(RootedTree tree, int widthGuide) {
-         Node root = tree.getRootNode();
-         double[] bounds = new double[2];
-         bounds[0] = java.lang.Double.MAX_VALUE;
-         bounds[1] = -1;
+    public static String[] asText(Tree tree, int widthGuide) {
+        RootedTree rtree = null;
+        if( tree instanceof RootedTree ) {
+            rtree = (RootedTree)tree;
+        } else {
+           rtree = rootTheTree(tree);
+        }
 
-         branchesMinMax(tree, root, bounds);
-         double lowBound = 2 / bounds[0];
-         double treeHeight = safeTreeHeight(tree);
-         double treeHieghtWithLowBound = treeHeight * lowBound;
+        Node root = rtree.getRootNode();
+        double[] bounds = new double[2];
+        bounds[0] = java.lang.Double.MAX_VALUE;
+        bounds[1] = -1;
 
-         double scale;
-         if( treeHieghtWithLowBound > widthGuide ) {
+        branchesMinMax(rtree, root, bounds);
+        double lowBound = 2 / bounds[0];
+        double treeHeight = safeTreeHeight(rtree);
+        double treeHieghtWithLowBound = treeHeight * lowBound;
+
+        double scale;
+        if( treeHieghtWithLowBound > widthGuide ) {
             scale = widthGuide / treeHeight;
-         } else {
+        } else {
             lowBound = (5 / bounds[0]);
             if( treeHeight * lowBound <= widthGuide ) {
                 scale = lowBound;
             } else {
                 scale = widthGuide / treeHeight;
             }
-         }
-         return asText(tree, root, scale);
-     }
+        }
+        return asText(rtree, root, scale);
+    }
+
+    private static double dist(Tree tree, Node root, Node node, Map<HashPair<Node>,Double> dists) throws Graph.NoEdgeException {
+        HashPair<Node> p = new HashPair<Node>(root, node);
+        if( dists.containsKey(p) ) {
+            return dists.get(p);
+        }
+
+        // assume positive branches
+        double maxDist = 0;
+        for( Node n : tree.getAdjacencies(node) ) {
+          if( n != root ) {
+              //Pair p = new Pair(node, n);
+              //if( dists.containsKey(p) ) {
+              //    continue;
+             // }
+
+             double d = dist(tree, node, n, dists);
+             maxDist = Math.max(maxDist, d);
+          }
+        }
+        double dist =  tree.getEdgeLength(node, root) + maxDist;
+        dists.put(p, dist);
+        return dist;
+    }
+
+     /*         for( Node n1 : tree.getAdjacencies(n) ) {
+                  if( n1 != n ) {
+                      Pair p1 = new Pair(n1, n);
+                      if( ! dists.containsKey(p1) ) {
+                         dist(tree, n1, n, dists);
+                      }
+                      maxDist = Math.max(maxDist, dists.get(p1));
+                  }
+              }
+              dists.put(p, tree.getEdgeLength(node, n) + maxDist);
+          }
+        }
+    }
+*/
+    public static RootedTree rootTheTree(Tree tree) {
+
+      try {
+          HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
+           /* for( Node e : tree.getExternalNodes() ) {
+                for( Node n : tree.getAdjacencies(e) ) {
+                    dist(tree, e, n, dists);
+                }
+            }*/
+
+            double minOfMaxes = Double.MAX_VALUE;
+            HashPair<Node> best = null;
+            for( Node i : tree.getInternalNodes() ) {
+                double maxDist = Double.MIN_VALUE;
+                HashPair<Node> maxDirection = null;
+                for( Node n : tree.getAdjacencies(i) ) {
+                    HashPair<Node> p = new HashPair<Node>(i, n);
+                    double d = dist(tree, p.first, p.second, dists); // dists.get(p);
+                    if( maxDist < d ) {
+                       maxDist = d;
+                       maxDirection = p;
+                    }
+                }
+
+                if( maxDist < minOfMaxes ) {
+                    minOfMaxes = maxDist;
+                    best = maxDirection;
+                }
+            }
+
+
+            Node second = null;
+            double distToSecond = -Double.MAX_VALUE;
+            for( Node n : tree.getAdjacencies(best.first) ) {
+                if( n != best.second ) {
+                    double d1 = dists.get(new HashPair<Node>(best.first, n));
+                    if( d1 > distToSecond ) {
+                        distToSecond = d1;
+                        second = n;
+                    }
+                }
+            }
+
+            if( Graph.Utils.getDegree(tree, best.first) < 3  || Graph.Utils.getDegree(tree, second) < 3 ) {
+               return new RootedFromUnrooted(tree, best.first);
+            }
+
+            double d = (minOfMaxes - distToSecond) / 2;
+            return new RootedFromUnrooted(tree, best.first, second, d);
+       } catch (Graph.NoEdgeException e1) {
+            return null; // bug
+       }
+    }
 
     /**
      * @param tree the tree
@@ -265,7 +368,7 @@ public final class Utils {
             }
 
             public boolean equals(Node node1, Node node2) {
-	            return compare(node1, node2) == 0;
+                return compare(node1, node2) == 0;
             }
         };
     }
