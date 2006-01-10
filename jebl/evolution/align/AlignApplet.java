@@ -2,9 +2,9 @@ package jebl.evolution.align;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * @author Alexei Drummond

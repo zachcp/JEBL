@@ -1,10 +1,8 @@
 package jebl.evolution.aligners.pairwise;
 
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.alignments.Alignment;
 import jebl.evolution.aligners.Aligner;
-
-import java.util.Collection;
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
 
 /**
  * @author Andrew Rambaut

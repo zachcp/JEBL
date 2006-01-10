@@ -1,17 +1,17 @@
 package jebl.evolution.align;
 
-import jebl.evolution.align.scores.*;
-import jebl.evolution.align.gui.TracebackPlot;
 import jebl.evolution.align.gui.FastaPanel;
 import jebl.evolution.align.gui.TracebackPanel;
+import jebl.evolution.align.gui.TracebackPlot;
+import jebl.evolution.align.scores.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.StringWriter;
+import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 
 /**

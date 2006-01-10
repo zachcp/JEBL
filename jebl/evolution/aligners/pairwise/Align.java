@@ -24,7 +24,9 @@ import jebl.evolution.aligners.scores.Blosum45;
 import jebl.evolution.aligners.scores.Scores;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
-import jebl.evolution.sequences.*;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
 
 import java.io.PrintStream;

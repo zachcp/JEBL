@@ -1,6 +1,8 @@
 package jebl.evolution.align;
 
-import jebl.evolution.align.scores.*;
+import jebl.evolution.align.scores.Scores;
+import jebl.evolution.align.scores.ScoresFactory;
+
 import java.io.*;
 
 /**

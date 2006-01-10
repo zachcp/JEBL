@@ -1,12 +1,13 @@
 package jebl.evolution.align.gui;
 
 import javax.swing.*;
-import java.util.*;
-import java.util.List;
+import java.awt.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  *

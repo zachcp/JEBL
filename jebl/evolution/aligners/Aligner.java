@@ -1,7 +1,7 @@
 package jebl.evolution.aligners;
 
-import jebl.evolution.sequences.Sequence;
 import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
 
 import java.util.Collection;
 

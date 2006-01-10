@@ -2,8 +2,8 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexei Drummond

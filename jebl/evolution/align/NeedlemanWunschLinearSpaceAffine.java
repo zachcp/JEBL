@@ -2,14 +2,7 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.SequenceTester;
-import jebl.evolution.taxa.Taxon;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 // uses linear space.

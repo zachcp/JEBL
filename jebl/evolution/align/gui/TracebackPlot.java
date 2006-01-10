@@ -1,15 +1,15 @@
 package jebl.evolution.align.gui;
 
-import jebl.evolution.align.TracebackPlotter;
 import jebl.evolution.align.Traceback;
+import jebl.evolution.align.TracebackPlotter;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexei Drummond
