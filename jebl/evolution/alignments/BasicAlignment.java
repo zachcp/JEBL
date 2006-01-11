@@ -35,7 +35,7 @@ public class BasicAlignment implements Alignment {
      * objects are not copied.
      * @param sequences
      */
-    public BasicAlignment(Collection<Sequence> sequences) {
+    public BasicAlignment(Collection<? extends Sequence> sequences) {
         for (Sequence sequence : sequences) {
             put(sequence);
         }

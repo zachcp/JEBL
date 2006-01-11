@@ -22,8 +22,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
     }
 
     // Helpers during construction
-    private static double const1;
-    private static double const2;
+    private static double maxTheoreticalSubsRate;
     private static Alignment alignment;
     private static final double MAX_DISTANCE = 1000.0;
 
@@ -31,17 +30,15 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
      * Calculate number of substitution between sequences as a ratio.
      */
     static private double anySubstitutionRatio(int taxon1, int taxon2) {
-
-        double weight, distance;
+        double distance;
         double sumDistance = 0.0;
         double sumWeight = 0.0;
 
         for( Pattern pattern : alignment.getPatterns() ) {
-
             State state1 = pattern.getState(taxon1);
             State state2 = pattern.getState(taxon2);
 
-            weight = pattern.getWeight();
+            final double weight = pattern.getWeight();
 
             if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
                 sumDistance += weight;
@@ -64,11 +61,11 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         if (obsDist == 0.0) return 0.0;
 
         // protect against log(negative number)
-        if (obsDist >= const1) {
+        if (obsDist >= maxTheoreticalSubsRate) {
             return MAX_DISTANCE;
         }
 
-        double expDist = -const1 * Math.log(1.0 - (const2 * obsDist));
+        double expDist = -maxTheoreticalSubsRate * Math.log(1.0 - ((1/maxTheoreticalSubsRate) * obsDist));
 
         return Math.min(expDist, MAX_DISTANCE);
     }
@@ -79,8 +76,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         // ASK Alexei
         int stateCount = alignment.getSequenceType().getCanonicalStateCount(); // getStateCount();
 
-        const1 = ((double)stateCount - 1) / stateCount;
-        const2 = 1.0/const1; // ((double)stateCount) / (stateCount - 1) ;
+        maxTheoreticalSubsRate = ((double)stateCount - 1) / stateCount;
 
         int dimension = alignment.getTaxa().size();
         double[][] distances = new double[dimension][dimension];
