@@ -552,87 +552,90 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private List<Sequence> readSequenceData(List<Taxon> taxonList) throws ImportException, IOException
 	{
-		int i;
 		String firstSequence = null;
+        List<Sequence> sequences = new ArrayList<Sequence>();
 
-		List<Sequence> sequences = new ArrayList<Sequence>();
+        if (isInterleaved) {
+            List<String> sequencesData = new ArrayList<String>(taxonCount);
+            List<Taxon> taxons =  new ArrayList<Taxon>();
+            List<Taxon> taxList =  (taxonList != null) ? taxonList : taxons;
 
-		if (isInterleaved) {
+            int[] charsRead = new int[taxonCount];
+            for (int i = 0; i < taxonCount; i++) {
+               sequencesData.add("");
+               charsRead[i] = 0;
+            }
+            //throw new ImportException.UnparsableDataException("At present, interleaved data is not parsable");
+			boolean firstLoop = true;
 
-			throw new ImportException.UnparsableDataException("At present, interleaved data is not parsable");
-//			boolean firstLoop = true;
-//
-//			int readCount = 0;
-//			while (readCount < siteCount) {
-//
-//				n = -1;
-//
-//				for (i = 0; i < taxonCount; i++) {
-//
-//					String token = helper.readToken();
-//
-//					Sequence sequence;
-//
-//					if (firstLoop) {
-//
-//						Taxon taxon = Taxon.getTaxon(token);
-//
-//						if (taxonList != null && !taxonList.contains(taxon)) {
-//							// taxon not found in taxon list...
-//							// ...perhaps it is a numerical taxon reference?
-//							throw new ImportException.UnknownTaxonException(token);
-//						}
-//
-//						sequence.setTaxon(taxon);
-//
-//					} else {
-//
-//						sequence = sequences.getSequence(i);
-//						Taxon taxon = sequence.getTaxon();
-//						if (!taxon.getId().equals(token)) {
-//							throw new ImportException.UnknownTaxonException("Unknown taxon label: expecting '" +
-//								taxon.getId() + "', found '" + token + "'");
-//						}
-//					}
-//
-//					StringBuffer buffer = new StringBuffer();
-//					helper.readSequenceLine(buffer, sequenceType, ";", gapCharacters, missingCharacters,
-//										matchCharacters, firstSequence);
-//					String seqString = buffer.toString();
-//					sequence.appendSequenceString(seqString);
-//					if (i == 0) {
-//						firstSequence = seqString;
-//					}
-//
-//					if (helper.getLastDelimiter() == ';') {
-//						if (i < taxonCount - 1) {
-//							throw new ImportException.TooFewTaxaException();
-//						}
-//						if (readCount + n < siteCount) {
-//							throw new ImportException.ShortSequenceException(sequence.getTaxon().getId());
-//						}
-//					}
-//
-//					if (n == -1) {
-//						n = seqString.length();
-//					}
-//
-//					if (n != seqString.length()) {
-//						throw new ImportException.ShortSequenceException(sequence.getTaxon().getId());
-//					}
-//				}
-//
-//				firstLoop = false;
-//				readCount += n;
-//
-//			}
-//			if (helper.getLastDelimiter() != ';') {
-//				throw new ImportException.BadFormatException("Expecting ';' after sequences data");
-//			}
+			int readCount = 0;
+			while (readCount < siteCount * taxonCount) {
 
-		} else {
+				for (int i = 0; i < taxonCount; i++) {
 
-			for (i = 0; i < taxonCount; i++) {
+					String token = helper.readToken();
+
+                    int sequenceIndex;
+                    Taxon taxon = Taxon.getTaxon(token);
+                    if (firstLoop) {
+                        if (taxonList != null ) {
+                            sequenceIndex = taxonList.indexOf(taxon);
+                        } else {
+                            sequenceIndex = taxons.size();
+                            taxons.add(taxon);
+                        }
+                    } else {
+                        sequenceIndex = taxList.indexOf(taxon);
+                    }
+
+                    if( sequenceIndex < 0 ) {
+                        // taxon not found in taxon list...
+                        // ...perhaps it is a numerical taxon reference?
+                        throw new ImportException.UnknownTaxonException("Unexpected taxon:" + token
+                                + " (expecting " + taxList.get(i).getName() + ")");
+                    }
+
+					StringBuffer buffer = new StringBuffer();
+
+                    helper.readSequenceLine(buffer, sequenceType, ";", gapCharacters, missingCharacters,
+										    matchCharacters, firstSequence);
+
+                    String seqString = buffer.toString();
+                    readCount += seqString.length();
+                    charsRead[sequenceIndex] += seqString.length();
+
+                    sequencesData.set(sequenceIndex, sequencesData.get(sequenceIndex).concat(seqString));
+					if (i == 0) {
+					   firstSequence = seqString;
+					}
+
+					if (helper.getLastDelimiter() == ';') {
+						if (i < taxonCount - 1) {
+							throw new ImportException.TooFewTaxaException();
+						}
+                        for (int k = 0; k < taxonCount; k++) {
+                          if (charsRead[k] != siteCount) {
+                            throw new ImportException.ShortSequenceException(taxList.get(k).getName());
+                          }
+                        }
+                    }
+				}
+
+				firstLoop = false;
+			}
+
+            if (helper.getLastDelimiter() != ';') {
+				throw new ImportException.BadFormatException("Expecting ';' after sequences data");
+			}
+
+            for (int k = 0; k < taxonCount; k++) {
+              Sequence sequence = new BasicSequence(sequenceType, taxList.get(k), sequencesData.get(k));
+		      sequences.add(sequence);
+            }
+
+        } else {
+
+			for (int i = 0; i < taxonCount; i++) {
 				String token = helper.readToken();
 
 				Taxon taxon = Taxon.getTaxon(token);
@@ -645,7 +648,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 				StringBuffer buffer = new StringBuffer();
 				helper.readSequence(buffer, sequenceType, ";", siteCount, gapCharacters,
-								missingCharacters, matchCharacters, firstSequence);
+								    missingCharacters, matchCharacters, firstSequence);
 				String seqString = buffer.toString();
 
 				if (seqString.length() != siteCount) {
