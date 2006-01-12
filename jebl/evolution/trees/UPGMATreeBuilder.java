@@ -15,7 +15,7 @@ import jebl.evolution.distances.DistanceMatrix;
  */
 
 class UPGMATreeBuilder extends ClusteringTreeBuilder {
-
+     // want a rooted tree
     /**
      * constructor UPGMA tree
      *
