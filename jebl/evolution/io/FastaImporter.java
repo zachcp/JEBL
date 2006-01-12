@@ -31,6 +31,7 @@ public class FastaImporter implements SequenceImporter {
 	 */
 	public FastaImporter(Reader reader, SequenceType sequenceType) {
         helper = new ImportHelper(reader);
+        helper.setCommentDelimiters(';');
         this.sequenceType = sequenceType;
 	}
 
@@ -54,11 +55,18 @@ public class FastaImporter implements SequenceImporter {
                 StringTokenizer tokenizer = new StringTokenizer(line, " \t");
                 String name = tokenizer.nextToken();
 
-				StringBuffer seq = new StringBuffer();
+                String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
+
+                StringBuffer seq = new StringBuffer();
 				helper.readSequence(seq, sequenceType, ">", Integer.MAX_VALUE, "-", "?", "", null);
 				ch = helper.getLastDelimiter();
 
-				sequences.add(new BasicSequence(sequenceType, Taxon.getTaxon(name), seq.toString()));
+                Taxon taxon = Taxon.getTaxon(name);
+                if( description != null && description.length() > 0 ) {
+                  taxon.setAttribute("description", description);
+                }
+
+                sequences.add(new BasicSequence(sequenceType, taxon, seq.toString()));
 
 			} while(ch == '>');
 
