@@ -983,10 +983,17 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	                tree = new SimpleRootedTree();
 	                readInternalNode(tree);
 
-// At present, trees don't have ids:
-//                    tree.setId(token2);
+                    // save name as attribute
+                    tree.setAttribute("name", token2);
 
-                    if (helper.getLastDelimiter() != ';') {
+                    int last = helper.getLastDelimiter();
+                    if( last == ':' ) {
+                        // root length - discard for now
+                        double rootLength = helper.readDouble(";");
+                        last = helper.getLastDelimiter();
+                    }
+
+                    if (last != ';') {
                         throw new ImportException.BadFormatException("Expecting ';' after tree, '" + token2 + "', TREE command of TREES block");
                     }
 
