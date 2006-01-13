@@ -39,4 +39,32 @@ public abstract class Scores implements ScoreMatrix {
         String name = getClass().getName();
         return name.substring(name.lastIndexOf(".")+1);
     }
+
+    public static Scores duplicate(Scores scores){
+        Scores result = null;
+        if(scores instanceof AminoAcidScores)
+            result =new AminoAcidScores();
+        else
+            result =new NucleotideScores();
+        result.score = new float[127][127];
+        for (int i = 0; i < 127; i++) {
+            for (int j = 0; j < 127; j++) {
+                result.score[i][j]= scores.score[i][j];
+            }
+
+        }
+        return result;
+    }
+
+    public static Scores includeGaps(Scores scores, float gapCost) {
+        Scores result =duplicate(scores);
+        String states = scores.getAlphabet();
+        for (int i = 0; i < states.length(); i++) {
+            char res1 = states.charAt(i);
+            result.score['-'] [res1] = gapCost;
+            result.score[res1]['-'] = gapCost;
+
+        }
+        return result;
+    }
 }

@@ -15,7 +15,10 @@ public class NeedlemanWunschAffine extends AlignAffine {
 	 * @param sq2
 	 */
     public void doAlignment(String sq1, String sq2) {
-        doAlignment (sq1,sq2, TYPE_ANY, TYPE_ANY);
+        this.seq1 =sq1;
+        this.seq2=sq2;
+
+        doAlignment (sq1, sq2, TYPE_ANY, TYPE_ANY);
         //the type_... parameters should generally only be used by the
         //NeedlemanWunschLinearSpaceAffine algorithm to handle it's base
         //recursion case.
@@ -51,14 +54,30 @@ public class NeedlemanWunschAffine extends AlignAffine {
         allocateMatrices (n,m);
     }
 
-    public void doAlignment(String sq1, String sq2, int startType, int endType) {
+    public void doAlignment(String sequence1, String sequence2, int startType, int endType) {
+        this.seq1 = sequence1;
+        this.seq2 = sequence2;
+        doAlignment(new Profile(0,sequence1), new Profile(0,sequence2),0, 0, sequence1.length(), sequence2.length(), startType, endType);
 
-    	prepareAlignment(sq1, sq2);
+    }
+    public void doAlignment(Profile sequence1 , Profile sequence2, int offset1, int offset2, int n, int m,int startType, int endType) {
+//        n = sequence1.length;
+//        m = sequence2.length;
+        this.n=n;
+        this.m=m;
 
-        char[] s1 = sq1.toCharArray();
-        char[] s2 = sq2.toCharArray();
+//        this.seq1 = sq1;
+//        this.seq2 = sq2;
 
-        int n = this.n, m = this.m;
+        allocateMatrices(n, m);
+//    }
+    	/*prepareAlignment(sq1, sq2);
+*/
+
+//        char[] s1 = seq1.toCharArray();
+//        char[] s2 = seq2.toCharArray();
+
+//        int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
         float val;
@@ -105,7 +124,10 @@ public class NeedlemanWunschAffine extends AlignAffine {
         for (int i=1; i<=n; i++) {
 
             for (int j=1; j<=m; j++) {
-                s = score[s1[i-1]][s2[j-1]];
+//                s = score[s1[i-1]][s2[j-1]];
+//                s = score[s1[i-1]][s2[j-1]];
+//                s= sub.score [ sequence1.profile [i-1].characters[0]][ sequence2.profile [j-1].characters [0]];
+                s= ProfileCharacter.score(sequence1.profile[offset1+i-1], sequence2.profile[offset2+j- 1], sub);
                 a = M[i-1][j-1]+s;
                 b = Ix[i-1][j-1]+s;
                 c = Iy[i-1][j-1]+s;
@@ -187,10 +209,18 @@ public class NeedlemanWunschAffine extends AlignAffine {
     }
 
 
-    public String[] getMatch() {
+    public void appendMatch(AlignmentResult result1, AlignmentResult result2) {
+        String[] results = getMatch(null, null);
+       result1.append(results [0]);
+       result2.append(results [1]);
 
-        char[] sq1 = seq1.toCharArray();
-        char[] sq2 = seq2.toCharArray();
+    }
+    public String[] getMatch() {
+        return getMatch(seq1.toCharArray(),seq2.toCharArray());
+
+    }
+    public String[] getMatch(char[] sq1, char[]sq2) {
+
 
         StringBuffer res1 = new StringBuffer();
         StringBuffer res2 = new StringBuffer();
@@ -209,12 +239,18 @@ public class NeedlemanWunschAffine extends AlignAffine {
             if (i == tbi) {
                 res1.append('-');
             } else {
-                res1.append(sq1[i - 1]);
+                if(sq1!= null)
+                    res1.append(sq1[i - 1]);
+                else
+                    res1.append('X');
             }
             if (j == tbj) {
                 res2.append('-');
             } else {
-                res2.append(sq2[j - 1]);
+                if(sq2 != null)
+                    res2.append(sq2[j - 1]);
+                else
+                    res2.append('X');
             }
             i = tbi;
             j = tbj;

@@ -196,9 +196,11 @@ abstract class Align {
      * @return the stripped string
      */
     String strip(String s) {
+        return strip(s,sub.getAlphabet ());
+    }
+    static String strip(String s, String residues) {
 
         boolean[] valid = new boolean[127];
-        String residues = sub.getAlphabet();
         for (int i=0; i<residues.length(); i++) {
             char c = residues.charAt(i);
             if (c < 96) {

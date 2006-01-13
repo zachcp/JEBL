@@ -8,7 +8,7 @@ import jebl.evolution.sequences.SequenceTester;
 // uses linear space.
 
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
-    private float finalScore;
+    private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
@@ -30,7 +30,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private long totalProgress;
     private long currentProgress;
     private boolean cancelled;
-    
+
 
     private boolean addProgress(long value) {
         currentProgress += value;
@@ -46,6 +46,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         doAlignment(sq1,sq2, null);
     }
 
+    private Profile profile1, profile2;
+//    private AlignmentResult result1, result2;
 
     public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress) {
         this.progress =progress;
@@ -53,11 +55,23 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         sq1 = strip(sq1);
         sq2 = strip(sq2);
-
-        prepareAlignment (sq1,sq2);
+//        prepareAlignment (sq1,sq2);
         //we initialise the following arrays here rather than in prepareAlignment
         //so that we do not have to create them again during recursion.
-        if (n> previousn||m> previousm) {
+        profile1 = new Profile(0,sq1);
+        profile2 = new Profile(0,sq2);
+        AlignmentResult[] results = doAlignment(profile1, profile2, progress);
+        matchResult = new String[2];
+        matchResult[0] = Profile.buildAlignmentString(sq1, results [0]);
+        matchResult[1] = Profile.buildAlignmentString(sq2, results[1]);
+    }
+    public AlignmentResult[] doAlignment(Profile profile1, Profile profile2, AlignmentProgressListener progress){
+this.progress = progress;
+    this.n = profile1.length();
+    this.m = profile2.length();
+        this.profile1= profile1;
+        this.profile2= profile2;
+    if (n> previousn||m> previousm) {
             F = new float[3][2][m + 1];
             C = new int [3] [ 2] [m+1];
             Ctype = new int [3] [3] [m+1];
@@ -67,29 +81,36 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         totalProgress =n*m*2;
         currentProgress= 0;
         cancelled = false;
-        matchResult =doAlignment (sq1,sq2, TYPE_ANY, TYPE_ANY);
+        int maximumResultLength =m+n;
+        AlignmentResult result1=new AlignmentResult(maximumResultLength);
+        AlignmentResult result2 =new AlignmentResult(maximumResultLength);
+        resultScore =doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2);
+        return new AlignmentResult[]{result1, result2};
+
     }
 
     public String[] getMatch() {
         return matchResult;
     }
 
-    public void prepareAlignment(String sq1, String sq2) {
+    /*public void prepareAlignment(String sq1, String sq2) {
         this.seq1 = sq1;
         this.seq2 = sq2;
 
         this.n = sq1.length();
         this.m = sq2.length();
-
-    }
-
-    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
-        prepareAlignment(sq1, sq2);
-
         char[] s1 = sq1.toCharArray();
         char[] s2 = sq2.toCharArray();
+    }
+*/
+//    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
+    private float doAlignment(int offset1, int offset2,int n,int m, int startType, int endType, AlignmentResult result1, AlignmentResult result2) {
+//        prepareAlignment(sq1, sq2);
+        this.n = n;
+        this.m=m;
 
-        int n = this.n, m = this.m;
+
+//        int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
         int[][] cm= C [0], cx= C [1],cy= C [2];
@@ -104,10 +125,13 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             quadraticAlign.setGapOpen(d);
             quadraticAlign.setGapExtend(e);
 //            align.doAlignment(sq1,sq2);
-            quadraticAlign.doAlignment(sq1,sq2, startType, endType);
-            if(addProgress(n*m)) return null;
-            setScore (quadraticAlign.getScore());
-            return quadraticAlign.getMatch();
+//            quadraticAlign.doAlignment(sq1,sq2, startType, endType);
+            quadraticAlign.doAlignment(profile1, profile2, offset1, offset2,n,m, startType, endType);
+            if(addProgress(n*m)) return 0;
+//            setScore (quadraticAlign.getScore());
+            quadraticAlign.appendMatch(result1, result2);
+            return quadraticAlign.getScore();
+//            return quadraticAlign.getMatch();
         }
 
         //all that the remainder of this function does is to calculate the midpoint
@@ -139,11 +163,12 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             if (startType == TYPE_X) base =e;
             Ix[1][0] = - base -e*(i- 1);
             for (int j=1; j<=m; j++) {
-                if(cancelled) return null;
-                char c1= s1[i - 1];
+                if(cancelled) return 0;
+                s = ProfileCharacter.score(profile1.profile[offset1 + i - 1], profile2.profile[offset2 + j - 1], sub);
+               /* char c1= s1[i - 1];
                 char c2= s2[j - 1];
                 
-                s = score[c1][c2];
+                s = score[c1][c2];*/
                 a = M[0][j-1]+s;
                 b = Ix[0][j-1]+s;
                 c = Iy[0][j-1]+s;
@@ -216,7 +241,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
                 }
 
             }
-            if(addProgress(m)) return null;
+            if(addProgress(m)) return  0;
         }
         // Find maximal score
         int bestk = 0;
@@ -235,8 +260,12 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         int vtype = Ctype [ bestk][1][m];
         float finalScore = F [ bestk][1][m];
 
+        doAlignment(offset1, offset2,u,v, startType, endType, result1, result2);
+        if(cancelled) return 0;
+        doAlignment(offset1+u, offset2+v,n-u,m-v, startType, endType, result1, result2);
+        if (cancelled) return 0;
 
-        String sequence1a = sq1.substring(0, u);
+       /* String sequence1a = sq1.substring(0, u);
         String sequence2a = sq2.substring(0, v);
         String[] match1= doAlignment(sequence1a,sequence2a,startType,vtype );
         if(cancelled) return null;
@@ -246,18 +275,18 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         String[] match2= doAlignment(sequence1b,sequence2b,vtype, endType );
         if (cancelled) return null;
         float match2Score = getScore();
-        float combineScore = match1Score + match2Score;
+        float combineScore = match1Score + match2Score;*/
 
         //I thought the following would be a good idea to test how well it is working,
         //  but in practice
         // the floatingpoint error builds up to exceed small amounts
         // even on my test caseof only a few hundred characters
         /*
-        if (Math.abs(combineScore - finalScore)> 0.0001f) {
+        if (Math.abs(combineScore - resultScore)> 0.0001f) {
             System.out.println (sequence1a+ "+" + sequence1b);
             System.out.println (sequence2a+ "+" + sequence2b);
 
-            String message = "final score doesn't match (" + match1Score + "+" + match2Score + "=" + (match2Score + match1Score)+ "!=" + finalScore + ")";
+            String message = "final score doesn't match (" + match1Score + "+" + match2Score + "=" + (match2Score + match1Score)+ "!=" + resultScore + ")";
             System.out.println (message);
             System.out.println (match1[0]);
             System.out.println (match1[1]);
@@ -276,19 +305,20 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
             throw new Error (message);
         }
         */
-        setScore (finalScore);
+//        setScore (resultScore);
 
 //        setScore (combineScore);
-        return new String[] {match1[0]+ match2[0], match1[1]+ match2[1]};
-    }
-
-    @Override public float getScore() {
+//        return new String[] {match1[0]+ match2[0], match1[1]+ match2[1]};
         return finalScore;
     }
 
-    private void setScore(float finalScore) {
-        this.finalScore=finalScore;
+    @Override public float getScore() {
+        return resultScore;
     }
+
+   /* private void setScore(float resultScore) {
+        this.resultScore=resultScore;
+    }*/
 
     public static void main(String[] arguments) {
         Scores scores = ScoresFactory.generateScores("Blosum45");
@@ -303,7 +333,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
 
         long start;
         long end;
-        final int repeat = 2;
+        final int repeat = 1;
 
         start = System.currentTimeMillis();
         String[] results2= null, results= null, results3= null;
@@ -328,7 +358,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         }
         end = System.currentTimeMillis();
         System.out.println("linear space took " + (end - start) + " milliseconds");
-
+//if(true)return;
         start = System.currentTimeMillis();
         for (int i = 0; i < repeat; i++) {
             align3 = new OldNeedlemanWunschAffine(scores, d, e);
