@@ -92,7 +92,19 @@ public final class Nucleotides {
 
 	public static boolean isGap(NucleotideState state) { return state == GAP_STATE; }
 
-	public String getName() { return "Nucleotides"; }
+    // both states must be not amibugues/gaps and unequal
+    // transition A<==>G or C<==>T
+    public static boolean isTransition(State state1, State state2) {
+        // use A,G is even and C,T are odd
+        return ((state1.getIndex() + state2.getIndex()) & 0x1) == 0;
+    }
+
+    // both states must be not amibugues/gaps and unequal
+    public static boolean isTransversion(State state1, State state2) {
+        return !isTransition(state1, state2);
+    }
+
+    public String getName() { return "Nucleotides"; }
 
 	public static NucleotideState[] toStateArray(String sequenceString) {
 		NucleotideState[] seq = new NucleotideState[sequenceString.length()];

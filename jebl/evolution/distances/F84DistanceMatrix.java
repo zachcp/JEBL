@@ -50,8 +50,7 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
              weight = pattern.getWeight();
                // acgt
             if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
-              if ( (state1 == Nucleotides.A_STATE && state2 == Nucleotides.G_STATE) ||
-                    (state1 == Nucleotides.G_STATE && state2 == Nucleotides.A_STATE)) {
+              if ( Nucleotides.isTransition(state1, state2) ) {
 					// it's a transition
 					sumTs += weight;
 				} else {
@@ -73,11 +72,7 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
 		distance = -(2.0 * constA * tmp1) +
 					(2.0 * (constA - constB - constC) * tmp2);
 
-		if (distance < MAX_DISTANCE) {
-			return distance;
-		} else {
-			return MAX_DISTANCE;
-		}
+		return Math.min(distance, MAX_DISTANCE);
 	}
 
 
@@ -85,7 +80,7 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
         F84DistanceMatrix.alignment = alignment;
 
         // ASK Alexei
-        int stateCount = alignment.getSequenceType().getCanonicalStateCount();
+        final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
 
         if (stateCount != 4) {
 			throw new IllegalArgumentException("F84DistanceMatrix must have nucleotide patterns");

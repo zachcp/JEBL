@@ -7,6 +7,7 @@ import jebl.evolution.taxa.Taxon;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An abstract base class for clustering algorithms from pairwise distances
@@ -21,8 +22,8 @@ import java.util.List;
  */
 
 abstract class ClusteringTreeBuilder {
-    protected SimpleTree tree;
-
+    protected SimpleTree tree = null;
+    protected SimpleRootedTree rtree = null;
     /**
      * constructor ClusteringTree
      *
@@ -30,7 +31,11 @@ abstract class ClusteringTreeBuilder {
      */
     public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
         this.distanceMatrix = distanceMatrix;
-        this.tree = new SimpleTree();
+        if (minimumTaxa == 2) {
+            this.rtree = new SimpleRootedTree();
+        } else {
+          this.tree = new SimpleTree();
+        }
         this.minimumTaxa = minimumTaxa;
 
         if (distanceMatrix.getSize() < minimumTaxa) {
@@ -51,7 +56,7 @@ abstract class ClusteringTreeBuilder {
         }
         finish();
 
-        return tree;
+        return tree != null ? tree : rtree;
     }
 
     /**
@@ -83,7 +88,7 @@ abstract class ClusteringTreeBuilder {
     protected void init(final DistanceMatrix distanceMatrix) {
 
         numClusters = distanceMatrix.getSize();
-        clusters = new SimpleNode[numClusters];
+        clusters = new Node[numClusters];
 
         distance = new double[numClusters][numClusters];
         for (int i = 0; i < numClusters; i++) {
@@ -94,7 +99,8 @@ abstract class ClusteringTreeBuilder {
 
         final List<Taxon> taxa = distanceMatrix.getTaxa();
         for (int i = 0; i < numClusters; i++) {
-            clusters[i] = tree.createExternalNode(taxa.get(i));
+            clusters[i] = (tree != null) ? tree.createExternalNode(taxa.get(i)) :
+                                           rtree.createExternalNode(taxa.get(i));
         }
 
         alias = new int[numClusters];
@@ -109,9 +115,17 @@ abstract class ClusteringTreeBuilder {
     protected void newCluster() {
         double[] d = newNodeDistance();
         Node[] n = { clusters[abi], clusters[abj] };
-        newCluster = tree.createInternalNode(new HashSet<Node>(Arrays.asList(n)));
-        for(int k = 0; k < 2; ++k) {
-            tree.setEdge(newCluster, n[k], d[k]);
+        Set<Node> a = new HashSet<Node>(Arrays.asList(n));
+        if( tree != null ) {
+            newCluster = tree.createInternalNode(a);
+            for(int k = 0; k < 2; ++k) {
+                tree.setEdge(newCluster, n[k], d[k]);
+            }
+        } else {
+          newCluster = rtree.createInternalNode(a);
+          for(int k = 0; k < 2; ++k) {
+             rtree.setLength(n[k], d[k]);
+          }
         }
 
         clusters[abi] = newCluster;
