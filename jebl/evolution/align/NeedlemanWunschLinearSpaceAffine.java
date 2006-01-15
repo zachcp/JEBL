@@ -62,6 +62,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         profile2 = new Profile(0,sq2);
         AlignmentResult[] results = doAlignment(profile1, profile2, progress);
         matchResult = new String[2];
+        if(cancelled) return;
         matchResult[0] = Profile.buildAlignmentString(sq1, results [0]);
         matchResult[1] = Profile.buildAlignmentString(sq2, results[1]);
     }
@@ -78,7 +79,8 @@ this.progress = progress;
             previousn=n;
             previousm=m;
         }
-        totalProgress =n*m*2;
+        totalProgress =((long)n)*m*2;
+//        System.out.println("total =" + totalProgress + "," +n+ "," +m);
         currentProgress= 0;
         cancelled = false;
         int maximumResultLength =m+n;
@@ -167,7 +169,7 @@ this.progress = progress;
                 s = ProfileCharacter.score(profile1.profile[offset1 + i - 1], profile2.profile[offset2 + j - 1], sub);
                /* char c1= s1[i - 1];
                 char c2= s2[j - 1];
-                
+
                 s = score[c1][c2];*/
                 a = M[0][j-1]+s;
                 b = Ix[0][j-1]+s;
