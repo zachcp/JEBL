@@ -3,11 +3,10 @@ package jebl.gui.trees.treeviewer.controlpanels;
 import jebl.gui.utils.IconUtils;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Andrew Rambaut
@@ -17,7 +16,7 @@ public class DisclosureButton extends JToggleButton {
 
 	private Timer timer = null;
 	private boolean opening;
-	private final List listeners = new ArrayList();
+	private final List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();
 
 	public DisclosureButton() {
 		putClientProperty("JButton.buttonType", "toolbar");
@@ -114,28 +113,28 @@ public class DisclosureButton extends JToggleButton {
 	private void fireOpening() {
 		Iterator iter = listeners.iterator();
 		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).opening();
+			((DisclosureListener)iter.next()).opening(this);
 		}
 	}
 
 	private void fireOpened() {
 		Iterator iter = listeners.iterator();
 		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).opened();
+			((DisclosureListener)iter.next()).opened(this);
 		}
 	}
 
 	private void fireClosing() {
 		Iterator iter = listeners.iterator();
 		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).closing();
+			((DisclosureListener)iter.next()).closing(this);
 		}
 	}
 
 	private void fireClosed() {
 		Iterator iter = listeners.iterator();
 		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).closed();
+			((DisclosureListener)iter.next()).closed(this);
 		}
 	}
 
@@ -167,19 +166,4 @@ public class DisclosureButton extends JToggleButton {
 		}
 	}
 
-	public static void main(String[] args) {
-		final JFrame frame = new JFrame();
-		frame.setSize(100, 100);
-
-		DisclosureButton button = new DisclosureButton();
-		frame.getContentPane().add(button);
-		button.addDisclosureListener(new DisclosureListener() {
-			public void opening() { frame.setSize(100, 200); }
-			public void opened() { frame.setSize(100, 300); }
-			public void closing() { frame.setSize(100, 200); }
-			public void closed() { frame.setSize(100, 100); }
-		});
-
-		frame.show();
-	}
 }

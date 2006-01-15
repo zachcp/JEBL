@@ -49,7 +49,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	};
 
 	public TreePane() {
-		setBackground(Color.WHITE);
+		setBackground(UIManager.getColor("window"));
 	}
 
 	public RootedTree getTree() {
