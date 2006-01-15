@@ -68,11 +68,12 @@ public class TreeViewer extends JPanel {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-        controlPanel = new ControlPanel(200, false);
+        controlPalette = new ControlPalette(200, ControlPalette.DisplayMode.DEFAULT_OPEN);
+	    controlPalette.setBorder(BorderFactory.createMatteBorder(0,0,0,1,Color.GRAY));
 //        JPanel panel = new JPanel(new BorderLayout());
-//        panel.add(controlPanel, BorderLayout.NORTH);
+//        panel.add(controlPalette, BorderLayout.NORTH);
 
-//        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPanel);
+//        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, controlPalette);
 //        splitPane.setContinuousLayout(true);
 //        splitPane.setOneTouchExpandable(true);
 //        splitPane.setResizeWeight(1.0);
@@ -81,19 +82,19 @@ public class TreeViewer extends JPanel {
 //        add(splitPane, BorderLayout.CENTER);
 
         add(scrollPane, BorderLayout.CENTER);
-        add(controlPanel, BorderLayout.WEST);
+        add(controlPalette, BorderLayout.WEST);
         treePane.setTreeLayoutType(TreePane.TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
         treePaneSelector = new TreePaneSelector(treePane);
 
-        controlPanel.addControlsProvider(controlsProvider);
-        controlPanel.addControlsProvider(treePane);
+        controlPalette.addControlsProvider(controlsProvider);
+        controlPalette.addControlsProvider(treePane);
 
-        controlPanel.addControlPanelListener(new ControlPanelListener() {
+        controlPalette.addControlPanelListener(new ControlPaletteListener() {
             public void controlsChanged() {
-                controlPanel.setupControls();
+                controlPalette.setupControls();
                 validate();
                 repaint();
             }
@@ -124,13 +125,13 @@ public class TreeViewer extends JPanel {
         setTree(tree, 6);
     }
 
-    public ControlPanel getControlPanel() {
-        return controlPanel;
+    public ControlPalette getControlPanel() {
+        return controlPalette;
     }
 
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
-        public void setControlPanel(ControlPanel controlPanel) {
+        public void setControlPanel(ControlPalette controlPalette) {
             // do nothing
         }
 
@@ -227,7 +228,7 @@ public class TreeViewer extends JPanel {
     };
 
     public void setControlPanelVisible(boolean visible) {
-        controlPanel.setVisible(visible);
+        controlPalette.setVisible(visible);
     }
 
     public void setBranchDecorator(BranchDecorator branchDecorator) {
@@ -372,7 +373,7 @@ public class TreeViewer extends JPanel {
 
     protected JViewport viewport;
     protected JSplitPane splitPane;
-    private ControlPanel controlPanel;
+    private ControlPalette controlPalette;
 
     static public void main(String[] args) {
 

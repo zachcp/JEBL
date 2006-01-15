@@ -2,7 +2,7 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
@@ -42,7 +42,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
-    public void setControlPanel(ControlPanel controlPanel) {
+    public void setControlPanel(ControlPalette controlPalette) {
         // do nothing...
     }
 
@@ -52,7 +52,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
 	    if (controls == null) {
 	        OptionsPanel optionsPanel = new OptionsPanel();
-	        
+
 		    controls = new Controls("Layout", optionsPanel, true);
 	    }
 

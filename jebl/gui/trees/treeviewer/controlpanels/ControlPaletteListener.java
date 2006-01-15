@@ -5,6 +5,6 @@ package jebl.gui.trees.treeviewer.controlpanels;
  * @author Alexei Drummond
  * @version $Id$
  */
-public interface ControlPanelListener {
+public interface ControlPaletteListener {
     void controlsChanged();
 }

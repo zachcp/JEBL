@@ -1,7 +1,7 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
@@ -45,7 +45,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
-    public void setControlPanel(ControlPanel controlPanel) {
+    public void setControlPanel(ControlPalette controlPalette) {
         // do nothing...
     }
 

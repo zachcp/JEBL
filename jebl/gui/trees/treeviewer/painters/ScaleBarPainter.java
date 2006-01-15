@@ -2,7 +2,7 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer.TreePane;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 import jebl.gui.utils.RealNumberField;
@@ -168,7 +168,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         firePainterChanged();
     }
 
-    public void setControlPanel(ControlPanel controlPanel) {
+    public void setControlPanel(ControlPalette controlPalette) {
         // nothing to do
     }
 

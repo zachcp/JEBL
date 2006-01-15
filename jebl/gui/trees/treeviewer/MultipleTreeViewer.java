@@ -1,7 +1,7 @@
 package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.trees.Tree;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
@@ -44,7 +44,7 @@ public class MultipleTreeViewer extends TreeViewer {
 
 	private ControlsProvider multipleTreeControlsProvider = new ControlsProvider() {
 
-	    public void setControlPanel(ControlPanel controlPanel) {
+	    public void setControlPanel(ControlPalette controlPalette) {
 	        // do nothing
 	    }
 

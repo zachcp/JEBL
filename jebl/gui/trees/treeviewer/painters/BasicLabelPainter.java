@@ -3,7 +3,7 @@ package jebl.gui.trees.treeviewer.painters;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
 
@@ -186,7 +186,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 		firePainterChanged();
 	}
 
-    public void setControlPanel(ControlPanel controlPanel) {
+    public void setControlPanel(ControlPalette controlPalette) {
         // nothing to do
     }
 

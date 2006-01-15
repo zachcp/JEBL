@@ -7,6 +7,6 @@ import java.util.List;
  * @version $Id$
  */
 public interface ControlsProvider {
-    void setControlPanel(ControlPanel controlPanel);    
+    void setControlPanel(ControlPalette controlPalette);
     List<Controls> getControls();
 }

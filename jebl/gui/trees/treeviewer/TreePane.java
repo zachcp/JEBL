@@ -6,7 +6,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SortedRootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import jebl.evolution.trees.Tree;
-import jebl.gui.trees.treeviewer.controlpanels.ControlPanel;
+import jebl.gui.trees.treeviewer.controlpanels.ControlPalette;
 import jebl.gui.trees.treeviewer.controlpanels.Controls;
 import jebl.gui.trees.treeviewer.controlpanels.ControlsProvider;
 import jebl.gui.trees.treeviewer.controlpanels.OptionsPanel;
@@ -97,7 +97,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 				repaint();
 			}
 		});
-		if( controlPanel != null ) controlPanel.fireControlsChanged();
+		if( controlPalette != null ) controlPalette.fireControlsChanged();
 		calibrated = false;
 		invalidate();
 		repaint();
@@ -263,7 +263,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		if (this.taxonLabelPainter != null) {
 			this.taxonLabelPainter.addPainterListener(this);
 		}
-		controlPanel.fireControlsChanged();
+		controlPalette.fireControlsChanged();
 		calibrated = false;
 		repaint();
 	}
@@ -280,7 +280,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		if (this.nodeLabelPainter != null) {
 			this.nodeLabelPainter.addPainterListener(this);
 		}
-		controlPanel.fireControlsChanged();
+		controlPalette.fireControlsChanged();
 		calibrated = false;
 		repaint();
 	}
@@ -297,7 +297,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		if (this.scaleBarPainter != null) {
 			this.scaleBarPainter.addPainterListener(this);
 		}
-		controlPanel.fireControlsChanged();
+		controlPalette.fireControlsChanged();
 		calibrated = false;
 		repaint();
 	}
@@ -403,10 +403,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		scrollRectToVisible(new Rectangle(point.x, point.y, 0, 0));
 	}
 
-	public void setControlPanel(ControlPanel controlPanel) {
-		this.controlPanel = controlPanel;
+	public void setControlPanel(ControlPalette controlPalette) {
+		this.controlPalette = controlPalette;
 	}
-	private ControlPanel controlPanel = null;
+	private ControlPalette controlPalette = null;
 
 	public List<Controls> getControls() {
 
