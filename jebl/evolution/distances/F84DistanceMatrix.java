@@ -89,20 +89,18 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
         double[] freqs = new double[stateCount];
         for( Sequence sequence : alignment.getSequences() ) {
            for( int i : sequence.getStateIndices() ) {
-               assert( (0 <= i && i < stateCount) ||
+               /*if( !((0 <= i && i < stateCount) ||
                        i == sequence.getSequenceType().getGapState().getIndex() ||
-                       i == sequence.getSequenceType().getUnknownState().getIndex() );
+                       i == sequence.getSequenceType().getUnknownState().getIndex()) ) {
+                   System.out.print(i);
+
+               } */
+              // ignore non definite states (ask alexei)
              if( i < stateCount ) ++freqs[i];
            }
         }
 
-      /*  for( Pattern p : alignment.getPatterns() ) {
-            for(int k = 0; k < p.getLength(); ++k) {
-              freqs[k] += p.getStateFrequency(p.getState(k));
-            }
-        }  */
-
-        // Ask Alexei
+        // Ask Alexei (mapping 0-a etc)
         double freqA = freqs[0];
 		double freqC = freqs[1];
 		double freqG = freqs[2];

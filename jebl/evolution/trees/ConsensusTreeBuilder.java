@@ -19,15 +19,16 @@ import java.util.Arrays;
  * @author Joseph Heled
  * @version $Id$
  *
- * Work in progress
+ * Work in progress.
  *
+ *  Currently only rooted binary trees are supported.
  */
 public class ConsensusTreeBuilder {
     ClusteringTreeBuilder builder;
 
     private List<Taxon> taxons;
     private TreeInfo[] info;
-    private Tree[] trees;
+    private RootedTree[] trees;
     final boolean isRooted;
     private final int nExternalNodes;
     private List<FixedBitSet> subTreeTips;
@@ -35,7 +36,7 @@ public class ConsensusTreeBuilder {
     class TreeInfo {
         // for each tree, establish a postorder order, and in each internal node the subsets of decendentants
         FixedBitSet[] nodesTipSet;
-        //List<Node> postorder;
+
         int[] postorder;
         int[][] nodeChildren;
 
@@ -180,17 +181,16 @@ public class ConsensusTreeBuilder {
         double[][] distances = new double [nExternalNodes][nExternalNodes];
         pairDistances(distances);
 
-        ArrayList<Taxon> taxa = new ArrayList<Taxon>(nExternalNodes);
-
         return new BasicDistanceMatrix(taxons, distances);
     }
 
-    ConsensusTreeBuilder(Tree[] trees) {
-        this.trees = new Tree[trees.length];
+    ConsensusTreeBuilder(RootedTree[] trees) {
+        this.trees = new RootedTree[trees.length];
 
         Tree first = trees[0];
 
-        isRooted = first instanceof RootedTree;
+        //isRooted = first instanceof RootedTree;
+        isRooted = true;
 
         nExternalNodes = first.getExternalNodes().size();
 
@@ -239,7 +239,7 @@ public class ConsensusTreeBuilder {
             }
 
             protected void clusterCreated(Node node) {
-               node.setAttribute("support", 100 * cachedDist[cachedDist.length - 1]);
+               node.setAttribute("Consensus support(%)", 100 * cachedDist[cachedDist.length - 1]);
             }
 
             protected double updatedDistance(int k) {

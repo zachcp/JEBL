@@ -87,7 +87,7 @@ public class FixedBitSet {
 
     private int firstBit(int i) {
         for(int k = 0; k < 4; ++k) {
-            byte b = (byte)(i & 0xff);
+            char b = (char)(i & 0xff);
             if( b != 0 ) {
                 return 8*k + firstBitLocation[b];
             }

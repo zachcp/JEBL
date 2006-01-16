@@ -49,7 +49,7 @@ public class TreeBuilder {
         return c.build();
     }
 
-    static public Tree build(Tree[] trees) {
+    static public Tree build(RootedTree[] trees) {
         ConsensusTreeBuilder b = new ConsensusTreeBuilder(trees);
         return b.build();
     }
