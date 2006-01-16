@@ -29,37 +29,14 @@ class UPGMATreeBuilder extends ClusteringTreeBuilder {
     // Protected and Private stuff
     //
 
-    protected void findNextPair() {
-
-        besti = 0;
-        bestj = 1;
-        double dmin = getDist(0, 1);
-        for (int i = 0; i < numClusters-1; i++) {
-
-            for (int j = i+1; j < numClusters; j++) {
-                final double dist = getDist(i, j);
-                if (dist < dmin) {
-                    dmin = dist;
-                    besti = i;
-                    bestj = j;
-                }
-            }
-        }
-        abi = alias[besti];
-        abj = alias[bestj];
-    }
-
-    protected double[] newNodeDistance() {
+    protected double[] joinClusters() {
         Double d = getDist(besti, bestj) / 2.0;
         return new double[]{d, d};
     }
 
-    /**
-     * compute updated distance between the new cluster (i,j)
-     * to any other cluster k
-     */
-    protected double updatedDistance(int i, int j, int k)
-    {
+    protected double updatedDistance(int k) {
+        int i = besti;
+        int j = bestj;
         int ai = alias[i];
         int aj = alias[j];
 

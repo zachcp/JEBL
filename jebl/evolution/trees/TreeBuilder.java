@@ -48,13 +48,10 @@ public class TreeBuilder {
         }
         return c.build();
     }
-    /*
-    static public Tree build(Alignment alignment) {
-       JukesCantorDistanceMatrix d = new JukesCantorDistanceMatrix(alignment);
 
-       UPGMATreeBuilder c = new UPGMATreeBuilder(d);
-       return c.build();
+    static public Tree build(Tree[] trees) {
+        ConsensusTreeBuilder b = new ConsensusTreeBuilder(trees);
+        return b.build();
     }
-    */
 }
 

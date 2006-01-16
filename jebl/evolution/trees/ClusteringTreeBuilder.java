@@ -49,6 +49,8 @@ abstract class ClusteringTreeBuilder {
         while (true) {
             findNextPair();
 
+            abi = alias[besti];
+            abj = alias[bestj];
             if (numClusters < minimumTaxa)
                 break;
 
@@ -60,22 +62,45 @@ abstract class ClusteringTreeBuilder {
     }
 
     /**
-     * Find next two clusters to join. set shared best{i,j} and ab{i,j}
+     * Find next two clusters to join. set shared best{i,j}.
      */
-    protected abstract void findNextPair();
+
+    protected void findNextPair() {
+        besti = 0;
+        bestj = 1;
+        double dmin = getDist(0, 1);
+        for (int i = 0; i < numClusters-1; i++) {
+            for (int j = i+1; j < numClusters; j++) {
+                final double dist = getDist(i, j);
+                if (dist < dmin) {
+                    dmin = dist;
+                    besti = i;
+                    bestj = j;
+                }
+            }
+        }
+    }
 
     /**
-     * compute branch distances to new internal node
-     * @return [besti - dist , bestj dist]
+     * Inform derived class that clusters besti,bestj are being joinded into a new cluster.
+     * New cluster will be (the smaller) besti while clusters greater than bestj are shifted one space back.
+     *
+     * @return  branch distances to new internal node [besti - dist , bestj dist]
      */
-    protected abstract double[] newNodeDistance();
+    protected abstract double[] joinClusters();
 
     /**
-     * compute updated distance between the new cluster (i,j)
+     * compute updated distance between the new cluster (besti,bestj)
      * to any other cluster k.
      *  (i,j,k) are cluster indices in [0..numClusters-1]
      */
-    protected abstract double updatedDistance(int i, int j, int k);
+    protected abstract double updatedDistance(int k);
+
+    /**
+     *
+     * @param node
+     */
+    protected void clusterCreated(Node node) {}
 
     //
     // Protected and Private stuff
@@ -113,7 +138,7 @@ abstract class ClusteringTreeBuilder {
     }
 
     protected void newCluster() {
-        double[] d = newNodeDistance();
+        double[] d = joinClusters();
         Node[] n = { clusters[abi], clusters[abj] };
         Set<Node> a = new HashSet<Node>(Arrays.asList(n));
         if( tree != null ) {
@@ -127,17 +152,17 @@ abstract class ClusteringTreeBuilder {
              rtree.setLength(n[k], d[k]);
           }
         }
+        
+        clusterCreated(newCluster);
 
         clusters[abi] = newCluster;
         clusters[abj] = null;
 
         // Update distances
         for (int k = 0; k < numClusters; k++) {
-
             if (k != besti && k != bestj) {
-
                 int ak = alias[k];
-                distance[ak][abi] = distance[abi][ak] = updatedDistance(besti, bestj, k);
+                distance[ak][abi] = distance[abi][ak] = updatedDistance(k);
                 distance[ak][abj] = distance[abj][ak] = -1.0;
             }
         }
@@ -170,8 +195,8 @@ abstract class ClusteringTreeBuilder {
 
     // Indices of two clusters in [0 .. numClusters-1], besti < bestj
     protected int besti, bestj;
-    //  actual index of besti,bestj into arrays (clusters,tipCount,distance)
-    protected int abi, abj;
+    //  Actual index of besti,bestj into arrays (clusters,tipCount,distance)
+    private int abi, abj;
     // Number of tips in cluster
     protected int[] tipCount;
 

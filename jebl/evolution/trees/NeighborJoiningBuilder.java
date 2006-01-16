@@ -57,14 +57,12 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
                 }
             }
         }
-        abi = alias[besti];
-        abj = alias[bestj];
     }
 
     protected void finish() {
         // Connect up the final two clusters
-        abi = alias[0];
-        abj = alias[1];
+        int abi = alias[0];
+        int abj = alias[1];
 
         double dij = getDist(0, 1);
 
@@ -73,7 +71,7 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
         super.finish();
     }
 
-    protected double[] newNodeDistance() {
+    protected double[] joinClusters() {
         double dij = getDist(besti, bestj);
         double li = (dij + (r[besti] - r[bestj]) * scale) * 0.5;
         double lj = dij - li;
@@ -84,11 +82,9 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
         return new double[]{li, lj};
     }
 
-    /**
-     * compute updated distance between the new cluster (i,j)
-     * to any other cluster k
-     */
-    protected double updatedDistance(int i, int j, int k) {
+    protected double updatedDistance(int k) {
+        int i = besti;
+        int j = bestj;
         return (getDist(k, i) + getDist(k, j) - getDist(i, j)) * 0.5;
     }
 }

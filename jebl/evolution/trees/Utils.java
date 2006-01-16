@@ -102,8 +102,6 @@ public final class Utils {
          }
          // one empty line between sub trees
          tot += children.size() - 1;
-         //int ltop = a.get(0).length;
-         //int lbot = a.get(a.size()-1).length;
 
          ArrayList<String> x = new ArrayList<String>(tot);
          for(int i = 0; i < a.size(); ++i) {
@@ -202,11 +200,6 @@ public final class Utils {
         double maxDist = 0;
         for( Node n : tree.getAdjacencies(node) ) {
           if( n != root ) {
-              //Pair p = new Pair(node, n);
-              //if( dists.containsKey(p) ) {
-              //    continue;
-             // }
-
              double d = dist(tree, node, n, dists);
              maxDist = Math.max(maxDist, d);
           }
@@ -216,24 +209,25 @@ public final class Utils {
         return dist;
     }
 
-     /*         for( Node n1 : tree.getAdjacencies(n) ) {
-                  if( n1 != n ) {
-                      Pair p1 = new Pair(n1, n);
-                      if( ! dists.containsKey(p1) ) {
-                         dist(tree, n1, n, dists);
-                      }
-                      maxDist = Math.max(maxDist, dists.get(p1));
-                  }
-              }
-              dists.put(p, tree.getEdgeLength(node, n) + maxDist);
-          }
-        }
-    }
-*/
     public static RootedTree rootTheTree(Tree tree) {
+        // If already rooted, do nothing
+        if( tree instanceof RootedTree ) {
+            return (RootedTree)tree;
+        }
 
-      try {
-          HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
+        // If a natural root exists, root there
+        Set<Node> d2 = tree.getNodes(2);
+        if( d2.size() == 1 ) {
+            return new RootedFromUnrooted(tree, d2.iterator().next());
+        }
+
+        // Root at tree center
+        return rootTreeAtCenter(tree);
+    }
+
+    public static RootedTree rootTreeAtCenter(Tree tree) {
+        try {
+            HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
 
             double minOfMaxes = Double.MAX_VALUE;
             HashPair<Node> best = null;
@@ -242,7 +236,7 @@ public final class Utils {
                 HashPair<Node> maxDirection = null;
                 for( Node n : tree.getAdjacencies(i) ) {
                     HashPair<Node> p = new HashPair<Node>(i, n);
-                    double d = dist(tree, p.first, p.second, dists); // dists.get(p);
+                    double d = dist(tree, p.first, p.second, dists);
                     if( maxDist < d ) {
                        maxDist = d;
                        maxDirection = p;
@@ -255,14 +249,12 @@ public final class Utils {
                 }
             }
 
-            Node second = null;
             double distToSecond = -Double.MAX_VALUE;
             for( Node n : tree.getAdjacencies(best.first) ) {
                 if( n != best.second ) {
                     double d1 = dists.get(new HashPair<Node>(best.first, n));
                     if( d1 > distToSecond ) {
                         distToSecond = d1;
-                        second = n;
                     }
                 }
             }
