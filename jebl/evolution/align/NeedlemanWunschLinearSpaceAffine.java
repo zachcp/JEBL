@@ -10,6 +10,7 @@ import jebl.evolution.sequences.SequenceTester;
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
+    private boolean debug;
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
         super(sub, d, e);
@@ -111,7 +112,6 @@ this.progress = progress;
         this.n = n;
         this.m=m;
 
-
 //        int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
@@ -121,6 +121,9 @@ this.progress = progress;
         float s, a, b, c;
         int u=n/2;
 
+        if (debug) {
+            System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1)+ " u=" +u);
+        }
         if (n< RECURSION_THRESHOLD || m<RECURSION_THRESHOLD) {
 //            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
             quadraticAlign.setScores(sub);
@@ -132,6 +135,8 @@ this.progress = progress;
             if(addProgress(n*m)) return 0;
 //            setScore (quadraticAlign.getScore());
             quadraticAlign.appendMatch(result1, result2);
+//            result1.print();
+//            result2.print();
             return quadraticAlign.getScore();
 //            return quadraticAlign.getMatch();
         }
@@ -141,6 +146,8 @@ this.progress = progress;
         //type of extension applied at the midpoint, in case it is the gap extension,
         //in which case the recursion functions need to know that.
 
+        //i corresponds to TYPE_X
+        //j corresponds to TYPE_Y
         for (int j = 1; j <= m; j++) {
             float base = d;
             if (startType ==TYPE_Y)
@@ -148,8 +155,14 @@ this.progress = progress;
             // gap, so we can use gap extension penalty rather than gap starting penalty
             Iy[0] [j] = - base -e*(j- 1);
             Ix [0] [j] = M [0] [j] = Float.NEGATIVE_INFINITY;
+            cy [0][j]= 0;
+            cytype [0][j]= TYPE_Y;
         }
-        Ix[0][0] = Iy[0][0] = M[0][0]= 0;
+        Ix[0][0] = Iy[0][0] = Float.NEGATIVE_INFINITY;
+        M[0][0]= 0;
+        cmtype[0][0] = 0;
+        cm[0][0] = 0;
+
         swap01(Ix);swap01(Iy); swap01 (M);
         swap01(cm); swap01 (cx); swap01 (cy);
         swap01(cmtype); swap01 (cxtype); swap01 (cytype);
@@ -164,6 +177,8 @@ this.progress = progress;
             float base =d;
             if (startType == TYPE_X) base =e;
             Ix[1][0] = - base -e*(i- 1);
+            cxtype[1][0] = TYPE_X;
+            cx[1][0] = 0;
             for (int j=1; j<=m; j++) {
                 if(cancelled) return 0;
                 s = ProfileCharacter.score(profile1.profile[offset1 + i - 1], profile2.profile[offset2 + j - 1], sub);
@@ -226,7 +241,7 @@ this.progress = progress;
                 val = Iy[1][j] = max(a, b, c);
                 if (i == u) {
                     cy[1][j] = j;
-                    cytype[1][j] = TYPE_ANY;
+                    cytype[1][j] = TYPE_Y;
                 } else if (i > u) {
                     if (val == a) {
                         cy[1][j] = cm[1][j - 1];
@@ -260,11 +275,14 @@ this.progress = progress;
 
         int v= C [ bestk][1][m];
         int vtype = Ctype [ bestk][1][m];
+        if(debug) {
+            System.out.println("bestk=" + bestk+ " v=" +v+ " vtype =" +vtype);
+        }
         float finalScore = F [ bestk][1][m];
 
-        doAlignment(offset1, offset2,u,v, startType, endType, result1, result2);
+        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2);
         if(cancelled) return 0;
-        doAlignment(offset1+u, offset2+v,n-u,m-v, startType, endType, result1, result2);
+        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2);
         if (cancelled) return 0;
 
        /* String sequence1a = sq1.substring(0, u);
@@ -394,6 +412,10 @@ this.progress = progress;
         }
         end = System.currentTimeMillis();
         System.out.println("SmithWaterman linear space affine space took " + (end - start) + " milliseconds");
+    }
+
+    public void setDebug(boolean display) {
+        debug = display;
     }
 }
 

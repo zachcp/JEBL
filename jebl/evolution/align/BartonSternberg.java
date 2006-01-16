@@ -52,6 +52,7 @@ public class BartonSternberg {
     };
 
     public String[] align(String sourceSequences[], AlignmentProgressListener progress) {
+
         cancelled = false;
         this.progress = progress;
         int count = sourceSequences.length;
@@ -72,6 +73,7 @@ public class BartonSternberg {
         for (int i : order) {
             if(order[0] ==i) continue;
             AlignmentResult results[] =aligner.doAlignment (profile, sequenceProfiles[i], minorProgress);
+            if(cancelled) return null;
             sectionsCompleted ++;
 //            System.out.println("result =" + results[0].size + "," + results[1].size + " from " + profile.length + "," + sequenceProfile.length);
             profile = Profile.combine(profile, sequenceProfiles[i], results[0], results[1]);
@@ -80,23 +82,34 @@ public class BartonSternberg {
         //now remove a single sequence, and we
         for (int j = 0; j < 2; j++) {
             for (int i : order) {
-//                if(j> 0&& i!= 3) continue;
+//                if(j> 0&& i!= 8) continue;
 //                Profile sequenceProfile = sequenceProfiles[i];
-                String sequence = profile.paddedSequences.get(i);
-                /*if(j> 0) {
-                    System.out.println("remove sequence =" + sequence);
-                    for (int k = 0; k < count; k++) {
-                        System.out.println(profile.paddedSequences.get(k));
+                boolean display = false;
 
-                    }
-                    profile.print ();
-                }*/
+                String sequence = profile.paddedSequences.get(i);
+                if(j>= 0 && i== 8) {
+//                    display = true;
+                }
+                if(display) {
+                    System.out.println("remove sequence =" + sequence);
+                    profile.print (true);
+                }
                 Profile sequenceProfile = new Profile(i, sequence);
                 profile.remove(sequenceProfile);
+//                aligner.setDebug(display);
                 AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], minorProgress);
+//                aligner.setDebug(false);
+                if (cancelled) return null;
                 sectionsCompleted ++;
-//            System.out.println("result =" + results[0].size + "," + results[1].size + " from " + profile.length + "," + sequenceProfile.length);
+                if(display){
+                    profile.print(false);
+
+                    System.out.println("result =" + results[0].size + "," + results[1].size + " from " + profile.length() + "," + sequenceProfile.length());
+                }
                 profile = Profile.combine(profile, sequenceProfiles[i], results[0], results[1]);
+                if(display) {
+                    profile.print(true);
+                }
             }
         }
 

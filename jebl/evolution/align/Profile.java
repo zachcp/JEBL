@@ -176,9 +176,23 @@ class Profile {
         return builder.toString();
     }
 
-    public void print() {
+    public void print(boolean displaySequences) {
+        if(displaySequences) {
+int maximum = 0;
+            for (int k = 0; k < paddedSequences.size(); k++) {
+                String sequence = paddedSequences.get(k);
+                maximum = Math.max(maximum, sequence.length ());
+                System.out.println(sequence);
+            }
+            for (int i = 0; i < maximum; i++) {
+                System.out.print(i % 10);
+            }
+        }
+        System.out.println ();
         int count = 0;
+        int index = 0;
         for (ProfileCharacter character : profile) {
+            System.out.print(" " +(index ++) + ":");
             count +=character.print ();
             if(count> 800000) {
                 count = 0;

@@ -29,4 +29,12 @@ class AlignmentResult {
                 values [ size ++ ] = true;
         }
     }
+
+    public void print() {
+        for (int i = 0; i < size; i++) {
+            System.out.print(values[i] ? "X" : "-");
+
+        }
+        System.out.println ();
+    }
 }
