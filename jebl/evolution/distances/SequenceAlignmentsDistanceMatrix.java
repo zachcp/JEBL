@@ -4,6 +4,7 @@ import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.align.PairwiseAligner;
 import jebl.evolution.align.AlignmentProgressListener;
+import jebl.evolution.align.CompoundAlignmentProgressListener;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -36,24 +37,21 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
     static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, final AlignmentProgressListener progress) {
         final int n = seqs.size();
         double [][] d = new double[n][n];
+        boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount()> 4;
 
-        AlignmentProgressListener minorProgress = new AlignmentProgressListener() {
-            boolean cancelled = false;
-            public int sectionsCompleted = 0;
-            final int totalSections = (n* (n-1))/2;
-
-            public boolean setProgress(double fractionCompleted) {
-                double totalProgress = (sectionsCompleted + fractionCompleted)/totalSections;
-                if( progress.setProgress(totalProgress) ) cancelled = true;
-                return cancelled;
-            }
-        };
+        CompoundAlignmentProgressListener compoundProgress =new CompoundAlignmentProgressListener(progress,(n * (n - 1)) / 2);
 
         for(int i = 0; i < n; ++i) {
             for(int j = i+1; j < n; ++j) {
-                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), minorProgress);
+                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), compoundProgress.getMinorProgress());
+                compoundProgress.incrementSectionsCompleted(1);
+                if(compoundProgress.isCancelled()) return null;
+                if(isProtein) {
+                    d[i][j] = new JukesCantorDistanceMatrix(result.alignment).getDistances()[0][1];
+                } else {
+                    d[i][j] = new F84DistanceMatrix(result.alignment).getDistances()[0][1];
 
-                d[i][j] = new F84DistanceMatrix(result.alignment).getDistances()[0][1];
+                }
                 d[j][i] = d[i][j];
             }
         }

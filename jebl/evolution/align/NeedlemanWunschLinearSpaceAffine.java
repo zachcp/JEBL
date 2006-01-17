@@ -434,7 +434,7 @@ this.progress = progress;
     }
 
     public Result doAlignment(Sequence seq1, Sequence seq2, AlignmentProgressListener progress) {
-        doAlignment(seq1.getString(), seq2.getString());
+        doAlignment(seq1.getString(), seq2.getString(), progress);
         List<Sequence> seqs = new ArrayList<Sequence>(2);
         String[] results = getMatch();
         seqs.add(new BasicSequence(seq1.getSequenceType(), seq1.getTaxon(), results[0]));

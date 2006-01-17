@@ -7,6 +7,7 @@ import jebl.evolution.distances.F84DistanceMatrix;
 import jebl.evolution.distances.SequenceAlignmentsDistanceMatrix;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.align.PairwiseAligner;
+import jebl.evolution.align.AlignmentProgressListener;
 
 import java.util.List;
 
@@ -59,8 +60,8 @@ public class TreeBuilder {
         return b.build();
     }
 
-    static public Tree build(List<Sequence> seqs, PairwiseAligner aligner) {
-       DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, null);
+    static public Tree build(List<Sequence> seqs, PairwiseAligner aligner, AlignmentProgressListener progress) {
+       DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
        return new NeighborJoiningBuilder(d).build();
     }
 }

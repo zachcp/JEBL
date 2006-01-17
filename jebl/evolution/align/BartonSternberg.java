@@ -45,7 +45,8 @@ public class BartonSternberg {
 
     }
 
-    private AlignmentProgressListener progress;
+    CompoundAlignmentProgressListener compoundProgress;
+    /*private AlignmentProgressListener progress;
     private boolean cancelled = false;
     private int sectionsCompleted;
     private int totalSections;
@@ -55,7 +56,7 @@ public class BartonSternberg {
             if(progress.setProgress(totalProgress)) cancelled = true;
             return cancelled;
         }
-    };
+    };*/
 
     private Profile align(RootedTree tree, Node node, List<Sequence> seqs) {
         if( tree.isExternal(node) ) {
@@ -71,14 +72,15 @@ public class BartonSternberg {
         Profile left = align(tree, childern.get(0), seqs);
         Profile right = align(tree, childern.get(1), seqs);
 
-        AlignmentResult results[] = aligner.doAlignment(left, right, minorProgress, false);
+        AlignmentResult results[] = aligner.doAlignment(left, right, compoundProgress.getMinorProgress(), false);
+        compoundProgress.incrementSectionsCompleted(1);
         return Profile.combine(left, right, results[0], results[1]);
     }
 
     public String[] align(List<Sequence> sourceSequences, AlignmentProgressListener progress) {
 
-        cancelled = false;
-        this.progress = progress;
+//        cancelled = false;
+//        this.progress = progress;
         int count = sourceSequences.size();
 
         String[] sequences = new String[count];
@@ -92,8 +94,15 @@ public class BartonSternberg {
             Sequence s = sourceSequences.get(i);
             seqs.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequences[i]));
         }
+        int treeWork = count*(count - 1)/2;
 
-        RootedTree guideTree = Utils.rootTheTree(TreeBuilder.build(seqs, aligner));
+        compoundProgress =
+                new CompoundAlignmentProgressListener(progress,treeWork +count*3- 1);
+
+        compoundProgress.setSectionSize(treeWork);
+        RootedTree guideTree = Utils.rootTheTree(TreeBuilder.build(seqs, aligner, compoundProgress.getMinorProgress()));
+        compoundProgress.incrementSectionsCompleted(treeWork);
+        compoundProgress.setSectionSize(1);
 
         Profile profile = align(guideTree, guideTree.getRootNode(), seqs);
         /*
@@ -103,8 +112,8 @@ public class BartonSternberg {
             order[i]=i; //todo: use an ordering based on similarity
         }
         */
-        totalSections = count*3-1;
-        sectionsCompleted = 0;
+//        totalSections = count*3-1;
+//        sectionsCompleted = 0;
         /*
         profile.addSequence(order [0],sequences [order [0]]);
         for (int i : order) {
@@ -136,10 +145,10 @@ public class BartonSternberg {
                 profile.remove(sequenceProfile);
 //                aligner.setDebug(display);
 
-                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], minorProgress, false);
+                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], compoundProgress.getMinorProgress(), false);
 //                aligner.setDebug(false);
-                if (cancelled) return null;
-                sectionsCompleted ++;
+                if (compoundProgress.isCancelled()) return null;
+                compoundProgress.incrementSectionsCompleted(1);
                 if(display){
                     profile.print(false);
 
