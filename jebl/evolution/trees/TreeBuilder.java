@@ -4,6 +4,11 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.distances.JukesCantorDistanceMatrix;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.distances.F84DistanceMatrix;
+import jebl.evolution.distances.SequenceAlignmentsDistanceMatrix;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.align.PairwiseAligner;
+
+import java.util.List;
 
 /**
  * A meeting point for tree building. A very initial form which will develope to encompass more
@@ -52,6 +57,11 @@ public class TreeBuilder {
     static public Tree build(RootedTree[] trees) {
         ConsensusTreeBuilder b = new ConsensusTreeBuilder(trees);
         return b.build();
+    }
+
+    static public Tree build(List<Sequence> seqs, PairwiseAligner aligner) {
+       DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, null);
+       return new NeighborJoiningBuilder(d).build();
     }
 }
 

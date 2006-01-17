@@ -3,11 +3,17 @@ package jebl.evolution.align;
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
 import jebl.evolution.sequences.SequenceTester;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.alignments.BasicAlignment;
+
+import java.util.List;
+import java.util.ArrayList;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 // uses linear space.
 
-public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
+public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine implements PairwiseAligner {
     private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
     private boolean debug;
@@ -50,8 +56,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
     private Profile profile1, profile2;
 //    private AlignmentResult result1, result2;
 
-    public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress) {
-        this.progress =progress;
+    public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress, boolean scoreOnly) {
+        this.progress = progress;
 
 
         sq1 = strip(sq1);
@@ -61,13 +67,19 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine {
         //so that we do not have to create them again during recursion.
         profile1 = new Profile(0,sq1);
         profile2 = new Profile(0,sq2);
-        AlignmentResult[] results = doAlignment(profile1, profile2, progress);
+        AlignmentResult[] results = doAlignment(profile1, profile2, progress, scoreOnly);
         matchResult = new String[2];
         if(cancelled) return;
         matchResult[0] = Profile.buildAlignmentString(sq1, results [0]);
         matchResult[1] = Profile.buildAlignmentString(sq2, results[1]);
     }
-    public AlignmentResult[] doAlignment(Profile profile1, Profile profile2, AlignmentProgressListener progress){
+
+     public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress) {
+            doAlignment(sq1, sq2, progress, false);
+    }
+
+    public AlignmentResult[] doAlignment(Profile profile1, Profile profile2,
+                                         AlignmentProgressListener progress, boolean scoreOnly){
 this.progress = progress;
     this.n = profile1.length();
     this.m = profile2.length();
@@ -87,7 +99,7 @@ this.progress = progress;
         int maximumResultLength =m+n;
         AlignmentResult result1=new AlignmentResult(maximumResultLength);
         AlignmentResult result2 =new AlignmentResult(maximumResultLength);
-        resultScore =doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2);
+        resultScore = doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly);
         return new AlignmentResult[]{result1, result2};
 
     }
@@ -107,7 +119,8 @@ this.progress = progress;
     }
 */
 //    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
-    private float doAlignment(int offset1, int offset2,int n,int m, int startType, int endType, AlignmentResult result1, AlignmentResult result2) {
+    private float doAlignment(int offset1, int offset2,int n,int m, int startType, int endType,
+                              AlignmentResult result1, AlignmentResult result2, boolean scoreOnly) {
 //        prepareAlignment(sq1, sq2);
         this.n = n;
         this.m=m;
@@ -280,9 +293,11 @@ this.progress = progress;
         }
         float finalScore = F [ bestk][1][m];
 
-        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2);
+        if( scoreOnly ) return finalScore;
+
+        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2, false);
         if(cancelled) return 0;
-        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2);
+        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2, false);
         if (cancelled) return 0;
 
        /* String sequence1a = sq1.substring(0, u);
@@ -416,6 +431,20 @@ this.progress = progress;
 
     public void setDebug(boolean display) {
         debug = display;
+    }
+
+    public Result doAlignment(Sequence seq1, Sequence seq2, AlignmentProgressListener progress) {
+        doAlignment(seq1.getString(), seq2.getString());
+        List<Sequence> seqs = new ArrayList<Sequence>(2);
+        String[] results = getMatch();
+        seqs.add(new BasicSequence(seq1.getSequenceType(), seq1.getTaxon(), results[0]));
+        seqs.add(new BasicSequence(seq2.getSequenceType(), seq2.getTaxon(), results[1]));
+        return new Result(new BasicAlignment(seqs), getScore());
+    }
+
+    public double getScore(Sequence seq1, Sequence seq2) {
+        doAlignment(seq1.getString(), seq2.getString(), null, true);
+        return getScore();
     }
 }
 

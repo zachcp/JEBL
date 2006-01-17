@@ -7,6 +7,12 @@ import jebl.evolution.io.ImportException;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.TreeBuilder;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Utils;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -35,7 +41,7 @@ public class BartonSternberg {
         this.gapOpen = gapOpen;
         this.gapExtend = gapExtend;
         this.scores = Scores.includeGaps(scores, 0);
-        aligner =new NeedlemanWunschLinearSpaceAffine(this.scores,gapOpen,gapExtend);
+        aligner = new NeedlemanWunschLinearSpaceAffine(this.scores,gapOpen,gapExtend);
 
     }
 
@@ -51,37 +57,69 @@ public class BartonSternberg {
         }
     };
 
-    public String[] align(String sourceSequences[], AlignmentProgressListener progress) {
+    private Profile align(RootedTree tree, Node node, List<Sequence> seqs) {
+        if( tree.isExternal(node) ) {
+            Taxon tax = tree.getTaxon(node);
+            int iSeq = Integer.parseInt(tax.getName());
+
+            Profile profile = new Profile(scores.getAlphabet().length());
+            profile.addSequence(iSeq, seqs.get(iSeq).getString());
+            return profile;
+        }
+
+        List<Node> childern = tree.getChildren(node);   assert( childern.size() == 2 );
+        Profile left = align(tree, childern.get(0), seqs);
+        Profile right = align(tree, childern.get(1), seqs);
+
+        AlignmentResult results[] = aligner.doAlignment(left, right, minorProgress, false);
+        return Profile.combine(left, right, results[0], results[1]);
+    }
+
+    public String[] align(List<Sequence> sourceSequences, AlignmentProgressListener progress) {
 
         cancelled = false;
         this.progress = progress;
-        int count = sourceSequences.length;
-        String[] sequences =new String[count];
-        Profile[] sequenceProfiles=new Profile[count];
+        int count = sourceSequences.size();
+
+        String[] sequences = new String[count];
+
+        Profile[] sequenceProfiles= new Profile[count];
+        List<Sequence> seqs = new ArrayList<Sequence>(sourceSequences.size());
         for (int i = 0; i < count; i++) {
-            sequences[i]= Align.strip(sourceSequences[i], scores.getAlphabet());
+            sequences[i]= Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet());
             sequenceProfiles[i] = new Profile(i, sequences[i]);
+
+            Sequence s = sourceSequences.get(i);
+            seqs.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequences[i]));
         }
-        Profile profile =new Profile(scores.getAlphabet().length());
-        int order[] =new int[count];
+
+        RootedTree guideTree = Utils.rootTheTree(TreeBuilder.build(seqs, aligner));
+
+        Profile profile = align(guideTree, guideTree.getRootNode(), seqs);
+        /*
+        Profile profile = new Profile(scores.getAlphabet().length());
+        int order[] = new int[count];
         for (int i = 0; i < count; i++) {
             order[i]=i; //todo: use an ordering based on similarity
         }
-        totalSections = count*3;
+        */
+        totalSections = count*3-1;
         sectionsCompleted = 0;
+        /*
         profile.addSequence(order [0],sequences [order [0]]);
         for (int i : order) {
             if(order[0] ==i) continue;
-            AlignmentResult results[] =aligner.doAlignment (profile, sequenceProfiles[i], minorProgress);
+            AlignmentResult results[] = aligner.doAlignment (profile, sequenceProfiles[i], minorProgress, false);
             if(cancelled) return null;
             sectionsCompleted ++;
 //            System.out.println("result =" + results[0].size + "," + results[1].size + " from " + profile.length + "," + sequenceProfile.length);
             profile = Profile.combine(profile, sequenceProfiles[i], results[0], results[1]);
 //            profile.print ();
         }
+        */
         //now remove a single sequence, and we
         for (int j = 0; j < 2; j++) {
-            for (int i : order) {
+            for (int i = 0; i < count; ++i) {
 //                if(j> 0&& i!= 8) continue;
 //                Profile sequenceProfile = sequenceProfiles[i];
                 boolean display = false;
@@ -97,7 +135,8 @@ public class BartonSternberg {
                 Profile sequenceProfile = new Profile(i, sequence);
                 profile.remove(sequenceProfile);
 //                aligner.setDebug(display);
-                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], minorProgress);
+
+                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], minorProgress, false);
 //                aligner.setDebug(false);
                 if (cancelled) return null;
                 sectionsCompleted ++;
@@ -149,7 +188,7 @@ public class BartonSternberg {
         BartonSternberg alignment =new BartonSternberg( new Blosum60(), 20, 1);
         String[] sequences = sequenceStrings.toArray(new String[0]);
         System.out.println("aligning " + sequences.length);
-        String results[] =alignment.align(sequences, null);
+        String results[] =alignment.align(xsequences, null);
         for (String result : results) {
             System.out.println(result);
         }

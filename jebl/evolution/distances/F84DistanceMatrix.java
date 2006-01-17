@@ -15,12 +15,18 @@ import java.util.Collection;
  * @version $Id$
  *
  */
+
+
 public class F84DistanceMatrix extends BasicDistanceMatrix {
 
     public F84DistanceMatrix(Alignment alignment) {
         super(alignment.getTaxa(), getDistances(alignment));
     }
 
+    /*static class d {
+        double[][] get() { return null; }
+    }
+    */
     //
     // Private stuff
     //

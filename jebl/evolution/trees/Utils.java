@@ -261,7 +261,7 @@ public final class Utils {
 
             double d = (minOfMaxes - distToSecond) / 2;
             if( d >= tree.getEdgeLength(best.first, best.second) ||
-                Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) < 3 ) {
+                Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2 ) {
                return new RootedFromUnrooted(tree, best.first);
             }
 
