@@ -5,6 +5,7 @@
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.Sequence;
+import jebl.evolution.taxa.Taxon;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,7 +35,9 @@ public class FastaExporter implements SequenceExporter {
 	public void exportSequences(List<Sequence> sequences) throws IOException {
 
         for (Sequence sequence : sequences) {
-            writer.println(">" + sequence.getTaxon().getName());
+            Taxon taxon = sequence.getTaxon();
+            String desc = (String)taxon.getAttribute(FastaImporter.descriptionPropertyName);
+            writer.println(">" + taxon.getName() + ((desc != null) ? (" " + desc) : ""));
             writer.println(sequence.getString());
         }
     }

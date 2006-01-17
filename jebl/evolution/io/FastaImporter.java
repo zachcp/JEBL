@@ -25,8 +25,9 @@ import java.util.StringTokenizer;
  * @author Alexei Drummond
  */
 public class FastaImporter implements SequenceImporter {
+     public static final String descriptionPropertyName = "description";
 
-	/**
+    /**
 	 * Constructor
 	 */
 	public FastaImporter(Reader reader, SequenceType sequenceType) {
@@ -63,7 +64,7 @@ public class FastaImporter implements SequenceImporter {
 
                 Taxon taxon = Taxon.getTaxon(name);
                 if( description != null && description.length() > 0 ) {
-                  taxon.setAttribute("description", description);
+                   taxon.setAttribute(descriptionPropertyName, description);
                 }
 
                 sequences.add(new BasicSequence(sequenceType, taxon, seq.toString()));
