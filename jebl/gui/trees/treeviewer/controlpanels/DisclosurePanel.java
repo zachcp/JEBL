@@ -14,6 +14,17 @@ import java.util.*;
 public class DisclosurePanel extends JPanel {
 
 	public DisclosurePanel(final Controls controls, boolean isOpen) {
+        this(controls, isOpen, false, null);
+    }
+
+    /**
+     *
+     * @param controls
+     * @param isOpen
+     * @param fastBlueStyle draw labels using blue coloured text, and expand/contract quickly when the button is clicked.
+     * @param checkbox A checkbox to be used instead of the default label next to the expand/contract button.
+     */
+    public DisclosurePanel(final Controls controls, boolean isOpen, boolean fastBlueStyle, JCheckBox checkbox) {
 
 		this.controls = controls;
 
@@ -27,12 +38,24 @@ public class DisclosurePanel extends JPanel {
 			}
 		};
 
-		button = new DisclosureButton();
+		button = new DisclosureButton(fastBlueStyle? 10:150);
 
 		panel1.add(button);
-		panel1.add(new JLabel(controls.getTitle()));
+        JLabel label = new JLabel(controls.getTitle());
+        if(fastBlueStyle) {
+            label.setForeground(Color.BLUE);
+        }
+        if(checkbox != null) {
+            if(fastBlueStyle) {
+                checkbox.setForeground(Color.BLUE);
+            }
+            panel1.add(checkbox);
+        }
+        else {
+            panel1.add(label);
+        }
 
-		add(panel1, BorderLayout.NORTH);
+        add(panel1, BorderLayout.NORTH);
 
 		add(controls.getPanel(), BorderLayout.CENTER);
 

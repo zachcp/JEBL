@@ -17,9 +17,14 @@ public class DisclosureButton extends JToggleButton {
 	private Timer timer = null;
 	private boolean opening;
 	private final List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();
+    private int animationSpeed;
 
-	public DisclosureButton() {
-		putClientProperty("JButton.buttonType", "toolbar");
+    public DisclosureButton() {
+        this(150);
+    }
+	public DisclosureButton(int animationSpeed) {
+        this.animationSpeed = animationSpeed;
+        putClientProperty("JButton.buttonType", "toolbar");
 		setBorderPainted(false);
 		setOpaque(false);
         // this is required on Windows XP platform -- untested on Macintosh
@@ -68,7 +73,7 @@ public class DisclosureButton extends JToggleButton {
     private void startAnimation() {
 		if (disclosureIcons == null) return;
 
-		timer = new Timer(150, listener);
+		timer = new Timer(animationSpeed, listener);
 		timer.setCoalesce(false);
 		timer.start();
 	}
