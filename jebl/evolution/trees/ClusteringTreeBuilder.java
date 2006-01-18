@@ -24,16 +24,23 @@ import java.util.Set;
 abstract class ClusteringTreeBuilder {
     protected SimpleTree tree = null;
     protected SimpleRootedTree rtree = null;
+    private boolean buildUsingBranches = true;
+
     /**
      * constructor ClusteringTree
      *
      * @param distanceMatrix distance matrix
      */
-    public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
+    public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa, boolean useBranches) throws IllegalArgumentException {
         this.distanceMatrix = distanceMatrix;
+        buildUsingBranches = useBranches;
+
         if (minimumTaxa == 2) {
-            this.rtree = new SimpleRootedTree();
+           this.rtree = new SimpleRootedTree();
         } else {
+            if( !buildUsingBranches ) {
+              throw new IllegalArgumentException("Only rooted trees can use heights");
+            }
           this.tree = new SimpleTree();
         }
         this.minimumTaxa = minimumTaxa;
@@ -41,6 +48,10 @@ abstract class ClusteringTreeBuilder {
         if (distanceMatrix.getSize() < minimumTaxa) {
             throw new IllegalArgumentException("less than " + minimumTaxa + " taxa in distance matrix");
         }
+    }
+
+    public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
+      this(distanceMatrix, minimumTaxa, true);
     }
 
     public Tree build() {
@@ -147,10 +158,14 @@ abstract class ClusteringTreeBuilder {
                 tree.setEdge(newCluster, n[k], d[k]);
             }
         } else {
-          newCluster = rtree.createInternalNode(a);
-          for(int k = 0; k < 2; ++k) {
-             rtree.setLength(n[k], d[k]);
-          }
+            newCluster = rtree.createInternalNode(a);
+            if( buildUsingBranches )  {
+                for(int k = 0; k < 2; ++k) {
+                    rtree.setLength(n[k], d[k]);
+                }
+            } else {
+                rtree.setHeight(newCluster, d[0]);
+            }
         }
         
         clusterCreated(newCluster);

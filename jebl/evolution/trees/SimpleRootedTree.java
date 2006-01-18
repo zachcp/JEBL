@@ -312,7 +312,7 @@ public class SimpleRootedTree implements RootedTree {
      */
     protected void calculateBranchLengths() {
 
-        if (!lengthsKnown) {
+        if (!hasLengths) {
             throw new IllegalArgumentException("Can't calculate branch lengths because node heights not known");
         }
 
