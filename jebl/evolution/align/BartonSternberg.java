@@ -70,10 +70,13 @@ public class BartonSternberg {
 
         List<Node> childern = tree.getChildren(node);   assert( childern.size() == 2 );
         Profile left = align(tree, childern.get(0), seqs);
+        if (compoundProgress.isCancelled()) return null;
         Profile right = align(tree, childern.get(1), seqs);
+        if (compoundProgress.isCancelled()) return null;
 
         AlignmentResult results[] = aligner.doAlignment(left, right, compoundProgress.getMinorProgress(), false);
         compoundProgress.incrementSectionsCompleted(1);
+        if(compoundProgress.isCancelled()) return null;
         return Profile.combine(left, right, results[0], results[1]);
     }
 
@@ -105,6 +108,8 @@ public class BartonSternberg {
         compoundProgress.setSectionSize(1);
 
         Profile profile = align(guideTree, guideTree.getRootNode(), seqs);
+        if (compoundProgress.isCancelled()) return null;
+
         /*
         Profile profile = new Profile(scores.getAlphabet().length());
         int order[] = new int[count];
