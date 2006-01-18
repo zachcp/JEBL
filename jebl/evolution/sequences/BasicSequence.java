@@ -44,10 +44,13 @@ public class BasicSequence implements Sequence {
         int k = 0;
         for (int i = 0; i < sequenceString.length(); i++) {
             State state = sequenceType.getState(sequenceString.substring(i, i + 1));
-            if (state != null) {
-                sequence[k] = state.getIndex();
-                k++;
+
+            if (state == null) {
+                // Something is wrong. Keep original length by inserting an unknown state
+                state = sequenceType.getUnknownState();
             }
+            sequence[k] = state.getIndex();
+            k++;
         }
     }
 
