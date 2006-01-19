@@ -25,7 +25,8 @@ import java.util.StringTokenizer;
  * @author Alexei Drummond
  */
 public class FastaImporter implements SequenceImporter {
-     public static final String descriptionPropertyName = "description";
+
+    public static final String descriptionPropertyName = "description";
 
     /**
 	 * Constructor
