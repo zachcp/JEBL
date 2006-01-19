@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * Class for importing PHYLIP sequential file format
+ * Class for importing Fasta sequential file format
  *
  * @version $Id$
  *
