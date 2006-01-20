@@ -115,7 +115,11 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
 		double freqR = freqA + freqG;
 		double freqY = freqC + freqT;
 
-		constA =  ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
+        // in extream cases avoid divide by zero
+        if( freqR == 0 ) freqR = 1;
+        if( freqY == 0 ) freqY = 1;
+
+        constA =  ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
 		constB =  (freqA * freqG) + (freqC * freqT);
 		constC =  (freqR * freqY);
 
