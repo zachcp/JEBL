@@ -104,7 +104,7 @@ public class BartonSternberg {
                 new CompoundAlignmentProgressListener(progress,treeWork +count* refinementIterations+ count- 1);
 
         compoundProgress.setSectionSize(treeWork);
-        RootedTree guideTree = Utils.rootTheTree(TreeBuilder.build(seqs, aligner, compoundProgress.getMinorProgress()));
+        RootedTree guideTree = Utils.rootTheTree(TreeBuilder.build(seqs, aligner, compoundProgress.getMinorProgress()).tree);
         compoundProgress.incrementSectionsCompleted(treeWork);
         compoundProgress.setSectionSize(1);
 

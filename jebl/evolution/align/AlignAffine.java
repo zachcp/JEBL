@@ -15,9 +15,9 @@ abstract class AlignAffine extends Align {
     private int oldn = 0;
     private int oldm = 0;
 
-    public AlignAffine(Scores sub, float d, float e) {
-    	super(sub, d);
-        setGapExtend(e);
+    public AlignAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
+    	super(sub, openGapPenalty);
+        setGapExtend(extendGapPenalty);
     }
     
     /**

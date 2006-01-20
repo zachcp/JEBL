@@ -19,8 +19,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private boolean debug;
     private boolean freeGapsAtEnds;
 
-    public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
-        this(sub, d, e, false);
+    public NeedlemanWunschLinearSpaceAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
+        this(sub, openGapPenalty, extendGapPenalty, false);
     }
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds) {

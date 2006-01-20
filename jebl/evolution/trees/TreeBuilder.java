@@ -60,9 +60,20 @@ public class TreeBuilder {
         return b.build();
     }
 
-    static public Tree build(List<Sequence> seqs, PairwiseAligner aligner, AlignmentProgressListener progress) {
+    static public class Result {
+        public final Tree tree;
+        public final DistanceMatrix distance;
+        
+        Result(Tree tree, DistanceMatrix distance) {
+            this.tree = tree;
+            this.distance = distance;
+        }
+    }
+
+    static public Result build(List<Sequence> seqs, PairwiseAligner aligner, AlignmentProgressListener progress) {
        DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
-       return new NeighborJoiningBuilder(d).build();
+       Tree t = new NeighborJoiningBuilder(d).build();
+       return new Result(t, d);
     }
 }
 
