@@ -12,10 +12,10 @@ import java.util.List;
 public class ControlPalette extends JPanel {
 
 	public enum DisplayMode {
-		DEFAULT_OPEN,
-		INITIALLY_OPEN,
-		INITIALLY_CLOSED,
-		ONLY_ONE_OPEN
+		DEFAULT_OPEN, // The controls themselves specify whether they should start open or not
+		INITIALLY_OPEN, // All controls start open
+		INITIALLY_CLOSED, // All controls start closed
+		ONLY_ONE_OPEN // Only one control is kept open at any time
 	}
 
 	public ControlPalette(int preferredWidth) {
@@ -98,7 +98,14 @@ public class ControlPalette extends JPanel {
 
 		if (displayMode == DisplayMode.ONLY_ONE_OPEN) {
 			panel.addDisclosureListener(new DisclosureListener() {
-				public void opening(Component component) { }
+				public void opening(Component component) {
+					if (currentlyOpen >= 0) {
+						DisclosurePanel panel = disclosurePanels.get(currentlyOpen);
+						Dimension size = panel.getSize();
+						panel.setSize(size.width, size.height / 2);
+					}
+
+				}
 
 				public void opened(Component component) {
 					int newlyOpened = disclosurePanels.indexOf(component);
