@@ -2,9 +2,8 @@ package jebl.evolution.distances;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.Nucleotides;
-import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.State;
 
 /**
  *  Compute HKY corrected distance matrix
@@ -30,17 +29,19 @@ import jebl.evolution.sequences.Sequence;
  * and wheather the element is a Purine or a Pyrimidine.
  *
  * pi(A,C,G,T) = stationary frequencies
+ *              F84                    HKY      Tamura-Nei
+ * K(AG) = 1 + Kappa/(pi(A)+pi(G))     Kappa       a1
  *
- * K(AG) = 1 + Kappa/(pi(A)+pi(G))    F84
- *         Kappa                      HKY
- * K(CT) = 1 + Kappa/(pi(C)+pi(T))    F84
- *         Kappa                      HKY
+ * K(CT) = 1 + Kappa/(pi(C)+pi(T))     Kappa       a2
+ *
+ *  b    =       1                       1         beta
  *
  * Rate Matrix
- *      |   -     1   K(AG)   1   |   | pi(A)   0     0     0   |
- * Q =  |   1     -     1   K(CT) |   |  0    pi(C)   0     0   |
- *      | K(AG)   1     -     1   |   |  0      0   pi(G)   0   |
- *      |   1   K(CT)   1,    -   |   |  0      0     0   pi(T) |
+ *
+ *      |   -     b   K(AG)   b   |   | pi(A)   0     0     0   |
+ * Q =  |   b     -     b   K(CT) |   |  0    pi(C)   0     0   |
+ *      | K(AG)   1     -     b   |   |  0      0   pi(G)   0   |
+ *      |   b   K(CT)   b    -    |   |  0      0     0   pi(T) |
  *
  *
  * Transition Probability Matrix
@@ -51,9 +52,9 @@ import jebl.evolution.sequences.Sequence;
  * Alpha(j) = 1 + Kappa        F84
  *            1 + PI(j)*(k-1)  HKY
  *
- * P(transversion) = pi,(i+1)%4 = pi,(i+3)%4 =  pi(i) * ( 1 - exp(-t) )
- * P(transition) = pi,(i+2)%4 = pi(i) + pi(j)(1/PI(j) - 1) * exp(-t)  -    pi(i)/PI(i)    * exp(-t * Alpha(i))
- * Pi,i =                       pi(i) + pi(i)(1/PI(i) - 1) * exp(-t)  - (pi(i)/PI(i) - 1) * exp(-t * Alpha(i))
+ * P(transversion) = pi,(i+1)%4 = pi,(i+3)%4 =  pi(i) * (1 - exp(-t))
+ * P(transition)   = pi,(i+2)%4 = pi(i) + pi(j)(1/PI(j) - 1) * exp(-t)  -    pi(i)/PI(i)    * exp(-t * Alpha(i))
+ * Pi,i =                         pi(i) + pi(i)(1/PI(i) - 1) * exp(-t)  - (pi(i)/PI(i) - 1) * exp(-t * Alpha(i))
  *
  *
  * From the above it is easy to see that for F84 Sum(all transversions) = 2 Sum(p(i)) (1 - exp(-t)) = 2(1-exp(-t))
@@ -62,12 +63,14 @@ import jebl.evolution.sequences.Sequence;
  * even when sequences are not identical. I am not sure if there is an easy way to fix this since in this case
  * Kappa is confused with t and only t*(Kappa+1) can be estimated.
  *
- * I am still confused about the code in this file and wheather the formulas are correct. They certainly
- * don't solve the above model. To complicate the situation further the original code had either a bug
- * or a documentation error - The documentation proclaimed transitions/transversions are being counted but code
- * counted only A<-->G substitutions and not C<-->T. Also counting the ratios of transitions to total sites look
- * suspect since estimating transition/transversion rates requires dividing by the number of bases in the sequence,
- * i.e.  #A->G / #A. (See F84DistanceMatrix code, which has been verified).
+ * The code in this file estimates the "evolutionary distance", which is
+ * (2*Kappa*(pi(A)*pi(G) + pi(T)*pi(C)) + 2*(pi(A) + PI(C))*beta) * t. (*)
+ * This raises a question since the stationary frequencies are estimated from all the sequences, but
+ * transition/transversion rates are done for each pair individually. The result is that distances are not neccesarily
+ * scaled correctly for the matrix as a whole. I am still trying to figure this out.
+ *
+ * (*) The original code had a bug which counted only A<-->G substitutions while C<-->T where ignored.
+ *
  */
 
 public class HKYDistanceMatrix extends BasicDistanceMatrix {
@@ -76,11 +79,10 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         super(alignment.getTaxa(), Initialaizer.getDistances(alignment));
     }
 
-    static class Initialaizer {
+    static class Initialaizer extends ModelBasedDistanceMatrix {
         //
         // Private stuff
         //
-        private static final double MAX_DISTANCE = 1000.0;
         private static Alignment alignment;
 
         //used in correction formula
@@ -118,12 +120,11 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             double Q = sumTv / sumWeight;
 
             double tmp1 = Math.log(1.0 - (P / (2.0 * constA)) -
-                    (((constA - constB) * Q) / (2.0 * constA * constC)));
+                                   (((constA - constB) * Q) / (2.0 * constA * constC)));
 
             double tmp2 = Math.log(1.0 - (Q / (2.0 * constC)));
 
-            distance = -(2.0 * constA * tmp1) +
-                    (2.0 * (constA - constB - constC) * tmp2);
+            distance = -(2.0 * constA * tmp1) + (2.0 * (constA - constB - constC) * tmp2);
 
             return Math.min(distance, MAX_DISTANCE);
         }
@@ -139,32 +140,13 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 throw new IllegalArgumentException("HKYDistanceMatrix must have nucleotide patterns");
             }
 
-            double[] freqs = new double[stateCount];
-            for( Sequence sequence : alignment.getSequences() ) {
-                for( int i : sequence.getStateIndices() ) {
-                    /*if( !((0 <= i && i < stateCount) ||
-                           i == sequence.getSequenceType().getGapState().getIndex() ||
-                           i == sequence.getSequenceType().getUnknownState().getIndex()) ) {
-                       System.out.print(i);
-
-                   } */
-                    // ignore non definite states (ask alexei)
-                    if( i < stateCount ) ++freqs[i];
-                }
-            }
+             double[] freqs = getFrequencies(alignment);
 
             // Ask Alexei (mapping 0-a etc)
-            double freqA = freqs[0];
-            double freqC = freqs[1];
-            double freqG = freqs[2];
-            double freqT = freqs[3];
-
-            double freqR = freqA + freqG;
-            double freqY = freqC + freqT;
-
-            // in extream cases avoid divide by zero
-            if( freqR == 0 ) freqR = 1;
-            if( freqY == 0 ) freqY = 1;
+            double freqA = freqs[Nucleotides.A_STATE.getIndex()];
+            double freqC = freqs[Nucleotides.C_STATE.getIndex()];
+            double freqG = freqs[Nucleotides.G_STATE.getIndex()];
+            double freqT = freqs[Nucleotides.T_STATE.getIndex()];
 
             constA =  ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
             constB =  (freqA * freqG) + (freqC * freqT);

@@ -1,8 +1,8 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.taxa.Taxon;
-
-import java.util.Collection;
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Nucleotides;
+import jebl.evolution.sequences.Sequence;
 
 /**
  *
@@ -10,25 +10,39 @@ import java.util.Collection;
  * @version $Id$
  *
  */
-public abstract class ModelBasedDistanceMatrix extends BasicDistanceMatrix {
+public class ModelBasedDistanceMatrix  {
     protected static final double MAX_DISTANCE = 1000.0;
 
-    public ModelBasedDistanceMatrix(Collection<Taxon> taxa, double[][] distances) {
-        super(taxa, distances);
-    }
-  /*
-    static double[][] buildDistances(int dimension) {
-        double[][] distances = new double[dimension][dimension];
+    protected  static double freqR, freqY;
 
-        for(int i = 0; i < dimension; ++i) {
-            for(int j = i+1; j < dimension; ++j) {
-                distances[i][j] = calculatePairwiseDistance(i, j);
-                distances[j][i] = distances[i][j];
+    protected static double[] getFrequencies(Alignment alignment) {
+        final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
+
+        double[] freqs = new double[stateCount];
+        long count = 0;
+        for( Sequence sequence : alignment.getSequences() ) {
+            for( int i : sequence.getStateIndices() ) {
+                // ignore non definite states (ask alexei)
+                if( i < stateCount ) {
+                    ++freqs[i];
+                    ++count;
+                }
             }
         }
 
-        return distances;
+        for(int i = 0; i < stateCount; ++i) {
+            freqs[i] /= count;
+        }
+
+        if( stateCount == 4 ) {
+           freqR = freqs[Nucleotides.A_STATE.getIndex()] + freqs[Nucleotides.G_STATE.getIndex()];
+           freqY = freqs[Nucleotides.C_STATE.getIndex()] + freqs[Nucleotides.T_STATE.getIndex()];
+        }
+
+        // in extream cases avoid divide by zero
+        if( freqR == 0 ) freqR = 1;
+        if( freqY == 0 ) freqY = 1;
+
+        return freqs;
     }
-    */
-    //static abstract double calculatePairwiseDistance(int i, int j);
 }

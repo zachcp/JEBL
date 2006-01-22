@@ -1,10 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.alignments.Alignment;
-import jebl.evolution.distances.JukesCantorDistanceMatrix;
-import jebl.evolution.distances.DistanceMatrix;
-import jebl.evolution.distances.F84DistanceMatrix;
-import jebl.evolution.distances.SequenceAlignmentsDistanceMatrix;
+import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.align.PairwiseAligner;
 import jebl.evolution.align.AlignmentProgressListener;
@@ -23,7 +20,7 @@ import java.util.List;
 public class TreeBuilder {
 
     public enum Method {UPGMA, NEIGHBOR_JOINING}
-    public enum DistanceModel { JukesCantor, F84 }
+    public enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
 
     static public Tree build(Alignment alignment, Method method, DistanceModel model) {
         DistanceMatrix d;
@@ -34,6 +31,12 @@ public class TreeBuilder {
                 break;
             case F84:
                 d = new F84DistanceMatrix(alignment);
+                break;
+             case HKY:
+                d = new HKYDistanceMatrix(alignment);
+                break;
+              case TamuraNei:
+                d = new TamuraNeiDistanceMatrix(alignment);
                 break;
         }
 
