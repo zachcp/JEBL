@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * Class for importing PHYLIP sequential file format
+ * Class for importing Fasta sequential file format
  *
  * @version $Id$
  *
@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
  * @author Alexei Drummond
  */
 public class FastaImporter implements SequenceImporter {
+
      public static final String descriptionPropertyName = "description";
 
     /**

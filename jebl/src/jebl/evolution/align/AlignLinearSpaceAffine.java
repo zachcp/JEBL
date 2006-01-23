@@ -8,8 +8,8 @@ abstract class AlignLinearSpaceAffine extends AlignAffine {
 
     float[][][] F;  // the matrices used to compute the alignment
     
-    public AlignLinearSpaceAffine(Scores sub, float d, float e) {
-    	super(sub, d, e);
+    public AlignLinearSpaceAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
+    	super(sub, openGapPenalty, extendGapPenalty);
     }
     
     /**

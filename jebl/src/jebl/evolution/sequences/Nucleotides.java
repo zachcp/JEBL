@@ -104,6 +104,13 @@ public final class Nucleotides {
         return !isTransition(state1, state2);
     }
 
+    public static boolean isPurine(State state) {
+        return state == A_STATE || state == G_STATE;
+    }
+    public static boolean isPyrimidine(State state) {
+        return state == C_STATE || state == T_STATE;
+    }
+
     public String getName() { return "Nucleotides"; }
 
 	public static NucleotideState[] toStateArray(String sequenceString) {

@@ -17,11 +17,18 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
     private boolean debug;
+    private boolean freeGapsAtEnds;
 
-    public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e) {
+    public NeedlemanWunschLinearSpaceAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
+        this(sub, openGapPenalty, extendGapPenalty, false);
+    }
+
+    public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds) {
         super(sub, d, e);
+        this.freeGapsAtEnds= freeGapsAtEnds;
         quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
+
 
     private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
     //  algorithm to calculate the alignment as the base recursion case.
@@ -99,7 +106,7 @@ this.progress = progress;
         int maximumResultLength =m+n;
         AlignmentResult result1=new AlignmentResult(maximumResultLength);
         AlignmentResult result2 =new AlignmentResult(maximumResultLength);
-        resultScore = doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly);
+        resultScore = doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly,freeGapsAtEnds, freeGapsAtEnds);
         return new AlignmentResult[]{result1, result2};
 
     }
@@ -120,7 +127,7 @@ this.progress = progress;
 */
 //    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
     private float doAlignment(int offset1, int offset2,int n,int m, int startType, int endType,
-                              AlignmentResult result1, AlignmentResult result2, boolean scoreOnly) {
+                              AlignmentResult result1, AlignmentResult result2, boolean scoreOnly, boolean freeStartGap, boolean freeEndGap) {
 //        prepareAlignment(sq1, sq2);
         this.n = n;
         this.m=m;
@@ -144,7 +151,7 @@ this.progress = progress;
             quadraticAlign.setGapExtend(e);
 //            align.doAlignment(sq1,sq2);
 //            quadraticAlign.doAlignment(sq1,sq2, startType, endType);
-            quadraticAlign.doAlignment(profile1, profile2, offset1, offset2,n,m, startType, endType);
+            quadraticAlign.doAlignment(profile1, profile2, offset1, offset2,n,m, startType, endType, freeStartGap, freeEndGap);
             if(addProgress(n*m)) return 0;
 //            setScore (quadraticAlign.getScore());
             quadraticAlign.appendMatch(result1, result2);
@@ -167,6 +174,7 @@ this.progress = progress;
                 base =e;//if startType IS TYPE_Y then we were already in a
             // gap, so we can use gap extension penalty rather than gap starting penalty
             Iy[0] [j] = - base -e*(j- 1);
+            if(freeStartGap) Iy[0][j]= 0;
             Ix [0] [j] = M [0] [j] = Float.NEGATIVE_INFINITY;
             cy [0][j]= 0;
             cytype [0][j]= TYPE_Y;
@@ -190,6 +198,7 @@ this.progress = progress;
             float base =d;
             if (startType == TYPE_X) base =e;
             Ix[1][0] = - base -e*(i- 1);
+            if (freeStartGap) Ix[1][0] = 0;
             cxtype[1][0] = TYPE_X;
             cx[1][0] = 0;
             for (int j=1; j<=m; j++) {
@@ -225,9 +234,15 @@ this.progress = progress;
                     }
                 }
 
-                a = M[0][j]-d;
-                b = Ix[0][j]-e;
-                c = Iy[0][j]-d;
+                float  xd=d;
+                float xe=e;
+                if(j==m && freeEndGap) {
+                    xd= 0;
+                    xe= 0;
+                }
+                a = M[0][j]-xd;
+                b = Ix[0][j]-xe;
+                c = Iy[0][j]-xd;
                 val = Ix[1][j] = max(a, b, c);
                 if (i == u) {
                     cx[1][j] = j;
@@ -248,9 +263,15 @@ this.progress = progress;
                 }
 
 
-                a = M[1][j-1]-d;
-                b = Iy[1][j-1]-e;
-                c = Ix[1][j-1]-d;
+                float yd = d;
+                float ye = e;
+                if (i == n && freeEndGap) {
+                    yd = 0;
+                    ye = 0;
+                }
+                a = M[1][j-1]-yd;
+                b = Iy[1][j-1]-ye;
+                c = Ix[1][j-1]-yd;
                 val = Iy[1][j] = max(a, b, c);
                 if (i == u) {
                     cy[1][j] = j;
@@ -295,10 +316,11 @@ this.progress = progress;
 
         if( scoreOnly ) return finalScore;
 
-        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2, false);
+        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2, false, freeStartGap, false);
         if(cancelled) return 0;
-        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2, false);
+        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2, false, false, freeEndGap);
         if (cancelled) return 0;
+        //System.out.println("free =" +freeStartGap+ "," + freeEndGap+ ",score =" + finalScore);
 
        /* String sequence1a = sq1.substring(0, u);
         String sequence2a = sq2.substring(0, v);

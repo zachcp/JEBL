@@ -232,7 +232,7 @@ public final class Utils {
             double minOfMaxes = Double.MAX_VALUE;
             HashPair<Node> best = null;
             for( Node i : tree.getInternalNodes() ) {
-                double maxDist = Double.MIN_VALUE;
+                double maxDist = -Double.MAX_VALUE;
                 HashPair<Node> maxDirection = null;
                 for( Node n : tree.getAdjacencies(i) ) {
                     HashPair<Node> p = new HashPair<Node>(i, n);
@@ -260,7 +260,7 @@ public final class Utils {
             }
 
             double d = (minOfMaxes - distToSecond) / 2;
-            if( d >= tree.getEdgeLength(best.first, best.second) ||
+            if( d > tree.getEdgeLength(best.first, best.second) ||
                 Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2 ) {
                return new RootedFromUnrooted(tree, best.first);
             }

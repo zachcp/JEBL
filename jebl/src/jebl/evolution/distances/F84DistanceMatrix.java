@@ -1,123 +1,74 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.Nucleotides;
-import jebl.evolution.sequences.Sequence;
-
-import java.util.Collection;
+import jebl.evolution.sequences.State;
 
 /**
 
  * @author Joseph Heled
  * @version $Id$
  *
+ * See the detailed comment in HKYDistanceMatrix on the model and the formula used for estimating the distance.
  */
 
 
 public class F84DistanceMatrix extends BasicDistanceMatrix {
 
     public F84DistanceMatrix(Alignment alignment) {
-        super(alignment.getTaxa(), getDistances(alignment));
+        super(alignment.getTaxa(), Initialaizer.getDistances(alignment));
     }
 
-    /*static class d {
-        double[][] get() { return null; }
-    }
-    */
+    static class Initialaizer {
+
     //
     // Private stuff
     //
     private static final double MAX_DISTANCE = 1000.0;
     private static Alignment alignment;
 
-    //used in correction formula
-    static private double constA, constB, constC;
-
 	/**
 	 * Calculate a pairwise distance
 	 */
 	static private double calculatePairwiseDistance(int taxon1, int taxon2) {
 
-		//int n = patterns.getPatternCount();
-		double weight, distance;
-		double sumTs = 0.0;
-		double sumTv = 0.0;
-		double sumWeight = 0.0;
-
-		//int[] pattern;
+            double[] total = new double [4];
+            double[] transversions = new double [4];
 
         for( Pattern pattern : alignment.getPatterns() ) {
              State state1 = pattern.getState(taxon1);
              State state2 = pattern.getState(taxon2);
 
-             weight = pattern.getWeight();
-               // acgt
-            if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
-              if ( Nucleotides.isTransition(state1, state2) ) {
-					// it's a transition
-					sumTs += weight;
-				} else {
-					// it's a transversion
-					sumTv += weight;
+                double weight = pattern.getWeight();
+                if (!state1.isAmbiguous() && !state2.isAmbiguous() ) {
+                    total[state1.getIndex()] += weight;
+
+                    if( Nucleotides.isTransversion(state1, state2) ) {
+                       transversions[state1.getIndex()] += weight;
 				}
 			}
-			sumWeight += weight;
         }
 
-		double P = sumTs / sumWeight;
-		double Q = sumTv / sumWeight;
-
-		double tmp1 = Math.log(1.0 - (P / (2.0 * constA)) -
-								(((constA - constB) * Q) / (2.0 * constA * constC)));
-
-		double tmp2 = Math.log(1.0 - (Q / (2.0 * constC)));
-
-		distance = -(2.0 * constA * tmp1) +
-					(2.0 * (constA - constB - constC) * tmp2);
-
-		return Math.min(distance, MAX_DISTANCE);
+            double totalTransversions = 0.0;
+            for(int i = 0; i < 4; ++i) {
+                if( total[i] > 0 ) {
+                    totalTransversions += transversions[i]/total[i];
+                }
+            }
+            double expDist = 1.0 - (totalTransversions / 2.0);
+            return expDist > 0 ? -Math.log( expDist) : MAX_DISTANCE;
 	}
 
 
     synchronized static double[][] getDistances(Alignment alignment) {
-        F84DistanceMatrix.alignment = alignment;
+            Initialaizer.alignment = alignment;
 
-        // ASK Alexei
         final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
 
         if (stateCount != 4) {
 			throw new IllegalArgumentException("F84DistanceMatrix must have nucleotide patterns");
 		}
-
-        double[] freqs = new double[stateCount];
-        for( Sequence sequence : alignment.getSequences() ) {
-           for( int i : sequence.getStateIndices() ) {
-               /*if( !((0 <= i && i < stateCount) ||
-                       i == sequence.getSequenceType().getGapState().getIndex() ||
-                       i == sequence.getSequenceType().getUnknownState().getIndex()) ) {
-                   System.out.print(i);
-
-               } */
-              // ignore non definite states (ask alexei)
-             if( i < stateCount ) ++freqs[i];
-           }
-        }
-
-        // Ask Alexei (mapping 0-a etc)
-        double freqA = freqs[0];
-		double freqC = freqs[1];
-		double freqG = freqs[2];
-		double freqT = freqs[3];
-
-		double freqR = freqA + freqG;
-		double freqY = freqC + freqT;
-
-		constA =  ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
-		constB =  (freqA * freqG) + (freqC * freqT);
-		constC =  (freqR * freqY);
 
         int dimension = alignment.getTaxa().size();
         double[][] distances = new double[dimension][dimension];
@@ -130,5 +81,6 @@ public class F84DistanceMatrix extends BasicDistanceMatrix {
         }
 
         return distances;
+        }
     }
 }

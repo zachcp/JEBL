@@ -10,6 +10,9 @@ public class NeedlemanWunschAffine extends AlignAffine {
         super(sub, d, e);
     }
 
+
+
+
 	/**
 	 * @param sq1
 	 * @param sq2
@@ -60,7 +63,11 @@ public class NeedlemanWunschAffine extends AlignAffine {
         doAlignment(new Profile(0,sequence1), new Profile(0,sequence2),0, 0, sequence1.length(), sequence2.length(), startType, endType);
 
     }
-    public void doAlignment(Profile sequence1 , Profile sequence2, int offset1, int offset2, int n, int m,int startType, int endType) {
+
+    public void doAlignment(Profile sequence1, Profile sequence2, int offset1, int offset2, int n, int m, int startType, int endType) {
+        doAlignment(sequence1, sequence2, offset1, offset2,n, m, startType, endType, false, false);
+    }
+        public void doAlignment(Profile sequence1 , Profile sequence2, int offset1, int offset2, int n, int m,int startType, int endType, boolean freeStartGap, boolean freeEndGap) {
 //        n = sequence1.length;
 //        m = sequence2.length;
         this.n=n;
@@ -93,6 +100,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
                 base = e;//if startType IS TYPE_X then we were already in a
             // gap, so we can use gap extension penalty rather than gap starting penalty
             Ix[i][0] = -base - e * (i-1);
+            if(freeStartGap) Ix[i][0] =0;
 //            B[1][i][0].setTraceback(1, i-1, 0);
             Bk[1][i][0]= 1;
             Bi[1][i][0] =i- 1;
@@ -111,6 +119,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
             // gap, so we can use gap extension penalty rather than gap starting penalty
 
             Iy[0][j] = -base - e * (j-1);
+            if (freeStartGap) Iy[0][j] = 0;
 //            B[2][0][j].setTraceback(2, 0, j-1);
             Bk[2][0][j]= 2;
             Bi[2][0][j]= 0;
@@ -148,10 +157,17 @@ public class NeedlemanWunschAffine extends AlignAffine {
                     throw new Error("NWAffine 1");
                 }
 
-                a = M[i-1][j]-d;
-                b = Ix[i-1][j]-e;
-                c = Iy[i-1][j]-d;
+                float xd = d;
+                float xe = e;
+                if (j == m && freeEndGap) {
+                    xd = 0;
+                    xe = 0;
+                }
+                a = M[i - 1][j] - xd;
+                b = Ix[i - 1][j] - xe;
+                c = Iy[i - 1][j] - xd;
                 val = Ix[i][j] = max(a, b, c);
+
 
                 Bi[1][i][j] = i - 1;
                 Bj[1][i][j] = j;
@@ -168,9 +184,16 @@ public class NeedlemanWunschAffine extends AlignAffine {
                     throw new Error("NWAffine 2");
                 }
 
-                a = M[i][j-1]-d;
-                b = Iy[i][j-1]-e;
-                c = Ix[i][j-1]-d;
+                float yd = d;
+                float ye = e;
+                if (i == n && freeEndGap) {
+                    yd = 0;
+                    ye = 0;
+                }
+                a = M[i][j - 1] - yd;
+                b = Iy[i][j - 1] - ye;
+                c = Ix[i][j - 1] - yd;
+
                 val = Iy[i][j] = max(a, b, c);
                 Bi[2][i][j] = i;
                 Bj[2][i][j] = j- 1;

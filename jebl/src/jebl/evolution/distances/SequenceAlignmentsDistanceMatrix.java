@@ -39,7 +39,7 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
         double [][] d = new double[n][n];
         boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount()> 4;
 
-        CompoundAlignmentProgressListener compoundProgress =new CompoundAlignmentProgressListener(progress,(n * (n - 1)) / 2);
+        CompoundAlignmentProgressListener compoundProgress = new CompoundAlignmentProgressListener(progress,(n * (n - 1)) / 2);
 
         for(int i = 0; i < n; ++i) {
             for(int j = i+1; j < n; ++j) {
