@@ -129,4 +129,3 @@ public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
 
     public float getScore() { return F[1][m]; }
 }
-

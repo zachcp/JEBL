@@ -1,9 +1,13 @@
 package jebl.evolution.distances;
 
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
+import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.State;
+
+import java.util.Collection;
 
 /**
 

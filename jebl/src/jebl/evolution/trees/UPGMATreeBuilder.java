@@ -22,7 +22,7 @@ class UPGMATreeBuilder extends ClusteringTreeBuilder {
      * @param distanceMatrix distance matrix
      */
     public UPGMATreeBuilder(DistanceMatrix distanceMatrix) {
-        super(distanceMatrix, 2, false);
+        super(distanceMatrix, 2);
     }
 
     //

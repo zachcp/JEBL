@@ -167,7 +167,7 @@ abstract class ClusteringTreeBuilder {
                 rtree.setHeight(newCluster, d[0]);
           }
         }
-        
+
         clusterCreated(newCluster);
 
         clusters[abi] = newCluster;

@@ -80,7 +80,7 @@
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
-        <!-- Put everything in ${build} into the iseq-${DSTAMP}.jar file -->
+        <!-- Put everything in ${build} into the jebl-${DSTAMP}.jar file -->
         <jar jarfile="${dist}/jebl.jar">
             <fileset dir="${build}" includes="**/*.class,**/*.properties"/>
             <fileset dir="${src}" includes="**/*.png"/>
@@ -88,4 +88,15 @@
         </jar>
     </target>
 
+    <target name="dist-both" depends="compile-jebl,compile-jam" description="generate the distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}"/>
+
+        <!-- Put everything in ${build} into the jebl-${DSTAMP}.jar file -->
+        <jar jarfile="${dist}/jebl.jar">
+            <fileset dir="${build}" includes="**/*.class,**/*.properties"/>
+            <fileset dir="${src}" includes="**/*.png"/>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+        </jar>
+    </target>
 </project>

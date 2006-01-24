@@ -66,7 +66,7 @@ public class TreeBuilder {
     static public class Result {
         public final Tree tree;
         public final DistanceMatrix distance;
-        
+
         Result(Tree tree, DistanceMatrix distance) {
             this.tree = tree;
             this.distance = distance;
@@ -79,4 +79,3 @@ public class TreeBuilder {
        return new Result(t, d);
     }
 }
-
