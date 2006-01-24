@@ -964,10 +964,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     helper.readCharacter();
                 }
 
-                String token2 = helper.readToken( "=;" );
+                final String treeName = helper.readToken( "=;" );
 
                 if (helper.getLastDelimiter() != '=') {
-                    throw new ImportException.BadFormatException("Missing label for tree'" + token2 + "' or missing '=' in TREE command of TREES block");
+                    throw new ImportException.BadFormatException("Missing label for tree'" + treeName + "' or missing '=' in TREE command of TREES block");
                 }
 
                 try {
@@ -984,7 +984,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	                readInternalNode(tree);
 
                     // save name as attribute
-                    tree.setAttribute("name", token2);
+                    tree.setAttribute("name", treeName);
 
                     int last = helper.getLastDelimiter();
                     if( last == ':' ) {
@@ -994,7 +994,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     }
 
                     if (last != ';') {
-                        throw new ImportException.BadFormatException("Expecting ';' after tree, '" + token2 + "', TREE command of TREES block");
+                        throw new ImportException.BadFormatException("Expecting ';' after tree, '" + treeName + "', TREE command of TREES block");
                     }
 
                     if  (comment != null) {

@@ -103,7 +103,6 @@ public class NewickImporter implements TreeImporter {
 	        tree.setLength(branch, length);
         }
 
-
         return branch;
     }
 

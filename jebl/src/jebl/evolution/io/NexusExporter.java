@@ -126,6 +126,7 @@ public class NexusExporter implements SequenceExporter {
         establishTaxa(trees.get(0));
 
         writer.println("begin trees;");
+        int nt = 0;
         for( Tree t : trees ) {
             if( establishTaxa(t) ) {
                 throw new IllegalArgumentException();
@@ -133,7 +134,10 @@ public class NexusExporter implements SequenceExporter {
             boolean isRooted = t instanceof RootedTree;
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
             // (FIXME) no tree name yet
-            writer.println("\t" + (isRooted ? "" : "u") + "tree unon=" + Utils.toNewick(rtree) + ";");
+            Object name = t.getAttribute("name");
+            ++nt;
+            writer.println("\t" + (isRooted ? "tree " : "utree ") + ((name != null) ? (String)name : "tree_" + nt)
+                    + "=" + Utils.toNewick(rtree) + ";");
         }
         writer.println("end;");
     }

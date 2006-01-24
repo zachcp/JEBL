@@ -33,11 +33,30 @@ public final class Utils {
         return buffer.toString();
     }
 
+    private static void addMetaComment(Node node, StringBuffer buffer) {
+       Map<String, Object> map = node.getAttributeMap();
+        if( map.size() == 0 ) {
+            return;
+        }
+        buffer.append(" [&");
+        boolean first = true;
+        for( Map.Entry<String, Object> o : map.entrySet() )  {
+            if( ! first ) buffer.append(",");
+            first = false;
+            String val = o.getValue().toString();
+            // we have no way to quote commas right now, throw them away if inside value.
+            val = val.replace(',', ' ');
+            buffer.append(o.getKey() + "=" + val);
+        }
+        buffer.append("] ");
+    }
+
     private static void toNewick(RootedTree tree, Node node, StringBuffer buffer) {
         if (tree.isExternal(node)) {
             buffer.append(tree.getTaxon(node).getName());
             buffer.append(':');
             buffer.append(tree.getLength(node));
+            addMetaComment(node,  buffer);
         } else {
             buffer.append('(');
             List<Node> children = tree.getChildren(node);
@@ -54,6 +73,7 @@ public final class Utils {
             if( parent != null ) {
                 buffer.append( ":" + tree.getLength(node) );
             }
+            addMetaComment(node,  buffer);
         }
     }
 
