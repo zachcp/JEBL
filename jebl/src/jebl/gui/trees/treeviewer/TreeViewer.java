@@ -54,9 +54,12 @@ public class TreeViewer extends JPanel {
         private final String name;
     };
 
-    /** Creates new AlignmentPanel */
+    /** Creates new TreeViewer */
     public TreeViewer() {
-
+	    this(new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN), SwingConstants.LEFT);
+    }
+	/** Creates new TreeViewer */
+	public TreeViewer(ControlPalette controlPalette, int CONTROL_PALETTE_ALIGNMENT) {
         setOpaque(false);
         setLayout(new BorderLayout());
 
@@ -69,7 +72,7 @@ public class TreeViewer extends JPanel {
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
 
-        controlPalette = new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN);
+        this.controlPalette = controlPalette;
 	    controlPalette.setBorder(BorderFactory.createMatteBorder(0,0,0,1,Color.GRAY));
 
 //        JPanel panel = new JPanel(new BorderLayout());
@@ -85,7 +88,11 @@ public class TreeViewer extends JPanel {
 
         add(scrollPane, BorderLayout.CENTER);
 
-        add(controlPalette, BorderLayout.WEST);
+		if (CONTROL_PALETTE_ALIGNMENT == SwingConstants.LEFT) {
+			add(controlPalette, BorderLayout.WEST);
+		} else {
+			add(controlPalette, BorderLayout.EAST);
+		}
         treePane.setTreeLayoutType(TreePane.TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
