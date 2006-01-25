@@ -18,12 +18,21 @@ import java.util.List;
  * @version $Id$
  */
 public class MultipleTreeViewer extends TreeViewer {
-	public MultipleTreeViewer() {
+
+    private void init() {
+       getControlPanel().addControlsProvider(multipleTreeControlsProvider);
+    }
+    public MultipleTreeViewer() {
 		super();
-		getControlPanel().addControlsProvider(multipleTreeControlsProvider);
+		init();
 	}
 
-	public void setTree(Tree tree) {
+    public MultipleTreeViewer(int CONTROL_PALETTE_ALIGNMENT) {
+        super(CONTROL_PALETTE_ALIGNMENT);
+        init();
+    }
+
+    public void setTree(Tree tree) {
 		this.trees = new ArrayList<Tree>();
 		trees.add(tree);
 		setCurrentTree(tree);

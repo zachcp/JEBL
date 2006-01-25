@@ -52,13 +52,18 @@ public class TreeViewer extends JPanel {
         public String toString() { return name; }
 
         private final String name;
-    };
+    }
 
     /** Creates new TreeViewer */
     public TreeViewer() {
 	    this(new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN), SwingConstants.LEFT);
     }
-	/** Creates new TreeViewer */
+
+    public TreeViewer(int CONTROL_PALETTE_ALIGNMENT) {
+        this(new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN), CONTROL_PALETTE_ALIGNMENT);
+    }
+
+    /** Creates new TreeViewer */
 	public TreeViewer(ControlPalette controlPalette, int CONTROL_PALETTE_ALIGNMENT) {
         setOpaque(false);
         setLayout(new BorderLayout());
@@ -114,15 +119,15 @@ public class TreeViewer extends JPanel {
 
     public void setTree(Tree tree, int defaultLabelSize) {
         if( tree instanceof RootedTree ) {
-          this.tree = (RootedTree)tree;
+            this.tree = (RootedTree)tree;
         } else {
             this.tree = Utils.rootTheTree(tree);
         }
 
         treePane.setTree(this.tree);
 
-	    BasicLabelPainter taxonLabelPainter = new BasicLabelPainter("Tip Labels", tree, true, defaultLabelSize);
-	    taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
+        BasicLabelPainter taxonLabelPainter = new BasicLabelPainter("Tip Labels", tree, true, defaultLabelSize);
+        taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
         treePane.setTaxonLabelPainter(taxonLabelPainter);
 
         BasicLabelPainter nodeLabelPainter = new BasicLabelPainter("Node Labels", tree);
