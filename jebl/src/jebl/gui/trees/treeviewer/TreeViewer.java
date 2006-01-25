@@ -104,7 +104,7 @@ public class TreeViewer extends JPanel {
 
         controlPalette.addControlPanelListener(new ControlPaletteListener() {
             public void controlsChanged() {
-                controlPalette.setupControls();
+                TreeViewer.this.controlPalette.setupControls();
                 validate();
                 repaint();
             }
@@ -153,7 +153,8 @@ public class TreeViewer extends JPanel {
 	        if (controls == null) {
 	            OptionsPanel optionsPanel = new OptionsPanel();
 
-	            JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+	            JPanel panel1 = new JPanel();
+		        panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
 	            Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
 	            Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
 	            Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
@@ -168,9 +169,11 @@ public class TreeViewer extends JPanel {
 	            buttonGroup.add(toggle2);
 	            buttonGroup.add(toggle3);
 	            toggle1.setSelected(true);
+		        panel1.add(Box.createHorizontalStrut(0));
 	            panel1.add(toggle1);
 	            panel1.add(toggle2);
 	            panel1.add(toggle3);
+		        panel1.add(Box.createHorizontalStrut(0));
 
 	            optionsPanel.addSpanningComponent(panel1);
 
