@@ -28,8 +28,8 @@ public class NeedlemanWunschAffine extends AlignAffine {
     }
 
     int[][][] Bi, Bj, Bk;
-    private int allocatedn= 0;
-    private int allocatedm= 0;
+    private int allocatedn= -1;
+    private int allocatedm= -1;
     int B0k, B0i, B0j;
 
     public void allocateMatrices (int n, int m) {

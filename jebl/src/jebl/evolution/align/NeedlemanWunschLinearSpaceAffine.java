@@ -38,7 +38,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private static final int TYPE_Y= 2;
     private int C[][][];
     private int Ctype[][][];
-    private int previousm= 0, previousn= 0;
+    private int previousm= -1, previousn= -1;
 
     private AlignmentProgressListener progress;
     private long totalProgress;
