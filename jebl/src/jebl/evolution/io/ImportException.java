@@ -9,8 +9,9 @@ package jebl.evolution.io;
 public class ImportException extends Exception {
 	public ImportException() { super(); }
 	public ImportException(String message) { super(message); }
+    public String userMessage() { return getMessage(); }
 
-	public static class DuplicateFieldException extends ImportException {
+    public static class DuplicateFieldException extends ImportException {
 		public DuplicateFieldException() { super(); }
 		public DuplicateFieldException(String message) { super(message); }
 	}
@@ -28,6 +29,7 @@ public class ImportException extends Exception {
 	public static class MissingFieldException extends ImportException {
 		public MissingFieldException() { super(); }
 		public MissingFieldException(String message) { super(message); }
+        public String userMessage() { return "Unsupported value for field " + getMessage(); }
 	}
 
 	public static class ShortSequenceException extends ImportException {
