@@ -22,11 +22,12 @@ public class ControlPalette extends JPanel {
 	}
 
 	public ControlPalette(int preferredWidth) {
-		this(preferredWidth, DisplayMode.DEFAULT_OPEN);
+		this(preferredWidth, DisplayMode.DEFAULT_OPEN, false);
 	}
 
-	public ControlPalette(int preferredWidth, DisplayMode displayMode) {
-		this.preferredWidth = preferredWidth;
+	public ControlPalette(int preferredWidth, DisplayMode displayMode, boolean fastBlueStyle) {
+        this.fastBlueStyle = fastBlueStyle;
+        this.preferredWidth = preferredWidth;
 		this.displayMode = displayMode;
         BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
@@ -90,16 +91,12 @@ public class ControlPalette extends JPanel {
 				open = true;
 				break;
 			case ONLY_ONE_OPEN:
-				if (currentlyOpen == disclosurePanels.size()) {
-					open = true;
-				} else {
-					open = false;
-				}
+                open = (currentlyOpen == disclosurePanels.size());
 				break;
 			default: throw new IllegalArgumentException("Unknown DisplayMode enum item");
 		}
 
-		final DisclosurePanel panel = new DisclosurePanel(controls.getTitle(), controls.getPanel(), open);
+		final DisclosurePanel panel = new DisclosurePanel(controls.getTitle(), controls.getPanel(), open, fastBlueStyle, null);
 
 		if (displayMode == DisplayMode.ONLY_ONE_OPEN) {
 			panel.addDisclosureListener(new DisclosureListener() {
@@ -135,7 +132,8 @@ public class ControlPalette extends JPanel {
 
 	private int preferredWidth;
 	private DisplayMode displayMode;
-	private int currentlyOpen = 0;
+    private boolean fastBlueStyle = false;
+    private int currentlyOpen = 0;
 	private List<ControlsProvider> providers = new ArrayList<ControlsProvider>();
 	private List<DisclosurePanel> disclosurePanels = new ArrayList<DisclosurePanel>();
 

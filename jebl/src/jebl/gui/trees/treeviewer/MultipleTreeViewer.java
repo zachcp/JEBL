@@ -22,13 +22,14 @@ public class MultipleTreeViewer extends TreeViewer {
     private void init() {
        getControlPanel().addControlsProvider(multipleTreeControlsProvider);
     }
+
     public MultipleTreeViewer() {
 		super();
 		init();
 	}
 
-    public MultipleTreeViewer(int CONTROL_PALETTE_ALIGNMENT) {
-        super(CONTROL_PALETTE_ALIGNMENT);
+    public MultipleTreeViewer(int CONTROL_PALETTE_ALIGNMENT, ControlPalette.DisplayMode mode) {
+        super(CONTROL_PALETTE_ALIGNMENT, mode);
         init();
     }
 

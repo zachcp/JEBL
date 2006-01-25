@@ -54,13 +54,19 @@ public class TreeViewer extends JPanel {
         private final String name;
     }
 
+    static final int  defaultPalleteSize = 200;
+
     /** Creates new TreeViewer */
     public TreeViewer() {
-	    this(new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN), SwingConstants.LEFT);
+	    this(new ControlPalette(defaultPalleteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), SwingConstants.LEFT);
+    }
+
+    public TreeViewer(int CONTROL_PALETTE_ALIGNMENT, ControlPalette.DisplayMode mode) {
+        this(new ControlPalette(defaultPalleteSize, mode, true), CONTROL_PALETTE_ALIGNMENT);
     }
 
     public TreeViewer(int CONTROL_PALETTE_ALIGNMENT) {
-        this(new ControlPalette(200, ControlPalette.DisplayMode.ONLY_ONE_OPEN), CONTROL_PALETTE_ALIGNMENT);
+        this(new ControlPalette(defaultPalleteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), CONTROL_PALETTE_ALIGNMENT);
     }
 
     /** Creates new TreeViewer */
