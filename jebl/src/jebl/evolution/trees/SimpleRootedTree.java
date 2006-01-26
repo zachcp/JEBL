@@ -43,7 +43,7 @@ public class SimpleRootedTree implements RootedTree {
      * @param children the child nodes of this nodes
      * @return the created node reference
      */
-    public Node createInternalNode(Set<Node> children) {
+    public Node createInternalNode(List<Node> children) {
         SimpleRootedNode node = new SimpleRootedNode(children);
 
         for (Node child : children) {
@@ -211,7 +211,7 @@ public class SimpleRootedTree implements RootedTree {
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
-    public Set<Node> getAdjacencies(Node node) {
+    public List<Node> getAdjacencies(Node node) {
         return ((SimpleRootedNode)node).getAdjacencies();
     }
 

@@ -74,7 +74,7 @@ public abstract class FilteredRootedTree implements RootedTree {
         return source.isExternal(node);
     }
 
-    public Set<Node> getAdjacencies(Node node) {
+    public List<Node> getAdjacencies(Node node) {
         return source.getAdjacencies(node);
     }
 

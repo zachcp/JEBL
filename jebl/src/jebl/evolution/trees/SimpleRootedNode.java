@@ -3,9 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -20,12 +18,12 @@ import java.util.Set;
  */
 class SimpleRootedNode extends BaseNode {
     public SimpleRootedNode(Taxon taxon) {
-        this.children = Collections.emptySet();
+        this.children = Collections.unmodifiableList(new ArrayList<Node>());
         this.taxon = taxon;
     }
 
-    public SimpleRootedNode(Set<Node> children) {
-        this.children = Collections.unmodifiableSet(children);
+    public SimpleRootedNode(List<Node> children) {
+        this.children = Collections.unmodifiableList(children);
         this.taxon = null;
     }
 
@@ -37,7 +35,7 @@ class SimpleRootedNode extends BaseNode {
         this.parent = parent;
     }
 
-    public Set<Node> getChildren() {
+    public List<Node> getChildren() {
         return children;
     }
 
@@ -68,8 +66,8 @@ class SimpleRootedNode extends BaseNode {
      * operation as it makes a new set containing the children and the parent.
      * @return the adjacaencies
      */
-    public Set<Node> getAdjacencies() {
-        Set<Node> adjacencies = new HashSet<Node>();
+    public List<Node> getAdjacencies() {
+        List<Node> adjacencies = new ArrayList<Node>();
         if (children != null) adjacencies.addAll(children);
         if (parent != null) adjacencies.add(parent);
         return adjacencies;
@@ -79,7 +77,7 @@ class SimpleRootedNode extends BaseNode {
         return taxon;
     }
 
-    private final Set<Node> children;
+    private final List<Node> children;
     private final Taxon taxon;
 
     private Node parent;

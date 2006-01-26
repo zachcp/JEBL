@@ -42,7 +42,7 @@ public class SimpleTree implements Tree {
      * @param children the child nodes of this nodes
      * @return the created node.
      */
-    public Node createInternalNode(Set<Node> children) {
+    public Node createInternalNode(List<Node> children) {
         SimpleNode node = new SimpleNode(children);
 
         internalNodes.add(node);
@@ -91,7 +91,7 @@ public class SimpleTree implements Tree {
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
-    public Set<Node> getAdjacencies(Node node) {
+    public List<Node> getAdjacencies(Node node) {
         return ((SimpleNode)node).getAdjacencies();
     }
 

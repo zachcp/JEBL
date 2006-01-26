@@ -1092,7 +1092,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
 	{
-	    Set<Node> children = new HashSet<Node>();
+	    List<Node> children = new ArrayList<Node>();
 
 	    // read the opening '('
 	    helper.readCharacter();

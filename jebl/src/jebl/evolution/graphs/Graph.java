@@ -11,6 +11,7 @@ package jebl.evolution.graphs;
 import jebl.util.Attributable;
 
 import java.util.Set;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -24,7 +25,7 @@ public interface Graph extends Attributable {
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
-    Set<Node> getAdjacencies(Node node);
+    List<Node> getAdjacencies(Node node);
 
     /**
      * @param node1

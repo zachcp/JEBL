@@ -3,9 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A simple implementation of Node that is used by SimpleTree.
@@ -24,7 +22,7 @@ class SimpleNode extends BaseNode {
      * @param taxon
      */
     public SimpleNode(Taxon taxon) {
-        this.adjacencies = Collections.emptySet();
+        this.adjacencies = Collections.unmodifiableList(new ArrayList<Node>());
         this.taxon = taxon;
     }
 
@@ -32,8 +30,8 @@ class SimpleNode extends BaseNode {
      * An internal node.
      * @param adjacencies set of adjacent noeds
      */
-    public SimpleNode(Set<Node> adjacencies) {
-        this.adjacencies = Collections.unmodifiableSet(adjacencies);
+    public SimpleNode(List<Node> adjacencies) {
+        this.adjacencies = Collections.unmodifiableList(adjacencies);
         this.taxon = null;
     }
 
@@ -42,9 +40,9 @@ class SimpleNode extends BaseNode {
      * @param node
      */
     public void addAdacency(Node node) {
-        Set<Node> a = new HashSet<Node>(adjacencies);
+        List<Node> a = new ArrayList<Node>(adjacencies);
         a.add(node);
-        adjacencies = a;
+        adjacencies = Collections.unmodifiableList(a);
     }
 
     public Taxon getTaxon() {
@@ -55,11 +53,11 @@ class SimpleNode extends BaseNode {
         return (adjacencies == null ? 0 : adjacencies.size());
     }
 
-    public Set<Node> getAdjacencies() {
+    public List<Node> getAdjacencies() {
         return adjacencies;
     }
 
     // PRIVATE members
-    private Set<Node> adjacencies;
+    private List<Node> adjacencies;
     private final Taxon taxon;
 }

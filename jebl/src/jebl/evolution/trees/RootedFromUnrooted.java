@@ -90,7 +90,7 @@ public class RootedFromUnrooted implements RootedTree {
             // bug
         }
         parents = new HashMap<Node, Node>();
-        root = new SimpleNode(new HashSet<Node>());
+        root = new SimpleNode(new ArrayList<Node>());
         parents.put(root, null);
         setParent(left, root);
         setParent(right, root);
@@ -163,15 +163,15 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getNode(taxon);
     }
 
-    public Set<Node> getAdjacencies(Node node) {
+    public List<Node> getAdjacencies(Node node) {
         // special case when syntetic root
         if( topLeft != null ) {
             if( node == root ) {
                 Node[] d = {topLeft, topRight};
-                return new HashSet<Node>(Arrays.asList(d));
+                return Arrays.asList(d);
             }
             if( node == topLeft || node == topRight ) {
-                HashSet<Node> s = new HashSet<Node>(source.getAdjacencies(node));
+                List<Node> s = new ArrayList<Node>(source.getAdjacencies(node));
                 s.remove(node == topLeft ? topRight : topLeft);
                 s.add(root);
                 return s;

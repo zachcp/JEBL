@@ -109,7 +109,7 @@ public class NewickImporter implements TreeImporter {
      */
     private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
     {
-        Set<Node> children = new LinkedHashSet<Node>();
+        List<Node> children = new ArrayList<Node>();
 
         // read the opening '('
         helper.readCharacter();

@@ -151,7 +151,7 @@ abstract class ClusteringTreeBuilder {
     protected void newCluster() {
         double[] d = joinClusters();
         Node[] n = { clusters[abi], clusters[abj] };
-        Set<Node> a = new HashSet<Node>(Arrays.asList(n));
+        List<Node> a = Arrays.asList(n);
         if( tree != null ) {
             newCluster = tree.createInternalNode(a);
             for(int k = 0; k < 2; ++k) {
