@@ -124,7 +124,7 @@ public class TreeViewer extends JPanel {
     }
 
     public void setTree(Tree inTree, int defaultLabelSize) {
-        if( tree instanceof RootedTree ) {
+        if( inTree instanceof RootedTree ) {
             tree = (RootedTree)inTree;
         } else {
             tree = Utils.rootTheTree(inTree);
