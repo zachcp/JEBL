@@ -57,7 +57,7 @@ public class Utils {
 		java.awt.Frame frame = new java.awt.Frame();
 		java.awt.FileDialog chooser = new java.awt.FileDialog(frame, message,
 															java.awt.FileDialog.SAVE);
-		chooser.setVisible(true);
+        chooser.setVisible(true);
         java.io.File file = null;
         if(chooser.getDirectory() != null && chooser.getFile() != null)
             file = new java.io.File(chooser.getDirectory(), chooser.getFile());

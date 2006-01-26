@@ -123,14 +123,15 @@ public class TreeViewer extends JPanel {
 
     }
 
-    public void setTree(Tree tree, int defaultLabelSize) {
+    public void setTree(Tree inTree, int defaultLabelSize) {
         if( tree instanceof RootedTree ) {
-            this.tree = (RootedTree)tree;
+            tree = (RootedTree)inTree;
         } else {
-            this.tree = Utils.rootTheTree(tree);
+            tree = Utils.rootTheTree(inTree);
         }
 
-        treePane.setTree(this.tree);
+        //System.out.println(Utils.toNewick(tree));
+        treePane.setTree(tree);
 
         BasicLabelPainter taxonLabelPainter = new BasicLabelPainter("Tip Labels", tree, true, defaultLabelSize);
         taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);

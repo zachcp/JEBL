@@ -9,10 +9,7 @@ import jebl.evolution.trees.Tree;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Andrew Rambaut
@@ -100,7 +97,7 @@ public class NewickImporter implements TreeImporter {
 
         if (helper.getLastDelimiter() == ':') {
             double length = helper.readDouble(",():;");
-	        tree.setLength(branch, length);
+            tree.setLength(branch, length);
         }
 
         return branch;
@@ -112,7 +109,7 @@ public class NewickImporter implements TreeImporter {
      */
     private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
     {
-        Set<Node> children = new HashSet<Node>();
+        Set<Node> children = new LinkedHashSet<Node>();
 
         // read the opening '('
         helper.readCharacter();
