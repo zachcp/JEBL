@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.painters;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.panels.OptionsPanel;
@@ -78,9 +79,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 		if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
 		    return tree.getTaxon(node).getName();
 		} else if (attribute.equalsIgnoreCase(NODE_HEIGHTS) && tree instanceof RootedTree) {
-	        return Double.toString(((RootedTree)tree).getHeight(node));
+	        return formatter.getFormattedValue(((RootedTree)tree).getHeight(node));
 	    } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) && tree instanceof RootedTree) {
-	            return Double.toString(((RootedTree)tree).getLength(node));
+	            return formatter.getFormattedValue(((RootedTree)tree).getLength(node));
 	    } else {
 	        Object value = node.getAttribute(attribute);
 	        if (value != null) {
@@ -274,6 +275,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private float yOffset;
 
     private boolean visible = true;
+
+	private NumberFormatter formatter = new NumberFormatter(6);
 
 	private final Tree tree;
 	protected String attribute;

@@ -119,16 +119,25 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
+	            Point2D branchLabelPoint1 = new Point2D.Double(xPosition + (length * 0.5 * Math.cos(branchAngle)),
+			                                                yPosition + (length * 0.5 * Math.sin(branchAngle)));
+	            Point2D branchLabelPoint2 = new Point2D.Double(xPosition + (((length * 0.5) + 1.0) * Math.cos(branchAngle)),
+			                                                yPosition + (((length * 0.5) + 1.0)  * Math.sin(branchAngle)));
+	            Line2D branchLabelPath = new Line2D.Double(branchLabelPoint1, branchLabelPoint2);
+
+	            branchLabelPaths.put(child, branchLabelPath);
                 i++;
             }
 
-	        Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)), yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+	        Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
+			                                            yPosition + ((length + 1.0) * Math.sin(branchAngle)));
 
 	        Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
 	        nodeLabelPaths.put(node, nodeLabelPath);
         } else {
 
-            Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)), yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+            Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
+		                                            yPosition + ((length + 1.0) * Math.sin(branchAngle)));
 
             Line2D taxonLabelPath = new Line2D.Double(nodePoint, taxonPoint);
             taxonLabelPaths.put(node, taxonLabelPath);

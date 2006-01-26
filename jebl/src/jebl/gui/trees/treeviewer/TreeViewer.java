@@ -54,19 +54,19 @@ public class TreeViewer extends JPanel {
         private final String name;
     }
 
-    static final int  defaultPalleteSize = 200;
+    static final int defaultPaletteSize = 200;
 
     /** Creates new TreeViewer */
     public TreeViewer() {
-	    this(new ControlPalette(defaultPalleteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), SwingConstants.LEFT);
+	    this(new ControlPalette(defaultPaletteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), SwingConstants.LEFT);
     }
 
     public TreeViewer(int CONTROL_PALETTE_ALIGNMENT, ControlPalette.DisplayMode mode) {
-        this(new ControlPalette(defaultPalleteSize, mode, true), CONTROL_PALETTE_ALIGNMENT);
+        this(new ControlPalette(defaultPaletteSize, mode, true), CONTROL_PALETTE_ALIGNMENT);
     }
 
     public TreeViewer(int CONTROL_PALETTE_ALIGNMENT) {
-        this(new ControlPalette(defaultPalleteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), CONTROL_PALETTE_ALIGNMENT);
+        this(new ControlPalette(defaultPaletteSize, ControlPalette.DisplayMode.ONLY_ONE_OPEN, true), CONTROL_PALETTE_ALIGNMENT);
     }
 
     /** Creates new TreeViewer */
@@ -140,6 +140,10 @@ public class TreeViewer extends JPanel {
         BasicLabelPainter nodeLabelPainter = new BasicLabelPainter("Node Labels", tree);
         nodeLabelPainter.setVisible(false);
         treePane.setNodeLabelPainter(nodeLabelPainter);
+
+	    BasicLabelPainter branchLabelPainter = new BasicLabelPainter("Branch Labels", tree);
+	    branchLabelPainter.setVisible(false);
+	    treePane.setBranchLabelPainter(branchLabelPainter);
 
         treePane.setScaleBarPainter(new ScaleBarPainter());
     }

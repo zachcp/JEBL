@@ -220,6 +220,13 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 				// add the branchPath to the map of branch paths
 				branchPaths.put(child, branchPath);
 
+				double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
+				Line2D branchLabelPath = new Line2D.Double(
+						transform(x3, nodePoint.getY()),
+						transform(x3 + 1.0, childPoints[i].getY()));
+
+				branchLabelPaths.put(child, branchLabelPath);
+
 				i++;
 			}
 

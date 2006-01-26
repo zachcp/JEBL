@@ -188,6 +188,14 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
+
+	            double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
+	            Line2D branchLabelPath = new Line2D.Double(
+				            x3, childPoint.getY(),
+				            x3 + 1.0, childPoint.getY());
+
+	            branchLabelPaths.put(child, branchLabelPath);
+
             }
 
 	        Line2D nodeLabelPath = new Line2D.Double(
