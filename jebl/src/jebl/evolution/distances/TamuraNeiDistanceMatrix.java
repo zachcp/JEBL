@@ -4,6 +4,10 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.State;
+import jebl.evolution.sequences.Sequence;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,6 +54,10 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
                 double weight = pattern.getWeight();
                 // acgt
+                if( state1.isAmbiguous() && state2.isAmbiguous() ) {
+                   continue;
+                }
+
                 if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
                     if ( Nucleotides.isTransition(state1, state2) ) {
                         // it's a transition
@@ -70,13 +78,15 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             double P2 = sumTsCT / sumWeight;
             double Q  = sumTv / sumWeight;
 
-            double tmp11 = Math.log(1.0 - P1 * (1/(2*constA1)) - Q * (1/(2*freqR)));
-            double tmp12 = Math.log(1.0 - P2 * (1/(2*constA2)) - Q * (1/(2*freqY))) ;
+            double a1 = 1.0 - P1 * (1 / (2 * constA1)) - Q * (1 / (2 * freqR));
+            double a2 = 1.0 - P2 * (1 / (2 * constA2)) - Q * (1 / (2 * freqY));
+            double b = 1.0 - (Q / (2.0 * constC));
+            if( a1 <= 0 || a2 <= 0 || b <= 0 ) {
+                return MAX_DISTANCE;
+            }
 
-            double tmp2 = Math.log(1.0 - (Q / (2.0 * constC)));
-
-            double distance = -2.0 * ((constC - constA1*freqY - constA2*freqR) * tmp2
-                                       + constA1 * tmp11 + constA2 * tmp12);
+            double distance = -2.0 * ((constC - constA1*freqY - constA2*freqR) * Math.log(b)
+                                       + constA1 * Math.log(a1) + constA2 * Math.log(a2));
 
             return Math.min(distance, MAX_DISTANCE);
         }

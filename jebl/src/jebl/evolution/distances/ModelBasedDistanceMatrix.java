@@ -4,6 +4,9 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.Sequence;
 
+import java.util.List;
+import java.util.Arrays;
+
 /**
  *
  * @author Joseph Heled
@@ -15,12 +18,12 @@ public class ModelBasedDistanceMatrix  {
 
     protected  static double freqR, freqY;
 
-    protected static double[] getFrequencies(Alignment alignment) {
-        final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
+     protected static double[] getFrequencies(List<Sequence> sequences) {
+        final int stateCount = sequences.get(0).getSequenceType().getCanonicalStateCount();
 
         double[] freqs = new double[stateCount];
         long count = 0;
-        for( Sequence sequence : alignment.getSequences() ) {
+        for( Sequence sequence : sequences ) {
             for( int i : sequence.getStateIndices() ) {
                 // ignore non definite states (ask alexei)
                 if( i < stateCount ) {
@@ -44,5 +47,9 @@ public class ModelBasedDistanceMatrix  {
         if( freqY == 0 ) freqY = 1;
 
         return freqs;
+
+     }
+    protected static double[] getFrequencies(Alignment alignment) {
+        return getFrequencies(alignment.getSequenceList());
     }
 }

@@ -225,6 +225,7 @@ public final class Utils {
           }
         }
         double dist =  tree.getEdgeLength(node, root) + maxDist;
+        
         dists.put(p, dist);
         return dist;
     }
@@ -266,6 +267,46 @@ public final class Utils {
                 if( maxDist < minOfMaxes ) {
                     minOfMaxes = maxDist;
                     best = maxDirection;
+                }
+            }
+
+            if( best == null )  {
+                 minOfMaxes = Double.MAX_VALUE;
+                best = null;
+                for( Node i : tree.getInternalNodes() ) {
+                    double maxDist = -Double.MAX_VALUE;
+                    HashPair<Node> maxDirection = null;
+                    for( Node n : tree.getAdjacencies(i) ) {
+                        HashPair<Node> p = new HashPair<Node>(i, n);
+                        double d = dist(tree, p.first, p.second, dists);
+                        if( maxDist < d ) {
+                            maxDist = d;
+                            maxDirection = p;
+                        }
+                    }
+
+                    if( maxDist < minOfMaxes ) {
+                        minOfMaxes = maxDist;
+                        best = maxDirection;
+                    }
+
+                    if( best == null ) {
+                        maxDist = -Double.MAX_VALUE;
+                        maxDirection = null;
+                        for( Node n : tree.getAdjacencies(i) ) {
+                            HashPair<Node> p = new HashPair<Node>(i, n);
+                            double d = dist(tree, p.first, p.second, dists);
+                            if( maxDist < d ) {
+                                maxDist = d;
+                                maxDirection = p;
+                            }
+                        }
+
+                        if( maxDist < minOfMaxes ) {
+                            minOfMaxes = maxDist;
+                            best = maxDirection;
+                        }
+                    }
                 }
             }
 

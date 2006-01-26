@@ -38,7 +38,8 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
         for (int i = 0; i < numClusters; i++) {
             r[i] = 0;
             for (int j = 0; j < numClusters; j++) {
-                r[i] += getDist(i,j);
+                double dist = getDist(i, j);
+                r[i] += dist;
             }
         }
 
@@ -78,7 +79,6 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
 
         if (li < 0.0) li = 0.0;
         if (lj < 0.0) lj = 0.0;
-
         return new double[]{li, lj};
     }
 

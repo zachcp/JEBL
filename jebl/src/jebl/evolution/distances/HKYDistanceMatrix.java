@@ -102,6 +102,10 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 State state1 = pattern.getState(taxon1);
                 State state2 = pattern.getState(taxon2);
 
+                if( state1.isAmbiguous() && state2.isAmbiguous() ) {
+                   continue;
+                }
+
                 weight = pattern.getWeight();
                 // acgt
                 if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
@@ -119,10 +123,15 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             double P = sumTs / sumWeight;
             double Q = sumTv / sumWeight;
 
-            double tmp1 = Math.log(1.0 - (P / (2.0 * constA)) -
-                                   (((constA - constB) * Q) / (2.0 * constA * constC)));
+            double a = 1.0 - (P / (2.0 * constA)) -
+                    (((constA - constB) * Q) / (2.0 * constA * constC));
+            double b = 1.0 - (Q / (2.0 * constC));
+            if( a <= 0 || b <= 0 ) {
+                return MAX_DISTANCE;
+            }
 
-            double tmp2 = Math.log(1.0 - (Q / (2.0 * constC)));
+            double tmp1 = Math.log(a);
+            double tmp2 = Math.log(b);
 
             distance = -(2.0 * constA * tmp1) + (2.0 * (constA - constB - constC) * tmp2);
 
