@@ -90,6 +90,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 this.progress = progress;
     this.n = profile1.length();
     this.m = profile2.length();
+//        System.out.println("aligning " + n + "," + m);
         this.profile1= profile1;
         this.profile2= profile2;
     if (n> previousn||m> previousm) {

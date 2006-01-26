@@ -5,6 +5,7 @@ import jebl.evolution.align.scores.Scores;
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 
 public class NeedlemanWunschAffine extends AlignAffine {
+    private boolean invert;
 
     public NeedlemanWunschAffine(Scores sub, float d, float e) {
         super(sub, d, e);
@@ -67,7 +68,28 @@ public class NeedlemanWunschAffine extends AlignAffine {
     public void doAlignment(Profile sequence1, Profile sequence2, int offset1, int offset2, int n, int m, int startType, int endType) {
         doAlignment(sequence1, sequence2, offset1, offset2,n, m, startType, endType, false, false);
     }
-        public void doAlignment(Profile sequence1 , Profile sequence2, int offset1, int offset2, int n, int m,int startType, int endType, boolean freeStartGap, boolean freeEndGap) {
+    private int convertType(int type) {
+        if(type == TYPE_ANY) return type;
+        if(type ==  TYPE_X) return TYPE_Y;
+        if (type == TYPE_Y) return TYPE_X;
+        throw new RuntimeException("invalid type");
+    }
+    public void doAlignment(Profile sequence1 , Profile sequence2, int offset1, int offset2, int n, int m,int startType, int endType, boolean freeStartGap, boolean freeEndGap) {
+        invert = false;
+        if(n>m) {
+            //swap the ordering, to prevent nasty allocation of matrices.
+            // for example, if we do a 100000 by 10 alignment, followed by a 10 x 100000 alignment, we end up
+            // allocating a 100000 x 100000 matrix
+            // This happens, when used by the NeedlemanWunschLinear
+            invert = true;
+            int temp;
+            temp=m;m=n;n= temp;
+            temp =offset1;offset1 = offset2; offset2= temp;
+            startType = convertType(startType);
+            endType = convertType(endType);
+            Profile tempSequence;
+            tempSequence = sequence1; sequence1 = sequence2; sequence2= tempSequence;
+        }
 //        n = sequence1.length;
 //        m = sequence2.length;
         this.n=n;
@@ -278,6 +300,9 @@ public class NeedlemanWunschAffine extends AlignAffine {
             i = tbi;
             j = tbj;
             k = tbk;
+        }
+        if(invert) {
+            return new String[]{res2.reverse().toString(), res1.reverse().toString()};
         }
         return new String[]{res1.reverse().toString(), res2.reverse().toString()};
     }

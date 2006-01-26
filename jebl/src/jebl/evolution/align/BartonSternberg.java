@@ -84,6 +84,7 @@ public class BartonSternberg {
         return Profile.combine(left, right, results[0], results[1]);
     }
 
+   
     public String[] align(List<Sequence> sourceSequences, AlignmentProgressListener progress) {
         int count = sourceSequences.size();
 
