@@ -39,7 +39,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 		this.defaultFontSize = defaultSize;
 		taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
 
-		this.attribute = NODE_HEIGHTS;
 		this.tree = tree;
 
 		Set<String> names = new TreeSet<String>();
@@ -47,14 +46,31 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 		    names.addAll(node.getAttributeNames());
 		}
 
-		List<String> sources = new ArrayList<String>();
-		if (includeTaxonNames) {
-			sources.add(TAXON_NAMES);
-		}
-		sources.add(NODE_HEIGHTS);
-		sources.add(BRANCH_LENGTHS);
-		sources.addAll(names);
-		this.attributes = new String[sources.size()];
+        this.attribute = null;
+
+        List<String> sources = new ArrayList<String>();
+        if ( includeTaxonNames ) {
+            sources.add(TAXON_NAMES);
+        }
+
+        if( tree instanceof RootedTree && ((RootedTree)tree).hasHeights() ) {
+            sources.add(NODE_HEIGHTS);
+            this.attribute  = NODE_HEIGHTS;
+        }
+
+        if( tree instanceof RootedTree && ((RootedTree)tree).hasLengths() ) {
+            sources.add(BRANCH_LENGTHS);
+        }
+
+        sources.addAll(names);
+
+        if( this.attribute == null && sources.size() > 0 ) {
+           this.attribute = sources.get(0);
+        } else {
+            this.attribute = "";
+        }
+
+        this.attributes = new String[sources.size()];
 		sources.toArray(this.attributes);
 	}
 
