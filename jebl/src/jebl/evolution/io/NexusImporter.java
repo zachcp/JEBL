@@ -543,7 +543,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			throw new ImportException.MissingFieldException("DIMENSIONS");
 		}
 		if ( block != NexusBlock.TAXA && sequenceType == null ) {
-			throw new ImportException.MissingFieldException("DATATYPE");
+			throw new ImportException.MissingFieldException("DATATYPE. Only Nucleotide or Protein sequences are supported.");
 		}
 	}
 
