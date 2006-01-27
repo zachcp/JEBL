@@ -34,20 +34,6 @@ import java.util.List;
  */
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
-	public enum TreeLayoutType {
-		RECTILINEAR("Rectangle"),
-		POLAR("Polar"),
-		RADIAL("Radial");
-
-		TreeLayoutType(String name) {
-			this.name = name;
-		}
-
-		public String toString() { return name; }
-
-		private final String name;
-	};
-
 	public TreePane() {
 		setBackground(UIManager.getColor("window"));
 	}
@@ -82,14 +68,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		repaint();
 	}
 
-	public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
-		switch (treeLayoutType) {
-			case RECTILINEAR: treeLayout = new RectilinearTreeLayout(); break;
-			case POLAR: treeLayout = new PolarTreeLayout(); break;
-			case RADIAL: treeLayout = new RadialTreeLayout(); break;
-			default: throw new IllegalArgumentException("Unknown TreeLayoutType: " + treeLayoutType);
-		}
+	public void setTreeLayout(TreeLayout treeLayout) {
 
+		this.treeLayout = treeLayout;
 		treeLayout.setTree(tree);
 		treeLayout.addTreeLayoutListener(new TreeLayoutListener() {
 			public void treeLayoutChanged() {
