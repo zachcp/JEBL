@@ -29,6 +29,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.print.Printable;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ import java.util.List;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreeViewer extends JPanel {
+public class TreeViewer extends JPanel implements Printable {
 
 	public enum TreeLayoutType {
 		RECTILINEAR("Rectangle"),
@@ -468,5 +471,9 @@ public class TreeViewer extends JPanel {
 
         frame.getContentPane().add(treeViewer, BorderLayout.CENTER);
         frame.setVisible(true);
+    }
+
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        return treePane.print(graphics, pageFormat, pageIndex);
     }
 }
