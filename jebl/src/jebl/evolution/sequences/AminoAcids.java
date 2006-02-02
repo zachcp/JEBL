@@ -8,9 +8,7 @@
  */
 package jebl.evolution.sequences;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Andrew Rambaut
@@ -19,7 +17,7 @@ import java.util.List;
  * @version $Id$
  */
 public final class AminoAcids {
-	public static final String NAME = "amino acid";
+    public static final String NAME = "amino acid";
 
     public static final int CANONICAL_STATE_COUNT = 20;
     public static final int STATE_COUNT = 26;
@@ -68,6 +66,25 @@ public final class AminoAcids {
             STOP_STATE, GAP_STATE
     };
 
+    // Chemical classifications
+    public static final StateClassification CHEMICAL_CLASSIFICATION = new StateClassification.Default("chemical",
+            new String[] { "alphatic", "phenylalanine", "sulphur", "glycine", "hydroxyl", "tryptophan", "tyrosine", "proline", "acidic", "amide", "basic" },
+            new State[][] { { A_STATE, V_STATE, I_STATE, L_STATE }, { F_STATE }, { C_STATE, M_STATE }, { G_STATE }, { S_STATE, T_STATE },
+                    { W_STATE }, { Y_STATE }, { P_STATE }, { D_STATE, E_STATE }, { N_STATE, Q_STATE }, { H_STATE, K_STATE, R_STATE } } );
+
+    // Hydropathy classifications
+    public static final StateClassification HYDROPATHY_CLASSIFICATION = new StateClassification.Default("hydropathy",
+            new String[] { "hydropathic", "neutral", "hydrophilic" },
+            new State[][] { { I_STATE, V_STATE, L_STATE, F_STATE, C_STATE, M_STATE, A_STATE, W_STATE },
+                    { G_STATE, T_STATE, S_STATE, Y_STATE, P_STATE, H_STATE },
+                    { D_STATE, E_STATE, K_STATE, N_STATE, Q_STATE, R_STATE } });
+
+    // Hydropathy classifications
+    public static final StateClassification VOLUME_CLASSIFICATION = new StateClassification.Default("volume",
+            new String[] { "60-90", "108-117", "138-154", "162-174", "189-228" },
+            new State[][] { { G_STATE, A_STATE, S_STATE }, { C_STATE, D_STATE,  P_STATE, N_STATE, T_STATE },
+                            { E_STATE, V_STATE, Q_STATE, H_STATE }, { M_STATE, I_STATE, L_STATE, K_STATE, R_STATE },
+                            { F_STATE, Y_STATE, W_STATE } });
 
     /**
      * This character represents the amino acid equivalent of a stop codon to cater for
@@ -93,43 +110,43 @@ public final class AminoAcids {
 
     public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
 
-	public static AminoAcidState getState(char code) {
-	    return statesByCode[code];
-	}
+    public static AminoAcidState getState(char code) {
+        return statesByCode[code];
+    }
 
-	public static AminoAcidState getState(String code) {
-	    return statesByCode[code.charAt(0)];
-	}
+    public static AminoAcidState getState(String code) {
+        return statesByCode[code.charAt(0)];
+    }
 
-	public static AminoAcidState getState(int index) {
-	    return STATES[index];
-	}
+    public static AminoAcidState getState(int index) {
+        return STATES[index];
+    }
 
-	public static AminoAcidState getUnknownState() { return UNKNOWN_STATE; }
+    public static AminoAcidState getUnknownState() { return UNKNOWN_STATE; }
 
-	public static AminoAcidState getGapState() { return GAP_STATE; }
+    public static AminoAcidState getGapState() { return GAP_STATE; }
 
-	public static boolean isUnknown(AminoAcidState state) { return state == UNKNOWN_STATE; }
+    public static boolean isUnknown(AminoAcidState state) { return state == UNKNOWN_STATE; }
 
-	public static boolean isGap(AminoAcidState state) { return state == GAP_STATE; }
+    public static boolean isGap(AminoAcidState state) { return state == GAP_STATE; }
 
-	public static String getTripletCode(AminoAcidState state) { return AMINOACID_TRIPLETS[state.getIndex()]; }
+    public static String getTripletCode(AminoAcidState state) { return AMINOACID_TRIPLETS[state.getIndex()]; }
 
-	public static AminoAcidState[] toStateArray(String sequenceString) {
-		AminoAcidState[] seq = new AminoAcidState[sequenceString.length()];
-		for (int i = 0; i < seq.length; i++) {
-			seq[i] = getState(sequenceString.charAt(i));
-		}
-		return seq;
-	}
+    public static AminoAcidState[] toStateArray(String sequenceString) {
+        AminoAcidState[] seq = new AminoAcidState[sequenceString.length()];
+        for (int i = 0; i < seq.length; i++) {
+            seq[i] = getState(sequenceString.charAt(i));
+        }
+        return seq;
+    }
 
-	public static AminoAcidState[] toStateArray(int[] indexArray) {
-	    AminoAcidState[] seq = new AminoAcidState[indexArray.length];
-	    for (int i = 0; i < seq.length; i++) {
-	        seq[i] = getState(indexArray[i]);
-	    }
-	    return seq;
-	}
+    public static AminoAcidState[] toStateArray(int[] indexArray) {
+        AminoAcidState[] seq = new AminoAcidState[indexArray.length];
+        for (int i = 0; i < seq.length; i++) {
+            seq[i] = getState(indexArray[i]);
+        }
+        return seq;
+    }
 
     private static final AminoAcidState[] statesByCode;
 

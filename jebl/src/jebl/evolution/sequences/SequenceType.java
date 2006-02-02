@@ -158,7 +158,7 @@ public interface SequenceType {
 		public State[] toStateArray(int[] indexArray) { return AminoAcids.toStateArray(indexArray); }
 	};
 
-	public static final SequenceType CODN = new SequenceType() {
+	public static final SequenceType CODON = new SequenceType() {
         public int getStateCount() { return Codons.getStateCount(); }
         public List<State> getStates() { return Codons.getStates(); }
         public int getCanonicalStateCount() { return Codons.getCanonicalStateCount(); }
