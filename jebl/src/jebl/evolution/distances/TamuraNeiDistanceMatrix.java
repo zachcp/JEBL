@@ -4,10 +4,6 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.State;
-import jebl.evolution.sequences.Sequence;
-
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +18,14 @@ import java.util.ArrayList;
  *  the Control Region of Mitochondrial DNA in Humans and
  *  Chimpanzees. Koichiro Tamura and Masatoshi Nei, 1993
  *
- * Estimated Distance is d = 2 (pi(A) pi(G) a1 + pi(T) pi(C) a2 + PI(A)PI(C)) t
+ * Estimated Distance is d = 2 (pi(A) pi(G) k_R + pi(T) pi(C) k_Y + PI(A)PI(C)) t, where k_R/k_Y are the rates of
+ * Purine/Pyrimidine respectivly.
+ *
+ * When distances grow large, the formulas break as estimates of number of transition/transversion becomes inconsistent,
+ * which results in negative logs. Returning "infinity" is not optimal as it breaks operations such as constructing
+ * consensus trees where distances for resampled sequences vary between (say) 2-3 and out "infinity" 10.
+ * As a workaround I try to reduce the number of transitions/transversions by the minimum amout which brings the estimates
+ * back to a consistent state.
  */
 
 public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
@@ -54,11 +57,13 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
                 double weight = pattern.getWeight();
                 // acgt
-                if( state1.isAmbiguous() && state2.isAmbiguous() ) {
+
+                // ignore any ambiguous states or gaps
+                if( state1.isAmbiguous() || state2.isAmbiguous() ) {
                    continue;
                 }
 
-                if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
+                if ( state1 != state2 ) {
                     if ( Nucleotides.isTransition(state1, state2) ) {
                         // it's a transition
                         if( Nucleotides.isPurine(state1) ) {
@@ -74,21 +79,45 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
                 sumWeight += weight;
             }
 
-            double P1 = sumTsAG / sumWeight;
-            double P2 = sumTsCT / sumWeight;
-            double Q  = sumTv / sumWeight;
+            // Unfortuanetly adjusting number of sites for Purine/Pyrimidine may turn the other into negative - so
+            // we iterate untile both estimates are consistent
+            while( true ) {
+                double P1 = sumTsAG / sumWeight;
+                double P2 = sumTsCT / sumWeight;
+                double Q  = sumTv / sumWeight;
 
-            double a1 = 1.0 - P1 * (1 / (2 * constA1)) - Q * (1 / (2 * freqR));
-            double a2 = 1.0 - P2 * (1 / (2 * constA2)) - Q * (1 / (2 * freqY));
-            double b = 1.0 - (Q / (2.0 * constC));
-            if( a1 <= 0 || a2 <= 0 || b <= 0 ) {
-                return MAX_DISTANCE;
+                double a1 = 1.0 - P1 * (1 / (2 * constA1)) - Q * (1 / (2 * freqR));
+                double a2 = 1.0 - P2 * (1 / (2 * constA2)) - Q * (1 / (2 * freqY));
+
+                if( a1 <= 0 ) {
+                    // smallest number of sites to remove which makes a1 positive.
+                    int adjustment = (int)(1 + (sumWeight * -a1) / ((1 / (2 * constA1)) - 1));
+                    sumTsAG -= adjustment;
+                    if( sumTsAG < 0 )  break;
+                    sumWeight -= adjustment;
+                    continue;
+                }
+
+                if( a2 <= 0 ) {
+                    // smallest number of sites to remove which makes a2 positive.
+                    int adjustment = (int)(1 + (sumWeight * -a2) / ((1 / (2 * constA2)) - 1));
+                    sumTsCT -= adjustment;
+                    if( sumTsCT < 0 )  break;
+                    sumWeight -= adjustment;
+                    continue;
+                }
+
+                double b = 1.0 - (Q / (2.0 * constC));
+                if( b <= 0 ) {
+                    break;
+                }
+
+                double distance = -2.0 * ((constC - constA1*freqY - constA2*freqR) * Math.log(b)
+                        + constA1 * Math.log(a1) + constA2 * Math.log(a2));
+
+                return Math.min(distance, MAX_DISTANCE);
             }
-
-            double distance = -2.0 * ((constC - constA1*freqY - constA2*freqR) * Math.log(b)
-                                       + constA1 * Math.log(a1) + constA2 * Math.log(a2));
-
-            return Math.min(distance, MAX_DISTANCE);
+            return MAX_DISTANCE;
         }
 
 
@@ -104,7 +133,6 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
             double[] freqs = getFrequencies(alignment);
 
-            // Ask Alexei (mapping 0-a etc)
             double freqA = freqs[Nucleotides.A_STATE.getIndex()];
             double freqC = freqs[Nucleotides.C_STATE.getIndex()];
             double freqG = freqs[Nucleotides.G_STATE.getIndex()];
@@ -123,7 +151,6 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
                     distances[j][i] = distances[i][j];
                 }
             }
-
             return distances;
         }
     }
