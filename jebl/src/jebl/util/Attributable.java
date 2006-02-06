@@ -34,7 +34,12 @@ public interface Attributable {
 	 */
 	Object getAttribute(String name);
 
-	/**
+    /**
+     * @param name name of attribute to remove
+     */
+    void removeAttribute(String name);
+
+    /**
 	 * @return an array of the attributes that this object has.
 	 */
     Set<String> getAttributeNames();

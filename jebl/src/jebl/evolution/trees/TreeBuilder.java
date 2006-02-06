@@ -5,12 +5,13 @@ import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.align.PairwiseAligner;
 import jebl.evolution.align.AlignmentProgressListener;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.List;
 
 /**
- * A meeting point for tree building. A very initial form which will develope to encompass more
- * methods and distances.
+ * A meeting point for tree building from sequence data. A very initial form which will develope to encompass more
+ * methods and distances. Currently only pairwise distance methods are implemented.
  *
  * @author Joseph Heled
  * @version $Id$
@@ -19,8 +20,59 @@ import java.util.List;
 
 public class TreeBuilder {
 
+    /**
+     * Supported methods for tree building
+     */
     public enum Method {UPGMA, NEIGHBOR_JOINING}
+
+    /**
+     * Supported pairwise distance methods
+     */
     public enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
+
+    /**
+     *
+     * @param method
+     * @return Wheather method generates a rooted or unrooted tree.
+     */
+    public static boolean isRootedMethod(Method method) {
+        switch( method ) {
+            case UPGMA:
+            {
+                return true;
+            }
+            case NEIGHBOR_JOINING:
+            default:
+            {
+                return false;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param method build method to use.
+     * @param distances Pre computed pairwise distances.
+     * @return A tree builder using method and distance matrix
+     */
+    static public ClusteringTreeBuilder getBuilder(Method method, DistanceMatrix distances) {
+        ClusteringTreeBuilder c;
+        switch( method ) {
+            case UPGMA:
+            {
+                c = new UPGMATreeBuilder(distances);
+                break;
+            }
+            case NEIGHBOR_JOINING:
+            default:
+            {
+                c = new NeighborJoiningBuilder(distances);
+                break;
+            }
+
+        }
+        return c;
+    }
 
     static public Tree build(Alignment alignment, Method method, DistanceModel model) {
         DistanceMatrix d;
@@ -40,28 +92,17 @@ public class TreeBuilder {
                 break;
         }
 
-        ClusteringTreeBuilder c;
-        switch( method ) {
-            case UPGMA:
-            {
-                c = new UPGMATreeBuilder(d);
-                break;
-            }
-            case NEIGHBOR_JOINING:
-            default:
-            {
-                c = new NeighborJoiningBuilder(d);
-                break;
-            }
-
-        }
-        return c.build();
+        return getBuilder(method, d).build();
     }
 
-    static public Tree build(RootedTree[] trees) {
-        ConsensusTreeBuilder b = new ConsensusTreeBuilder(trees);
-        return b.build();
+    static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold) {
+        return new UnRootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
     }
+
+    static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold) {
+        return new RootedConsensusTreeBuilder(trees, supportThreshold);
+    }
+
 
     static public class Result {
         public final Tree tree;
@@ -73,9 +114,10 @@ public class TreeBuilder {
         }
     }
 
-    static public Result build(List<Sequence> seqs, PairwiseAligner aligner, AlignmentProgressListener progress) {
-       DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
-       Tree t = new NeighborJoiningBuilder(d).build();
+    static public Result build(List<Sequence> seqs, Method method, PairwiseAligner aligner,
+                               AlignmentProgressListener progress) {
+       final DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
+       final Tree t = getBuilder(method, d).build();
        return new Result(t, d);
     }
 }

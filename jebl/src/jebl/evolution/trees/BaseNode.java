@@ -36,6 +36,12 @@ abstract class BaseNode extends Node {
         }
         return helper.getAttribute(name);
     }
+    
+    public void removeAttribute(String name) {
+        if( helper != null ) {
+            helper.removeAttribute(name);
+        }
+    }
 
     public Set<String> getAttributeNames() {
         if (helper == null) {

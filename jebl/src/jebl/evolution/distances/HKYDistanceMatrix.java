@@ -92,8 +92,6 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
          * Calculate a pairwise distance
          */
         static private double calculatePairwiseDistance(int taxon1, int taxon2) {
-
-            double weight, distance;
             double sumTs = 0.0;
             double sumTv = 0.0;
             double sumWeight = 0.0;
@@ -102,13 +100,14 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 State state1 = pattern.getState(taxon1);
                 State state2 = pattern.getState(taxon2);
 
-                if( state1.isAmbiguous() && state2.isAmbiguous() ) {
+                // ignore any ambiguous or gaps
+                if( state1.isAmbiguous() || state2.isAmbiguous() ) {
                    continue;
                 }
 
-                weight = pattern.getWeight();
+                double weight = pattern.getWeight();
                 // acgt
-                if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
+                if ( state1 != state2 ) {
                     if ( Nucleotides.isTransition(state1, state2) ) {
                         // it's a transition
                         sumTs += weight;
@@ -120,22 +119,34 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 sumWeight += weight;
             }
 
-            double P = sumTs / sumWeight;
-            double Q = sumTv / sumWeight;
+            while( true ) {
+                double P = sumTs / sumWeight;
+                double Q = sumTv / sumWeight;
 
-            double a = 1.0 - (P / (2.0 * constA)) -
-                    (((constA - constB) * Q) / (2.0 * constA * constC));
-            double b = 1.0 - (Q / (2.0 * constC));
-            if( a <= 0 || b <= 0 ) {
-                return MAX_DISTANCE;
+                double a = 1.0 - (P / (2.0 * constA)) - (((constA - constB) * Q) / (2.0 * constA * constC));
+
+                if( a <= 0 ) {
+                    // minimum number of sites whose removal restors consistency. see comments
+                    // in TamuraNei. 
+                    final int adjustment = (int)(1 + (sumWeight * -a) / (1/(2.0*constA)  - 1));
+                    sumTs -= adjustment;
+                    if( sumTs < 0) {
+                       break;
+                    }
+                    sumWeight -= adjustment;
+                    continue;
+                }
+
+                double b = 1.0 - (Q / (2.0 * constC));
+                if( b < 0 ) {
+                    break;
+                }
+
+                final double distance = -(2.0 * constA * Math.log(a)) + (2.0 * (constA - constB - constC) * Math.log(b));
+
+                return Math.min(distance, MAX_DISTANCE);
             }
-
-            double tmp1 = Math.log(a);
-            double tmp2 = Math.log(b);
-
-            distance = -(2.0 * constA * tmp1) + (2.0 * (constA - constB - constC) * tmp2);
-
-            return Math.min(distance, MAX_DISTANCE);
+            return MAX_DISTANCE;
         }
 
 

@@ -65,7 +65,7 @@ public class SimpleTree implements Tree {
      * @param distance
      */
     public void setEdge(Node node1, Node node2, double distance) {
-        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1);
+        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && distance >= 0;
 
         edges.put(new HashPair<Node>(node1, node2), distance);
         edges.put(new HashPair<Node>(node2, node1), distance);
@@ -197,6 +197,12 @@ public class SimpleTree implements Tree {
         return helper.getAttribute(name);
     }
 
+    public void removeAttribute(String name) {
+        if( helper != null ) {
+            helper.removeAttribute(name);
+        }
+    }
+    
     public Set<String> getAttributeNames() {
         if (helper == null) {
             return Collections.emptySet();

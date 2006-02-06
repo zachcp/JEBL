@@ -7,7 +7,7 @@ import java.util.*;
 
 
 /**
- * A simple implementation of a rooted Node that is used by SimpleRootedTree.
+ * A simple implementation of a rooted Node that is used by SimpleRootedTree and MutableRootedTree.
  *
  * This class is package private.
  *
@@ -16,16 +16,39 @@ import java.util.*;
  * @version $Id$
  *
  */
+
 class SimpleRootedNode extends BaseNode {
     public SimpleRootedNode(Taxon taxon) {
         this.children = Collections.unmodifiableList(new ArrayList<Node>());
         this.taxon = taxon;
     }
 
-    public SimpleRootedNode(List<Node> children) {
-        this.children = Collections.unmodifiableList(children);
+    public SimpleRootedNode(List<? extends Node> children) {
+        this.children = Collections.unmodifiableList(new ArrayList<Node>(children));
         this.taxon = null;
     }
+
+
+    public void removeChild(Node node) {
+        List<Node> c = new ArrayList<Node>(children);
+        c.remove(node);
+        children = Collections.unmodifiableList(c);
+    }
+
+    public void addChild(SimpleRootedNode node) {
+        List<Node> c = new ArrayList<Node>(children);
+        c.add(node);
+        node.setParent(this);
+        children = Collections.unmodifiableList(c);
+    }
+
+    public void replaceChildren(List<SimpleRootedNode> nodes) {
+        for( SimpleRootedNode n : nodes ) {
+            n.setParent(this);
+        }
+        children = Collections.unmodifiableList(new ArrayList<Node>(nodes));
+    }
+
 
     public Node getParent() {
         return parent;
@@ -77,7 +100,7 @@ class SimpleRootedNode extends BaseNode {
         return taxon;
     }
 
-    private final List<Node> children;
+    private List<Node> children;
     private final Taxon taxon;
 
     private Node parent;

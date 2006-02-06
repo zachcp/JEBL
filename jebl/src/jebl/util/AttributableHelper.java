@@ -20,7 +20,11 @@ public class AttributableHelper implements Attributable {
 		return attributeMap.get(name);
 	}
 
-	public Set<String> getAttributeNames() {
+    public void removeAttribute(String name) {
+		attributeMap.remove(name);
+	}
+
+    public Set<String> getAttributeNames() {
 		return attributeMap.keySet();
 	}
 

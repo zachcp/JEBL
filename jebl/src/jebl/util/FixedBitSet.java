@@ -1,5 +1,7 @@
 package jebl.util;
 
+import java.util.Arrays;
+
 /**
  * Created by IntelliJ IDEA.
  * User: joseph
@@ -24,11 +26,22 @@ public class FixedBitSet {
         return bitIndex >> ADDRESS_BITS_PER_UNIT;
     }
 
+    private int countBits(int b) {
+        int sum = 0;
+
+        while( b != 0) {
+            // remove most significant bit
+            b = b & (b-1);
+            ++sum;
+        }
+        return sum;
+    }
+
     /**
      * Given a bit index, return a unit that masks that bit in its unit.
      */
-    private static long bit(int bitIndex) {
-        return 1L << (bitIndex & BIT_INDEX_MASK);
+    private static int bit(int bitIndex) {
+        return 1 << (bitIndex & BIT_INDEX_MASK);
     }
 
     public FixedBitSet(int size) {
@@ -61,10 +74,38 @@ public class FixedBitSet {
         return true;
     }
 
-    public void or(FixedBitSet b) {
+    public void union(FixedBitSet b) {
         for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
             bits[k] |= b.bits[k];
         }
+    }
+
+    public void intersect(FixedBitSet b) {
+      for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+         bits[k] &= b.bits[k];
+      }
+    }
+
+    public void setMinus(FixedBitSet b) {
+        for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+         bits[k] &= ~b.bits[k];
+      }
+    }
+
+    public int intersectCardinality(FixedBitSet b) {
+        int c = 0;
+        for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+           c += countBits(bits[k] & b.bits[k] );
+        }
+        return c;
+    }
+
+    public void complement() {
+        int k;
+        for(k = 0; k < bits.length-1; ++k ) {
+           bits[k] = ~ bits[k];
+        }
+        bits[k] = (~bits[k]) & (bit(size) - 1);
     }
 
     private final static byte firstBitLocation[] = {
@@ -118,17 +159,48 @@ public class FixedBitSet {
     public int cardinality() {
         int sum = 0;
         for( int b : bits ) {
-           while( b != 0) {
-               // remove most significant bit
-               b = b & (b-1);
-               ++sum;
-           }
+           sum += countBits(b);
         }
         return sum;
     }
 
-    public boolean contains(int i) {
+    public boolean contains(final int i) {
         final int unitIndex = unitIndex(i);
         return (bits[unitIndex] & bit(i)) != 0;
     }
+
+    public int hashCode() {
+        int code = 0;
+
+        for (int bit : bits) {
+            code = code ^ bit;
+        }
+        return code;
+    }
+
+    public boolean equals(Object x) {
+        if( x instanceof FixedBitSet ) {
+            final FixedBitSet b = (FixedBitSet)x;
+
+            return b.size == size && Arrays.equals(bits, b.bits);
+        }
+        return false;
+    }
+
+    public String toString() {
+        StringBuffer rep = new StringBuffer();
+        rep.append("{");
+        for(int b = 0; b < size; ++b) {
+            if( contains(b) ) {
+                if( rep.length() > 0 ) {
+                    rep.append("," + b);
+                }  else {
+                    rep.append("" + b);
+                }
+            }
+        }
+        rep.append("}");
+        return rep.toString();
+    }
+
 }

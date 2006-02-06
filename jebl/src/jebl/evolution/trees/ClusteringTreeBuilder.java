@@ -5,9 +5,7 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * An abstract base class for clustering algorithms from pairwise distances
@@ -39,9 +37,9 @@ abstract class ClusteringTreeBuilder {
             this.rtree = new SimpleRootedTree();
         } else {
             if( !buildUsingBranches ) {
-              throw new IllegalArgumentException("Only rooted trees can use heights");
+                throw new IllegalArgumentException("Only rooted trees can use heights");
             }
-          this.tree = new SimpleTree();
+            this.tree = new SimpleTree();
         }
         this.minimumTaxa = minimumTaxa;
 

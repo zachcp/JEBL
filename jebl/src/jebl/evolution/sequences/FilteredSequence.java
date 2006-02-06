@@ -110,7 +110,11 @@ public abstract class FilteredSequence implements Sequence {
 		return source.getAttribute(name);
 	}
 
-	public Set<String> getAttributeNames() {
+    public void removeAttribute(String name) {
+        source.removeAttribute(name);
+    }
+
+    public Set<String> getAttributeNames() {
 		return source.getAttributeNames();
 	}
 

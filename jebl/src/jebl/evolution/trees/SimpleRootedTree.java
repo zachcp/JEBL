@@ -43,7 +43,7 @@ public class SimpleRootedTree implements RootedTree {
      * @param children the child nodes of this nodes
      * @return the created node reference
      */
-    public Node createInternalNode(List<Node> children) {
+    public SimpleRootedNode createInternalNode(List<? extends Node> children) {
         SimpleRootedNode node = new SimpleRootedNode(children);
 
         for (Node child : children) {
@@ -350,12 +350,18 @@ public class SimpleRootedTree implements RootedTree {
 		return helper.getAttribute(name);
 	}
 
-	public Set<String> getAttributeNames() {
-		if (helper == null) {
-			return Collections.emptySet();
-		}
-		return helper.getAttributeNames();
-	}
+    public void removeAttribute(String name) {
+        if( helper != null ) {
+            helper.removeAttribute(name);
+        }
+    }
+
+    public Set<String> getAttributeNames() {
+        if (helper == null) {
+            return Collections.emptySet();
+        }
+        return helper.getAttributeNames();
+    }
 
 	public Map<String, Object> getAttributeMap() {
 		if (helper == null) {
@@ -368,8 +374,8 @@ public class SimpleRootedTree implements RootedTree {
 
 	private AttributableHelper helper = null;
 
-    private SimpleRootedNode rootNode = null;
-    private final Set<Node> internalNodes = new HashSet<Node>();
+    protected SimpleRootedNode rootNode = null;
+    protected final Set<Node> internalNodes = new HashSet<Node>();
     private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
 
     private boolean heightsKnown = false;
@@ -377,4 +383,5 @@ public class SimpleRootedTree implements RootedTree {
 
     private boolean hasHeights = false;
     private boolean hasLengths = false;
+
 }

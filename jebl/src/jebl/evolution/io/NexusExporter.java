@@ -133,7 +133,7 @@ public class NexusExporter implements SequenceExporter {
             }
             boolean isRooted = t instanceof RootedTree;
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
-            // (FIXME) no tree name yet
+            
             Object name = t.getAttribute("name");
             ++nt;
             writer.println("\t" + (isRooted ? "tree " : "utree ") + ((name != null) ? (String)name : "tree_" + nt)

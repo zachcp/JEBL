@@ -155,6 +155,12 @@ public class BasicSequence implements Sequence {
 		}
 		return helper.getAttribute(name);
 	}
+    
+    public void removeAttribute(String name) {
+        if( helper != null ) {
+            helper.removeAttribute(name);
+        }
+    }
 
 	public Set<String> getAttributeNames() {
 		if (helper == null) {

@@ -46,7 +46,9 @@ public class NewickImporter implements TreeImporter {
 
             tree = readTree();
         } catch (EOFException e) {
-         }
+            //
+            throw new ImportException("error");
+        }
 
         lastTree = tree;
 
@@ -133,8 +135,12 @@ public class NewickImporter implements TreeImporter {
             throw new ImportException.BadFormatException("Missing closing ')' in tree");
         }
 
-        // find the next delimiter
-        helper.readToken(":(),;");
+        try {
+          // find the next delimiter
+          helper.readToken(":(),;");
+        } catch( EOFException e) {
+            // Ok if we just finished
+        }
 
         return tree.createInternalNode(children);
     }

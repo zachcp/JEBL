@@ -72,12 +72,18 @@ public final class Taxon implements Attributable, Comparable {
 		return helper.getAttribute(name);
 	}
 
-	public Set<String> getAttributeNames() {
-		if (helper == null) {
-			return Collections.emptySet();
-		}
-		return helper.getAttributeNames();
-	}
+    public void removeAttribute(String name) {
+        if( helper != null ) {
+            helper.removeAttribute(name);
+        }
+    }
+
+    public Set<String> getAttributeNames() {
+        if (helper == null) {
+            return Collections.emptySet();
+        }
+        return helper.getAttributeNames();
+    }
 
 	public Map<String, Object> getAttributeMap() {
 		if (helper == null) {

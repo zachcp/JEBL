@@ -83,8 +83,11 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
     }
 
     protected double updatedDistance(int k) {
-        int i = besti;
-        int j = bestj;
-        return (getDist(k, i) + getDist(k, j) - getDist(i, j)) * 0.5;
+        final int i = besti;
+        final int j = bestj;
+
+        double d = (getDist(k, i) + getDist(k, j) - getDist(i, j)) * 0.5;
+        // Some large distances foil the method
+        return Math.max(d, 0.0);
     }
 }

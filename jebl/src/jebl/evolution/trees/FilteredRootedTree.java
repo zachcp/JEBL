@@ -100,7 +100,11 @@ public abstract class FilteredRootedTree implements RootedTree {
 		return source.getAttribute(name);
 	}
 
-	public Set<String> getAttributeNames() {
+    public void removeAttribute(String name) {
+        source.removeAttribute(name);
+    }
+
+    public Set<String> getAttributeNames() {
 		return source.getAttributeNames();
 	}
 
