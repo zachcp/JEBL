@@ -8,23 +8,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 5/02/2006
- * Time: 15:00:10
- *
- * @author Joseph Heled
- * @version $Id$
- *
  * Construct a consensus tree for a set of rooted trees. The construction is done via clustering. For any two
  * clusters/clades, their distance is the height of their most recent common ancesstor (computed as an average over all
  * trees). This seem natural as it connectes clades in reverse time order.
- */
+ *
+ * @author Joseph Heled
+ * @version $Id$
+ **/
 
 public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
     RootedTree[] trees;
     private double supportThreshold;
-    private List<FixedBitSet> subTreeTips;
+    private List<FixedBitSet> tipsInCluster;
 
     private TreeInfo[] info;
 
@@ -105,6 +100,8 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
         }
     }
 
+    // Height of minimal clade containing clusters i&j (i < j) is height[i][j].
+    // (Only upper right of matrix is used)
     double[][] height;
 
     void setupPairs() {
@@ -145,63 +142,61 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
     }
 
     private double[] updateHeights(int i, int j) {
-        final int nUpdates = subTreeTips.size();
-        double[] distances = new double[nUpdates+1];
+        final int nClusters = tipsInCluster.size();
+        double[] distances = new double[nClusters +1];
 
-        FixedBitSet joined = new FixedBitSet(subTreeTips.get(i));
-        joined.union(subTreeTips.get(j));
-        double totWeight = 0.0;
-        boolean firstUpdate = true;
+        // tips in clustes i & j
+        FixedBitSet joined = new FixedBitSet(tipsInCluster.get(i));
+        joined.union(tipsInCluster.get(j));
 
-        if( nUpdates == 2 ) {
-            for (Tree t : trees) {
-                RootedTree tree = (RootedTree) t;
+        int numberOfTreesSupportClade = 0;
+
+        if( nClusters == 2 ) {
+            for (RootedTree tree : trees) {
                 distances[1] += tree.getHeight(tree.getRootNode());
             }
             distances[2] = 1;
         }   else {
-            for(int l = 0; l < nUpdates; ++l) {
+            for(int l = 0; l < nClusters; ++l) {
                 if( (l == i || l == j) ) {
                     continue;
                 }
 
-                FixedBitSet joinedk = new FixedBitSet(joined);
-                joinedk.union(subTreeTips.get(l));
+                // Tips in i, j & l
+                FixedBitSet joinedWithL = new FixedBitSet(joined);
+                joinedWithL.union(tipsInCluster.get(l));
 
                 for(int iTree = 0; iTree < trees.length; ++iTree) {
                     RootedTree tree = trees[iTree];
                     TreeInfo info = this.info[iTree];
-                    boolean commonAnncestor = !firstUpdate;
+                    boolean commonAnncestorFound = false;
+
                     for (int nodeIndex : info.postorder) {
                         FixedBitSet nodeBS = info.nodesTipSet[nodeIndex];
 
-                        if (!commonAnncestor && joined.containedIn(nodeBS)) {
+                        if (!commonAnncestorFound && joined.containedIn(nodeBS)) {
 
                             final int tipsInSubtree = nodeBS.cardinality();
                             final int tipsInClusters = joined.cardinality();
-                            final double w = (tipsInSubtree == tipsInClusters) ? 1 : 0;
 
-                            totWeight += w;
-                            commonAnncestor = true;
+                            numberOfTreesSupportClade += ((tipsInSubtree == tipsInClusters) ? 1 : 0);
+                            commonAnncestorFound = true;
                         }
 
-                        if (joinedk.containedIn(nodeBS)) {
-                            final double h = tree.getHeight(info.allNodes[nodeIndex]);
-                            distances[l] += h;
+                        if( joinedWithL.containedIn(nodeBS) ) {
+                            distances[l] += tree.getHeight(info.allNodes[nodeIndex]);
                             break;
                         }
                     }
-
                 }
-                firstUpdate = false;
             }
         }
 
-        for(int l = 0; l < nUpdates; ++l) {
+        for(int l = 0; l < nClusters; ++l) {
             distances[l] /= trees.length;
         }
 
-        distances[nUpdates] = totWeight / trees.length;
+        distances[nClusters] = (double)numberOfTreesSupportClade / trees.length;
         return distances;
     }
 
@@ -210,28 +205,32 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
         MutableRootedTree consensus = new MutableRootedTree();
         List<Node> subTrees = new ArrayList<Node>(nExternalNodes);
 
+        // compute average length of branch from tip over all trees
         double[] tipHeights = new double[taxons.size()];
-        for (Tree tree1 : trees) {
-            RootedTree tree = (RootedTree) tree1;
+        for (RootedTree tree : trees) {
             for (Node e : tree.getExternalNodes()) {
                 final int i = taxons.indexOf(tree.getTaxon(e));
                 tipHeights[i] += tree.getHeight(e);
             }
         }
 
-        subTreeTips = new ArrayList<FixedBitSet>(nExternalNodes);
+        // Start with each tip in it's own cluster
+        tipsInCluster = new ArrayList<FixedBitSet>(nExternalNodes);
         for(int k = 0; k < nExternalNodes; ++k) {
             FixedBitSet b = new FixedBitSet(nExternalNodes);
             b.set(k);
-            subTreeTips.add(b);
+            tipsInCluster.add(b);
             final Node externalNode = consensus.createExternalNode(taxons.get(k));
             consensus.setHeight(externalNode, tipHeights[k]/trees.length);
             subTrees.add(externalNode);
         }
 
+        // set up distances between all tips
         setupPairs();
 
         for(int nClusters = nExternalNodes; nClusters > 1; --nClusters) {
+
+            // Find most recent ancesstor of two clusters from distance matrix
             double mostRecentAnncestorHeight = Double.MAX_VALUE;
             int besti = 0, bestj = 0;
             for(int d = 0; d < nClusters; ++d) {
@@ -242,6 +241,8 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                     }
                 }
             }
+
+            // Join clusters
             double[] newHeights = updateHeights(besti, bestj);
             double supportForClade = newHeights[newHeights.length-1];
 
@@ -257,8 +258,8 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                 sub.setAttribute(supportAttributeName, 100.0*supportForClade);
             }
             subTrees.set(besti, sub);
-            subTreeTips.get(besti).union(subTreeTips.get(bestj));
-            subTreeTips.remove(bestj);
+            tipsInCluster.get(besti).union(tipsInCluster.get(bestj));
+            tipsInCluster.remove(bestj);
             subTrees.remove(bestj);
 
             // compress distance matrix
@@ -277,6 +278,7 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
             }
         }
 
+        // Remove nodes with low support
         supportThreshold *= 100;
         for( Node node : consensus.getInternalNodes() ) {
             Object sup = node.getAttribute(supportAttributeName);

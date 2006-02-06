@@ -7,20 +7,16 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 6/02/2006
- * Time: 17:05:53
- *
- * @author Joseph Heled
- * @version $Id$
- *
  * A simple rooted tree providing some ability to manipulate the tree.
  *
  *   - Root an unrooted tree using an outgroup.
  *   - Remove internal node: all children of node are adopted by it's parent.
  *   - Split/Refine node by creating two new children and distributing the children to new nodes.
  *   - Re-root a rooted tree given an outgroup.
+
+ * @author Joseph Heled
+ * @version $Id$
+ *
  */
 
 public class MutableRootedTree extends SimpleRootedTree {

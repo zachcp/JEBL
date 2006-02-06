@@ -9,12 +9,7 @@ import java.util.Set;
 
 /**
  * Common implementation of Attributable interface used by Nodes.
- *
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 7/01/2006
- * Time: 07:26:35
- *
+ * 
  * @author Joseph Heled
  * @version $Id$
  *

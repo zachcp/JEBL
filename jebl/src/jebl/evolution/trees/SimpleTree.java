@@ -10,7 +10,6 @@ import java.util.*;
  * A basic implementation on an unrooted tree.
  *
  * @author Joseph Heled
- *
  * @version $Id$
  *
  */

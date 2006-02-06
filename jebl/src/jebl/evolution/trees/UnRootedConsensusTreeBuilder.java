@@ -8,10 +8,6 @@ import jebl.util.FixedBitSet;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 5/02/2006
- * Time: 15:12:48
  *
  * @author Joseph Heled
  * @version $Id$

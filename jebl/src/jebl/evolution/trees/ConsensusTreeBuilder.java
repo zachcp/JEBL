@@ -7,16 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 15/01/2006
- * Time: 17:26:01
- *
- * @author Joseph Heled
- * @version $Id$
  *
  * Build a consensus tree for a set of trees. Base class just check for consistency
  * Work in progress.
+ *
+ * @author Joseph Heled
+ * @version $Id$
  */
 
 public abstract class ConsensusTreeBuilder {
