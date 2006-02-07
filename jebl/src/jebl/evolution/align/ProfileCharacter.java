@@ -8,7 +8,7 @@ import jebl.evolution.align.scores.Scores;
  *
  * Represents a single residue in a multiple alignment profile
  */
-class ProfileCharacter {
+public class ProfileCharacter {
     /*
     'characters' contains the actual residue character, and a parallel array called
     'count' contains the number of times that character occurs. NumberOfUniqueCharacters
@@ -100,5 +100,10 @@ class ProfileCharacter {
         if(characters[0]!='-') return false;
         return true;
 
+    }
+
+    public void clear() {
+        numberOfUniqueCharacters= 0;
+        totalCharacters= 0;
     }
 }

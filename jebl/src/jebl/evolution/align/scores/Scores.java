@@ -31,6 +31,22 @@ public abstract class Scores implements ScoreMatrix {
         }
     }
 
+    void buildScores(float match, float mismatch) {
+        int states = getAlphabet().length();
+        float[][] scores = new float[states][states];
+
+        for (int i = 0; i < states; i++) {
+            for (int j = 0; j < states; j++) {
+                if (i == j) {
+                    scores[i][j] = match;
+                } else {
+                    scores[i][j] = mismatch;
+                }
+            }
+        }
+        buildScores(scores);
+    }
+
     public final float getScore(char x, char y) {
         return score[x][y];
     }

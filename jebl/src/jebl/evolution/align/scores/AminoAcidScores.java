@@ -11,4 +11,10 @@ public class AminoAcidScores extends Scores {
 
     public final String getAlphabet() { return residues; }
 
+    public AminoAcidScores() {
+    }
+
+    public AminoAcidScores(float m, float n) {
+        buildScores(m, n);
+    }
 }
