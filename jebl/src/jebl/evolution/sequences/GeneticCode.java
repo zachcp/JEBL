@@ -220,5 +220,9 @@ public final class GeneticCode {
     private static final int FLATWORM_MT_ID = 12;
     private static final int BLEPHARISMA_NUC_ID = 13;
 
+    public String toString() {
+        return getDescription();
+    }
+
 
 }
