@@ -14,9 +14,12 @@ import java.util.*;
  *
  * Builds consensus tree given a set of unrooted trees.
  *
+ * Each edge in a tree "supports" the partition of the taxa into two clades (which you get by deleteing the edge). A
+ * consensus tree is built by finding clades getting support by 50% of the trees or more.
+ *
  * The implementation is relativly simple. Each tree is scanned, and support for each clade is collected in one table.
  * The clade is represented by a bitset, which always contains the (arbitrary) first node. The scan is made by going
- * over all internal branches ordered in such a way that the subtree of exactly one edge node has been completly scanned,
+ * over all nodes ordered in such a way that the subtree of exactly one edge of the node has been completly scanned,
  * so the node "knows" the set of tips of that subtree.
  *
  * After collection an initial tree is constructed with one root and all tips as children. The support set is scanned
@@ -27,6 +30,10 @@ import java.util.*;
  *
  * The length of the consensus tree branches are computed from the average over all trees containing the clade. The
  * lenghts of tip branches are computed from the average over all trees.
+ *
+ * While the consensus tree is logically unrooted, we generate a rooted tree because we can store attributes like
+ * support only for nodes.
+ * 
  */
 
 public class UnRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
