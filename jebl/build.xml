@@ -36,6 +36,13 @@
         </javac>
     </target>
 
+    <target name="clean">
+        <delete includeEmptyDirs="true">
+            <fileset dir="${build}" includes="**/*"/>
+        </delete>
+
+    </target>
+
     <target name="compile-jam-mac-only" depends="init">
         <!-- Compile the java code from ${jamsrc} into ${build} -->
         <condition property="isMac">
@@ -72,7 +79,7 @@
     <target name="compile-jebl" depends="init">
         <!-- Compile the java code from ${src} into ${build} -->
         <javac source="1.5" srcdir="${src}" destdir="${build}">
-            <include name="jebl/**"/>
+            <include name="jebl/**/*"/>
         </javac>
     </target>
 
@@ -88,7 +95,7 @@
         </jar>
     </target>
 
-    <target name="dist-both" depends="compile-jebl,compile-jam" description="generate the distribution">
+    <target name="dist-both" depends="clean,compile-jebl,compile-jam" description="generate the distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
