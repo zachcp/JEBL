@@ -72,15 +72,22 @@ public abstract class Scores implements ScoreMatrix {
         return result;
     }
 
-    public static Scores includeGaps(Scores scores, float gapCost) {
+    /**
+     *
+     * @param scores
+     * @param gapVersusResidueCost should be a negative value
+     * @param gapVersusGapCost should be a positive value
+     * @return
+     */
+    public static Scores includeGaps(Scores scores, float gapVersusResidueCost, float gapVersusGapCost) {
         Scores result =duplicate(scores);
         String states = scores.getAlphabet();
         for (int i = 0; i < states.length(); i++) {
             char res1 = states.charAt(i);
-            result.score['-'] [res1] = gapCost;
-            result.score[res1]['-'] = gapCost;
-
+            result.score['-'] [res1] = gapVersusResidueCost;
+            result.score[res1]['-'] = gapVersusResidueCost;
         }
+        result.score['-']['-'] = gapVersusGapCost;
         return result;
     }
 }

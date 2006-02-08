@@ -86,6 +86,31 @@ public class ProfileCharacter {
         return score/totalCharacters;
     }
 
+    public static float scoreSelf(ProfileCharacter character, Scores scores) {
+        float score = 0;
+        int totalCharacters = character.totalCharacters * character.totalCharacters;
+        if (totalCharacters == 1) {
+            return scores.score[character.characters[0]][character.characters[0]];
+        }
+        for (int i = 0; i < character.numberOfUniqueCharacters; i++) {
+            for (int j = 0; j < character.numberOfUniqueCharacters; j++) {
+                score += scores.score[character.characters[i]][character.characters[j]] *
+                        character.count[i] * character.count[j];
+            }
+        }
+
+        //reduce counts of identical characters being compared by one
+        // for example, if comparing A:1 and B:1, score should be minimum
+        // but if comparing A:2 B:1,  score should be higher
+        for (int i = 0; i < character.numberOfUniqueCharacters; i++) {
+            score -= scores.score[character.characters[i]][character.characters[i]];
+            totalCharacters --;
+        }
+
+        return score / totalCharacters;
+    }
+
+
     public int print() {
         System.out.print("(");
         for (int i = 0; i < numberOfUniqueCharacters; i++) {

@@ -42,7 +42,7 @@ public class BartonSternberg {
     public BartonSternberg(Scores scores, float gapOpen, float gapExtend, int refinementIterations, boolean freeGapsAtEnds) {
         this.gapOpen = gapOpen;
         this.gapExtend = gapExtend;
-        this.scores = Scores.includeGaps(scores, 0);
+        this.scores = Scores.includeGaps(scores, 0, 0);
         this.refinementIterations= refinementIterations;
         this.freeGapsAtEnds=freeGapsAtEnds;
         aligner = new NeedlemanWunschLinearSpaceAffine(this.scores,gapOpen,gapExtend, freeGapsAtEnds);
@@ -84,7 +84,7 @@ public class BartonSternberg {
         return Profile.combine(left, right, results[0], results[1]);
     }
 
-   
+
     public String[] align(List<Sequence> sourceSequences, AlignmentProgressListener progress) {
         int count = sourceSequences.size();
 
