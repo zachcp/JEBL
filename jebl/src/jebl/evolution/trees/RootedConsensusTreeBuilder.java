@@ -124,8 +124,8 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                 final FixedBitSet left = info.nodesTipSet[leftChildIndex];
                 final FixedBitSet right = info.nodesTipSet[rightChildIndex];
 
-                for (int lTip = left.nextSetBit(0); lTip >= 0; lTip = left.nextSetBit(lTip + 1)) {
-                    for (int rTip = right.nextSetBit(0); rTip >= 0; rTip = right.nextSetBit(rTip + 1)) {
+                for (int lTip = left.nextOnBit(0); lTip >= 0; lTip = left.nextOnBit(lTip + 1)) {
+                    for (int rTip = right.nextOnBit(0); rTip >= 0; rTip = right.nextOnBit(rTip + 1)) {
 
                         final double h = (trees[iTree]).getHeight(info.allNodes[nodeIndex]);
                         height[Math.min(lTip, rTip)][Math.max(lTip, rTip)] += h;
@@ -174,7 +174,7 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                     for (int nodeIndex : info.postorder) {
                         FixedBitSet nodeBS = info.nodesTipSet[nodeIndex];
 
-                        if (!commonAnncestorFound && joined.containedIn(nodeBS)) {
+                        if (!commonAnncestorFound && joined.setInclusion(nodeBS)) {
 
                             final int tipsInSubtree = nodeBS.cardinality();
                             final int tipsInClusters = joined.cardinality();
@@ -183,7 +183,7 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                             commonAnncestorFound = true;
                         }
 
-                        if( joinedWithL.containedIn(nodeBS) ) {
+                        if( joinedWithL.setInclusion(nodeBS) ) {
                             distances[l] += tree.getHeight(info.allNodes[nodeIndex]);
                             break;
                         }

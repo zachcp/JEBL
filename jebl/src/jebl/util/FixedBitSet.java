@@ -3,10 +3,7 @@ package jebl.util;
 import java.util.Arrays;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 15/01/2006
- * Time: 09:36:13
+ * A bit-set of fixed size. Size is determined on creation.
  *
  * @author Joseph Heled
  * @version $Id$
@@ -65,7 +62,7 @@ public class FixedBitSet {
        bits[unitIndex] &= ~bit(position);
     }
 
-    public boolean containedIn(final FixedBitSet b) {
+    public boolean setInclusion(final FixedBitSet b) {
         for(int k = 0; k < bits.length; ++k) {
             if( bits[k] != (bits[k] & b.bits[k]) ) {
                 return false;
@@ -132,7 +129,7 @@ public class FixedBitSet {
        5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
        4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
 
-    private int firstBit(int i) {
+    private int firstOnBit(int i) {
         for(int k = 0; k < 4; ++k) {
             char b = (char)(i & 0xff);
             if( b != 0 ) {
@@ -143,7 +140,7 @@ public class FixedBitSet {
         return -1;
     }
 
-    public int nextSetBit(int fromIndex) {
+    public int nextOnBit(int fromIndex) {
         int u = unitIndex(fromIndex);
         int testIndex = (fromIndex & BIT_INDEX_MASK);
         int unit = bits[u] >> testIndex;
@@ -158,7 +155,7 @@ public class FixedBitSet {
         if (unit == 0)
             return -1;
 
-        testIndex += firstBit(unit);
+        testIndex += firstOnBit(unit);
         return ((u * BITS_PER_UNIT) + testIndex);
     }
 

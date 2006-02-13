@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Builds greedy consensus tree given a set of unrooted trees.
  *
- * Each edge in a tree "supports" a split, i.r. the partition of the taxa into two clades
+ * Each edge in a tree "supports" a split, i.e.. the partition of the taxa into two clades
  * (which you get by deleting the edge). A Majority consensus tree is built by finding
  * clades appearing in at least 50% of the trees or more. A Greedy consensus tree is a
  * refinement of a Majority tree where the splits are sorted by amount of support, and are
@@ -24,14 +24,14 @@ import java.util.*;
  * bitset, which always contains the (arbitrary) first node. The scan is made by going
  * over all nodes ordered in such a way that the subtree of exactly one edge of the node
  * has been completely scanned, so the node "knows" the set of tips of that subtree without
- * needing to rescan the tree.
+ * needing to re-scan the tree.
  *
  * After all trees are scanned an initial consensus tree is constructed with one root and
  * all tips as children. The split set is scanned in order of decreasing support, and each
  * supported clade refines the tree by creating a new descendant for the node containing
  * the clade and re-attaching the clade to that new node. This is done only if the split
  * is compatible with the tree, i.e.  only if the split is completely contained in a proper
- * subset of descendents of one node. This process continues until only clades with support
+ * subset of descendants of one node. This process continues until only clades with support
  * lower that the threshold are left.
  *
  * The length of the consensus tree branches is computed from the average over all trees
@@ -101,7 +101,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
 
     private String tipsAsText(FixedBitSet b) {
         String names = "(";
-        for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i+1)) {
+        for(int i = b.nextOnBit(0); i >= 0; i = b.nextOnBit(i+1)) {
             names = names + taxons.get(i).getName() + ",";
         }
         return names + ")";
@@ -191,7 +191,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
                             doneSet.put(n, new FixedBitSet(b));
                             // in case it has been added by a previous node
                             nextScanSet.remove(n);
-                            // support keys always contains the (arbitray) tip 0
+                            // support keys always contains the (arbitrary) tip 0
                             if( ! b.contains(0) ) {
                                 b.complement();
                             }
@@ -243,14 +243,14 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
 
             MutableRootedTree consTree = new MutableRootedTree();
 
-            // Contains all internal nodes in the tree so far, ordered so descendents
+            // Contains all internal nodes in the tree so far, ordered so descendants
             // appear later than ancestors
             List<Node> internalNodes = new ArrayList<Node>(nExternalNodes);
 			
             // For each internal node, a bit set with the complete set of tips for it's clade
             List<FixedBitSet> internalNodesTips = new ArrayList<FixedBitSet>(nExternalNodes);              assert taxons.size() == nExternalNodes;
 
-            // establish a tree with one root having all tips as decendents
+            // establish a tree with one root having all tips as descendants
             internalNodesTips.add(new FixedBitSet(nExternalNodes));
             Node[] nodes = new Node[nExternalNodes];
             for(int nt = 0; nt < taxons.size(); ++nt) {
@@ -296,7 +296,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
                             }
                         }
 
-                        // Locate node decendents containing the split
+                        // Locate node descendants containing the split
                         found = true;
                         List<Integer> split = new ArrayList<Integer>();
 
@@ -345,7 +345,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
                             System.out.println("tree: " + Utils.toNewick(consTree));
                         }
 
-                        // insert just after parent, so before any decendents
+                        // insert just after parent, so before any descendants
                         internalNodes.add(nsub+1, detached);
                         internalNodesTips.add(nsub+1, new FixedBitSet(sharedTips));
 
