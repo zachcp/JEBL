@@ -45,11 +45,18 @@ public class Utils {
         }
     }
 
-    public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
+    public static String translate(final String nucleotideSequence, GeneticCode geneticCode, boolean reverseComplement) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         seq = new GaplessSequence(seq);
         State[] states = seq.getStates();
-        states = translate(states, geneticCode);
+        NucleotideState[] nucleotideStates=new NucleotideState[states.length];
+        for (int i = 0; i < states.length; i++) {
+            nucleotideStates[i]= (NucleotideState) states[i];
+        }
+        if(reverseComplement)
+            nucleotideStates=reverseComplement(nucleotideStates);
+
+        states = translate(nucleotideStates, geneticCode);
         seq = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("x"), states);
         return seq.getString();
     }
