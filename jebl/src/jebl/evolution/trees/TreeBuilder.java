@@ -96,7 +96,7 @@ public class TreeBuilder {
     }
 
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold) {
-        return new UnRootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
+        return new GreedyConsensusTreeBuilder(trees, outGroup, supportThreshold);
     }
 
     static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold) {

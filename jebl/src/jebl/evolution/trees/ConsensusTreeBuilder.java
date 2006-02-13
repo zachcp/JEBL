@@ -25,6 +25,10 @@ public abstract class ConsensusTreeBuilder {
     /** Name of attribute specifing amount of support for branch */
     final static public String supportAttributeName = "Consensus support(%)";
 
+    /**
+     * Check for consistmcy and establish the common taxa
+     * @param trees
+     */
     ConsensusTreeBuilder(Tree[] trees) {
         Tree first = trees[0];
 
@@ -33,18 +37,15 @@ public abstract class ConsensusTreeBuilder {
         final Set<Taxon> taxa = first.getTaxa();
         taxons = new ArrayList<Taxon>(taxa);
 
-        for(int iTree = 0; iTree < trees.length; ++iTree) {
-             Tree t = trees[iTree];
-
+        for (Tree t : trees) {
             final int nExternal = t.getExternalNodes().size();
-            if( nExternal != nExternalNodes || !t.getTaxa().containsAll(taxa) ) {
+            if (nExternal != nExternalNodes || !t.getTaxa().containsAll(taxa)) {
                 throw new IllegalArgumentException("Non compatible trees");
             }
         }
     }
 
     /**
-     *
      * @return  The consensus tree
      */
     abstract public Tree build();

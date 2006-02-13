@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class FixedBitSet {
     int[] bits;
     int size;
-    private int intSize = Integer.SIZE;
+    //private int intSize = Integer.SIZE;
 
     private final static int ADDRESS_BITS_PER_UNIT = 5;
     private final static int BITS_PER_UNIT = 1 << ADDRESS_BITS_PER_UNIT;
@@ -98,6 +98,12 @@ public class FixedBitSet {
            c += countBits(bits[k] & b.bits[k] );
         }
         return c;
+    }
+
+    public static FixedBitSet complement(FixedBitSet b) {
+       FixedBitSet t = new FixedBitSet(b);
+        t.complement();
+        return t;
     }
 
     public void complement() {

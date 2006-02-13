@@ -168,4 +168,31 @@ public class MutableRootedTree extends SimpleRootedTree {
             }
         }
     }
+
+    public Node detachChildren(Node node, List<Integer> split) {
+        assert( split.size() > 1 );
+
+        List<Node> allChildren = getChildren(node);
+
+        List<Node> detached = new ArrayList<Node>();
+
+        for( int n : split ) {
+           detached.add(allChildren.get(n));
+        }
+
+        SimpleRootedNode saveRoot = rootNode;
+
+        for( Node n : allChildren ) {
+            if( detached.contains(n) ) {
+                ((SimpleRootedNode)node).removeChild(n);
+            }
+        }
+
+        SimpleRootedNode dnode = createInternalNode(detached);
+        ((SimpleRootedNode)node).addChild(dnode);
+
+        rootNode = saveRoot;
+
+        return dnode;
+    }
 }
