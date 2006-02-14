@@ -45,18 +45,25 @@ public class Utils {
         }
     }
 
-    public static String translate(final String nucleotideSequence, GeneticCode geneticCode, boolean reverseComplement) {
+    public static String reverseComplement(final String nucleotideSequence) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         seq = new GaplessSequence(seq);
         State[] states = seq.getStates();
-        NucleotideState[] nucleotideStates=new NucleotideState[states.length];
+        NucleotideState[] nucleotideStates = new NucleotideState[states.length];
         for (int i = 0; i < states.length; i++) {
-            nucleotideStates[i]= (NucleotideState) states[i];
+            nucleotideStates[i] = (NucleotideState) states[i];
         }
-        if(reverseComplement)
-            nucleotideStates=reverseComplement(nucleotideStates);
+        nucleotideStates = reverseComplement(nucleotideStates);
+        seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideStates);
+        return seq.getString();
+    }
 
-        states = translate(nucleotideStates, geneticCode);
+    public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
+        Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
+        seq = new GaplessSequence(seq);
+        State[] states = seq.getStates();
+
+        states = translate(states, geneticCode);
         seq = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("x"), states);
         return seq.getString();
     }
