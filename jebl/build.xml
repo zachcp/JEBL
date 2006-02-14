@@ -64,7 +64,7 @@
     </target>
 
 
-    <target name="dist-jam" depends="compile-jam" description="generate the distribution">
+    <target name="dist-jam" depends="compile-jam" description="generate the JAM distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
         <delete file="${dist}/jam.jar"/>
@@ -83,7 +83,7 @@
         </javac>
     </target>
 
-    <target name="dist" depends="compile-jebl" description="generate the distribution">
+    <target name="dist-jebl" depends="compile-jebl" description="generate the JEBL distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
@@ -95,7 +95,7 @@
         </jar>
     </target>
 
-    <target name="dist-both" depends="clean,compile-jebl,compile-jam" description="generate the distribution">
+    <target name="dist" depends="dist-jebl,dist-jam" description="generate the distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
