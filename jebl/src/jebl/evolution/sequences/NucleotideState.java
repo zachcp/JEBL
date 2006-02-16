@@ -16,11 +16,11 @@ package jebl.evolution.sequences;
  */
 public final class NucleotideState extends State {
 
-    public NucleotideState(String name, String stateCode, int index) {
+    NucleotideState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
 
-    public NucleotideState(String name, String stateCode, int index, NucleotideState[] ambiguities) {
+    NucleotideState(String name, String stateCode, int index, NucleotideState[] ambiguities) {
         super(name, stateCode, index, ambiguities);
     }
 

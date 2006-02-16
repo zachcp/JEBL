@@ -16,11 +16,11 @@ package jebl.evolution.sequences;
  */
 public final class CodonState extends State {
 
-    public CodonState(String name, String stateCode, int index) {
+    CodonState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
 
-    public CodonState(String name, String stateCode, int index, CodonState[] ambiguities) {
+    CodonState(String name, String stateCode, int index, CodonState[] ambiguities) {
         super(name, stateCode, index, ambiguities);
     }
 

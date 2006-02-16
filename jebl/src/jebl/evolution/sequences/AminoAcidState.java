@@ -16,11 +16,11 @@ package jebl.evolution.sequences;
  */
 public final class AminoAcidState extends State {
 
-    public AminoAcidState(String name, String stateCode, int index) {
+    AminoAcidState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
 
-    public AminoAcidState(String name, String stateCode, int index, AminoAcidState[] ambiguities) {
+    AminoAcidState(String name, String stateCode, int index, AminoAcidState[] ambiguities) {
         super(name, stateCode, index, ambiguities);
     }
 
