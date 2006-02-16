@@ -83,6 +83,11 @@ public class ScoresFactory {
         new Pam230 (), new Pam240 (), new Pam250 ()};
     }
     public static NucleotideScores[] getAvailableNucleotideScores () {
-        return new NucleotideScores[] {new NucleotideScores(5,-4)/*,new Hamming()*/};
+        return new NucleotideScores[] {new NucleotideScores(5,-4)
+                ,new NucleotideScores(5, -3)
+                ,new NucleotideScores("Transition/Transversion",1, -1,-5)
+                , new NucleotideScores("Identity",1,0, 0)
+
+                /*,new Hamming()*/};
     }
 }

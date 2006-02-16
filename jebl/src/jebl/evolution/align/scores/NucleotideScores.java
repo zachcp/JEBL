@@ -11,7 +11,9 @@ package jebl.evolution.align.scores;
 public class NucleotideScores extends Scores {
 
     float match = 5;
-    float mismatch = -4;
+    float mismatchTransition = -4;
+    float mismatchTransversion = -4;
+    String name= "";
 
     public NucleotideScores() {}
 
@@ -20,13 +22,20 @@ public class NucleotideScores extends Scores {
      * @param n mismatch score
      */
     public NucleotideScores(float m, float n) {
-        buildScores(m,n);
+        this("",m,n,n);
     }
 
-    void buildScores(float match, float mismatch) {
+    public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion) {
+        this . name = name;
+        buildScores(match, mismatchTransition, mismatchTransversion);
+    }
+
+
+    void buildScores(float match, float mismatchTransition, float mismatchTransversion) {
 
         this.match = match;
-        this.mismatch = mismatch;
+        this.mismatchTransition = mismatchTransition;
+        this.mismatchTransversion = mismatchTransversion;
 
         int states = getAlphabet().length();
         float[][] scores = new float[states][states];
@@ -36,8 +45,12 @@ public class NucleotideScores extends Scores {
                 if (i == j) {
                     scores[i][j] = match;
                 }
+                else if(isPurine(i)== isPurine(j)) {
+                    scores[i][j] = mismatchTransition;
+                }
                 else {
-                    scores[i][j] = mismatch;
+                    scores[i][j] = mismatchTransversion;
+
                 }
             }
         }
@@ -45,11 +58,22 @@ public class NucleotideScores extends Scores {
     }
 
     private String residues = "ACGT";
-	
-	public final String getAlphabet() { return residues; }
+
+    private boolean isPurine(int state) {
+        return state == 0 || state == 2;
+    }
+
+    public final String getAlphabet() { return residues; }
 
     public String toString() {
-        return match + "/" + mismatch;
+        String result = match + "/" + mismatchTransition;
+        if(mismatchTransversion != mismatchTransition) {
+            result = result + "/" + mismatchTransversion;
+        }
+        if(name.length ()> 0){
+            result = name + " (" + result + ")";
+        }
+        return result;
     }
 }
 
