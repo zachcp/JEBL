@@ -242,8 +242,10 @@ public final class Utils {
             return new RootedFromUnrooted(tree, d2.iterator().next());
         }
 
+        // Root at any internal node. The root of the tree has at least 3 children.
+        return new RootedFromUnrooted(tree, tree.getInternalNodes().iterator().next());
         // Root at tree center
-        return rootTreeAtCenter(tree);
+        // return rootTreeAtCenter(tree);
     }
 
     public static RootedTree rootTreeAtCenter(Tree tree) {
