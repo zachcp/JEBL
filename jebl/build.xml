@@ -106,4 +106,19 @@
             <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
         </jar>
     </target>
+
+    <target name="dist-clean" depends="clean,compile-jebl,compile-jam" description="generate the distribution">
+        <!-- For some reason I don't fully understand, running the standard distribute
+         script doesn't always work if you have done a previous build on a previous version
+         of the source code. For some reason, it just doesn't compile some files. This
+         script seems to work better.-->
+        <mkdir dir="${dist}"/>
+
+        <!-- Put everything in ${build} into the jebl-${DSTAMP}.jar file -->
+        <jar jarfile="${dist}/jebl.jar">
+            <fileset dir="${build}" includes="**/*.class,**/*.properties"/>
+            <fileset dir="${src}" includes="**/*.png"/>
+            <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+        </jar>
+    </target>
 </project>
