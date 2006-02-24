@@ -71,7 +71,7 @@ public class BartonSternberg {
             return profile;
         }
 
-        List<Node> children = tree.getChildren(node);   assert( children.size() == 2 );
+        List<Node> children = tree.getChildren(node);  assert( children.size() == 2 );
         Profile left = align(tree, children.get(0), seqs);
         if (compoundProgress.isCancelled()) return null;
         Profile right = align(tree, children.get(1), seqs);
