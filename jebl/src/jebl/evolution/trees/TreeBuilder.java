@@ -4,7 +4,7 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.align.PairwiseAligner;
-import jebl.evolution.align.AlignmentProgressListener;
+import jebl.util.ProgressListener;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.List;
@@ -115,7 +115,7 @@ public class TreeBuilder {
     }
 
     static public Result build(List<Sequence> seqs, Method method, PairwiseAligner aligner,
-                               AlignmentProgressListener progress) {
+                               ProgressListener progress) {
        final DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
        final Tree t = getBuilder(method, d).build();
        return new Result(t, d);

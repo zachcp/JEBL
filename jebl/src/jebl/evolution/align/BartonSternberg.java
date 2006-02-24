@@ -12,6 +12,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Utils;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -49,11 +50,11 @@ public class BartonSternberg {
     }
 
     CompoundAlignmentProgressListener compoundProgress;
-    /*private AlignmentProgressListener progress;
+    /*private ProgressListener progress;
     private boolean cancelled = false;
     private int sectionsCompleted;
     private int totalSections;
-    AlignmentProgressListener minorProgress = new AlignmentProgressListener() {
+    ProgressListener minorProgress = new ProgressListener() {
         public boolean setProgress(double fractionCompleted) {
             double totalProgress = (sectionsCompleted + fractionCompleted)/totalSections;
             if(progress.setProgress(totalProgress)) cancelled = true;
@@ -84,7 +85,7 @@ public class BartonSternberg {
     }
 
 
-    public String[] align(List<Sequence> sourceSequences, AlignmentProgressListener progress) {
+    public String[] align(List<Sequence> sourceSequences, ProgressListener progress) {
         int count = sourceSequences.size();
 
         String[] sequences = new String[count];

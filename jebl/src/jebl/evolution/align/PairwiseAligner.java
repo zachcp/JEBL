@@ -2,6 +2,7 @@ package jebl.evolution.align;
 
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.alignments.Alignment;
+import jebl.util.ProgressListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +25,7 @@ public interface PairwiseAligner {
         }
     }
 
-    Result doAlignment(Sequence seq1, Sequence seq2, AlignmentProgressListener progress);
+    Result doAlignment(Sequence seq1, Sequence seq2, ProgressListener progress);
 
     double getScore(Sequence seq1, Sequence seq2);
 }

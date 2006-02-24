@@ -6,6 +6,7 @@ import jebl.evolution.sequences.SequenceTester;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.alignments.BasicAlignment;
+import jebl.util.ProgressListener;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private int Ctype[][][];
     private int previousm= -1, previousn= -1;
 
-    private AlignmentProgressListener progress;
+    private ProgressListener progress;
     private long totalProgress;
     private long currentProgress;
     private boolean cancelled;
@@ -63,7 +64,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private Profile profile1, profile2;
 //    private AlignmentResult result1, result2;
 
-    public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress, boolean scoreOnly) {
+    public void doAlignment(String sq1, String sq2, ProgressListener progress, boolean scoreOnly) {
         this.progress = progress;
 
 
@@ -81,12 +82,12 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         matchResult[1] = Profile.buildAlignmentString(sq2, results[1]);
     }
 
-     public void doAlignment(String sq1, String sq2, AlignmentProgressListener progress) {
+     public void doAlignment(String sq1, String sq2, ProgressListener progress) {
             doAlignment(sq1, sq2, progress, false);
     }
 
     public AlignmentResult[] doAlignment(Profile profile1, Profile profile2,
-                                         AlignmentProgressListener progress, boolean scoreOnly){
+                                         ProgressListener progress, boolean scoreOnly){
 this.progress = progress;
     this.n = profile1.length();
     this.m = profile2.length();
@@ -456,7 +457,7 @@ this.progress = progress;
         debug = display;
     }
 
-    public Result doAlignment(Sequence seq1, Sequence seq2, AlignmentProgressListener progress) {
+    public Result doAlignment(Sequence seq1, Sequence seq2, ProgressListener progress) {
         doAlignment(seq1.getString(), seq2.getString(), progress);
         if(progress.setProgress(1)) return null;
         List<Sequence> seqs = new ArrayList<Sequence>(2);

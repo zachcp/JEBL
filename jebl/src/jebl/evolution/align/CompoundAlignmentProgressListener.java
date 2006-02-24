@@ -1,5 +1,7 @@
 package jebl.evolution.align;
 
+import jebl.util.ProgressListener;
+
 /**
  * @author Matt Kearse
  * @version $Id$
@@ -8,10 +10,10 @@ public class CompoundAlignmentProgressListener  {
     private boolean cancelled = false;
     private int sectionsCompleted = 0;
     private int totalSections ;
-    private AlignmentProgressListener progress;
+    private ProgressListener progress;
     private int sectionSize= 1;
 
-    public CompoundAlignmentProgressListener(AlignmentProgressListener progress, int totalSections) {
+    public CompoundAlignmentProgressListener(ProgressListener progress, int totalSections) {
         this.totalSections = totalSections;
         this.progress = progress;
     }
@@ -27,11 +29,11 @@ public class CompoundAlignmentProgressListener  {
         return cancelled;
     }
 
-    public AlignmentProgressListener getMinorProgress() {
+    public ProgressListener getMinorProgress() {
         return minorProgress;
     }
 
-    AlignmentProgressListener minorProgress = new AlignmentProgressListener() {
+    ProgressListener minorProgress = new ProgressListener() {
 
         public boolean setProgress(double fractionCompleted) {
 //            System.out.println("progress =" + fractionCompleted+ " sections =" + sectionsCompleted+ "/" + totalSections);

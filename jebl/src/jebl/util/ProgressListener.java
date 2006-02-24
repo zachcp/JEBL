@@ -1,11 +1,11 @@
-package jebl.evolution.align;
+package jebl.util;
 
 /**
  * @author Matt
  *
  * @version $Id$
  */
-public interface AlignmentProgressListener {
+public interface ProgressListener {
     /**
      *
      * @param fractionCompleted a number between 0 and 1 inclusive
