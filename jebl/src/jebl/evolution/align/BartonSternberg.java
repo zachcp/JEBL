@@ -7,7 +7,6 @@ import jebl.evolution.io.ImportException;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.TreeBuilder;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Utils;
@@ -72,10 +71,10 @@ public class BartonSternberg {
             return profile;
         }
 
-        List<Node> childern = tree.getChildren(node);   assert( childern.size() == 2 );
-        Profile left = align(tree, childern.get(0), seqs);
+        List<Node> children = tree.getChildren(node);   assert( children.size() == 2 );
+        Profile left = align(tree, children.get(0), seqs);
         if (compoundProgress.isCancelled()) return null;
-        Profile right = align(tree, childern.get(1), seqs);
+        Profile right = align(tree, children.get(1), seqs);
         if (compoundProgress.isCancelled()) return null;
 
         AlignmentResult results[] = aligner.doAlignment(left, right, compoundProgress.getMinorProgress(), false);
