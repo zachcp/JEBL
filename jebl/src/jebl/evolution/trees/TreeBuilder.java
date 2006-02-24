@@ -74,21 +74,21 @@ public class TreeBuilder {
         return c;
     }
 
-    static public Tree build(Alignment alignment, Method method, DistanceModel model) {
+    static public Tree build(Alignment alignment, Method method, DistanceModel model, ProgressListener progress) {
         DistanceMatrix d;
         switch( model ) {
             case JukesCantor:
             default:
-                d = new JukesCantorDistanceMatrix(alignment);
+                d = new JukesCantorDistanceMatrix(alignment, progress);
                 break;
             case F84:
-                d = new F84DistanceMatrix(alignment);
+                d = new F84DistanceMatrix(alignment, progress);
                 break;
              case HKY:
-                d = new HKYDistanceMatrix(alignment);
+                d = new HKYDistanceMatrix(alignment, progress);
                 break;
               case TamuraNei:
-                d = new TamuraNeiDistanceMatrix(alignment);
+                d = new TamuraNeiDistanceMatrix(alignment, progress);
                 break;
         }
 

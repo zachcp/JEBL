@@ -3,6 +3,7 @@ package jebl.evolution.distances;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.sequences.State;
+import jebl.util.ProgressListener;
 
 /**
  * Compute jukes-cantor corrected distance matrix for a set of aligned sequences.
@@ -17,8 +18,8 @@ import jebl.evolution.sequences.State;
 
 public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
-    public JukesCantorDistanceMatrix(Alignment alignment) {
-        super(alignment.getTaxa(), getDistances(alignment));
+    public JukesCantorDistanceMatrix(Alignment alignment, ProgressListener progress) {
+        super(alignment.getTaxa(), getDistances(alignment, progress));
     }
 
     // Helpers during construction
@@ -70,21 +71,25 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         return Math.min(expDist, MAX_DISTANCE);
     }
 
-    synchronized static double[][] getDistances(Alignment alignment) {
+    synchronized static double[][] getDistances(Alignment alignment, ProgressListener progress) {
         JukesCantorDistanceMatrix.alignment = alignment;
 
         // ASK Alexei
-        int stateCount = alignment.getSequenceType().getCanonicalStateCount(); // getStateCount();
+        int stateCount = alignment.getSequenceType().getCanonicalStateCount();
 
         maxTheoreticalSubsRate = ((double)stateCount - 1) / stateCount;
 
         int dimension = alignment.getTaxa().size();
         double[][] distances = new double[dimension][dimension];
 
+        float tot = (dimension * (dimension - 1)) / 2;
+        int done = 0;
         for(int i = 0; i < dimension; ++i) {
             for(int j = i+1; j < dimension; ++j) {
                 distances[i][j] = calculatePairwiseDistance(i, j);
                 distances[j][i] = distances[i][j];
+
+                progress.setProgress( ++done / tot);
             }
         }
 

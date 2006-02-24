@@ -4,6 +4,7 @@ import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.State;
+import jebl.util.ProgressListener;
 
 /**
  *  Compute HKY corrected distance matrix
@@ -75,8 +76,8 @@ import jebl.evolution.sequences.State;
 
 public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
-    public HKYDistanceMatrix(Alignment alignment) {
-        super(alignment.getTaxa(), Initialaizer.getDistances(alignment));
+    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) {
+        super(alignment.getTaxa(), Initialaizer.getDistances(alignment, progress));
     }
 
     static class Initialaizer extends ModelBasedDistanceMatrix {
@@ -150,7 +151,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         }
 
 
-        static double[][] getDistances(Alignment alignment) {
+        static double[][] getDistances(Alignment alignment, ProgressListener progress) {
             Initialaizer.alignment = alignment;
 
             // ASK Alexei
@@ -175,10 +176,14 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             int dimension = alignment.getTaxa().size();
             double[][] distances = new double[dimension][dimension];
 
+            float tot = (dimension * (dimension - 1)) / 2;
+            int done = 0;
+
             for(int i = 0; i < dimension; ++i) {
                 for(int j = i+1; j < dimension; ++j) {
                     distances[i][j] = calculatePairwiseDistance(i, j);
                     distances[j][i] = distances[i][j];
+                    progress.setProgress( ++done / tot);
                 }
             }
 

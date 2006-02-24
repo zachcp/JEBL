@@ -47,7 +47,7 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
                 compoundProgress.incrementSectionsCompleted(1);
                 if(compoundProgress.isCancelled()) return d;
                 if(isProtein) {
-                    d[i][j] = new JukesCantorDistanceMatrix(result.alignment).getDistances()[0][1];
+                    d[i][j] = new JukesCantorDistanceMatrix(result.alignment, null).getDistances()[0][1];
                 } else {
                     d[i][j] = new F84DistanceMatrix(result.alignment).getDistances()[0][1];
 
