@@ -230,9 +230,7 @@ public final class MatrixCalc {
 		int j=0;
 		for(int i=0;i<matrix.length;i++){
 			if(i!=row){
-				for(int k=0;k<matrix[i].length;k++){
-					x[j][k]=matrix[i][k];
-				}
+                System.arraycopy(matrix[i], 0, x[j], 0, matrix[i].length);
 				j++;
 			}
 		}
@@ -300,15 +298,14 @@ public final class MatrixCalc {
 	 */
 	public static double sumVector(double [] vector){
 		double sum = 0.0;
-		for (int i = 0; i < vector.length; i++ )
-			sum += vector[i];
+        for (double aVector : vector) sum += aVector;
 		return sum;
 			
 	}
 	 
 	/**
 	 * copy one matrix into another
-	 * @param m the matrix to copy
+	 * @param matrix the matrix to copy
 	 * @return the copied matrix
 	 */
 	 public static double [][] copyMatrix(double [][] matrix){
