@@ -69,12 +69,12 @@ public class TreeBuilder {
                 c = new NeighborJoiningBuilder(distances);
                 break;
             }
-
         }
         return c;
     }
 
     static public Tree build(Alignment alignment, Method method, DistanceModel model, ProgressListener progress) {
+        progress.setMessage("Computing geeenetic distance for all pairs");
         DistanceMatrix d;
         switch( model ) {
             case JukesCantor:
@@ -92,6 +92,7 @@ public class TreeBuilder {
                 break;
         }
 
+        progress.setMessage("Building tree");
         return getBuilder(method, d).build();
     }
 
@@ -116,7 +117,9 @@ public class TreeBuilder {
 
     static public Result build(List<Sequence> seqs, Method method, PairwiseAligner aligner,
                                ProgressListener progress) {
+       progress.setMessage("Computing geeenetic distance for all pairs");
        final DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
+       progress.setMessage("Building tree");
        final Tree t = getBuilder(method, d).build();
        return new Result(t, d);
     }

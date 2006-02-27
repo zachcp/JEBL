@@ -13,5 +13,12 @@ public interface ProgressListener {
      * If you are unsure of the fraction completed, set this parameter to 0.
      * @return returns true if the user has requested that this operation be cancelled.
      */
-    public boolean setProgress(double fractionCompleted);
+    boolean setProgress(double fractionCompleted);
+
+    /**
+     * Set visible user message.
+     * @param message
+     * @return true if the user has requested that this operation be cancelled.
+     */
+    boolean setMessage(String message);
 }
