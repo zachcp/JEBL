@@ -27,5 +27,4 @@ public final class NucleotideState extends State {
 	public boolean isGap() {
 		return this == Nucleotides.GAP_STATE;
 	}
-
 }

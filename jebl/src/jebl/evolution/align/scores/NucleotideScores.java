@@ -1,5 +1,7 @@
 package jebl.evolution.align.scores;
 
+import jebl.evolution.sequences.Nucleotides;
+
 /**
  * 
  * @author Richard Moir
@@ -18,15 +20,15 @@ public class NucleotideScores extends Scores {
     public NucleotideScores() {}
 
     /**
-     * @param m match score
-     * @param n mismatch score
+     * @param match match score
+     * @param misMatch mismatch score
      */
-    public NucleotideScores(float m, float n) {
-        this("",m,n,n);
+    public NucleotideScores(float match, float misMatch) {
+        this("", match, misMatch, misMatch);
     }
 
     public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion) {
-        this . name = name;
+        this.name = name;
         buildScores(match, mismatchTransition, mismatchTransversion);
     }
 
@@ -37,30 +39,28 @@ public class NucleotideScores extends Scores {
         this.mismatchTransition = mismatchTransition;
         this.mismatchTransversion = mismatchTransversion;
 
-        int states = getAlphabet().length();
+        final int states = Nucleotides.getCanonicalStateCount();
         float[][] scores = new float[states][states];
 
         for (int i = 0; i < states; i++) {
             for (int j = 0; j < states; j++) {
-                if (i == j) {
-                    scores[i][j] = match;
-                }
-                else if(isPurine(i)== isPurine(j)) {
-                    scores[i][j] = mismatchTransition;
-                }
-                else {
-                    scores[i][j] = mismatchTransversion;
-
-                }
+                float val = (i == j) ? match :
+                        ((isPurine(i) == isPurine(j)) ? mismatchTransition : mismatchTransversion);
+                scores[i][j] = val;
             }
         }
         buildScores(scores);
     }
 
-    private String residues = "ACGT";
+    private static final String residues =
+            Nucleotides.CANONICAL_STATES[0].getCode() +
+            Nucleotides.CANONICAL_STATES[1].getCode() +
+            Nucleotides.CANONICAL_STATES[2].getCode() +
+            Nucleotides.CANONICAL_STATES[3].getCode();
+
 
     private boolean isPurine(int state) {
-        return state == 0 || state == 2;
+        return Nucleotides.isPurine(Nucleotides.CANONICAL_STATES[state]);
     }
 
     public final String getAlphabet() { return residues; }
@@ -70,7 +70,7 @@ public class NucleotideScores extends Scores {
         if(mismatchTransversion != mismatchTransition) {
             result = result + "/" + mismatchTransversion;
         }
-        if(name.length ()> 0){
+        if(name.length()>  0){
             result = name + " (" + result + ")";
         }
         return result;
