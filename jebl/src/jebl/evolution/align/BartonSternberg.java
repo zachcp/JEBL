@@ -40,6 +40,7 @@ public class BartonSternberg {
     private boolean freeGapsAtEnds;
 
     public BartonSternberg(Scores scores, float gapOpen, float gapExtend, int refinementIterations, boolean freeGapsAtEnds) {
+//        if (true) throw new RuntimeException("testing");
         this.gapOpen = gapOpen;
         this.gapExtend = gapExtend;
         this.scores = Scores.includeGaps(scores, 0, 0);

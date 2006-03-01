@@ -78,7 +78,7 @@
 
     <target name="compile-jebl" depends="init">
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac source="1.5" srcdir="${src}" destdir="${build}">
+        <javac source="1.5" srcdir="${src}" destdir="${build}" debug = "true">
             <include name="jebl/**/*"/>
         </javac>
     </target>
