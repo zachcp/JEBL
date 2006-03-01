@@ -183,7 +183,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 for(int j = i+1; j < dimension; ++j) {
                     distances[i][j] = calculatePairwiseDistance(i, j);
                     distances[j][i] = distances[i][j];
-                    progress.setProgress( ++done / tot);
+                    if( progress != null ) progress.setProgress( ++done / tot);
                 }
             }
 

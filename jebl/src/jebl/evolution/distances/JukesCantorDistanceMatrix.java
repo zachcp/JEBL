@@ -89,7 +89,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
                 distances[i][j] = calculatePairwiseDistance(i, j);
                 distances[j][i] = distances[i][j];
 
-                progress.setProgress( ++done / tot);
+                if( progress != null ) progress.setProgress( ++done / tot);
             }
         }
 
