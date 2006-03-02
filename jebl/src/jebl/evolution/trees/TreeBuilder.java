@@ -76,6 +76,12 @@ public class TreeBuilder {
     static public Tree build(Alignment alignment, Method method, DistanceModel model, ProgressListener progress) {
         progress.setMessage("Computing genetic distance for all pairs");
         DistanceMatrix d;
+
+        boolean timeit = false;
+
+        if( timeit ) progress = null;
+        long start = timeit ? System.currentTimeMillis() : 0;              
+
         switch( model ) {
             case JukesCantor:
             default:
@@ -91,8 +97,11 @@ public class TreeBuilder {
                 d = new TamuraNeiDistanceMatrix(alignment, progress);
                 break;
         }
+        if( timeit ) {
+            System.out.println("took " +(System.currentTimeMillis() - start) + " to build distance matrix");
+        }
 
-        progress.setMessage("Building tree");
+        if( progress != null ) progress.setMessage("Building tree");
         return getBuilder(method, d).build();
     }
 
