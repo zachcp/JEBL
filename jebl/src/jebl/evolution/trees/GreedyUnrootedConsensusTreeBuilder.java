@@ -46,7 +46,7 @@ import java.util.*;
  *
  */
 
-public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
+public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder {
     /** Set of trees. */
     private final Tree[] trees;
 
@@ -56,7 +56,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
     /** Consensus contains only clades having at least that amount of support in set. Traditionally 50% */
     private final double supportThreshold;
 
-    GreedyConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
+    GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
         super(trees);
         this.trees = trees;
         this.outGroup = outGroup;

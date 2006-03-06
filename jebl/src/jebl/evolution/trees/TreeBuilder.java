@@ -106,12 +106,12 @@ public class TreeBuilder {
     }
 
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold) {
-        return new GreedyConsensusTreeBuilder(trees, outGroup, supportThreshold);
+        return new GreedyUnrootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
     }
 
     static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold) {
        // return new RootedConsensusTreeBuilder(trees, supportThreshold);
-        return new GreedyRootedConsensus(trees, supportThreshold);
+        return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
     }
 
     /**
@@ -126,7 +126,7 @@ public class TreeBuilder {
         for(int i = 0; i < trees.length; ++i) {
            rtrees[i] = (RootedTree)trees[i];
         }
-        return new GreedyRootedConsensus(rtrees, supportThreshold);
+        return new GreedyRootedConsensusTreeBuilder(rtrees, supportThreshold);
     }
 
     static public class Result {

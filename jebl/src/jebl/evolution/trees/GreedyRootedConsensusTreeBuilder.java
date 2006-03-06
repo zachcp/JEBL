@@ -13,8 +13,11 @@ import java.util.*;
  *
  * @author Joseph Heled
  * @version $Id$
+ *
+ * Implementation shares some code with GreedyUnrootedConsensusTreeBuilder (which preceded it), and perhaps I will
+ * find a way to merge the two at a later stage when I have the time.
  */
-public class GreedyRootedConsensus extends ConsensusTreeBuilder {
+public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
     /** Set of trees. */
     private final RootedTree[] rtrees;
 
@@ -22,7 +25,7 @@ public class GreedyRootedConsensus extends ConsensusTreeBuilder {
     /** Consensus contains only clades having at least that amount of support in set. Traditionally 50% */
     private final double supportThreshold;
 
-    GreedyRootedConsensus(RootedTree[] trees, double supportThreshold) {
+    GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold) {
         super(trees);
         this.rtrees = trees;
         this.supportThreshold = supportThreshold;
@@ -48,7 +51,7 @@ public class GreedyRootedConsensus extends ConsensusTreeBuilder {
         }
     }
 
-    private final boolean debug = true;
+    private final boolean debug = false;
     // debug
     private String subTreeRep(RootedTree t, Node n) {
 
