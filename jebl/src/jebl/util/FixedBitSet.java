@@ -62,9 +62,14 @@ public class FixedBitSet {
        bits[unitIndex] &= ~bit(position);
     }
 
-    public boolean setInclusion(final FixedBitSet b) {
+    /**
+     *
+     * @param bitset
+     * @return true if bitset contains this set (this <= bitset)
+     */
+    public boolean setInclusion(final FixedBitSet bitset) {
         for(int k = 0; k < bits.length; ++k) {
-            if( bits[k] != (bits[k] & b.bits[k]) ) {
+            if( bits[k] != (bits[k] & bitset.bits[k]) ) {
                 return false;
             }
         }
@@ -140,6 +145,14 @@ public class FixedBitSet {
         return -1;
     }
 
+    /**
+     * Iteration helper. A typical iteration on set bits might be
+     * FixedBitSet b;
+     * for(int i = b.nextOnBit(0); i >= 0; i = b.nextOnBit(i+1)) ...
+     *
+     * @param fromIndex
+     * @return Next set member whose index is >= fromIndex. -1 if none.
+     */
     public int nextOnBit(int fromIndex) {
         int u = unitIndex(fromIndex);
         int testIndex = (fromIndex & BIT_INDEX_MASK);

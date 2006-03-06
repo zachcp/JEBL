@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Builds greedy consensus tree given a set of unrooted trees.
  *
- * Each edge in a tree "supports" a split, i.e.. the partition of the taxa into two clades
+ * Each edge in a tree "supports" a split, i.e. the partition of the taxa into two clades
  * (which you get by deleting the edge). A Majority consensus tree is built by finding
  * clades appearing in at least 50% of the trees or more. A Greedy consensus tree is a
  * refinement of a Majority tree where the splits are sorted by amount of support, and are
@@ -83,7 +83,7 @@ public final class GreedyConsensusTreeBuilder extends ConsensusTreeBuilder {
         }
     }
 
-    private final boolean debug = true;
+    private final boolean debug = false;
     // debug
     private String subTreeRep(Tree t, Node n, Node root) {
 

@@ -109,10 +109,25 @@ public class TreeBuilder {
         return new GreedyConsensusTreeBuilder(trees, outGroup, supportThreshold);
     }
 
-    static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold) {
-        return new RootedConsensusTreeBuilder(trees, supportThreshold);
+    static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold) {
+       // return new RootedConsensusTreeBuilder(trees, supportThreshold);
+        return new GreedyRootedConsensus(trees, supportThreshold);
     }
 
+    /**
+     * convenience method. Convert arrays of trees, guaranteed to be rooted to the array of the appropriate
+     * type.
+     * @param trees trees - all must be rooted
+     * @param supportThreshold
+     * @return consensus tree builder
+     */
+    static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold) {
+        RootedTree[] rtrees = new RootedTree[trees.length];
+        for(int i = 0; i < trees.length; ++i) {
+           rtrees[i] = (RootedTree)trees[i];
+        }
+        return new GreedyRootedConsensus(rtrees, supportThreshold);
+    }
 
     static public class Result {
         public final Tree tree;
