@@ -31,6 +31,11 @@ public class TreeBuilder {
     public enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
 
     /**
+     * Supported consesus methods.
+     */
+    public enum ConsensusMethod { GREEDY, MRCAC }
+
+    /**
      *
      * @param method
      * @return Wheather method generates a rooted or unrooted tree.
@@ -105,13 +110,27 @@ public class TreeBuilder {
         return getBuilder(method, d).build();
     }
 
-    static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold) {
-        return new GreedyUnrootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
+    static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold, ConsensusMethod method) {
+        switch( method ) {
+            case GREEDY: {
+                return new GreedyUnrootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
+            }
+        }
+        // bug
+        throw new IllegalArgumentException(method.toString());
     }
 
-    static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold) {
-       // return new RootedConsensusTreeBuilder(trees, supportThreshold);
-        return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
+    static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold, ConsensusMethod method) {
+        switch( method ) {
+            case GREEDY: {
+                 return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
+            }
+            case MRCAC: {
+                return new MRCACConsensusTreeBuilder(trees, supportThreshold);
+            }
+        }
+        // bug
+        throw new IllegalArgumentException(method.toString());
     }
 
     /**
@@ -121,12 +140,12 @@ public class TreeBuilder {
      * @param supportThreshold
      * @return consensus tree builder
      */
-    static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold) {
+    static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold, ConsensusMethod method) {
         RootedTree[] rtrees = new RootedTree[trees.length];
         for(int i = 0; i < trees.length; ++i) {
            rtrees[i] = (RootedTree)trees[i];
         }
-        return new GreedyRootedConsensusTreeBuilder(rtrees, supportThreshold);
+        return buildRooted(rtrees, supportThreshold, method);
     }
 
     static public class Result {

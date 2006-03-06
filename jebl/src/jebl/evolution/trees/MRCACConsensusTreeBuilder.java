@@ -16,7 +16,7 @@ import java.util.List;
  * @version $Id$
  **/
 
-public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
+public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder {
     RootedTree[] trees;
     private double supportThreshold;
     private List<FixedBitSet> tipsInCluster;
@@ -25,7 +25,7 @@ public class RootedConsensusTreeBuilder extends ConsensusTreeBuilder {
 
     private boolean debug = false;
 
-    RootedConsensusTreeBuilder(Tree[] trees, double supportThreshold) {
+    MRCACConsensusTreeBuilder(Tree[] trees, double supportThreshold) {
         super(trees);
         this.trees = new RootedTree[trees.length];
         for(int i = 0; i < trees.length; ++i) {
