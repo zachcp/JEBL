@@ -131,4 +131,21 @@ public class ProfileCharacter {
         numberOfUniqueCharacters= 0;
         totalCharacters= 0;
     }
+
+    /**
+     *
+     * @return the fraction of characters that are gap Characters in this profile
+     */
+    public float gapFraction () {
+        for (int i = 0; i < numberOfUniqueCharacters; i++) {
+            if(characters[i]=='-') {
+                float result = ((float) count[i]) / totalCharacters;
+                assert result>= 0;
+                assert result < 1;//should not be calling this function on a profile that contains all gap Characters at one location.
+
+                return result;
+            }
+        }
+        return 0;
+    }
 }

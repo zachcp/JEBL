@@ -43,7 +43,9 @@ public class BartonSternberg {
 //        if (true) throw new RuntimeException("testing");
         this.gapOpen = gapOpen;
         this.gapExtend = gapExtend;
-        this.scores = Scores.includeGaps(scores, 0, 0);
+
+        this.scores = Scores.includeGaps(scores, -gapExtend,0);
+//        this.scores = Scores.includeGaps(scores);
         this.refinementIterations= refinementIterations;
         this.freeGapsAtEnds=freeGapsAtEnds;
         aligner = new NeedlemanWunschLinearSpaceAffine(this.scores,gapOpen,gapExtend, freeGapsAtEnds);
@@ -112,12 +114,18 @@ public class BartonSternberg {
         compoundProgress.incrementSectionsCompleted(treeWork);
         compoundProgress.setSectionSize(1);
 
+        progress.setMessage("Building alignment");
         Profile profile = align(guideTree, guideTree.getRootNode(), seqs);
         if (compoundProgress.isCancelled()) return null;
 
 
         //now remove a single sequence, and we
         for (int j = 0; j < refinementIterations; j++) {
+            String message = "Refining alignment";
+            if(refinementIterations> 1) {
+                message = message + " (iteration " +(j+1) + " of " + refinementIterations+ ")";
+            }
+            progress.setMessage(message);
             for (int i = 0; i < count; ++i) {
 //                if(j> 0&& i!= 8) continue;
 //                Profile sequenceProfile = sequenceProfiles[i];

@@ -77,9 +77,9 @@ public abstract class Scores implements ScoreMatrix {
      * @param scores
      * @param gapVersusResidueCost should be a negative value
      * @param gapVersusGapCost should be a positive value
-     * @return
      */
     public static Scores includeGaps(Scores scores, float gapVersusResidueCost, float gapVersusGapCost) {
+//        System.out.println("cost =" + gapVersusResidueCost+ "," + gapVersusGapCost);
         Scores result =duplicate(scores);
         String states = scores.getAlphabet();
         for (int i = 0; i < states.length(); i++) {
@@ -89,5 +89,35 @@ public abstract class Scores implements ScoreMatrix {
         }
         result.score['-']['-'] = gapVersusGapCost;
         return result;
+    }
+
+    /**
+     * extends the given score matrix to include gap Versus gap and gap Versus residue costs
+     * The gap versus the gap cost is taken to be the same as the average residue match cost
+     * The gap in versus residue cost is taken to be the same as the average residue mismatch cost
+     * @param scores
+     */
+    public static Scores includeGaps(Scores scores) {
+        float totalMismatch = 0;
+        float totalMatch = 0;
+        int mismatchCount= 0;
+        int matchCount = 0;
+        String states = scores.getAlphabet();
+        for (int i = 0; i < states.length(); i++) {
+            char res1 = states.charAt(i);
+            for (int j = 0; j < states.length(); j++) {
+                char res2 = states.charAt(j);
+                double score = scores.score[res1] [res2];
+                if(i==j) {
+                    totalMatch += score;
+                    matchCount ++;
+                }
+                else {
+                    totalMismatch += score;
+                    mismatchCount ++;
+                }
+            }
+        }
+        return includeGaps(scores, totalMismatch/mismatchCount-0.1f, totalMatch/matchCount);
     }
 }

@@ -236,11 +236,30 @@ this.progress = progress;
                     }
                 }
 
+                //introduce a gap by skipping a character in the i direction
+
                 float  xd=d;
                 float xe=e;
                 if(j==m && freeEndGap) {
                     xd= 0;
                     xe= 0;
+                }
+                float gapFraction = profile1.profile [ offset1+i- 1].gapFraction();
+                float ownGapFraction = profile2.profile [ offset2+j-1].gapFraction();
+                if(gapFraction> 0) {
+                    // if the other sequence that we are aligning a gap to
+                    // already had some gaps in it, proportionally reduce the gap cost.
+//                    xd= xd*(1-  gapFraction);
+                    xd= xd- xe*gapFraction;
+                    xe=xe*(1- gapFraction);
+                }
+                if(ownGapFraction> 0) {
+                    //if our own sequence already has some gaps following the proposed
+                    // insertion of a gap at this point, then reduce the gap opening
+                    // penalty to a point such that if the sequence contained entirely Characters
+                    // at the next position (which is impossible) then the
+                    // gap opening cost would reduce to the same as the gap Extension cost
+//                    xd= xe+(xd-xe)*(1- ownGapFraction);
                 }
                 a = M[0][j]-xd;
                 b = Ix[0][j]-xe;
@@ -264,12 +283,30 @@ this.progress = progress;
                     }
                 }
 
-
+                //introduce a gap by skipping a character in the j direction
                 float yd = d;
                 float ye = e;
                 if (i == n && freeEndGap) {
                     yd = 0;
                     ye = 0;
+                }
+                ownGapFraction = profile1.profile[offset1 + i - 1].gapFraction();
+                gapFraction = profile2.profile[offset2 + j - 1].gapFraction();
+                if (gapFraction > 0) {
+                    // if the other sequence that we are aligning a gap to
+                    // already had some gaps in it, proportionally reduce the gap cost.
+//                    yd = yd * (1 - gapFraction);
+                    yd = yd - ye * gapFraction;
+                    ye = ye * (1 - gapFraction);
+
+                }
+                if (ownGapFraction > 0) {
+                    //if our own sequence already has some gaps following the proposed
+                    // insertion of a gap at this point, then reduce the gap opening
+                    // penalty to a point such that if the sequence contained entirely Characters
+                    // at the next position (which is impossible) then the
+                    // gap opening cost would reduce to the same as the gap Extension cost
+//                    yd = ye + (yd - ye) * (1 - ownGapFraction);
                 }
                 a = M[1][j-1]-yd;
                 b = Iy[1][j-1]-ye;
