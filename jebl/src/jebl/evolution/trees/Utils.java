@@ -53,7 +53,11 @@ public final class Utils {
 
     private static void toNewick(RootedTree tree, Node node, StringBuffer buffer) {
         if (tree.isExternal(node)) {
-            buffer.append(tree.getTaxon(node).getName());
+            String name = tree.getTaxon(node).getName();
+            if( !name.matches("^\\w+$") ) {
+                name = "\"" + name + "\"";
+            }
+            buffer.append(name);
             buffer.append(':');
             buffer.append(tree.getLength(node));
             addMetaComment(node,  buffer);

@@ -107,8 +107,28 @@ public class RootedFromUnrooted implements RootedTree {
         return false;
     }
 
+    private double findNodeHeightFromTips(Node node) {
+        if( isExternal(node) ) return 0.0;
+
+        double h = 0.0;
+        for( Node n : getChildren(node) ) {
+            h = Math.max(h, getLength(n) + findNodeHeightFromTips(n));
+        }
+        return h;
+    }
+
     public double getHeight(Node node) {
-        return 0;
+        double hr = findNodeHeightFromTips(root);
+        if( node == root ) {
+            return hr;
+        }
+
+        double toRoot = 0.0;
+        while( node != root ) {
+            toRoot += getLength(node);
+            node = getParent(node);
+        }
+        return hr - toRoot;
     }
 
     public boolean hasLengths() {

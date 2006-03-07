@@ -35,6 +35,15 @@ public class TreeBuilder {
      */
     public enum ConsensusMethod { GREEDY, MRCAC }
 
+    
+    public static String niceName(Method method) {
+        switch( method ){
+            case UPGMA: return "UPGMA";
+            case NEIGHBOR_JOINING: return "Neighbor Joining";
+        }
+        return null;
+    }
+
     /**
      *
      * @param method
