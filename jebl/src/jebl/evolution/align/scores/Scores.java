@@ -97,7 +97,8 @@ public abstract class Scores implements ScoreMatrix {
      * The gap in versus residue cost is taken to be the same as the average residue mismatch cost
      * @param scores
      */
-    public static Scores includeGaps(Scores scores) {
+    // this function is a bad idea, don't use it.
+/*    public static Scores includeGaps(Scores scores) {
         float totalMismatch = 0;
         float totalMatch = 0;
         int mismatchCount= 0;
@@ -119,5 +120,5 @@ public abstract class Scores implements ScoreMatrix {
             }
         }
         return includeGaps(scores, totalMismatch/mismatchCount-0.1f, totalMatch/matchCount);
-    }
+    }*/
 }

@@ -163,6 +163,9 @@ class Profile {
     public static String buildAlignmentString(String sequence, AlignmentResult result) {
 
         StringBuilder builder =new StringBuilder();
+//        System.out.println("sequence =" + sequence);
+//        result.print ();
+//        if(true) return "";
         int index = 0;
         for (int i = 0; i < result.size; i++) {
             if(result.values[i]) {
@@ -178,7 +181,7 @@ class Profile {
 
     public void print(boolean displaySequences) {
         if(displaySequences) {
-int maximum = 0;
+            int maximum = 0;
             for (int k = 0; k < paddedSequences.size(); k++) {
                 String sequence = paddedSequences.get(k);
                 maximum = Math.max(maximum, sequence.length ());

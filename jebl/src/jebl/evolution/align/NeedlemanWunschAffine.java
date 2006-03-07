@@ -185,24 +185,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
                     xd = 0;
                     xe = 0;
                 }
-                float gapFraction = sequence1.profile[offset1 + i - 1].gapFraction();
-                float ownGapFraction = sequence2.profile[offset2 + j - 1].gapFraction();
-                if (gapFraction > 0) {
-                    // if the other sequence that we are aligning a gap to
-                    // already had some gaps in it, proportionally reduce the gap cost.
-//                    xd = xd * (1 - gapFraction);
-                    xd = xd - xe * gapFraction;
-
-                    xe = xe * (1 - gapFraction);
-                }
-                if (ownGapFraction > 0) {
-                    //if our own sequence already has some gaps following the proposed
-                    // insertion of a gap at this point, then reduce the gap opening
-                    // penalty to a point such that if the sequence contained entirely Characters
-                    // at the next position (which is impossible) then the
-                    // gap opening cost would reduce to the same as the gap Extension cost
-//                    xd = xe + (xd - xe) * (1 - ownGapFraction);
-                }
+              
                 a = M[i - 1][j] - xd;
                 b = Ix[i - 1][j] - xe;
                 c = Iy[i - 1][j] - xd;
@@ -230,24 +213,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
                     yd = 0;
                     ye = 0;
                 }
-                ownGapFraction = sequence1.profile[offset1 + i - 1].gapFraction();
-                gapFraction = sequence2.profile[offset2 + j - 1].gapFraction();
-                if (gapFraction > 0) {
-                    // if the other sequence that we are aligning a gap to
-                    // already had some gaps in it, proportionally reduce the gap cost.
-//                    yd = yd * (1 - gapFraction);
-                    yd = yd - ye * gapFraction;
 
-                    ye = ye * (1 - gapFraction);
-                }
-                if (ownGapFraction > 0) {
-                    //if our own sequence already has some gaps following the proposed
-                    // insertion of a gap at this point, then reduce the gap opening
-                    // penalty to a point such that if the sequence contained entirely Characters
-                    // at the next position (which is impossible) then the
-                    // gap opening cost would reduce to the same as the gap Extension cost
-//                    yd = ye + (yd - ye) * (1 - ownGapFraction);
-                }
                 a = M[i][j - 1] - yd;
                 b = Iy[i][j - 1] - ye;
                 c = Ix[i][j - 1] - yd;

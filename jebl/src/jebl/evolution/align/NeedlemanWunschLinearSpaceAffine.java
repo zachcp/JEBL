@@ -27,11 +27,11 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds) {
         super(sub, d, e);
         this.freeGapsAtEnds= freeGapsAtEnds;
-        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
+//        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
 
 
-    private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
+//    private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
     //  algorithm to calculate the alignment as the base recursion case.
     String[] matchResult;
     private static final int TYPE_ANY = 0;
@@ -46,6 +46,30 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private long currentProgress;
     private boolean cancelled;
 
+    int[][][] Bi, Bj, Bk;
+    private int allocatedn = -1;
+    private int allocatedm = -1;
+
+    public void allocateMatrices(int n, int m) {
+        //first time running this alignment. Create all new matrices.
+        if (n > allocatedn || m > allocatedm) {
+            n = maxi(n, allocatedn + 5);
+            m = maxi(m, allocatedm + 5);
+            allocatedn = n;
+            allocatedm = m;
+            Bi = new int[3][n + 1][m + 1];
+            Bj = new int[3][n + 1][m + 1];
+            Bk = new int[3][n + 1][m + 1];
+        }
+
+    }
+
+    private int convertType(int type) {
+        if (type == TYPE_ANY) return type;
+        if (type == TYPE_X) return TYPE_Y;
+        if (type == TYPE_Y) return TYPE_X;
+        throw new RuntimeException("invalid type");
+    }
 
     private boolean addProgress(long value) {
         currentProgress += value;
@@ -61,7 +85,6 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         doAlignment(sq1,sq2, null);
     }
 
-    private Profile profile1, profile2;
 //    private AlignmentResult result1, result2;
 
     public void doAlignment(String sq1, String sq2, ProgressListener progress, boolean scoreOnly) {
@@ -73,8 +96,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 //        prepareAlignment (sq1,sq2);
         //we initialise the following arrays here rather than in prepareAlignment
         //so that we do not have to create them again during recursion.
-        profile1 = new Profile(0,sq1);
-        profile2 = new Profile(0,sq2);
+        Profile profile1 = new Profile(0,sq1);
+        Profile profile2 = new Profile(0,sq2);
         AlignmentResult[] results = doAlignment(profile1, profile2, progress, scoreOnly);
         matchResult = new String[2];
         if(cancelled) return;
@@ -92,8 +115,6 @@ this.progress = progress;
     this.n = profile1.length();
     this.m = profile2.length();
 //        System.out.println("aligning " + n + "," + m);
-        this.profile1= profile1;
-        this.profile2= profile2;
     if (n> previousn||m> previousm) {
             F = new float[3][2][m + 1];
             C = new int [3] [ 2] [m+1];
@@ -108,7 +129,7 @@ this.progress = progress;
         int maximumResultLength =m+n;
         AlignmentResult result1=new AlignmentResult(maximumResultLength);
         AlignmentResult result2 =new AlignmentResult(maximumResultLength);
-        resultScore = doAlignment (0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly,freeGapsAtEnds, freeGapsAtEnds);
+        resultScore = doAlignment (profile1, profile2,0, 0,n,m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly,freeGapsAtEnds, freeGapsAtEnds);
         return new AlignmentResult[]{result1, result2};
 
     }
@@ -128,7 +149,8 @@ this.progress = progress;
     }
 */
 //    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
-    private float doAlignment(int offset1, int offset2,int n,int m, int startType, int endType,
+    private float doAlignment(Profile profile1, Profile profile2,
+            int offset1, int offset2,int n,int m, int startType, int endType,
                               AlignmentResult result1, AlignmentResult result2, boolean scoreOnly, boolean freeStartGap, boolean freeEndGap) {
 //        prepareAlignment(sq1, sq2);
         this.n = n;
@@ -146,8 +168,26 @@ this.progress = progress;
         if (debug) {
             System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1)+ " u=" +u);
         }
+        boolean calculateResults = false;
+        boolean invert = false;
         if (n< RECURSION_THRESHOLD || m<RECURSION_THRESHOLD) {
-//            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
+            calculateResults = true;
+            if(false && n>m) {
+                //swap the ordering, to prevent nasty allocation of matrices.
+                // for example, if we do a 100000 by 10 alignment, followed by a 10 x 100000 alignment, we end up
+                // allocating a 100000 x 100000 matrix
+                invert = true;
+                int temp;
+                temp=m;m=n;n= temp;
+                temp =offset1;offset1 = offset2; offset2= temp;
+                startType = convertType(startType);
+                endType = convertType(endType);
+                Profile tempSequence;
+                tempSequence = profile1; profile1 = profile2; profile2= tempSequence;
+
+            }
+            allocateMatrices(n, m);
+/*//            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
             quadraticAlign.setScores(sub);
             quadraticAlign.setGapOpen(d);
             quadraticAlign.setGapExtend(e);
@@ -159,7 +199,7 @@ this.progress = progress;
             quadraticAlign.appendMatch(result1, result2);
 //            result1.print();
 //            result2.print();
-            return quadraticAlign.getScore();
+            return quadraticAlign.getScore();*/
 //            return quadraticAlign.getMatch();
         }
 
@@ -168,6 +208,13 @@ this.progress = progress;
         //type of extension applied at the midpoint, in case it is the gap extension,
         //in which case the recursion functions need to know that.
 
+        if(calculateResults) {
+            for (int i = 1; i <= n; i++) {
+                Bk[1][i][0] = 1;
+                Bi[1][i][0] = i - 1;
+                Bj[1][i][0] = 0;
+            }
+        }
         //i corresponds to TYPE_X
         //j corresponds to TYPE_Y
         for (int j = 1; j <= m; j++) {
@@ -180,6 +227,11 @@ this.progress = progress;
             Ix [0] [j] = M [0] [j] = Float.NEGATIVE_INFINITY;
             cy [0][j]= 0;
             cytype [0][j]= TYPE_Y;
+            if(calculateResults) {
+                Bk[2][0][j] = 2;
+                Bi[2][0][j] = 0;
+                Bj[2][0][j] = j - 1;
+            }
         }
         Ix[0][0] = Iy[0][0] = Float.NEGATIVE_INFINITY;
         M[0][0]= 0;
@@ -215,6 +267,14 @@ this.progress = progress;
                 c = Iy[0][j-1]+s;
 
                 val = M[1][j] = max(a, b, c);
+                if(calculateResults) {
+                    int k = 0;
+                    if(val ==b) k= 1;
+                    if(val ==c) k= 2;
+                    Bi[0][i][j] = i - 1;
+                    Bj[0][i][j] = j - 1;
+                    Bk[0][i][j] = k;
+                }
                 if (i == u) {
                     cm[1][j]=j;
                     cmtype[1][j]= TYPE_ANY;
@@ -265,6 +325,14 @@ this.progress = progress;
                 b = Ix[0][j]-xe;
                 c = Iy[0][j]-xd;
                 val = Ix[1][j] = max(a, b, c);
+                if(calculateResults) {
+                    int k= 0;
+                    if(val == b) k= 1;
+                    if(val == c) k= 2;
+                    Bi[1][i][j] = i - 1;
+                    Bj[1][i][j] = j;
+                    Bk[1][i][j] = k;
+                }
                 if (i == u) {
                     cx[1][j] = j;
                     cxtype[1][j] = TYPE_X;
@@ -312,6 +380,14 @@ this.progress = progress;
                 b = Iy[1][j-1]-ye;
                 c = Ix[1][j-1]-yd;
                 val = Iy[1][j] = max(a, b, c);
+                if (calculateResults) {
+                    int k = 0;
+                    if (val == b) k = 2;
+                    if (val == c) k = 1;
+                    Bi[2][i][j] = i;
+                    Bj[2][i][j] = j - 1;
+                    Bk[2][i][j] = k;
+                }
                 if (i == u) {
                     cy[1][j] = j;
                     cytype[1][j] = TYPE_Y;
@@ -355,10 +431,15 @@ this.progress = progress;
 
         if( scoreOnly ) return finalScore;
 
-        doAlignment(offset1, offset2,u,v, startType, vtype, result1, result2, false, freeStartGap, false);
-        if(cancelled) return 0;
-        doAlignment(offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2, false, false, freeEndGap);
-        if (cancelled) return 0;
+        if(calculateResults) {
+            appendResults(invert,result1, result2,n,m, bestk);
+        }
+        else {
+            doAlignment(profile1, profile2,offset1, offset2,u,v, startType, vtype, result1, result2, false, freeStartGap, false);
+            if(cancelled) return 0;
+            doAlignment(profile1, profile2,offset1+u, offset2+v,n-u,m-v, vtype, endType, result1, result2, false, false, freeEndGap);
+            if (cancelled) return 0;
+        }
         //System.out.println("free =" +freeStartGap+ "," + freeEndGap+ ",score =" + finalScore);
 
        /* String sequence1a = sq1.substring(0, u);
@@ -406,6 +487,51 @@ this.progress = progress;
 //        setScore (combineScore);
 //        return new String[] {match1[0]+ match2[0], match1[1]+ match2[1]};
         return finalScore;
+    }
+
+    private void appendResults(boolean  invert,AlignmentResult result1, AlignmentResult result2, int n, int m, int bestk) {
+
+        StringBuffer res1 = new StringBuffer();
+        StringBuffer res2 = new StringBuffer();
+        int tbi, tbj, tbk;
+
+        int i = n;
+        int j = m;
+        int k = bestk;
+        while (i != 0 || j != 0) {
+            tbi = Bi[k][i][j];
+            tbj = Bj[k][i][j];
+            tbk = Bk[k][i][j];
+
+            if (i == tbi) {
+                res1.append('-');
+            } else {
+                res1.append('X');
+            }
+            if (j == tbj) {
+                res2.append('-');
+            } else {
+                res2.append('X');
+            }
+            i = tbi;
+            j = tbj;
+            k = tbk;
+        }
+        String string1 = res1.reverse().toString();
+        String string2 = res2.reverse().toString();
+//        System.out.println("string 1 =" + string1);
+//        System.out.println("string 2 =" + string2);
+        if (invert) {
+            result1.append(string2);
+            result2.append(string1);
+        }
+        else {
+            result1.append(string1);
+            result2.append(string2);
+        }
+//        result1.print ();
+//        result2.print ();
+
     }
 
     @Override public float getScore() {
