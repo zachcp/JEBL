@@ -45,6 +45,7 @@ public class BartonSternberg {
         this.gapExtend = gapExtend;
 
         this.scores = Scores.includeGaps(scores, -gapExtend,0);
+//        this.scores = Scores.includeGaps(scores, 0,0);
 //        this.scores = Scores.includeGaps(scores);
         this.refinementIterations= refinementIterations;
         this.freeGapsAtEnds=freeGapsAtEnds;

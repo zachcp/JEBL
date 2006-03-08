@@ -156,6 +156,7 @@ this.progress = progress;
         this.n = n;
         this.m=m;
 
+        boolean gapCostProduction = true;
 //        int n = this.n, m = this.m;
         float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
@@ -306,7 +307,7 @@ this.progress = progress;
                 }
                 float gapFraction = profile1.profile [ offset1+i- 1].gapFraction();
                 float ownGapFraction = profile2.profile [ offset2+j-1].gapFraction();
-                if(gapFraction> 0) {
+                if(gapCostProduction&& gapFraction> 0) {
                     // if the other sequence that we are aligning a gap to
                     // already had some gaps in it, proportionally reduce the gap cost.
 //                    xd= xd*(1-  gapFraction);
@@ -360,7 +361,7 @@ this.progress = progress;
                 }
                 ownGapFraction = profile1.profile[offset1 + i - 1].gapFraction();
                 gapFraction = profile2.profile[offset2 + j - 1].gapFraction();
-                if (gapFraction > 0) {
+                if (gapCostProduction&& gapFraction > 0) {
                     // if the other sequence that we are aligning a gap to
                     // already had some gaps in it, proportionally reduce the gap cost.
 //                    yd = yd * (1 - gapFraction);
