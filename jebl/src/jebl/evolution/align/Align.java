@@ -199,6 +199,9 @@ abstract class Align {
         return strip(s,sub.getAlphabet ());
     }
     static String strip(String s, String residues) {
+        return strip(s, residues, false);
+    }
+    static String strip(String s, String residues, boolean allowGaps) {
 
         boolean[] valid = new boolean[127];
         for (int i=0; i<residues.length(); i++) {
@@ -208,6 +211,9 @@ abstract class Align {
             } else {
                 valid[c-32] = valid[c] = true;
             }
+        }
+        if(allowGaps) {
+            valid ['-'] = true;
         }
         StringBuffer res = new StringBuffer(s.length());
         for (int i=0; i<s.length(); i++) {

@@ -89,7 +89,14 @@ public class BartonSternberg {
     }
 
 
-    public String[] align(List<Sequence> sourceSequences, ProgressListener progress) {
+    /**
+     *
+     * @param sourceSequences
+     * @param progress
+     * @param refineOnly if specified, then the input sequences are assumed to be aligned already,
+     * and this function will only refine the alignment.
+     */
+    public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly) {
         int count = sourceSequences.size();
 
         String[] sequences = new String[count];
@@ -97,27 +104,44 @@ public class BartonSternberg {
         Profile[] sequenceProfiles= new Profile[count];
         List<Sequence> seqs = new ArrayList<Sequence>(sourceSequences.size());
         for (int i = 0; i < count; i++) {
-            sequences[i]= Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet());
+            sequences[i]= Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), refineOnly);
             sequenceProfiles[i] = new Profile(i, sequences[i]);
 
             Sequence s = sourceSequences.get(i);
             seqs.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequences[i]));
         }
         int treeWork = count*(count - 1)/2;
+        int alignmentWork = count - 1;
+        int refinementWork = count * refinementIterations;
+
+        if(refineOnly) {
+            treeWork = 0;
+            alignmentWork = 0;
+        }
 
         compoundProgress =
-                new CompoundAlignmentProgressListener(progress,treeWork +count* refinementIterations+ count- 1);
+                new CompoundAlignmentProgressListener(progress,treeWork +refinementWork+alignmentWork);
 
-        compoundProgress.setSectionSize(treeWork);
-        // We want a binary rooted tree
-        RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilder.build(seqs, TreeBuilder.Method.NEIGHBOR_JOINING,
-                                                                   aligner, compoundProgress.getMinorProgress()).tree);
-        compoundProgress.incrementSectionsCompleted(treeWork);
-        compoundProgress.setSectionSize(1);
+        Profile profile= null;
+        if(refineOnly) {
+            profile =new Profile(0,sequences [0]);
+            for (int i = 1; i < count; i++) {
+                assert(sequences[i].length()== sequences [0].length ());
+                profile.addSequence(i, sequences[i]);
+            }
+        } else {
+            compoundProgress.setSectionSize(treeWork);
+            // We want a binary rooted tree
+            RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilder.build(seqs, TreeBuilder.Method.NEIGHBOR_JOINING,
+                    aligner, compoundProgress.getMinorProgress()).tree);
+            compoundProgress.incrementSectionsCompleted(treeWork);
+            compoundProgress.setSectionSize(1);
 
-        progress.setMessage("Building alignment");
-        Profile profile = align(guideTree, guideTree.getRootNode(), seqs);
-        if (compoundProgress.isCancelled()) return null;
+            progress.setMessage("Building alignment");
+            profile = align(guideTree, guideTree.getRootNode(), seqs);
+            if (compoundProgress.isCancelled()) return null;
+        }
+
 
 
         //now remove a single sequence, and we
@@ -196,7 +220,7 @@ public class BartonSternberg {
         BartonSternberg alignment =new BartonSternberg( new Blosum60(), 20, 1, 2, true);
         String[] sequences = sequenceStrings.toArray(new String[0]);
         System.out.println("aligning " + sequences.length);
-        String results[] =alignment.align(xsequences, null);
+        String results[] =alignment.align(xsequences, null, false);
         for (String result : results) {
             System.out.println(result);
         }
