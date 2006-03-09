@@ -246,10 +246,14 @@ public final class Utils {
             return new RootedFromUnrooted(tree, d2.iterator().next());
         }
 
-        // Root at any internal node. The root of the tree has at least 3 children.
-        return new RootedFromUnrooted(tree, tree.getInternalNodes().iterator().next());
-        // Root at tree center
-        // return rootTreeAtCenter(tree);
+        RootedTree rtree = rootTreeAtCenter(tree);
+        if( Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2 ) {
+            return rtree;
+        }
+
+        // Root at central internal node. The root of the tree has at least 3 children.
+        // WARNING: using the implementation fact that childern of RootedFromUnrooted are in fact nodes from tree.
+        return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0));
     }
 
     public static RootedTree rootTreeAtCenter(Tree tree) {
