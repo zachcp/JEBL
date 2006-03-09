@@ -23,7 +23,7 @@ public class TreeBuilder {
     /**
      * Supported methods for tree building
      */
-    public enum Method {UPGMA, NEIGHBOR_JOINING}
+    public enum Method { NEIGHBOR_JOINING, UPGMA }
 
     /**
      * Supported pairwise distance methods
