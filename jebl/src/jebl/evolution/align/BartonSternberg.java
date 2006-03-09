@@ -99,16 +99,15 @@ public class BartonSternberg {
     public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly) {
         int count = sourceSequences.size();
 
-        String[] sequences = new String[count];
+//        String[] sequences = new String[count];
 
-        Profile[] sequenceProfiles= new Profile[count];
-        List<Sequence> seqs = new ArrayList<Sequence>(sourceSequences.size());
+//        Profile[] sequenceProfiles= new Profile[count];
+        Profile[] sequenceProfilesWithoutGaps= new Profile[count];
+        String[] sequencesWithoutGaps=new String[count];
         for (int i = 0; i < count; i++) {
-            sequences[i]= Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), refineOnly);
-            sequenceProfiles[i] = new Profile(i, sequences[i]);
+            sequencesWithoutGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), false);
+            sequenceProfilesWithoutGaps[i] = new Profile(i, sequencesWithoutGaps[i]);
 
-            Sequence s = sourceSequences.get(i);
-            seqs.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequences[i]));
         }
         int treeWork = count*(count - 1)/2;
         int alignmentWork = count - 1;
@@ -124,21 +123,32 @@ public class BartonSternberg {
 
         Profile profile= null;
         if(refineOnly) {
-            profile =new Profile(0,sequences [0]);
+            String[] sequencesWithGaps = new String[count];
+            for (int i = 0; i < count; i++) {
+                sequencesWithGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), true);
+
+            }
+            profile =new Profile(0,sequencesWithGaps [0]);
             for (int i = 1; i < count; i++) {
-                assert(sequences[i].length()== sequences [0].length ());
-                profile.addSequence(i, sequences[i]);
+                assert(sequencesWithGaps[i].length()== sequencesWithGaps [0].length ());
+                profile.addSequence(i, sequencesWithGaps[i]);
             }
         } else {
+            List<Sequence> sequencesForGuideTree = new ArrayList<Sequence>(sourceSequences.size());
+            for (int i = 0; i < count; i++) {
+
+                Sequence s = sourceSequences.get(i);
+                sequencesForGuideTree.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequencesWithoutGaps[i]));
+            }
             compoundProgress.setSectionSize(treeWork);
             // We want a binary rooted tree
-            RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilder.build(seqs, TreeBuilder.Method.NEIGHBOR_JOINING,
+            RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilder.build(sequencesForGuideTree, TreeBuilder.Method.NEIGHBOR_JOINING,
                     aligner, compoundProgress.getMinorProgress()).tree);
             compoundProgress.incrementSectionsCompleted(treeWork);
             compoundProgress.setSectionSize(1);
 
             progress.setMessage("Building alignment");
-            profile = align(guideTree, guideTree.getRootNode(), seqs);
+            profile = align(guideTree, guideTree.getRootNode(), sequencesForGuideTree);
             if (compoundProgress.isCancelled()) return null;
         }
 
@@ -168,7 +178,7 @@ public class BartonSternberg {
                 profile.remove(sequenceProfile);
 //                aligner.setDebug(display);
 
-                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfiles[i], compoundProgress.getMinorProgress(), false);
+                AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfilesWithoutGaps[i], compoundProgress.getMinorProgress(), false);
 //                aligner.setDebug(false);
                 if (compoundProgress.isCancelled()) return null;
                 compoundProgress.incrementSectionsCompleted(1);
@@ -177,7 +187,7 @@ public class BartonSternberg {
 
                     System.out.println("result =" + results[0].size + "," + results[1].size + " from " + profile.length() + "," + sequenceProfile.length());
                 }
-                profile = Profile.combine(profile, sequenceProfiles[i], results[0], results[1]);
+                profile = Profile.combine(profile, sequenceProfilesWithoutGaps[i], results[0], results[1]);
                 if(display) {
                     profile.print(true);
                 }

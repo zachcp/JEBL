@@ -40,8 +40,18 @@ class Profile {
     }
     public void addSequence(int sequenceNumber,String sequence) {
         sequenceCount++;
-        profile = createProfile(sequence, alphabetSize);
+        if (sequenceCount == 1) {
+            profile = createProfile(sequence, alphabetSize);
+        }
+        else {
+            assert(profile.length == sequence.length());
+            for (int i = 0; i < profile.length; i++) {
+                ProfileCharacter character = profile[i];
+                character.addCharacter(sequence.charAt(i), 1);
+            }
+        }
         paddedSequences.put(sequenceNumber, sequence);
+
 //        length = profile.length;
     }
 
