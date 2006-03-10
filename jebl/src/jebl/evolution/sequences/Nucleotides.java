@@ -72,7 +72,7 @@ public final class Nucleotides {
 
 	public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
 
-	public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }
+	public static List<NucleotideState> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
 
 	public static NucleotideState getState(char code) {
 	    return statesByCode[code];

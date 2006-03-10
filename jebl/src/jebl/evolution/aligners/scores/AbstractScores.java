@@ -26,7 +26,7 @@ public abstract class AbstractScores implements Scores {
             stateOrderMap[state.getIndex()] = i;
         }
 
-        List<State> states = sequenceType.getStates();
+        List<? extends State> states = sequenceType.getStates();
         for (State state1 : states) {
             // Get the canonical states for state1 (may be multiple if state1 is ambiguous)
             Set<State> stateSet1 = state1.getCanonicalStates();

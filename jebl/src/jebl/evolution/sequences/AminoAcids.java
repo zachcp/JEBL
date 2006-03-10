@@ -104,8 +104,8 @@ public final class AminoAcids {
 
     public static int getStateCount() { return STATE_COUNT; }
 
-    public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
-
+    //public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
+    public static List<AminoAcidState> getStates() { return Collections.unmodifiableList(Arrays.asList(STATES)); }
     public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
 
     public static List<State> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList((State[])CANONICAL_STATES)); }

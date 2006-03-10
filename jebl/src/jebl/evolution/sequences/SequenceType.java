@@ -33,7 +33,7 @@ public interface SequenceType {
      *
      * @return a list of states
      */
-    List<State> getStates();
+    List<? extends State> getStates();
 
     /**
      * Get number of canonical states
@@ -47,7 +47,7 @@ public interface SequenceType {
      *
      * @return a list of states
      */
-    List<State> getCanonicalStates();
+    List<? extends State> getCanonicalStates();
 
     /**
      * Get state corresponding to a string code
@@ -126,7 +126,7 @@ public interface SequenceType {
 		public int getStateCount() { return Nucleotides.getStateCount(); }
 		public List<State> getStates() { return Nucleotides.getStates(); }
         public int getCanonicalStateCount() { return Nucleotides.getCanonicalStateCount(); }
-        public List<State> getCanonicalStates() { return Nucleotides.getCanonicalStates(); }
+        public List<NucleotideState> getCanonicalStates() { return Nucleotides.getCanonicalStates(); }
 		public State getState(String code) { return Nucleotides.getState(code); }
 		public int getCodeLength() { return 1;}
         public State getState(int index) { return Nucleotides.getState(index); }
@@ -142,7 +142,7 @@ public interface SequenceType {
 
 	public static final SequenceType AMINO_ACID = new SequenceType() {
         public int getStateCount() { return AminoAcids.getStateCount(); }
-        public List<State> getStates() { return AminoAcids.getStates(); }
+        public List<AminoAcidState> getStates() { return AminoAcids.getStates(); }
         public int getCanonicalStateCount() { return AminoAcids.getCanonicalStateCount(); }
         public List<State> getCanonicalStates() { return AminoAcids.getCanonicalStates(); }
 		public State getState(String code) { return AminoAcids.getState(code); }
