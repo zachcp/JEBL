@@ -15,32 +15,31 @@ import java.util.List;
 /**
  * Class for exporting a fasta file format.
  *
- * @version $Id$
- *
  * @author Andrew Rambaut
  * @author Alexei Drummond
+ * @version $Id$
  */
 public class FastaExporter implements SequenceExporter {
 
-	/**
-	 * Constructor
-	 */
-	public FastaExporter(Writer writer) {
+    /**
+     * Constructor
+     */
+    public FastaExporter(Writer writer) {
         this.writer = new PrintWriter(writer);
     }
 
-	/**
-	 * export alignment.
-	 */
-	public void exportSequences(List<Sequence> sequences) throws IOException {
+    /**
+     * export alignment or set of sequences.
+     */
+    public void exportSequences(List<Sequence> sequences) throws IOException {
 
         for (Sequence sequence : sequences) {
-            Taxon taxon = sequence.getTaxon();
-            String desc = (String)taxon.getAttribute(FastaImporter.descriptionPropertyName);
+            final Taxon taxon = sequence.getTaxon();
+            final String desc = (String) taxon.getAttribute(FastaImporter.descriptionPropertyName);
             writer.println(">" + taxon.getName() + ((desc != null) ? (" " + desc) : ""));
             writer.println(sequence.getString());
         }
     }
 
-	private final PrintWriter writer;
+    private final PrintWriter writer;
 }

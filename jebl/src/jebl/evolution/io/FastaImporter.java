@@ -17,67 +17,76 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * Class for importing Fasta sequential file format
- *
- * @version $Id$
+ * Class for importing Fasta sequential file format.
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
+ * @author Joseph Heled
+ * @version $Id$
  */
 public class FastaImporter implements SequenceImporter {
 
-     public static final String descriptionPropertyName = "description";
+    /**
+     * Name of Jebl taxon property which stores sequence description (i.e. anything after sequence name in fasta
+     * file), so this data is available and an export to fasta can preserves the original data.
+     */
+    public static final String descriptionPropertyName = "description";
+
+
+    private final ImportHelper helper;
+    private final SequenceType sequenceType;
 
     /**
-	 * Constructor
-	 */
-	public FastaImporter(Reader reader, SequenceType sequenceType) {
+     * @param reader       holds sequences data
+     * @param sequenceType pre specified sequences type. We should try and guess hem some day.
+     */
+    public FastaImporter(Reader reader, SequenceType sequenceType) {
         helper = new ImportHelper(reader);
         helper.setCommentDelimiters(';');
         this.sequenceType = sequenceType;
-	}
+    }
 
-	/**
-	 * importAlignment.
-	 */
-	public 	List<Sequence> importSequences() throws IOException, ImportException {
+    /**
+     * @return sequences from file.
+     * @throws IOException
+     * @throws ImportException
+     */
+    public final List<Sequence> importSequences() throws IOException, ImportException {
 
-		List<Sequence> sequences = new ArrayList<Sequence>();
+        List<Sequence> sequences = new ArrayList<Sequence>();
+        final char fastaFirstChar = '>';
+        final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
 
-		try {
-
-            int ch = helper.read();
-            while (ch != '>') {
-                ch = helper.read();
+        try {
+            // find fasta line start
+            while (helper.read() != fastaFirstChar) {
             }
 
-    		do {
-                String line = helper.readLine();
+            do {
+                final String line = helper.readLine();
 
-                StringTokenizer tokenizer = new StringTokenizer(line, " \t");
-                String name = tokenizer.nextToken();
+                final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
+                final String name = tokenizer.nextToken();
 
-                String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
+                final String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
 
-                StringBuffer seq = new StringBuffer();
-				helper.readSequence(seq, sequenceType, ">", Integer.MAX_VALUE, "-", "?", "", null);
-				ch = helper.getLastDelimiter();
+                final StringBuffer seq = new StringBuffer();
 
-                Taxon taxon = Taxon.getTaxon(name);
-                if( description != null && description.length() > 0 ) {
-                   taxon.setAttribute(descriptionPropertyName, description);
+                helper.readSequence(seq, sequenceType, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
+
+                final Taxon taxon = Taxon.getTaxon(name);
+                if (description != null && description.length() > 0) {
+                    taxon.setAttribute(descriptionPropertyName, description);
                 }
 
                 sequences.add(new BasicSequence(sequenceType, taxon, seq.toString()));
 
-			} while(ch == '>');
+            } while (helper.getLastDelimiter() == fastaFirstChar);
 
+        } catch (EOFException e) {
+            // catch end of file the ugly way.
+        }
 
-		} catch (EOFException e) { }
-
-		return sequences;
-	}
-
-	private final ImportHelper helper;
-    private final SequenceType sequenceType;
+        return sequences;
+    }
 }
