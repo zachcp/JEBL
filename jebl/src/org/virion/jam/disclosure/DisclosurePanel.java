@@ -19,7 +19,6 @@ public class DisclosurePanel extends JPanel {
 
     /**
      *
-     * @param controls
      * @param isOpen
      * @param fastBlueStyle draw labels using blue coloured text, and expand/contract quickly when the button is clicked.
      * @param component A component to be used instead of the default label next to the expand/contract button.
@@ -128,7 +127,7 @@ public class DisclosurePanel extends JPanel {
 	private final DisclosureButton button;
     private final String title;
     private final JPanel panel;
-	private final java.util.List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();
+	private final java.util.List listeners = new ArrayList();
 
 	private static BufferedImage background = null;
 
