@@ -77,6 +77,10 @@ public class PrintUtilities implements Printable {
     }
 
     public int printScaled(Graphics g, PageFormat pageFormat, int pageIndex) {
+        return printScaled(componentToBePrinted,g, pageFormat, pageIndex);
+    }
+
+    public static int printScaled(Component componentToBePrinted, Graphics g, PageFormat pageFormat, int pageIndex) {
         if (pageIndex > 0) {
             return (NO_SUCH_PAGE);
         } else {
