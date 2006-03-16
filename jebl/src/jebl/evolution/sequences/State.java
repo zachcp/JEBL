@@ -19,7 +19,6 @@ import java.util.*;
 public abstract class State implements Comparable {
 
     State(String name, String stateCode, int index) {
-
         this.name = name;
         this.stateCode = stateCode;
 
@@ -30,7 +29,6 @@ public abstract class State implements Comparable {
     }
 
     State(String name, String stateCode, int index, State[] ambiguities) {
-
         this.name = name;
         this.stateCode = stateCode;
         this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(Arrays.asList(ambiguities)));
@@ -57,6 +55,14 @@ public abstract class State implements Comparable {
 
     public int compareTo(Object o) {
         return index - ((State)o).index;
+    }
+
+    public boolean equals(Object o) {
+        return (o instanceof State) && (this.index == ((State) o).index);
+    }
+
+    public int hashCode() {
+        return index;
     }
 
     public String toString() { return stateCode; }

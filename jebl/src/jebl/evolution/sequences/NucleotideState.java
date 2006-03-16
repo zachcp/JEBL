@@ -24,7 +24,23 @@ public final class NucleotideState extends State {
         super(name, stateCode, index, ambiguities);
     }
 
-	public boolean isGap() {
+    public int compareTo(Object o) {
+        // throws ClassCastException on across-class comparison
+        NucleotideState that = (NucleotideState) o;
+        return super.compareTo(that);
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof NucleotideState))
+            return false;
+        return super.equals(o);
+    }
+
+    public int hashCode() {
+        return 23 * super.hashCode() + 17;
+    }
+
+    public boolean isGap() {
 		return this == Nucleotides.GAP_STATE;
 	}
 }
