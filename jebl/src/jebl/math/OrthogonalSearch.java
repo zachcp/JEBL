@@ -110,10 +110,13 @@ public class OrthogonalSearch extends MultivariateMinimum
 		double lastFX;
 		while (true) {
 			lastFX = fx;
-			fx = od.doRound(xvec,um,tolx,fx, (frequentMonitoring_ ? monitor : null));
+            fx = od.doRound(xvec,um,tolx,fx, (frequentMonitoring_ ? monitor : null));
 			if(monitor!=null) {
 				monitor.newMinimum(fx,xvec,f);
-			}
+                if (maxFun > 0) {
+                    monitor.updateProgress((double) numFun / maxFun);
+                }
+            }
 			debug("Round fx:"+fx);
 
 			if (stopCondition(fx, xvec, tolfx, tolx, false) ||
