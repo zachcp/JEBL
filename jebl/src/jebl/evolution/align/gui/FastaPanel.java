@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- *
  * @author Alexei Drummond
- *
  * @version $Id$
  */
 public class FastaPanel extends JPanel {
@@ -20,12 +18,13 @@ public class FastaPanel extends JPanel {
     private JComboBox urlComboBox;
     private URL[] urls;
     private JButton button;
-    List names, sequences;
+    List<String> names;
+    List<String> sequences;
 
     public FastaPanel(URL[] urls) {
 
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
         button = new JButton();
         button.setAlignmentX(0.0f);
@@ -34,7 +33,7 @@ public class FastaPanel extends JPanel {
         for (int i = 0; i < urls.length; i++) {
             names[i] = urls[i].getFile();
             int pos = names[i].lastIndexOf(File.separatorChar);
-            names[i] = names[i].substring(pos+1);
+            names[i] = names[i].substring(pos + 1);
         }
 
         urlComboBox = new JComboBox(names);
@@ -44,22 +43,22 @@ public class FastaPanel extends JPanel {
         label.setAlignmentX(0.0f);
 
         panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(10,10)));
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
         panel.add(urlComboBox);
-        panel.add(Box.createRigidArea(new Dimension(10,10)));
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
         panel.add(button);
         panel.add(Box.createGlue());
 
         this.urls = urls;
 
         setLayout(new BorderLayout());
-        add(panel,BorderLayout.WEST);
+        add(panel, BorderLayout.WEST);
     }
 
     public void importSequences() {
 
-        names = new ArrayList();
-        sequences = new ArrayList();
+        names = new ArrayList<String>();
+        sequences = new ArrayList<String>();
 
         try {
 
@@ -85,10 +84,10 @@ public class FastaPanel extends JPanel {
                 names.add(name);
                 sequences.add(seq.toString());
 
-            } while(ch == '>');
+            } while (ch == '>');
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         catch (EOFException e) {
         }
@@ -101,13 +100,13 @@ public class FastaPanel extends JPanel {
 
         String[] nameArray = new String[names.size()];
         for (int i = 0; i < nameArray.length; i++) {
-            nameArray[i] = (String)names.get(i);
+            nameArray[i] = (String) names.get(i);
         }
         return nameArray;
     }
 
     public String[] getSequences() {
-        return (String[])sequences.toArray(new String[]{});
+        return (String[]) sequences.toArray(new String[]{});
     }
 
     public void setAction(Action action) {
@@ -163,7 +162,7 @@ public class FastaPanel extends JPanel {
             if (lastChar == '\0') {
                 lastChar = readCharacter();
             }
-            return (char)lastChar;
+            return (char) lastChar;
         }
 
         public char readCharacter() throws IOException {
@@ -189,7 +188,7 @@ public class FastaPanel extends JPanel {
             if (lastChar == '\0') {
                 lastChar = read();
             }
-            return (char)lastChar;
+            return (char) lastChar;
         }
 
         public char read() throws IOException {
@@ -205,7 +204,7 @@ public class FastaPanel extends JPanel {
                 lastChar = '\0';
             }
 
-            return (char)ch;
+            return (char) ch;
         }
 
         /**
@@ -251,15 +250,15 @@ public class FastaPanel extends JPanel {
         }
 
         /**
-         *
          * Reads sequence, skipping over any comments and filtering using sequenceType.
-         * @param sequence a StringBuffer into which the sequence is put
-         * @param delimiters list of characters that will stop the reading
-         * @param gapCharacters list of characters that will be read as gaps
+         *
+         * @param sequence          a StringBuffer into which the sequence is put
+         * @param delimiters        list of characters that will stop the reading
+         * @param gapCharacters     list of characters that will be read as gaps
          * @param missingCharacters list of characters that will be read as missing
-         * @param matchCharacters list of characters that will be read as matching the matchSequence
-         * @param matchSequence the sequence string to match match characters to
-         * @param maxSites maximum number of sites to read
+         * @param matchCharacters   list of characters that will be read as matching the matchSequence
+         * @param matchSequence     the sequence string to match match characters to
+         * @param maxSites          maximum number of sites to read
          */
         public void readSequence(StringBuffer sequence,
                                  String delimiters, int maxSites,
@@ -304,7 +303,7 @@ public class FastaPanel extends JPanel {
 
                 lastDelimiter = ch;
 
-                if (Character.isWhitespace((char)lastDelimiter)) {
+                if (Character.isWhitespace((char) lastDelimiter)) {
                     ch = nextCharacter();
                     if (delimiters.indexOf(ch) != -1) {
                         lastDelimiter = readCharacter();
@@ -318,12 +317,13 @@ public class FastaPanel extends JPanel {
 
         /**
          * Reads a line of sequence, skipping over any comments and filtering using sequenceType.
-         * @param sequence a StringBuffer into which the sequence is put
-         * @param delimiters list of characters that will stop the reading
-         * @param gapCharacters list of characters that will be read as gaps
+         *
+         * @param sequence          a StringBuffer into which the sequence is put
+         * @param delimiters        list of characters that will stop the reading
+         * @param gapCharacters     list of characters that will be read as gaps
          * @param missingCharacters list of characters that will be read as missing
-         * @param matchCharacters list of characters that will be read as matching the matchSequence
-         * @param matchSequence the sequence string to match match characters to
+         * @param matchCharacters   list of characters that will be read as matching the matchSequence
+         * @param matchSequence     the sequence string to match match characters to
          * @throws IOException
          */
         public void readSequenceLine(StringBuffer sequence,
@@ -379,7 +379,7 @@ public class FastaPanel extends JPanel {
 
                 lastDelimiter = ch;
 
-                if (Character.isWhitespace((char)lastDelimiter)) {
+                if (Character.isWhitespace((char) lastDelimiter)) {
                     ch = nextCharacter();
                     if (delimiters.indexOf(ch) != -1) {
                         lastDelimiter = readCharacter();
@@ -442,7 +442,7 @@ public class FastaPanel extends JPanel {
                         quoteChar = ch;
                         first = false;
                         space = 0;
-                    } else if ( ch == startComment || ch == lineComment ) {
+                    } else if (ch == startComment || ch == lineComment) {
                         skipComments(ch);
                         lastDelimiter = ' ';
                         done = true;
@@ -476,7 +476,7 @@ public class FastaPanel extends JPanel {
                 }
             }
 
-            if (Character.isWhitespace((char)lastDelimiter)) {
+            if (Character.isWhitespace((char) lastDelimiter)) {
                 ch = nextCharacter();
                 while (Character.isWhitespace(ch)) {
                     read();
@@ -497,7 +497,7 @@ public class FastaPanel extends JPanel {
         protected void skipComments(char delimiter) throws IOException {
 
             char ch;
-            int n=1;
+            int n = 1;
             boolean write = false;
 
             if (nextCharacter() == writeComment) {
@@ -565,7 +565,7 @@ public class FastaPanel extends JPanel {
 
             do {
                 ch = read();
-            } while ( skip.indexOf(ch) > -1 );
+            } while (skip.indexOf(ch) > -1);
 
             unreadCharacter(ch);
         }
@@ -596,7 +596,7 @@ public class FastaPanel extends JPanel {
 
             do {
                 ch = readCharacter();
-            } while ( skip.indexOf(ch) == -1 );
+            } while (skip.indexOf(ch) == -1);
 
             return ch;
         }
@@ -610,10 +610,10 @@ public class FastaPanel extends JPanel {
         private int lastDelimiter = '\0';
 
         private boolean hasComments = false;
-        private char startComment = (char)-1;
-        private char stopComment = (char)-1;
-        private char lineComment = (char)-1;
-        private char writeComment = (char)-1;
+        private char startComment = (char) -1;
+        private char stopComment = (char) -1;
+        private char lineComment = (char) -1;
+        private char writeComment = (char) -1;
 
     }
 }
