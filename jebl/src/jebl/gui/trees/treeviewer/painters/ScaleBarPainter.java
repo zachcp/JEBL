@@ -2,10 +2,10 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer.TreePane;
-import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.components.RealNumberField;
+import org.virion.jam.controlpanels.ControlPaletteInterface;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.panels.OptionsPanel;
-import org.virion.jam.components.RealNumberField;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -67,7 +67,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         preferredWidth = treePane.getTreeScale() * scaleRange;
         preferredHeight = labelHeight + 4 + scaleBarStroke.getLineWidth();
 
-        yOffset = (float)(fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
+        yOffset = (float) (fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
     }
@@ -98,18 +98,18 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         float xOffset;
         switch (justification) {
             case CENTER:
-                xOffset = (float)(bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+                xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
                 x1 = (bounds.getX() + (bounds.getWidth() - preferredWidth) / 2.0);
                 x2 = x1 + preferredWidth;
                 break;
             case FLUSH:
             case LEFT:
-                xOffset = (float)bounds.getX();
+                xOffset = (float) bounds.getX();
                 x1 = bounds.getX();
                 x2 = x1 + preferredWidth;
                 break;
             case RIGHT:
-                xOffset = (float)(bounds.getX() + bounds.getWidth() - rect.getWidth());
+                xOffset = (float) (bounds.getX() + bounds.getWidth() - rect.getWidth());
                 x2 = bounds.getX() + bounds.getWidth();
                 x1 = x2 - preferredWidth;
                 break;
@@ -122,7 +122,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
         g2.draw(new Line2D.Double(x1, bounds.getY(), x2, bounds.getY()));
 
-        g2.drawString(label, xOffset, yOffset + (float)bounds.getY());
+        g2.drawString(label, xOffset, yOffset + (float) bounds.getY());
 
         g2.setFont(oldFont);
         g2.setPaint(oldPaint);
@@ -168,7 +168,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         firePainterChanged();
     }
 
-    public void setControlPanel(ControlPalette controlPalette) {
+    public void setControlPanel(ControlPaletteInterface controlPalette) {
         // nothing to do
     }
 
@@ -201,7 +201,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
             spinner1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setFontSize(((Double)spinner1.getValue()).floatValue());
+                    setFontSize(((Double) spinner1.getValue()).floatValue());
                 }
             });
             final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
@@ -210,7 +210,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
             spinner2.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setLineWeight(((Double)spinner2.getValue()).floatValue());
+                    setLineWeight(((Double) spinner2.getValue()).floatValue());
                 }
             });
             final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
@@ -235,13 +235,14 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                 }
             });
 
-	        controls = new Controls("Scale Bar", optionsPanel, false);
+            controls = new Controls("Scale Bar", optionsPanel, false);
         }
 
         controlsList.add(controls);
 
         return controlsList;
     }
+
     private Controls controls = null;
 
     private boolean visible = true;
