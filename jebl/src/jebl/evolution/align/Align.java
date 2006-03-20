@@ -4,12 +4,13 @@ import jebl.evolution.align.scores.Scores;
 
 abstract class Align {
 
-    Scores sub;             		// scores matrix
-    float d;          				// gap cost
+    Scores sub;                     // scores matrix
+    float d;                          // gap cost
     String seq1 = null;
-    String seq2 = null;           	// the sequences
-    int n = 0; int m = 0;           // their lengths
-    Traceback B0;                	// the starting point of the traceback
+    String seq2 = null;               // the sequences
+    int n = 0;
+    int m = 0;           // their lengths
+    Traceback B0;                    // the starting point of the traceback
 
     public Align(Scores sub, float d) {
         setGapOpen(d);
@@ -18,7 +19,7 @@ abstract class Align {
 
     /**
      * Performs the alignment, abstract.
-     * 
+     *
      * @param seq1
      * @param seq2
      */
@@ -26,7 +27,7 @@ abstract class Align {
 
     /**
      * Initialises the matrices for the alignment.
-     * 
+     *
      * @param seq1
      * @param seq2
      */
@@ -48,8 +49,8 @@ abstract class Align {
         char[] sq1 = seq1.toCharArray();
         char[] sq2 = seq2.toCharArray();
 
-        StringBuffer res1 = new StringBuffer();
-        StringBuffer res2 = new StringBuffer();
+        StringBuilder res1 = new StringBuilder();
+        StringBuilder res2 = new StringBuilder();
         Traceback tb = B0;
 
         int i = tb.i, j = tb.j;
@@ -57,20 +58,20 @@ abstract class Align {
             if (i == tb.i) {
                 res1.append('-');
             } else {
-                res1.append(sq1[i-1]);
+                res1.append(sq1[i - 1]);
             }
             if (j == tb.j) {
                 res2.append('-');
             } else {
-                res2.append(sq2[j-1]);
+                res2.append(sq2[j - 1]);
             }
-            i = tb.i; j = tb.j;
+            i = tb.i;
+            j = tb.j;
         }
-        return new String[]{ res1.reverse().toString(), res2.reverse().toString() };
+        return new String[]{res1.reverse().toString(), res2.reverse().toString()};
     }
 
     /**
-     * 
      * @param val
      * @return float value of string val
      */
@@ -80,17 +81,17 @@ abstract class Align {
 
     /**
      * Print the score, the F matrix, and the alignment
-     * 
-     * @param out output to print to
-     * @param msg message printed at start
+     *
+     * @param out           output to print to
+     * @param msg           message printed at start
      * @param outputFMatrix print the score matrix
      */
     public void doMatch(Output out, String msg, boolean outputFMatrix) {
         out.println(msg + ":");
         out.println("Score = " + getScore());
         if (outputFMatrix) {
-          out.println("The F matrix:");
-          printf(out);
+            out.println("The F matrix:");
+            printf(out);
         }
         out.println("An optimal alignment:");
         String[] match = getMatch();
@@ -100,7 +101,7 @@ abstract class Align {
         int[] counts = matchCounts(match);
 
         out.println("matchs=" + counts[0] + " mismatchs=" + counts[1] + " gaps=" + counts[2]);
-        out.println("percent identity=" + Math.round((double)counts[0]*1000 / match[0].length())/10.0 + "%");
+        out.println("percent identity=" + Math.round((double) counts[0] * 1000 / match[0].length()) / 10.0 + "%");
 
     }
 
@@ -135,19 +136,23 @@ abstract class Align {
 
     /**
      * Print the score and the alignment
-     * 
+     *
      * @param out output to print to
      * @param msg msg printed at the start
      */
-    public void doMatch(Output out, String msg) { doMatch(out, msg, false); }
+    public void doMatch(Output out, String msg) {
+        doMatch(out, msg, false);
+    }
 
     /**
      * Get the next state in the traceback
-     * 
+     *
      * @param tb current Traceback
      * @return next Traceback
      */
-    public Traceback next(Traceback tb) { return tb; } // dummy implementation for the `smart' algs.
+    public Traceback next(Traceback tb) {
+        return tb;
+    } // dummy implementation for the `smart' algs.
 
     /**
      * @return the score of the best alignment
@@ -156,67 +161,77 @@ abstract class Align {
 
     /**
      * Print the matrix (matrices) used to compute the alignment
-     * 
+     *
      * @param out output to print to
      */
     public abstract void printf(Output out);
 
     // auxillary static functions
 
-    static float max(float x1, float x2) { return (x1 > x2 ? x1 : x2); }
-    static int maxi(int x1, int x2) { return (x1 > x2 ? x1 : x2); }
+    static float max(float x1, float x2) {
+        return (x1 > x2 ? x1 : x2);
+    }
 
-    static float max(float x1, float x2, float x3) { return max(x1, max(x2, x3)); }
+    static int maxi(int x1, int x2) {
+        return (x1 > x2 ? x1 : x2);
+    }
 
-    static float max(float x1, float x2, float x3, float x4) { return max(max(x1, x2), max(x3, x4)); }
+    static float max(float x1, float x2, float x3) {
+        return max(x1, max(x2, x3));
+    }
+
+    static float max(float x1, float x2, float x3, float x4) {
+        return max(max(x1, x2), max(x3, x4));
+    }
 
     /**
-     * 
-     * @param s string to pad
+     * @param s     string to pad
      * @param width width to pad to
      * @return string padded to specified width with space chars.
      */
     static String padLeft(String s, int width) {
-      int filler = width - s.length();
-      if (filler > 0) {           // and therefore width > 0
-        StringBuffer res = new StringBuffer(width);
-        for (int i=0; i<filler; i++)
-          res.append(' ');
-        return res.append(s).toString();
-      } else
-        return s;
+        int filler = width - s.length();
+        if (filler > 0) {           // and therefore width > 0
+            StringBuilder res = new StringBuilder(width);
+            for (int i = 0; i < filler; i++)
+                res.append(' ');
+            return res.append(s).toString();
+        } else
+            return s;
     }
 
     // PRIVATE METHODS
 
     /**
      * Strips the given string of all characters that are not recognized sequence states.
-     * 
+     *
      * @param s
      * @return the stripped string
      */
     String strip(String s) {
-        return strip(s,sub.getAlphabet ());
+        return strip(s, sub.getAlphabet());
     }
+
     static String strip(String s, String residues) {
         return strip(s, residues, false);
     }
+
     static String strip(String s, String residues, boolean allowGaps) {
 
         boolean[] valid = new boolean[127];
-        for (int i=0; i<residues.length(); i++) {
+        for (int i = 0; i < residues.length(); i++) {
             char c = residues.charAt(i);
             if (c < 96) {
-                valid[c] = valid[c+32] = true;
+                valid[c] = valid[c + 32] = true;
             } else {
-                valid[c-32] = valid[c] = true;
+                valid[c - 32] = valid[c] = true;
             }
         }
-        if(allowGaps) {
-            valid ['-'] = true;
+        if (allowGaps) {
+            valid['-'] = true;
         }
-        StringBuffer res = new StringBuffer(s.length());
-        for (int i=0; i<s.length(); i++) {
+        StringBuilder res = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
             if (valid[s.charAt(i)]) {
                 res.append(s.charAt(i));
             }

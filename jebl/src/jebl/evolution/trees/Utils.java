@@ -18,7 +18,6 @@ import java.util.*;
  *
  * @author rambaut
  * @author Alexei Drummond
- *
  * @version $Id$
  */
 public final class Utils {
@@ -28,20 +27,20 @@ public final class Utils {
      * @return the rooted tree as a newick format string
      */
     public static String toNewick(RootedTree tree) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         toNewick(tree, tree.getRootNode(), buffer);
         return buffer.toString();
     }
 
-    private static void addMetaComment(Node node, StringBuffer buffer) {
-       Map<String, Object> map = node.getAttributeMap();
-        if( map.size() == 0 ) {
+    private static void addMetaComment(Node node, StringBuilder buffer) {
+        Map<String, Object> map = node.getAttributeMap();
+        if (map.size() == 0) {
             return;
         }
         buffer.append(" [&");
         boolean first = true;
-        for( Map.Entry<String, Object> o : map.entrySet() )  {
-            if( ! first ) buffer.append(",");
+        for (Map.Entry<String, Object> o : map.entrySet()) {
+            if (! first) buffer.append(",");
             first = false;
             String val = o.getValue().toString();
             // we have no way to quote commas right now, throw them away if inside value.
@@ -51,33 +50,33 @@ public final class Utils {
         buffer.append("] ");
     }
 
-    private static void toNewick(RootedTree tree, Node node, StringBuffer buffer) {
+    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
-            if( !name.matches("^\\w+$") ) {
+            if (!name.matches("^\\w+$")) {
                 name = "\"" + name + "\"";
             }
             buffer.append(name);
             buffer.append(':');
             buffer.append(tree.getLength(node));
-            addMetaComment(node,  buffer);
+            addMetaComment(node, buffer);
         } else {
             buffer.append('(');
             List<Node> children = tree.getChildren(node);
-            for (int i = 0; i < children.size()-1; i++) {
+            for (int i = 0; i < children.size() - 1; i++) {
                 toNewick(tree, children.get(i), buffer);
                 buffer.append(',');
             }
-            toNewick(tree, children.get(children.size()-1), buffer);
+            toNewick(tree, children.get(children.size() - 1), buffer);
             buffer.append(")");
 
             Node parent = tree.getParent(node);
             // Don't write root length. This is ignored elsewhere and the nexus importer fails
             // whet it is present.
-            if( parent != null ) {
-                buffer.append( ":" + tree.getLength(node) );
+            if (parent != null) {
+                buffer.append(":" + tree.getLength(node));
             }
-            addMetaComment(node,  buffer);
+            addMetaComment(node, buffer);
         }
     }
 
@@ -86,13 +85,13 @@ public final class Utils {
             return;
         }
 
-        if( ! tree.hasLengths() ) {
-           bounds[0] = bounds[1] = 1;
+        if (! tree.hasLengths()) {
+            bounds[0] = bounds[1] = 1;
             return;
         }
 
         final List<Node> children = tree.getChildren(node);
-        for( Node n : children ) {
+        for (Node n : children) {
             final double len = tree.getLength(n);
             bounds[0] = Math.min(bounds[0], len);
             bounds[1] = Math.max(bounds[1], len);
@@ -100,75 +99,76 @@ public final class Utils {
         }
     }
 
-   private static String[] asText(RootedTree tree, Node node, final double factor) {
-          if (tree.isExternal(node)) {
-             String name = tree.getTaxon(node).getName();
-             return new String[] { ' ' + name };
-          }
+    private static String[] asText(RootedTree tree, Node node, final double factor) {
+        if (tree.isExternal(node)) {
+            String name = tree.getTaxon(node).getName();
+            return new String[]{' ' + name};
+        }
 
-         final List<Node> children = tree.getChildren(node);
-         List< String[] > a = new ArrayList< String[] >(children.size());
-         int[] branches = new int[children.size()];
-         int tot = 0;
-         int maxHeight = -1;
+        final List<Node> children = tree.getChildren(node);
+        List<String[]> a = new ArrayList<String[]>(children.size());
+        int[] branches = new int[children.size()];
+        int tot = 0;
+        int maxHeight = -1;
 
-         int k = 0;
-         for( Node n : children ) {
-             String[] s = asText(tree, n, factor);
-             tot += s.length;
-             final double len = tree.hasLengths() ? tree.getLength(n) : 1.0;
-             // set 1 as lower bound for branch since the vertical connector
-             // (which theoretically has zero width) takes one line.
-             final int branchLen = Math.max((int)Math.round(len * factor), 1);
-             branches[k] = branchLen; ++k;
-             maxHeight = Math.max(maxHeight, s[0].length() + branchLen);
-             a.add(s);
-         }
-         // one empty line between sub trees
-         tot += children.size() - 1;
+        int k = 0;
+        for (Node n : children) {
+            String[] s = asText(tree, n, factor);
+            tot += s.length;
+            final double len = tree.hasLengths() ? tree.getLength(n) : 1.0;
+            // set 1 as lower bound for branch since the vertical connector
+            // (which theoretically has zero width) takes one line.
+            final int branchLen = Math.max((int) Math.round(len * factor), 1);
+            branches[k] = branchLen;
+            ++k;
+            maxHeight = Math.max(maxHeight, s[0].length() + branchLen);
+            a.add(s);
+        }
+        // one empty line between sub trees
+        tot += children.size() - 1;
 
-         ArrayList<String> x = new ArrayList<String>(tot);
-         for(int i = 0; i < a.size(); ++i) {
-             String[] s = a.get(i);
-             int branchIndex = s.length / 2;
-             boolean isLast = i == a.size()-1;
-             for(int j = 0; j < s.length; ++j) {
-                 char c = (j == branchIndex) ? '=' : ' ';
-                 char l = ( i == 0 && j < branchIndex || isLast && j > branchIndex ) ? ' ' :
-                         (j == branchIndex ? '+' : '|');
-                 String l1 = l + rep(c, branches[i]-1) + s[j];
-                 x.add( l1 + rep(' ', maxHeight - l1.length()));
-             }
-             if( !isLast ) {
-                 x.add( '|' + rep(' ', maxHeight-1) );
-             }
-         }
+        ArrayList<String> x = new ArrayList<String>(tot);
+        for (int i = 0; i < a.size(); ++i) {
+            String[] s = a.get(i);
+            int branchIndex = s.length / 2;
+            boolean isLast = i == a.size() - 1;
+            for (int j = 0; j < s.length; ++j) {
+                char c = (j == branchIndex) ? '=' : ' ';
+                char l = (i == 0 && j < branchIndex || isLast && j > branchIndex) ? ' ' :
+                        (j == branchIndex ? '+' : '|');
+                String l1 = l + rep(c, branches[i] - 1) + s[j];
+                x.add(l1 + rep(' ', maxHeight - l1.length()));
+            }
+            if (!isLast) {
+                x.add('|' + rep(' ', maxHeight - 1));
+            }
+        }
 
-         for( String ss : x ) {
-             assert(ss.length() == x.get(0).length() );
-         }
+        for (String ss : x) {
+            assert(ss.length() == x.get(0).length());
+        }
 
-         return x.toArray(new String[]{});
+        return x.toArray(new String[]{});
 
     }
 
-     private static String rep(char c, int count) {
-         StringBuffer b = new StringBuffer();
-         while( count > 0 ) {
-             b.append(c);
-             --count;
-         }
-         return b.toString();
-     }
+    private static String rep(char c, int count) {
+        StringBuilder b = new StringBuilder();
+        while (count > 0) {
+            b.append(c);
+            --count;
+        }
+        return b.toString();
+    }
 
     // NUmber of branches from node to most remote tip.
     private static int nodeDistance(final RootedTree tree, final Node node) {
-        if( tree.isExternal(node) ) {
+        if (tree.isExternal(node)) {
             return 0;
         }
 
         int d = 0;
-        for( Node n : tree.getChildren(node) ) {
+        for (Node n : tree.getChildren(node)) {
             d = Math.max(d, nodeDistance(tree, n));
         }
         return d + 1;
@@ -176,7 +176,7 @@ public final class Utils {
 
     private static double safeTreeHeight(final RootedTree tree) {
         final Node root = tree.getRootNode();
-        if( tree.hasHeights() )  {
+        if (tree.hasHeights()) {
             return tree.getHeight(root);
         }
         return nodeDistance(tree, root);
@@ -184,10 +184,10 @@ public final class Utils {
 
     public static String[] asText(Tree tree, int widthGuide) {
         RootedTree rtree = null;
-        if( tree instanceof RootedTree ) {
-            rtree = (RootedTree)tree;
+        if (tree instanceof RootedTree) {
+            rtree = (RootedTree) tree;
         } else {
-           rtree = rootTheTree(tree);
+            rtree = rootTheTree(tree);
         }
 
         Node root = rtree.getRootNode();
@@ -201,11 +201,11 @@ public final class Utils {
         double treeHieghtWithLowBound = treeHeight * lowBound;
 
         double scale;
-        if( treeHieghtWithLowBound > widthGuide ) {
+        if (treeHieghtWithLowBound > widthGuide) {
             scale = widthGuide / treeHeight;
         } else {
             lowBound = (5 / bounds[0]);
-            if( treeHeight * lowBound <= widthGuide ) {
+            if (treeHeight * lowBound <= widthGuide) {
                 scale = lowBound;
             } else {
                 scale = widthGuide / treeHeight;
@@ -214,40 +214,40 @@ public final class Utils {
         return asText(rtree, root, scale);
     }
 
-    private static double dist(Tree tree, Node root, Node node, Map<HashPair<Node>,Double> dists) throws Graph.NoEdgeException {
+    private static double dist(Tree tree, Node root, Node node, Map<HashPair<Node>, Double> dists) throws Graph.NoEdgeException {
         HashPair<Node> p = new HashPair<Node>(root, node);
-        if( dists.containsKey(p) ) {
+        if (dists.containsKey(p)) {
             return dists.get(p);
         }
 
         // assume positive branches
         double maxDist = 0;
-        for( Node n : tree.getAdjacencies(node) ) {
-          if( n != root ) {
-             double d = dist(tree, node, n, dists);
-             maxDist = Math.max(maxDist, d);
-          }
+        for (Node n : tree.getAdjacencies(node)) {
+            if (n != root) {
+                double d = dist(tree, node, n, dists);
+                maxDist = Math.max(maxDist, d);
+            }
         }
-        double dist =  tree.getEdgeLength(node, root) + maxDist;
-        
+        double dist = tree.getEdgeLength(node, root) + maxDist;
+
         dists.put(p, dist);
         return dist;
     }
 
     public static RootedTree rootTheTree(Tree tree) {
         // If already rooted, do nothing
-        if( tree instanceof RootedTree ) {
-            return (RootedTree)tree;
+        if (tree instanceof RootedTree) {
+            return (RootedTree) tree;
         }
 
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
-        if( d2.size() == 1 ) {
+        if (d2.size() == 1) {
             return new RootedFromUnrooted(tree, d2.iterator().next());
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
-        if( Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2 ) {
+        if (Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2) {
             return rtree;
         }
 
@@ -262,57 +262,57 @@ public final class Utils {
 
             double minOfMaxes = Double.MAX_VALUE;
             HashPair<Node> best = null;
-            for( Node i : tree.getInternalNodes() ) {
+            for (Node i : tree.getInternalNodes()) {
                 double maxDist = -Double.MAX_VALUE;
                 HashPair<Node> maxDirection = null;
-                for( Node n : tree.getAdjacencies(i) ) {
+                for (Node n : tree.getAdjacencies(i)) {
                     HashPair<Node> p = new HashPair<Node>(i, n);
                     double d = dist(tree, p.first, p.second, dists);
-                    if( maxDist < d ) {
-                       maxDist = d;
-                       maxDirection = p;
+                    if (maxDist < d) {
+                        maxDist = d;
+                        maxDirection = p;
                     }
                 }
 
-                if( maxDist < minOfMaxes ) {
+                if (maxDist < minOfMaxes) {
                     minOfMaxes = maxDist;
                     best = maxDirection;
                 }
             }
 
-            if( best == null )  {
-                 minOfMaxes = Double.MAX_VALUE;
+            if (best == null) {
+                minOfMaxes = Double.MAX_VALUE;
                 best = null;
-                for( Node i : tree.getInternalNodes() ) {
+                for (Node i : tree.getInternalNodes()) {
                     double maxDist = -Double.MAX_VALUE;
                     HashPair<Node> maxDirection = null;
-                    for( Node n : tree.getAdjacencies(i) ) {
+                    for (Node n : tree.getAdjacencies(i)) {
                         HashPair<Node> p = new HashPair<Node>(i, n);
                         double d = dist(tree, p.first, p.second, dists);
-                        if( maxDist < d ) {
+                        if (maxDist < d) {
                             maxDist = d;
                             maxDirection = p;
                         }
                     }
 
-                    if( maxDist < minOfMaxes ) {
+                    if (maxDist < minOfMaxes) {
                         minOfMaxes = maxDist;
                         best = maxDirection;
                     }
 
-                    if( best == null ) {
+                    if (best == null) {
                         maxDist = -Double.MAX_VALUE;
                         maxDirection = null;
-                        for( Node n : tree.getAdjacencies(i) ) {
+                        for (Node n : tree.getAdjacencies(i)) {
                             HashPair<Node> p = new HashPair<Node>(i, n);
                             double d = dist(tree, p.first, p.second, dists);
-                            if( maxDist < d ) {
+                            if (maxDist < d) {
                                 maxDist = d;
                                 maxDirection = p;
                             }
                         }
 
-                        if( maxDist < minOfMaxes ) {
+                        if (maxDist < minOfMaxes) {
                             minOfMaxes = maxDist;
                             best = maxDirection;
                         }
@@ -321,29 +321,29 @@ public final class Utils {
             }
 
             double distToSecond = -Double.MAX_VALUE;
-            for( Node n : tree.getAdjacencies(best.first) ) {
-                if( n != best.second ) {
+            for (Node n : tree.getAdjacencies(best.first)) {
+                if (n != best.second) {
                     double d1 = dists.get(new HashPair<Node>(best.first, n));
-                    if( d1 > distToSecond ) {
+                    if (d1 > distToSecond) {
                         distToSecond = d1;
                     }
                 }
             }
 
             double d = (minOfMaxes - distToSecond) / 2;
-            if( d > tree.getEdgeLength(best.first, best.second) ||
-                Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2 ) {
-               return new RootedFromUnrooted(tree, best.first);
+            if (d > tree.getEdgeLength(best.first, best.second) ||
+                    Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2) {
+                return new RootedFromUnrooted(tree, best.first);
             }
 
             return new RootedFromUnrooted(tree, best.first, best.second, d);
-       } catch (Graph.NoEdgeException e1) {
+        } catch (Graph.NoEdgeException e1) {
             return null; // bug
-       }
+        }
     }
 
     /**
-     * @param tree the tree
+     * @param tree  the tree
      * @param node1
      * @param node2
      * @return the path length between the two nodes
@@ -355,7 +355,7 @@ public final class Utils {
     /**
      * @param rootedTree the rooted tree
      * @return true if all internal nodes in the given tree are of degree 3, except the root
-     * which must have a degree of 2.
+     *         which must have a degree of 2.
      */
     public static boolean isBinary(RootedTree rootedTree) {
 
@@ -379,6 +379,7 @@ public final class Utils {
 
     /**
      * Return the number of external nodes under this node.
+     *
      * @param tree
      * @param node
      * @return the number of external nodes under this node.
@@ -397,7 +398,6 @@ public final class Utils {
     }
 
     /**
-     *
      * @param tree
      * @param node
      * @return the minimum node height

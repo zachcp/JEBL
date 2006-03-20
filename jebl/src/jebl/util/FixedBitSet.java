@@ -7,7 +7,6 @@ import java.util.Arrays;
  *
  * @author Joseph Heled
  * @version $Id$
- *
  */
 public class FixedBitSet {
     int[] bits;
@@ -26,9 +25,9 @@ public class FixedBitSet {
     private int countBits(int b) {
         int sum = 0;
 
-        while( b != 0) {
+        while (b != 0) {
             // remove most significant bit
-            b = b & (b-1);
+            b = b & (b - 1);
             ++sum;
         }
         return sum;
@@ -42,8 +41,8 @@ public class FixedBitSet {
     }
 
     public FixedBitSet(int size) {
-       this.size = size;
-       bits = new int[(unitIndex(size-1) + 1)];
+        this.size = size;
+        bits = new int[(unitIndex(size - 1) + 1)];
     }
 
     public FixedBitSet(FixedBitSet bs) {
@@ -53,23 +52,22 @@ public class FixedBitSet {
 
 
     public void set(int position) {
-       int unitIndex = unitIndex(position);
-       bits[unitIndex] |= bit(position);
+        int unitIndex = unitIndex(position);
+        bits[unitIndex] |= bit(position);
     }
 
     public void clear(int position) {
-       int unitIndex = unitIndex(position);
-       bits[unitIndex] &= ~bit(position);
+        int unitIndex = unitIndex(position);
+        bits[unitIndex] &= ~bit(position);
     }
 
     /**
-     *
      * @param bitset
      * @return true if bitset contains this set (this <= bitset)
      */
     public boolean setInclusion(final FixedBitSet bitset) {
-        for(int k = 0; k < bits.length; ++k) {
-            if( bits[k] != (bits[k] & bitset.bits[k]) ) {
+        for (int k = 0; k < bits.length; ++k) {
+            if (bits[k] != (bits[k] & bitset.bits[k])) {
                 return false;
             }
         }
@@ -77,68 +75,68 @@ public class FixedBitSet {
     }
 
     public void union(FixedBitSet b) {
-        for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+        for (int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
             bits[k] |= b.bits[k];
         }
     }
 
     public void intersect(FixedBitSet b) {
-      for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
-         bits[k] &= b.bits[k];
-      }
+        for (int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+            bits[k] &= b.bits[k];
+        }
     }
 
     public void setMinus(FixedBitSet b) {
-        for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
-         bits[k] &= ~b.bits[k];
-      }
+        for (int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+            bits[k] &= ~b.bits[k];
+        }
     }
 
     public int intersectCardinality(FixedBitSet b) {
         int c = 0;
-        for(int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
-           c += countBits(bits[k] & b.bits[k] );
+        for (int k = 0; k < Math.min(bits.length, b.bits.length); ++k) {
+            c += countBits(bits[k] & b.bits[k]);
         }
         return c;
     }
 
     public static FixedBitSet complement(FixedBitSet b) {
-       FixedBitSet t = new FixedBitSet(b);
+        FixedBitSet t = new FixedBitSet(b);
         t.complement();
         return t;
     }
 
     public void complement() {
         int k;
-        for(k = 0; k < bits.length-1; ++k ) {
-           bits[k] = ~ bits[k];
+        for (k = 0; k < bits.length - 1; ++k) {
+            bits[k] = ~ bits[k];
         }
         bits[k] = (~bits[k]) & (bit(size) - 1);
     }
 
     private final static byte firstBitLocation[] = {
-         -1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-       4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
+            -1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+            4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
 
     private int firstOnBit(int i) {
-        for(int k = 0; k < 4; ++k) {
-            char b = (char)(i & 0xff);
-            if( b != 0 ) {
-                return 8*k + firstBitLocation[b];
+        for (int k = 0; k < 4; ++k) {
+            char b = (char) (i & 0xff);
+            if (b != 0) {
+                return 8 * k + firstBitLocation[b];
             }
             i = i >> 8;
         }
@@ -161,8 +159,8 @@ public class FixedBitSet {
         if (unit == 0) {
             testIndex = 0;
 
-          while((unit==0) && (u < bits.length-1))
-              unit = bits[++u];
+            while ((unit == 0) && (u < bits.length - 1))
+                unit = bits[++u];
         }
 
         if (unit == 0)
@@ -174,8 +172,8 @@ public class FixedBitSet {
 
     public int cardinality() {
         int sum = 0;
-        for( int b : bits ) {
-           sum += countBits(b);
+        for (int b : bits) {
+            sum += countBits(b);
         }
         return sum;
     }
@@ -195,8 +193,8 @@ public class FixedBitSet {
     }
 
     public boolean equals(Object x) {
-        if( x instanceof FixedBitSet ) {
-            final FixedBitSet b = (FixedBitSet)x;
+        if (x instanceof FixedBitSet) {
+            final FixedBitSet b = (FixedBitSet) x;
 
             return b.size == size && Arrays.equals(bits, b.bits);
         }
@@ -204,13 +202,13 @@ public class FixedBitSet {
     }
 
     public String toString() {
-        StringBuffer rep = new StringBuffer();
+        StringBuilder rep = new StringBuilder();
         rep.append("{");
-        for(int b = 0; b < size; ++b) {
-            if( contains(b) ) {
-                if( rep.length() > 0 ) {
+        for (int b = 0; b < size; ++b) {
+            if (contains(b)) {
+                if (rep.length() > 0) {
                     rep.append("," + b);
-                }  else {
+                } else {
                     rep.append("" + b);
                 }
             }

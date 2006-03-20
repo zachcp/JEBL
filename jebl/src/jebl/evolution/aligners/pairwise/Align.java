@@ -38,7 +38,7 @@ abstract class AbstractAligner implements PairwiseAligner {
     private final Scores scores;    // scores matrix
     Sequence sequence1 = null;
     Sequence sequence2 = null;      // the sequences
-    Traceback B0;                	// the starting point of the traceback
+    Traceback B0;                    // the starting point of the traceback
 
     AbstractAligner(Scores scores) {
         this.scores = scores;
@@ -105,8 +105,8 @@ abstract class AbstractAligner implements PairwiseAligner {
      * @return two-string array containing an alignment with maximal score
      */
     public String[] getOptimalAlignmentStrings() {
-        StringBuffer res1 = new StringBuffer();
-        StringBuffer res2 = new StringBuffer();
+        StringBuilder res1 = new StringBuilder();
+        StringBuilder res2 = new StringBuilder();
         Traceback tb = B0;
 
         int i = tb.i, j = tb.j;
@@ -114,20 +114,20 @@ abstract class AbstractAligner implements PairwiseAligner {
             if (i == tb.i) {
                 res1.append('-');
             } else {
-                res1.append(sequence1.getState(i-1).getCode());
+                res1.append(sequence1.getState(i - 1).getCode());
             }
             if (j == tb.j) {
                 res2.append('-');
             } else {
-                res2.append(sequence2.getState(j-1).getCode());
+                res2.append(sequence2.getState(j - 1).getCode());
             }
-            i = tb.i; j = tb.j;
+            i = tb.i;
+            j = tb.j;
         }
-        return new String[]{ res1.reverse().toString(), res2.reverse().toString() };
+        return new String[]{res1.reverse().toString(), res2.reverse().toString()};
     }
 
     /**
-     *
      * @param val
      * @return float value of string val
      */
@@ -138,8 +138,8 @@ abstract class AbstractAligner implements PairwiseAligner {
     /**
      * Print the score, the F matrix, and the alignment
      *
-     * @param out output to print to
-     * @param msg message printed at start
+     * @param out           output to print to
+     * @param msg           message printed at start
      * @param outputFMatrix print the score matrix
      */
     public void print(PrintStream out, String msg, boolean outputFMatrix) {
@@ -162,7 +162,9 @@ abstract class AbstractAligner implements PairwiseAligner {
      * @param out output to print to
      * @param msg msg printed at the start
      */
-    public void print(PrintStream out, String msg) { print(out, msg, false); }
+    public void print(PrintStream out, String msg) {
+        print(out, msg, false);
+    }
 
     /**
      * Get the next state in the traceback
@@ -170,7 +172,9 @@ abstract class AbstractAligner implements PairwiseAligner {
      * @param tb current Traceback
      * @return next Traceback
      */
-    public Traceback next(Traceback tb) { return tb; } // dummy implementation for the `smart' algs.
+    public Traceback next(Traceback tb) {
+        return tb;
+    } // dummy implementation for the `smart' algs.
 
     /**
      * @return the score of the best alignment
@@ -186,23 +190,28 @@ abstract class AbstractAligner implements PairwiseAligner {
 
     // auxillary static functions
 
-    static float max(float x1, float x2) { return (x1 > x2 ? x1 : x2); }
+    static float max(float x1, float x2) {
+        return (x1 > x2 ? x1 : x2);
+    }
 
-    static float max(float x1, float x2, float x3) { return max(x1, max(x2, x3)); }
+    static float max(float x1, float x2, float x3) {
+        return max(x1, max(x2, x3));
+    }
 
-    static float max(float x1, float x2, float x3, float x4) { return max(max(x1, x2), max(x3, x4)); }
+    static float max(float x1, float x2, float x3, float x4) {
+        return max(max(x1, x2), max(x3, x4));
+    }
 
     /**
-     *
-     * @param s string to pad
+     * @param s     string to pad
      * @param width width to pad to
      * @return string padded to specified width with space chars.
      */
     static String padLeft(String s, int width) {
         int filler = width - s.length();
         if (filler > 0) {           // and therefore width > 0
-            StringBuffer res = new StringBuffer(width);
-            for (int i=0; i<filler; i++)
+            StringBuilder res = new StringBuilder(width);
+            for (int i = 0; i < filler; i++)
                 res.append(' ');
             return res.append(s).toString();
         } else

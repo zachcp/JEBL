@@ -20,13 +20,13 @@ import java.util.Set;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- *
  * @version $Id$
  */
 public class BasicSequence implements Sequence {
 
     /**
      * Creates a sequence with a name corresponding to the taxon name
+     *
      * @param taxon
      * @param sequenceString
      */
@@ -56,13 +56,14 @@ public class BasicSequence implements Sequence {
 
     /**
      * Creates a sequence with a name corresponding to the taxon name
+     *
      * @param taxon
      * @param sequenceType
      * @param states
      */
     public BasicSequence(SequenceType sequenceType, Taxon taxon, State[] states) {
 
-	    this.sequenceType = sequenceType;
+        this.sequenceType = sequenceType;
         this.taxon = taxon;
         this.sequence = new int[states.length];
         for (int i = 0; i < sequence.length; i++) {
@@ -81,7 +82,7 @@ public class BasicSequence implements Sequence {
      * @return a string representing the sequence of symbols.
      */
     public String getString() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (int i : sequence) {
             buffer.append(sequenceType.getState(i).getCode());
         }
@@ -89,35 +90,36 @@ public class BasicSequence implements Sequence {
     }
 
     public String getCleanString() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (int i : sequence) {
             State state = sequenceType.getState(i);
-            if (state.isAmbiguous()|| state.isGap()) continue;
+            if (state.isAmbiguous() || state.isGap()) continue;
             buffer.append(sequenceType.getState(i).getCode());
         }
         return buffer.toString();
     }
 
-	/**
-	 * @return an array of state objects.
-	 */
-	public State[] getStates() {
-	    return sequenceType.toStateArray(sequence);
-	}
+    /**
+     * @return an array of state objects.
+     */
+    public State[] getStates() {
+        return sequenceType.toStateArray(sequence);
+    }
 
-	public int[] getStateIndices() {
-		return sequence;
-	}
+    public int[] getStateIndices() {
+        return sequence;
+    }
 
-	/**
-	 * @return the state at site.
-	 */
-	public State getState(int site) {
-	    return sequenceType.getState(sequence[site]);
-	}
+    /**
+     * @return the state at site.
+     */
+    public State getState(int site) {
+        return sequenceType.getState(sequence[site]);
+    }
 
     /**
      * Returns the length of the sequence
+     *
      * @return the length
      */
     public int getLength() {
@@ -131,58 +133,59 @@ public class BasicSequence implements Sequence {
         return taxon;
     }
 
-	/**
-	 * Sequences are compared by their taxa
-	 * @param o another sequence
-	 * @return an integer
-	 */
+    /**
+     * Sequences are compared by their taxa
+     *
+     * @param o another sequence
+     * @return an integer
+     */
     public int compareTo(Object o) {
-        return taxon.compareTo(((Sequence)o).getTaxon());
+        return taxon.compareTo(((Sequence) o).getTaxon());
     }
 
-	// Attributable IMPLEMENTATION
+    // Attributable IMPLEMENTATION
 
-	public void setAttribute(String name, Object value) {
-		if (helper == null) {
-			helper = new AttributableHelper();
-		}
-		helper.setAttribute(name, value);
-	}
+    public void setAttribute(String name, Object value) {
+        if (helper == null) {
+            helper = new AttributableHelper();
+        }
+        helper.setAttribute(name, value);
+    }
 
-	public Object getAttribute(String name) {
-		if (helper == null) {
-			return null;
-		}
-		return helper.getAttribute(name);
-	}
-    
+    public Object getAttribute(String name) {
+        if (helper == null) {
+            return null;
+        }
+        return helper.getAttribute(name);
+    }
+
     public void removeAttribute(String name) {
-        if( helper != null ) {
+        if (helper != null) {
             helper.removeAttribute(name);
         }
     }
 
-	public Set<String> getAttributeNames() {
-		if (helper == null) {
-			return Collections.emptySet();
-		}
-		return helper.getAttributeNames();
-	}
+    public Set<String> getAttributeNames() {
+        if (helper == null) {
+            return Collections.emptySet();
+        }
+        return helper.getAttributeNames();
+    }
 
-	public Map<String, Object> getAttributeMap() {
-		if (helper == null) {
-			return Collections.emptyMap();
-		}
-		return helper.getAttributeMap();
-	}
+    public Map<String, Object> getAttributeMap() {
+        if (helper == null) {
+            return Collections.emptyMap();
+        }
+        return helper.getAttributeMap();
+    }
 
-	private AttributableHelper helper = null;
+    private AttributableHelper helper = null;
 
-	// private members
+    // private members
 
     private final Taxon taxon;
     private final SequenceType sequenceType;
     private final int[] sequence;
 
-	private Map<String, Object>attributeMap = null;
+    private Map<String, Object> attributeMap = null;
 }
