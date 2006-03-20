@@ -183,12 +183,7 @@ public final class Utils {
     }
 
     public static String[] asText(Tree tree, int widthGuide) {
-        RootedTree rtree = null;
-        if (tree instanceof RootedTree) {
-            rtree = (RootedTree) tree;
-        } else {
-            rtree = rootTheTree(tree);
-        }
+        RootedTree rtree = rootTheTree(tree);
 
         Node root = rtree.getRootNode();
         double[] bounds = new double[2];
