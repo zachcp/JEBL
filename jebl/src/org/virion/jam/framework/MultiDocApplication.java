@@ -8,17 +8,16 @@ import org.virion.jam.mac.Utils;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class MultiDocApplication extends Application {
-	private DocumentFrameFactory documentFrameFactory = null;
+    private DocumentFrameFactory documentFrameFactory = null;
 
     private AbstractFrame invisibleFrame = null;
     private DocumentFrame upperDocumentFrame = null;
 
-    private ArrayList documents = new ArrayList();
+    private ArrayList<DocumentFrame> documents = new ArrayList<DocumentFrame>();
 
     public MultiDocApplication(String nameString, String aboutString, Icon icon) {
 
@@ -26,29 +25,29 @@ public class MultiDocApplication extends Application {
     }
 
     public MultiDocApplication(String nameString, String aboutString, Icon icon,
-    							String websiteURLString, String helpURLString) {
+                               String websiteURLString, String helpURLString) {
 
         super(new MultiDocMenuBarFactory(), nameString, aboutString, icon, websiteURLString, helpURLString);
     }
 
-	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
+    public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
 
-	    super(menuBarFactory, nameString, aboutString, icon);
-	}
+        super(menuBarFactory, nameString, aboutString, icon);
+    }
 
-	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
-								String websiteURLString, String helpURLString) {
+    public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
+                               String websiteURLString, String helpURLString) {
 
-	    super(menuBarFactory, nameString, aboutString, icon, websiteURLString, helpURLString);
-	}
+        super(menuBarFactory, nameString, aboutString, icon, websiteURLString, helpURLString);
+    }
 
-	public final void initialize() {
-		setupFramelessMenuBar();
-	}
+    public final void initialize() {
+        setupFramelessMenuBar();
+    }
 
-	public void setDocumentFrameFactory(DocumentFrameFactory documentFrameFactory) {
-	    this.documentFrameFactory = documentFrameFactory;
-	}
+    public void setDocumentFrameFactory(DocumentFrameFactory documentFrameFactory) {
+        this.documentFrameFactory = documentFrameFactory;
+    }
 
     protected JFrame getDefaultFrame() {
         JFrame frame = getUpperDocumentFrame();
@@ -74,9 +73,7 @@ public class MultiDocApplication extends Application {
 
         boolean ok = true;
 
-        Iterator iter = documents.iterator();
-        while (iter.hasNext()) {
-            DocumentFrame documentFrame = (DocumentFrame) iter.next();
+        for (DocumentFrame documentFrame : documents) {
             if (!documentFrame.requestClose()) {
                 ok = false;
                 break;
@@ -135,61 +132,61 @@ public class MultiDocApplication extends Application {
         return upperDocumentFrame;
     }
 
-	private void setupFramelessMenuBar() {
-		if (Utils.isMacOSX() &&
-		    System.getProperty("apple.laf.useScreenMenuBar").equalsIgnoreCase("true")) {
-			if (invisibleFrame == null) {
-				// We use reflection here because the setUndecorated() method
-				// only exists in Java 1.4 and up
-				invisibleFrame = new AbstractFrame() {
+    private void setupFramelessMenuBar() {
+        if (Utils.isMacOSX() &&
+                System.getProperty("apple.laf.useScreenMenuBar").equalsIgnoreCase("true")) {
+            if (invisibleFrame == null) {
+                // We use reflection here because the setUndecorated() method
+                // only exists in Java 1.4 and up
+                invisibleFrame = new AbstractFrame() {
 
-					protected void initializeComponents() {
-						getSaveAction().setEnabled(false);
-						getSaveAsAction().setEnabled(false);
-						if (getImportAction() != null) getImportAction().setEnabled(false);
-						if (getExportAction() != null) getExportAction().setEnabled(false);
-						getPrintAction().setEnabled(false);
+                    protected void initializeComponents() {
+                        getSaveAction().setEnabled(false);
+                        getSaveAsAction().setEnabled(false);
+                        if (getImportAction() != null) getImportAction().setEnabled(false);
+                        if (getExportAction() != null) getExportAction().setEnabled(false);
+                        getPrintAction().setEnabled(false);
 
-						getCutAction().setEnabled(false);
-						getCopyAction().setEnabled(false);
-						getPasteAction().setEnabled(false);
-						getDeleteAction().setEnabled(false);
-						getSelectAllAction().setEnabled(false);
-						getFindAction().setEnabled(false);
+                        getCutAction().setEnabled(false);
+                        getCopyAction().setEnabled(false);
+                        getPasteAction().setEnabled(false);
+                        getDeleteAction().setEnabled(false);
+                        getSelectAllAction().setEnabled(false);
+                        getFindAction().setEnabled(false);
 
-						getZoomWindowAction().setEnabled(false);
-						getMinimizeWindowAction().setEnabled(false);
-						getCloseWindowAction().setEnabled(false);
+                        getZoomWindowAction().setEnabled(false);
+                        getMinimizeWindowAction().setEnabled(false);
+                        getCloseWindowAction().setEnabled(false);
 
-					}
+                    }
 
-					public boolean requestClose() {
-						return false;
-					}
+                    public boolean requestClose() {
+                        return false;
+                    }
 
-					public JComponent getExportableComponent() {
-						return null;
-					}
-				};
-				invisibleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-				try {
-					Method mthd = invisibleFrame.getClass().getMethod("setUndecorated",
-						new Class[] {Boolean.TYPE});
-					mthd.invoke(invisibleFrame, new Object[] {Boolean.TRUE});
-				} catch (Exception ex) {
-					// Shouldn't happen
-				}
-				invisibleFrame.setSize(0, 0);
-				invisibleFrame.pack();
-			}
-			invisibleFrame.initialize();
+                    public JComponent getExportableComponent() {
+                        return null;
+                    }
+                };
+                invisibleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                try {
+                    Method mthd = invisibleFrame.getClass().getMethod("setUndecorated",
+                            new Class[]{Boolean.TYPE});
+                    mthd.invoke(invisibleFrame, new Object[]{Boolean.TRUE});
+                } catch (Exception ex) {
+                    // Shouldn't happen
+                }
+                invisibleFrame.setSize(0, 0);
+                invisibleFrame.pack();
+            }
+            invisibleFrame.initialize();
 
-			if (!invisibleFrame.isVisible())
-				invisibleFrame.setVisible(true);
+            if (!invisibleFrame.isVisible())
+                invisibleFrame.setVisible(true);
 
-			invisibleFrame.pack();
-		}
+            invisibleFrame.pack();
+        }
 
-	}
+    }
 
 }
