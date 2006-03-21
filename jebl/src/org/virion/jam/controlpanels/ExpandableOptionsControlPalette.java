@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
  * @author Joseph Heled
  * @version $Id$
  */
-public class ExpandableOptionsControlPalette extends ExpandableOptions implements ControlPaletteInterface {
+public class ExpandableOptionsControlPalette extends ExpandableOptions implements ControlPalette {
     public ExpandableOptionsControlPalette(boolean allowMultipleExpanded, Preferences preferences) {
         super(allowMultipleExpanded, preferences);
     }
@@ -26,7 +26,7 @@ public class ExpandableOptionsControlPalette extends ExpandableOptions implement
     private List<ControlsProvider> providers = new ArrayList<ControlsProvider>();
 
     public void addControlsProvider(ControlsProvider provider, boolean addAtStart) {
-        provider.setControlPanel(this);
+        provider.setControlPalette(this);
         providers.add(addAtStart ? 0 : providers.size(), provider);
     }
 

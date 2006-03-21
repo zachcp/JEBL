@@ -63,7 +63,11 @@ public class ExpandableOptions extends JPanel {
     public void addOption(String preferenceSuffix, String text, JPanel contents, JComponent component, boolean defaultOpen) {
         final String preferenceName = "expanded_" + preferenceSuffix;
         boolean open = preferences.getBoolean(preferenceName, defaultOpen);
-        DisclosurePanel disclosure = new DisclosurePanel(text, contents, open, true, component);
+
+	    if (component == null) {
+			component = new JLabel(text);
+	    }
+	    DisclosurePanel disclosure = new DisclosurePanel(component, contents, open, 20);
         disclosure.addDisclosureListener(new DisclosureListener() {
             public void opening(Component component) {
             }

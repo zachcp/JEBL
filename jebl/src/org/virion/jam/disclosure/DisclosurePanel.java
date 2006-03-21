@@ -13,24 +13,35 @@ import java.util.*;
  */
 public class DisclosurePanel extends JPanel {
 
+	/**
+	 *
+	 * @param title The title of the panel
+	 * @param panel The contents of the panel
+	 * @param isOpen Whether the panel should start open
+	 */
 	public DisclosurePanel(final String title, final JPanel panel, boolean isOpen) {
-        this(title, panel, isOpen, false, null);
+        this(new JLabel(title), panel, isOpen, 50);
     }
 
-    /**
-     *
-     * @param isOpen
-     * @param fastBlueStyle draw labels using blue coloured text, and expand/contract quickly when the button is clicked.
-     * @param component A component to be used instead of the default label next to the expand/contract button.
-     */
-    public DisclosurePanel(final String title, final JPanel panel, boolean isOpen, boolean fastBlueStyle, JComponent component) {
+	/**
+	 *
+	 * @param titleComponent The component to use as the title of the panel
+	 * @param panel The contents of the panel
+	 * @param isOpen Whether the panel should start open
+	 * @param openSpeed The opening speed in milliseconds
+	 */
+    public DisclosurePanel(final JComponent titleComponent, final JPanel panel,
+	                       boolean isOpen, int openSpeed) {
 
-        this.title = title;
         this.panel = panel;
 
         setLayout(new BorderLayout());
 
-		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
+		button = new DisclosureButton(openSpeed);
+
+        this.titleComponent = titleComponent;
+
+		JPanel panel1 = new JPanel(new BorderLayout(6, 0)) {
 
 			public void paint(Graphics graphics) {
 				graphics.drawImage(background, 0, 0, getWidth(), getHeight(), null);
@@ -38,23 +49,8 @@ public class DisclosurePanel extends JPanel {
 			}
 		};
 
-		button = new DisclosureButton(fastBlueStyle? 10:150);
-
-		panel1.add(button);
-        JLabel label = new JLabel(title);
-        if(fastBlueStyle) {
-            label.setForeground(Color.BLUE);
-        }
-        if(component != null) {
-            if(fastBlueStyle) {
-                component.setForeground(Color.BLUE);
-            }
-            panel1.add(component);
-        }
-        else {
-            panel1.add(label);
-        }
-
+		panel1.add(button, BorderLayout.WEST);
+		panel1.add(titleComponent, BorderLayout.CENTER);
         add(panel1, BorderLayout.NORTH);
 
 		add(panel, BorderLayout.CENTER);
@@ -124,8 +120,20 @@ public class DisclosurePanel extends JPanel {
 		}
 	}
 
+	public DisclosureButton getDisclosureButton() {
+		return button;
+	}
+
+	public Component getTitleComponent() {
+		return titleComponent;
+	}
+
+	public JPanel getContentsPanel() {
+		return panel;
+	}
+
 	private final DisclosureButton button;
-    private final String title;
+    private final Component titleComponent;
     private final JPanel panel;
 	private final java.util.List listeners = new ArrayList();
 
