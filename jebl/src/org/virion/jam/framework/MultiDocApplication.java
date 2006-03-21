@@ -31,6 +31,17 @@ public class MultiDocApplication extends Application {
         super(new MultiDocMenuBarFactory(), nameString, aboutString, icon, websiteURLString, helpURLString);
     }
 
+	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
+
+	    super(menuBarFactory, nameString, aboutString, icon);
+	}
+
+	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
+								String websiteURLString, String helpURLString) {
+
+	    super(menuBarFactory, nameString, aboutString, icon, websiteURLString, helpURLString);
+	}
+
 	public final void initialize() {
 		setupFramelessMenuBar();
 	}
