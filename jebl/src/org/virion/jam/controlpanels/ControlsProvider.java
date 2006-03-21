@@ -20,16 +20,14 @@ public interface ControlsProvider {
     List<Controls> getControls();
 
 	/**
-	 * Give the provider some settings for the given Controls object
-	 * @param controls
+	 * Give the provider some settings
 	 * @param settings
 	 */
-	void setSettings(Controls controls, ControlsSettings settings);
+	void setSettings(ControlsSettings settings);
 
 	/**
 	 * Get the settings for a given Controls object
-	 * @param controls
-	 * @return The settings
+	 * @param settings
 	 */
-	ControlsSettings getSettings(Controls controls);
+	void getSettings(ControlsSettings settings);
 }

@@ -417,12 +417,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	    if (controls == null) {
 	        OptionsPanel optionsPanel = new OptionsPanel();
 
-	        final JCheckBox checkBox1 = new JCheckBox("Transform branches");
-	        optionsPanel.addComponent(checkBox1);
+	        transformCheck = new JCheckBox("Transform branches");
+	        optionsPanel.addComponent(transformCheck);
 
-	        checkBox1.setSelected(transformBranches);
+	        transformCheck.setSelected(transformBranches);
 	        if (!originalTree.hasLengths()) {
-	            checkBox1.setEnabled(false);
+	            transformCheck.setEnabled(false);
 	        }
 
 	        final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
@@ -435,15 +435,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 	            }
 	        });
 	        final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", combo1);
-	        label1.setEnabled(checkBox1.isSelected());
-	        combo1.setEnabled(checkBox1.isSelected());
+	        label1.setEnabled(transformCheck.isSelected());
+	        combo1.setEnabled(transformCheck.isSelected());
 
-	        checkBox1.addChangeListener(new ChangeListener() {
+	        transformCheck.addChangeListener(new ChangeListener() {
 	            public void stateChanged(ChangeEvent changeEvent) {
-	                label1.setEnabled(checkBox1.isSelected());
-	                combo1.setEnabled(checkBox1.isSelected());
+	                label1.setEnabled(transformCheck.isSelected());
+	                combo1.setEnabled(transformCheck.isSelected());
 
-	                setBranchTransform(checkBox1.isSelected(),
+	                setBranchTransform(transformCheck.isSelected(),
 	                        (TransformedRootedTree.Transform) combo1.getSelectedItem());
 	            }
 	        });
@@ -519,12 +519,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 		return controlsList;
 	}
 
-	public void setSettings(Controls controls, ControlsSettings settings) {
+	public void setSettings(ControlsSettings settings) {
+		transformCheck.setSelected((Boolean)settings.getSetting("Transformed"));
 	}
 
-	public ControlsSettings getSettings(Controls controls) {
-		return null;
+	public void getSettings(ControlsSettings settings) {
+		settings.putSetting("Transformed", transformCheck.isSelected());
 	}
+
+	private JCheckBox transformCheck;
 
     private Controls controls = null;
 

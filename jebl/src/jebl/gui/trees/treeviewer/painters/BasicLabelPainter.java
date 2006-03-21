@@ -255,11 +255,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return controlsList;
     }
 
-	public void setSettings(Controls controls, ControlsSettings settings) {
+	public void setSettings(ControlsSettings settings) {
 	}
 
-	public ControlsSettings getSettings(Controls controls) {
-		return null;
+	public void getSettings(ControlsSettings settings) {
 	}
 
     private Controls controls = null;

@@ -242,11 +242,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         return controlsList;
     }
 
-	public void setSettings(Controls controls, ControlsSettings settings) {
+	public void setSettings(ControlsSettings settings) {
 	}
 
-	public ControlsSettings getSettings(Controls controls) {
-		return null;
+	public void getSettings(ControlsSettings settings) {
 	}
 
     private Controls controls = null;
