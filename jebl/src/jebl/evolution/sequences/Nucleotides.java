@@ -94,14 +94,14 @@ public final class Nucleotides {
 
 	public static boolean isGap(NucleotideState state) { return state == GAP_STATE; }
 
-    // both states must be not amibugues/gaps and unequal
+    // states must not be ambiguous/gaps nor equal
     // transition A<==>G or C<==>T
     public static boolean isTransition(State state1, State state2) {
         // use A,G is even and C,T are odd
-        return ((state1.getIndex() + state2.getIndex()) & 0x1) == 0;
+        return ((state1.getIndex() + state2.getIndex()) & 0x1) == 0; // checks if sum is even
     }
 
-    // both states must be not amibugues/gaps and unequal
+    // states must not be ambiguous/gaps nor equal
     public static boolean isTransversion(State state1, State state2) {
         return !isTransition(state1, state2);
     }

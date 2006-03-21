@@ -30,11 +30,14 @@ public final class AminoAcidState extends State {
         return super.compareTo(that);
     }
 
+    // we do not need to override equals because there is only one
+    // unique instance of each nucleotide state - i.e. we can use ==
+    /*
     public boolean equals(Object o) {
         if (!(o instanceof AminoAcidState))
           return false;
         return super.equals(o);
-    }
+    }*/
 
     public int hashCode() {
         return 7 * super.hashCode() + 23;
