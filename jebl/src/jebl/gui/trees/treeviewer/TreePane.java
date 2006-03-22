@@ -37,7 +37,7 @@ import java.util.List;
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
     public TreePane() {
-        setBackground(UIManager.getColor("window"));
+        setBackground(UIManager.getColor("TextArea.background"));
     }
 
     public RootedTree getTree() {

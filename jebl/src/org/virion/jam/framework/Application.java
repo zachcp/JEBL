@@ -6,6 +6,8 @@ package org.virion.jam.framework;
 
 import org.virion.jam.html.HTMLViewer;
 import org.virion.jam.util.BrowserLauncher;
+import org.virion.jam.preferences.PreferencesDialog;
+import org.virion.jam.preferences.PreferencesSection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,6 +34,8 @@ public abstract class Application {
     private static Application application = null;
 
     private JMenu recentFileMenu = null;
+
+    private PreferencesDialog preferencesDialog = null;
 
     public static Application getApplication() {
         return application;
@@ -89,6 +93,8 @@ public abstract class Application {
         if (org.virion.jam.mac.Utils.isMacOSX()) {
             org.virion.jam.mac.Utils.macOSXRegistration(application);
         }
+
+        preferencesDialog = new PreferencesDialog(getDefaultFrame());
     }
 
 	public abstract void initialize();
@@ -195,7 +201,13 @@ public abstract class Application {
 
     public abstract void doQuit();
 
-    public abstract void doPreferences();
+    public void doPreferences() {
+        preferencesDialog.showDialog();
+    }
+
+    public void addPreferencesSection(PreferencesSection preferencesSection) {
+        preferencesDialog.addSection(preferencesSection);
+    }
 
     public Action getNewAction() {
         return newAction;

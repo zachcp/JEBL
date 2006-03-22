@@ -88,14 +88,6 @@ public class MultiDocApplication extends Application {
         }
     }
 
-    public void doPreferences() {
-        //       JFrame frame = new JPEGViewerPreferences(this);
-        //       frame.pack();
-        //       SwingTools.centerComponent(frame, null);
-        //       if (macOS) frame.setJMenuBar(createMenuBar());
-        //       frame.setVisible(true);
-    }
-
     private void documentFrameActivated(DocumentFrame documentFrame) {
         upperDocumentFrame = documentFrame;
     }
