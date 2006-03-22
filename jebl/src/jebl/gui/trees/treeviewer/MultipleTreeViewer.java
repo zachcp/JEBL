@@ -10,7 +10,6 @@ import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -32,8 +31,8 @@ public class MultipleTreeViewer extends TreeViewer {
         init();
     }
 
-    public MultipleTreeViewer(Preferences control_palette_alignment, int right) {
-        super(control_palette_alignment, right);
+    public MultipleTreeViewer(ControlPalette controlPalette, int controlsLocation) {
+        super(controlPalette, controlsLocation);
         init();
     }
 

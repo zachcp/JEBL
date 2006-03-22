@@ -93,9 +93,6 @@ public class TreeViewer extends JPanel implements Printable {
 
     static private Preferences defaultPreferences = Preferences.userNodeForPackage(TreeViewer.class);
 
-    public TreeViewer(Preferences p, int CONTROL_PALETTE_ALIGNMENT) {
-        this(new ExpandableOptionsControlPalette(true, p != null ? p : defaultPreferences), CONTROL_PALETTE_ALIGNMENT);
-    }
 
     public TreeViewer(int CONTROL_PALETTE_ALIGNMENT, BasicControlPalette.DisplayMode mode) {
         this(new BasicControlPalette(defaultPaletteSize, mode, true), CONTROL_PALETTE_ALIGNMENT);
