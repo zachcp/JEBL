@@ -2,9 +2,11 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer.TreePane;
-import org.virion.jam.controlpanels.*;
-import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.components.RealNumberField;
+import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsSettings;
+import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -66,7 +68,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         preferredWidth = treePane.getTreeScale() * scaleRange;
         preferredHeight = labelHeight + 4 + scaleBarStroke.getLineWidth();
 
-        yOffset = (float)(fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
+        yOffset = (float) (fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
     }
@@ -97,18 +99,18 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         float xOffset;
         switch (justification) {
             case CENTER:
-                xOffset = (float)(bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+                xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
                 x1 = (bounds.getX() + (bounds.getWidth() - preferredWidth) / 2.0);
                 x2 = x1 + preferredWidth;
                 break;
             case FLUSH:
             case LEFT:
-                xOffset = (float)bounds.getX();
+                xOffset = (float) bounds.getX();
                 x1 = bounds.getX();
                 x2 = x1 + preferredWidth;
                 break;
             case RIGHT:
-                xOffset = (float)(bounds.getX() + bounds.getWidth() - rect.getWidth());
+                xOffset = (float) (bounds.getX() + bounds.getWidth() - rect.getWidth());
                 x2 = bounds.getX() + bounds.getWidth();
                 x1 = x2 - preferredWidth;
                 break;
@@ -121,7 +123,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
         g2.draw(new Line2D.Double(x1, bounds.getY(), x2, bounds.getY()));
 
-        g2.drawString(label, xOffset, yOffset + (float)bounds.getY());
+        g2.drawString(label, xOffset, yOffset + (float) bounds.getY());
 
         g2.setFont(oldFont);
         g2.setPaint(oldPaint);
@@ -171,7 +173,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         // nothing to do
     }
 
-    public List<Controls> getControls() {
+    public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
         List<Controls> controlsList = new ArrayList<Controls>();
 
@@ -179,7 +181,9 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             OptionsPanel optionsPanel = new OptionsPanel();
 
             final JCheckBox checkBox1 = new JCheckBox("Show Scale Bar");
-            optionsPanel.addComponent(checkBox1);
+            if (! detachPrimaryCheckbox) {
+                optionsPanel.addComponent(checkBox1);
+            }
 
             checkBox1.setSelected(isVisible());
 
@@ -200,7 +204,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
             spinner1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setFontSize(((Double)spinner1.getValue()).floatValue());
+                    setFontSize(((Double) spinner1.getValue()).floatValue());
                 }
             });
             final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
@@ -209,7 +213,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
             spinner2.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setLineWeight(((Double)spinner2.getValue()).floatValue());
+                    setLineWeight(((Double) spinner2.getValue()).floatValue());
                 }
             });
             final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
@@ -234,7 +238,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                 }
             });
 
-	        controls = new Controls("Scale Bar", optionsPanel, false);
+            controls = new Controls("Scale Bar", optionsPanel, false, false, detachPrimaryCheckbox ? checkBox1 : null);
         }
 
         controlsList.add(controls);
@@ -242,11 +246,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         return controlsList;
     }
 
-	public void setSettings(ControlsSettings settings) {
-	}
+    public void setSettings(ControlsSettings settings) {
+    }
 
-	public void getSettings(ControlsSettings settings) {
-	}
+    public void getSettings(ControlsSettings settings) {
+    }
 
     private Controls controls = null;
 

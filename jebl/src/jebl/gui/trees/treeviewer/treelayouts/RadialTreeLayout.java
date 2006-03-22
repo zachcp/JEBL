@@ -2,7 +2,9 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
-import org.virion.jam.controlpanels.*;
+import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
 
 import java.awt.*;
@@ -45,28 +47,28 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         // do nothing...
     }
 
-	public List<Controls> getControls() {
+    public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
-	    List<Controls> controlsList = new ArrayList<Controls>();
+        List<Controls> controlsList = new ArrayList<Controls>();
 
-	    if (controls == null) {
-	        OptionsPanel optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
-		    controls = new Controls("Layout", optionsPanel, true);
-	    }
+            controls = new Controls("Layout", optionsPanel, true);
+        }
 
-	    controlsList.add(controls);
+        controlsList.add(controls);
 
-	    return controlsList;
-	}
+        return controlsList;
+    }
 
-	public void setSettings(ControlsSettings settings) {
-	}
+    public void setSettings(ControlsSettings settings) {
+    }
 
-	public void getSettings(ControlsSettings settings) {
-	}
+    public void getSettings(ControlsSettings settings) {
+    }
 
-	private Controls controls = null;
+    private Controls controls = null;
 
     protected void validate() {
         nodePoints.clear();
@@ -125,25 +127,25 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
-	            Point2D branchLabelPoint1 = new Point2D.Double(xPosition + (length * 0.5 * Math.cos(branchAngle)),
-			                                                yPosition + (length * 0.5 * Math.sin(branchAngle)));
-	            Point2D branchLabelPoint2 = new Point2D.Double(xPosition + (((length * 0.5) + 1.0) * Math.cos(branchAngle)),
-			                                                yPosition + (((length * 0.5) + 1.0)  * Math.sin(branchAngle)));
-	            Line2D branchLabelPath = new Line2D.Double(branchLabelPoint1, branchLabelPoint2);
+                Point2D branchLabelPoint1 = new Point2D.Double(xPosition + (length * 0.5 * Math.cos(branchAngle)),
+                        yPosition + (length * 0.5 * Math.sin(branchAngle)));
+                Point2D branchLabelPoint2 = new Point2D.Double(xPosition + (((length * 0.5) + 1.0) * Math.cos(branchAngle)),
+                        yPosition + (((length * 0.5) + 1.0) * Math.sin(branchAngle)));
+                Line2D branchLabelPath = new Line2D.Double(branchLabelPoint1, branchLabelPoint2);
 
-	            branchLabelPaths.put(child, branchLabelPath);
+                branchLabelPaths.put(child, branchLabelPath);
                 i++;
             }
 
-	        Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
-			                                            yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+            Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
+                    yPosition + ((length + 1.0) * Math.sin(branchAngle)));
 
-	        Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
-	        nodeLabelPaths.put(node, nodeLabelPath);
+            Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
+            nodeLabelPaths.put(node, nodeLabelPath);
         } else {
 
             Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
-		                                            yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+                    yPosition + ((length + 1.0) * Math.sin(branchAngle)));
 
             Line2D taxonLabelPath = new Line2D.Double(nodePoint, taxonPoint);
             taxonLabelPaths.put(node, taxonLabelPath);

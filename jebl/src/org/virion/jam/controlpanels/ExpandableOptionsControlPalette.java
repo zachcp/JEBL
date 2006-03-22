@@ -52,8 +52,8 @@ public class ExpandableOptionsControlPalette extends ExpandableOptions implement
         boolean first = true;
         for (ControlsProvider controlsProvider : providers) {
 
-            for (Controls controls : controlsProvider.getControls()) {
-                addOption(controls.getTitle(), controls.getTitle(), controls.getPanel(), null, first);
+            for (Controls controls : controlsProvider.getControls(true)) {
+                addOption(controls.getTitle(), controls.getTitle(), controls.getPanel(), controls.getPrimaryCheckbox(), first);
                 first = false;
             }
         }

@@ -11,7 +11,10 @@ import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.PainterListener;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
-import org.virion.jam.controlpanels.*;
+import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsProvider;
+import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -37,142 +40,142 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         setBackground(UIManager.getColor("window"));
     }
 
-	public RootedTree getTree() {
-		return tree;
-	}
+    public RootedTree getTree() {
+        return tree;
+    }
 
-	public void setTree(Tree tree) {
-		this.originalTree = (RootedTree)tree;
-		if (!originalTree.hasLengths()) {
-			transformBranches = true;
-		}
-		setupTree();
-	}
+    public void setTree(Tree tree) {
+        this.originalTree = (RootedTree) tree;
+        if (!originalTree.hasLengths()) {
+            transformBranches = true;
+        }
+        setupTree();
+    }
 
-	private void setupTree() {
-		tree = originalTree;
+    private void setupTree() {
+        tree = originalTree;
 
-		if (orderBranches) {
-			tree = new SortedRootedTree(tree, branchOrdering);
-		}
+        if (orderBranches) {
+            tree = new SortedRootedTree(tree, branchOrdering);
+        }
 
-		if (transformBranches || !this.tree.hasLengths()) {
-			tree = new TransformedRootedTree(tree, branchTransform);
-		}
+        if (transformBranches || !this.tree.hasLengths()) {
+            tree = new TransformedRootedTree(tree, branchTransform);
+        }
 
-		treeLayout.setTree(tree);
+        treeLayout.setTree(tree);
 
-		calibrated = false;
-		invalidate();
-		repaint();
-	}
+        calibrated = false;
+        invalidate();
+        repaint();
+    }
 
-	public void setTreeLayout(TreeLayout treeLayout) {
+    public void setTreeLayout(TreeLayout treeLayout) {
 
-		this.treeLayout = treeLayout;
-		treeLayout.setTree(tree);
-		treeLayout.addTreeLayoutListener(new TreeLayoutListener() {
-			public void treeLayoutChanged() {
-				calibrated = false;
-				repaint();
-			}
-		});
-		if( controlPalette != null ) controlPalette.fireControlsChanged();
-		calibrated = false;
-		invalidate();
-		repaint();
-	}
+        this.treeLayout = treeLayout;
+        treeLayout.setTree(tree);
+        treeLayout.addTreeLayoutListener(new TreeLayoutListener() {
+            public void treeLayoutChanged() {
+                calibrated = false;
+                repaint();
+            }
+        });
+        if (controlPalette != null) controlPalette.fireControlsChanged();
+        calibrated = false;
+        invalidate();
+        repaint();
+    }
 
-	public Rectangle2D getTreeBounds() {
-		return treeBounds;
-	}
+    public Rectangle2D getTreeBounds() {
+        return treeBounds;
+    }
 
-	/**
-	 * This returns the scaling factor between the graphical image and the branch
-	 * lengths of the tree
+    /**
+     * This returns the scaling factor between the graphical image and the branch
+     * lengths of the tree
      *
-	 * @return the tree scale
-	 */
-	public double getTreeScale() {
-		return treeScale;
-	}
+     * @return the tree scale
+     */
+    public double getTreeScale() {
+        return treeScale;
+    }
 
-	public void painterChanged() {
-		calibrated = false;
-		repaint();
-	}
+    public void painterChanged() {
+        calibrated = false;
+        repaint();
+    }
 
-	public void setBranchOrdering(boolean orderBranches, SortedRootedTree.BranchOrdering branchOrdering) {
-		this.orderBranches = orderBranches;
-		this.branchOrdering = branchOrdering;
-		setupTree();
-	}
+    public void setBranchOrdering(boolean orderBranches, SortedRootedTree.BranchOrdering branchOrdering) {
+        this.orderBranches = orderBranches;
+        this.branchOrdering = branchOrdering;
+        setupTree();
+    }
 
-	public void setBranchTransform(boolean transformBranches, TransformedRootedTree.Transform branchTransform) {
-		this.transformBranches = transformBranches;
-		this.branchTransform = branchTransform;
-		setupTree();
-	}
+    public void setBranchTransform(boolean transformBranches, TransformedRootedTree.Transform branchTransform) {
+        this.transformBranches = transformBranches;
+        this.branchTransform = branchTransform;
+        setupTree();
+    }
 
-	public boolean isShowingRootBranch() {
-		return showingRootBranch;
-	}
+    public boolean isShowingRootBranch() {
+        return showingRootBranch;
+    }
 
-	public void setShowingRootBranch(boolean showingRootBranch) {
-		this.showingRootBranch = showingRootBranch;
-		calibrated = false;
-		repaint();
-	}
+    public void setShowingRootBranch(boolean showingRootBranch) {
+        this.showingRootBranch = showingRootBranch;
+        calibrated = false;
+        repaint();
+    }
 
-	public boolean isShowingTaxonCallouts() {
-		return showingTaxonCallouts;
-	}
+    public boolean isShowingTaxonCallouts() {
+        return showingTaxonCallouts;
+    }
 
-	public void setShowingTaxonCallouts(boolean showingTaxonCallouts) {
-		this.showingTaxonCallouts = showingTaxonCallouts;
-		calibrated = false;
-		repaint();
-	}
+    public void setShowingTaxonCallouts(boolean showingTaxonCallouts) {
+        this.showingTaxonCallouts = showingTaxonCallouts;
+        calibrated = false;
+        repaint();
+    }
 
-	public void setSelectedNode(Node selectedNode) {
-		selectedNodes.clear();
-		selectedTaxa.clear();
-		addSelectedNode(selectedNode);
-	}
+    public void setSelectedNode(Node selectedNode) {
+        selectedNodes.clear();
+        selectedTaxa.clear();
+        addSelectedNode(selectedNode);
+    }
 
-	public void setSelectedTaxon(Taxon selectedTaxon) {
-		selectedNodes.clear();
-		selectedTaxa.clear();
-		addSelectedTaxon(selectedTaxon);
-	}
+    public void setSelectedTaxon(Taxon selectedTaxon) {
+        selectedNodes.clear();
+        selectedTaxa.clear();
+        addSelectedTaxon(selectedTaxon);
+    }
 
-	public void setSelectedClade(Node selectedNode) {
-		selectedNodes.clear();
-		selectedTaxa.clear();
-		addSelectedClade(selectedNode);
-	}
+    public void setSelectedClade(Node selectedNode) {
+        selectedNodes.clear();
+        selectedTaxa.clear();
+        addSelectedClade(selectedNode);
+    }
 
-	public void setSelectedTaxa(Node selectedNode) {
-		selectedNodes.clear();
-		selectedTaxa.clear();
-		addSelectedTaxa(selectedNode);
-	}
+    public void setSelectedTaxa(Node selectedNode) {
+        selectedNodes.clear();
+        selectedTaxa.clear();
+        addSelectedTaxa(selectedNode);
+    }
 
-	public void addSelectedNode(Node selectedNode) {
-		if (selectedNode != null) {
-			selectedNodes.add(selectedNode);
-		}
-		fireSelectionChanged();
-		repaint();
-	}
+    public void addSelectedNode(Node selectedNode) {
+        if (selectedNode != null) {
+            selectedNodes.add(selectedNode);
+        }
+        fireSelectionChanged();
+        repaint();
+    }
 
-	public void addSelectedTaxon(Taxon selectedTaxon) {
-		if (selectedTaxon != null) {
-			selectedTaxa.add(selectedTaxon);
-		}
-		fireSelectionChanged();
-		repaint();
-	}
+    public void addSelectedTaxon(Taxon selectedTaxon) {
+        if (selectedTaxon != null) {
+            selectedTaxa.add(selectedTaxon);
+        }
+        fireSelectionChanged();
+        repaint();
+    }
 
     public void addSelectedClade(Node selectedNode) {
         if (selectedNode != null) {
@@ -403,131 +406,131 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setControlPalette(ControlPalette controlPalette) {
-		this.controlPalette = controlPalette;
-	}
+        this.controlPalette = controlPalette;
+    }
 
     private ControlPalette controlPalette = null;
 
-	public List<Controls> getControls() {
+    public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
-	    List<Controls> controlsList = new ArrayList<Controls>();
+        List<Controls> controlsList = new ArrayList<Controls>();
 
-	    controlsList.addAll(treeLayout.getControls());
+        controlsList.addAll(treeLayout.getControls(detachPrimaryCheckbox));
 
-	    if (controls == null) {
-	        OptionsPanel optionsPanel = new OptionsPanel();
+        if (controls == null) {
+            OptionsPanel optionsPanel = new OptionsPanel();
 
-	        transformCheck = new JCheckBox("Transform branches");
-	        optionsPanel.addComponent(transformCheck);
+            transformCheck = new JCheckBox("Transform branches");
+            optionsPanel.addComponent(transformCheck);
 
-	        transformCheck.setSelected(transformBranches);
-	        if (!originalTree.hasLengths()) {
-	            transformCheck.setEnabled(false);
-	        }
+            transformCheck.setSelected(transformBranches);
+            if (!originalTree.hasLengths()) {
+                transformCheck.setEnabled(false);
+            }
 
-	        final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
-	        combo1.setSelectedItem(branchTransform);
-	        combo1.addItemListener(new ItemListener() {
-	            public void itemStateChanged(ItemEvent itemEvent) {
-	                setBranchTransform(true,
-	                        (TransformedRootedTree.Transform) combo1.getSelectedItem());
+            final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
+            combo1.setSelectedItem(branchTransform);
+            combo1.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent itemEvent) {
+                    setBranchTransform(true,
+                            (TransformedRootedTree.Transform) combo1.getSelectedItem());
 
-	            }
-	        });
-	        final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", combo1);
-	        label1.setEnabled(transformCheck.isSelected());
-	        combo1.setEnabled(transformCheck.isSelected());
+                }
+            });
+            final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", combo1);
+            label1.setEnabled(transformCheck.isSelected());
+            combo1.setEnabled(transformCheck.isSelected());
 
-	        transformCheck.addChangeListener(new ChangeListener() {
-	            public void stateChanged(ChangeEvent changeEvent) {
-	                label1.setEnabled(transformCheck.isSelected());
-	                combo1.setEnabled(transformCheck.isSelected());
+            transformCheck.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    label1.setEnabled(transformCheck.isSelected());
+                    combo1.setEnabled(transformCheck.isSelected());
 
-	                setBranchTransform(transformCheck.isSelected(),
-	                        (TransformedRootedTree.Transform) combo1.getSelectedItem());
-	            }
-	        });
+                    setBranchTransform(transformCheck.isSelected(),
+                            (TransformedRootedTree.Transform) combo1.getSelectedItem());
+                }
+            });
 
-	        final JCheckBox checkBox2 = new JCheckBox("Order branches");
-	        optionsPanel.addComponent(checkBox2);
+            final JCheckBox checkBox2 = new JCheckBox("Order branches");
+            optionsPanel.addComponent(checkBox2);
 
-	        checkBox2.setSelected(orderBranches);
+            checkBox2.setSelected(orderBranches);
 
-	        final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values());
-	        combo2.setSelectedItem(branchOrdering);
-	        combo2.addItemListener(new ItemListener() {
-	            public void itemStateChanged(ItemEvent itemEvent) {
-	                setBranchOrdering(true,
-	                        (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
+            final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values());
+            combo2.setSelectedItem(branchOrdering);
+            combo2.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent itemEvent) {
+                    setBranchOrdering(true,
+                            (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
 
-	            }
-	        });
-	        final JLabel label2 = optionsPanel.addComponentWithLabel("Ordering:", combo2);
-	        label2.setEnabled(checkBox2.isSelected());
-	        combo2.setEnabled(checkBox2.isSelected());
+                }
+            });
+            final JLabel label2 = optionsPanel.addComponentWithLabel("Ordering:", combo2);
+            label2.setEnabled(checkBox2.isSelected());
+            combo2.setEnabled(checkBox2.isSelected());
 
-	        checkBox2.addChangeListener(new ChangeListener() {
-	            public void stateChanged(ChangeEvent changeEvent) {
-	                label2.setEnabled(checkBox2.isSelected());
-	                combo2.setEnabled(checkBox2.isSelected());
+            checkBox2.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    label2.setEnabled(checkBox2.isSelected());
+                    combo2.setEnabled(checkBox2.isSelected());
 
-	                setBranchOrdering(checkBox2.isSelected(),
-	                        (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
-	            }
-	        });
+                    setBranchOrdering(checkBox2.isSelected(),
+                            (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
+                }
+            });
 
-	        final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
-	        optionsPanel.addComponent(checkBox3);
+            final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
+            optionsPanel.addComponent(checkBox3);
 
-	        checkBox3.setSelected(isShowingRootBranch());
-	        checkBox3.addChangeListener(new ChangeListener() {
-	            public void stateChanged(ChangeEvent changeEvent) {
-	                setShowingRootBranch(checkBox3.isSelected());
+            checkBox3.setSelected(isShowingRootBranch());
+            checkBox3.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setShowingRootBranch(checkBox3.isSelected());
 
-	            }
-	        });
+                }
+            });
 
-	        final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
 
-	        spinner.addChangeListener(new ChangeListener() {
-	            public void stateChanged(ChangeEvent changeEvent) {
-	                setBranchLineWeight(((Double) spinner.getValue()).floatValue());
-	            }
-	        });
-	        optionsPanel.addComponentWithLabel("Line Weight:", spinner);
+            spinner.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    setBranchLineWeight(((Double) spinner.getValue()).floatValue());
+                }
+            });
+            optionsPanel.addComponentWithLabel("Line Weight:", spinner);
 
-	        controls = new Controls("Formatting", optionsPanel, true);
-	    }
-	    controlsList.add(controls);
+            controls = new Controls("Formatting", optionsPanel, true);
+        }
+        controlsList.add(controls);
 
-	    if (getTaxonLabelPainter() != null) {
-	        controlsList.addAll(getTaxonLabelPainter().getControls());
-	    }
+        if (getTaxonLabelPainter() != null) {
+            controlsList.addAll(getTaxonLabelPainter().getControls(detachPrimaryCheckbox));
+        }
 
-	    if (getNodeLabelPainter() != null) {
-	        controlsList.addAll(getNodeLabelPainter().getControls());
-	    }
+        if (getNodeLabelPainter() != null) {
+            controlsList.addAll(getNodeLabelPainter().getControls(detachPrimaryCheckbox));
+        }
 
-	    if (getBranchLabelPainter() != null) {
-	        controlsList.addAll(getBranchLabelPainter().getControls());
-	    }
+        if (getBranchLabelPainter() != null) {
+            controlsList.addAll(getBranchLabelPainter().getControls(detachPrimaryCheckbox));
+        }
 
-	    if (getScaleBarPainter() != null) {
-	        controlsList.addAll(getScaleBarPainter().getControls());
-	    }
+        if (getScaleBarPainter() != null) {
+            controlsList.addAll(getScaleBarPainter().getControls(detachPrimaryCheckbox));
+        }
 
-		return controlsList;
-	}
+        return controlsList;
+    }
 
-	public void setSettings(ControlsSettings settings) {
-		transformCheck.setSelected((Boolean)settings.getSetting("Transformed"));
-	}
+    public void setSettings(ControlsSettings settings) {
+        transformCheck.setSelected((Boolean) settings.getSetting("Transformed"));
+    }
 
-	public void getSettings(ControlsSettings settings) {
-		settings.putSetting("Transformed", transformCheck.isSelected());
-	}
+    public void getSettings(ControlsSettings settings) {
+        settings.putSetting("Transformed", transformCheck.isSelected());
+    }
 
-	private JCheckBox transformCheck;
+    private JCheckBox transformCheck;
 
     private Controls controls = null;
 

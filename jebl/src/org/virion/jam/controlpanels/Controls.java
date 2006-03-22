@@ -8,44 +8,51 @@ import javax.swing.*;
  */
 public class Controls {
 
-	public Controls(String title, JPanel panel, boolean isVisible) {
-		this(title, panel, isVisible, false);
-	}
 
-	public Controls(String title, JPanel panel, boolean isVisible, boolean isPinned) {
-		this.title = title;
-		this.panel = panel;
-		this.isVisible = isVisible;
-		this.isPinned = isPinned;
-	}
+    public Controls(String title, JPanel panel, boolean isVisible) {
+        this(title, panel, isVisible, false, null);
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Controls(String title, JPanel panel, boolean isVisible, boolean isPinned, JCheckBox primaryCheckbox) {
+        this.title = title;
+        this.panel = panel;
+        this.isVisible = isVisible;
+        this.isPinned = isPinned;
+        this.primaryCheckbox = primaryCheckbox;
+    }
 
-	public JPanel getPanel() {
-		return panel;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public boolean isVisible() {
-		return isVisible;
-	}
+    public JPanel getPanel() {
+        return panel;
+    }
 
-	public void setVisible(boolean visible) {
-		isVisible = visible;
-	}
+    public boolean isVisible() {
+        return isVisible;
+    }
 
-	public boolean isPinned() {
-		return isPinned;
-	}
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
 
-	public void setPinned(boolean pinned) {
-		isPinned = pinned;
-	}
+    public boolean isPinned() {
+        return isPinned;
+    }
 
-	private String title;
-	private JPanel panel;
-	private boolean isVisible;
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
+    }
 
-	private boolean isPinned;
+    public JCheckBox getPrimaryCheckbox() {
+        return primaryCheckbox;
+    }
+
+    private String title;
+    private JPanel panel;
+    private JCheckBox primaryCheckbox;
+    private boolean isVisible;
+
+    private boolean isPinned;
 }
