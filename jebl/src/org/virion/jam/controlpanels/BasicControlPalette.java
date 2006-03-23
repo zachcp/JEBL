@@ -28,7 +28,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
     }
 
     /**
-     * @todo We should probably dump this constructor. We don't really want a different constructor
+     * todo We should probably dump this constructor. We don't really want a different constructor
      * for each style that might be desired. The opening speed is OK, but I don't like passing a
      * title colour. I suggest that properties might be used for this.
      */

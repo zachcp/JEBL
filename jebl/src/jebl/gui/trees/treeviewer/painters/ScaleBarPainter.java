@@ -91,7 +91,8 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
         g2.setFont(scaleFont);
 
-        String label = Double.toString(scaleRange);
+        // show less precision - nicer to view (and exact number is not that important)
+        final String label = String.format("%.5g", scaleRange); //Double.toString(scaleRange);
 
         Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
@@ -180,12 +181,12 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JCheckBox checkBox1 = new JCheckBox("Show Scale Bar");
+            final JCheckBox showScaleBarCB = new JCheckBox("Show Scale Bar");
             if (! detachPrimaryCheckbox) {
-                optionsPanel.addComponent(checkBox1);
+                optionsPanel.addComponent(showScaleBarCB);
             }
 
-            checkBox1.setSelected(isVisible());
+            showScaleBarCB.setSelected(isVisible());
 
             final RealNumberField text1 = new RealNumberField(0.0, Double.MAX_VALUE);
             text1.setValue(scaleRange);
@@ -194,7 +195,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                 public void stateChanged(ChangeEvent changeEvent) {
                     Double value = text1.getValue();
                     if (value != null) {
-                        setScaleRange(value.doubleValue());
+                        setScaleRange(value);
                     }
                 }
             });
@@ -218,27 +219,29 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             });
             final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
 
-            label1.setEnabled(checkBox1.isSelected());
-            text1.setEnabled(checkBox1.isSelected());
-            label2.setEnabled(checkBox1.isSelected());
-            spinner1.setEnabled(checkBox1.isSelected());
-            label3.setEnabled(checkBox1.isSelected());
-            spinner2.setEnabled(checkBox1.isSelected());
+            final boolean isSelected = showScaleBarCB.isSelected();
+            label1.setEnabled(isSelected);
+            text1.setEnabled(isSelected);
+            label2.setEnabled(isSelected);
+            spinner1.setEnabled(isSelected);
+            label3.setEnabled(isSelected);
+            spinner2.setEnabled(isSelected);
 
-            checkBox1.addChangeListener(new ChangeListener() {
+            showScaleBarCB.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    label1.setEnabled(checkBox1.isSelected());
-                    text1.setEnabled(checkBox1.isSelected());
-                    label2.setEnabled(checkBox1.isSelected());
-                    spinner1.setEnabled(checkBox1.isSelected());
-                    label3.setEnabled(checkBox1.isSelected());
-                    spinner2.setEnabled(checkBox1.isSelected());
+                    final boolean isSelected = showScaleBarCB.isSelected();
+                    label1.setEnabled(isSelected);
+                    text1.setEnabled(isSelected);
+                    label2.setEnabled(isSelected);
+                    spinner1.setEnabled(isSelected);
+                    label3.setEnabled(isSelected);
+                    spinner2.setEnabled(isSelected);
 
-                    setVisible(checkBox1.isSelected());
+                    setVisible(isSelected);
                 }
             });
 
-            controls = new Controls("Scale Bar", optionsPanel, false, false, detachPrimaryCheckbox ? checkBox1 : null);
+            controls = new Controls("Scale Bar", optionsPanel, false, false, detachPrimaryCheckbox ? showScaleBarCB : null);
         }
 
         controlsList.add(controls);

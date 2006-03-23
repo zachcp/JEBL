@@ -13,6 +13,13 @@ public class Controls {
         this(title, panel, isVisible, false, null);
     }
 
+    /**
+     * @param title
+     * @param panel
+     * @param isVisible
+     * @param isPinned
+     * @param primaryCheckbox the "main" on/off toggle, if any.
+     */
     public Controls(String title, JPanel panel, boolean isVisible, boolean isPinned, JCheckBox primaryCheckbox) {
         this.title = title;
         this.panel = panel;

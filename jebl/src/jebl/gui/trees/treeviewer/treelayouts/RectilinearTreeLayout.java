@@ -57,26 +57,31 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
-            slider1.setValue((int) (rootLength * 10000));
-            slider1.setPaintTicks(true);
-            slider1.setPaintLabels(true);
+            final int slider1max = 10000;
+            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, slider1max, 0);
+            slider1.setValue((int) (rootLength * slider1max));
+
+            // don't make sense without setting spacing
+            //slider1.setPaintTicks(true);
+            //slider1.setPaintLabels(true);
 
             slider1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     double value = slider1.getValue();
-                    setRootLength(value / 10000.0);
+                    setRootLength(value / slider1max);
                 }
             });
             optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
 
-            final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
-            slider2.setPaintTicks(true);
-            slider2.setPaintLabels(true);
+            final int slider2max = 100;
+            final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, slider2max, 0);
+            //slider2.setMajorTickSpacing(20);
+            //slider2.setPaintTicks(true);
+            //slider2.setPaintLabels(true);
 
             slider2.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    double value = 1.0 - (((double) slider2.getValue()) / 100.0);
+                    double value = 1.0 - (((double) slider2.getValue()) / slider2max);
                     setBranchCurveProportion(value, value);
                 }
             });
@@ -92,7 +97,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             });
             optionsPanel.addComponent(checkBox1);
 
-            controls = new Controls("Layout", optionsPanel, true);
+            controls = new Controls("Layout", optionsPanel, true, false, null);
         }
 
         controlsList.add(controls);

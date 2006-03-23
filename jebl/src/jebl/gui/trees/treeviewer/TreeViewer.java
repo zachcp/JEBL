@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -62,8 +61,6 @@ public class TreeViewer extends JPanel implements Printable {
 
         private final String name;
     }
-
-    ;
 
     public enum SearchType {
         CONTAINS("Contains"),
@@ -90,9 +87,6 @@ public class TreeViewer extends JPanel implements Printable {
     public TreeViewer() {
         this(new BasicControlPalette(defaultPaletteSize, BasicControlPalette.DisplayMode.ONLY_ONE_OPEN, true), SwingConstants.LEFT);
     }
-
-    static private Preferences defaultPreferences = Preferences.userNodeForPackage(TreeViewer.class);
-
 
     public TreeViewer(int CONTROL_PALETTE_ALIGNMENT, BasicControlPalette.DisplayMode mode) {
         this(new BasicControlPalette(defaultPaletteSize, mode, true), CONTROL_PALETTE_ALIGNMENT);

@@ -17,22 +17,25 @@ public interface TreeLayout extends ControlsProvider {
     enum AxisType {
         CONTINUOUS,
         DISCRETE
-    };
+    }
 
     /**
      * Set the tree for the layout0
+     *
      * @param tree
      */
     void setTree(Tree tree);
 
     /**
      * Add a listener for this layout
+     *
      * @param listener
      */
     void addTreeLayoutListener(TreeLayoutListener listener);
 
     /**
      * Remove a listener from this layout
+     *
      * @param listener
      */
     void removeTreeLayoutListener(TreeLayoutListener listener);
@@ -44,12 +47,14 @@ public interface TreeLayout extends ControlsProvider {
 
     /**
      * Return whether the x axis is continuous or discrete
+     *
      * @return the axis type
      */
     AxisType getXAxisType();
 
     /**
      * Return whether the y axis is continuous or discrete
+     *
      * @return the axis type
      */
     AxisType getYAxisType();
@@ -57,6 +62,7 @@ public interface TreeLayout extends ControlsProvider {
     /**
      * Return whether the two axis scales should be maintained
      * relative to each other
+     *
      * @return a boolean
      */
     boolean maintainAspectRatio();
@@ -65,6 +71,7 @@ public interface TreeLayout extends ControlsProvider {
      * Return the height (from the youngest tip) for the given
      * 2d point. Some layouts won't be able to produce this and
      * may throw an UnsupportedOperationException.
+     *
      * @param point
      * @return the height
      */
@@ -73,6 +80,7 @@ public interface TreeLayout extends ControlsProvider {
     /**
      * Return a line that defines a particular height. Some layouts
      * won't be able to produce this and may throw an UnsupportedOperationException.
+     *
      * @param height
      * @return the line
      */
@@ -81,6 +89,7 @@ public interface TreeLayout extends ControlsProvider {
     /**
      * Return a shape that defines a particular height interval. Some layouts
      * won't be able to produce this and may throw an UnsupportedOperationException.
+     *
      * @param height
      * @return the area
      */
@@ -88,6 +97,7 @@ public interface TreeLayout extends ControlsProvider {
 
     /**
      * Return the point in 2d space of the given node
+     *
      * @param node
      * @return the point
      */
@@ -95,14 +105,17 @@ public interface TreeLayout extends ControlsProvider {
 
     /**
      * Return the shape that represents the given branch
+     *
      * @param node
      * @return the branch shape
      */
     Shape getBranchPath(Node node);
 
     Line2D getTaxonLabelPath(Node node);
+
     Line2D getBranchLabelPath(Node node);
+
     Line2D getNodeLabelPath(Node node);
 
-	Shape getCalloutPath(Node node);
+    Shape getCalloutPath(Node node);
 }
