@@ -31,8 +31,6 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         HORIZONTAL
     }
 
-    ;
-
     public AxisType getXAxisType() {
         return AxisType.CONTINUOUS;
     }
