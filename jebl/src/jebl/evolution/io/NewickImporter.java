@@ -9,7 +9,8 @@ import jebl.evolution.trees.Tree;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -21,8 +22,9 @@ public class NewickImporter implements TreeImporter {
     /**
      * Constructor
      */
-    public NewickImporter(Reader reader) {
+    public NewickImporter(Reader reader, boolean unquotedLables) {
         helper = new ImportHelper(reader);
+        this.unquotedLables = unquotedLables;
     }
 
     public boolean hasTree() throws IOException, ImportException {
@@ -150,9 +152,12 @@ public class NewickImporter implements TreeImporter {
     private Node readExternalNode(SimpleRootedTree tree) throws IOException
     {
         String label = helper.readToken(":(),;");
+        while( unquotedLables && helper.getLastDelimiter() == ' ' ) {
+            label = label + " " + helper.readToken(":(),;");
+        }
         return tree.createExternalNode(Taxon.getTaxon(label));
     }
 
     private final ImportHelper helper;
-
+    private boolean unquotedLables;
 }

@@ -361,9 +361,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
         }
 
-        if (distanceMatrices == null) {
-            throw new MissingBlockException("DISTANCES block is missing");
-        }
+        assert distanceMatrices != null;
+       //   throw new MissingBlockException("DISTANCES block is missing");
 
         return distanceMatrices;
     }
@@ -401,9 +400,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			do {
 				token = helper.readToken(";");
 			} while ( !token.equalsIgnoreCase("END") && !token.equalsIgnoreCase("ENDBLOCK") );
-		} catch (EOFException e) { } // Doesn't matter if the End is missing
+		} catch (EOFException e) {
+            // Doesn't matter if the End is missing
+        }
 
-		nextBlock = NexusBlock.UNKNOWN;
+        nextBlock = NexusBlock.UNKNOWN;
 	}
 
 	/**
@@ -1139,7 +1140,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             try {
                 number = Double.parseDouble(value);
             } catch (NumberFormatException nfe2) {
-
+              //
             }
         }
         if (number != null) {
