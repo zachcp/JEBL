@@ -33,6 +33,16 @@ public class NexusExporter implements SequenceExporter {
         this.writer.println("#NEXUS");
     }
 
+    // name suitable for printing - quotes if necessary.
+    private static String safeTaxonName(Taxon tax) {
+        String name = tax.getName();
+
+        if(  ! name.matches("[a-zA-Z0-9_]+") ) {
+            name = "\"" + name + "\"";
+        }
+        return name;
+    }
+
     /**
      * Write a new taxa block and record them for later reference.
      * @param taxons
@@ -46,7 +56,8 @@ public class NexusExporter implements SequenceExporter {
 
         for (Taxon tax : taxons) {
             taxa.add(tax);
-            writer.print("\t" + tax.getName());
+
+            writer.print("\t" + safeTaxonName(tax));
         }
         writer.println(";\nend;\n");
     }
@@ -112,7 +123,7 @@ public class NexusExporter implements SequenceExporter {
             if( sequence.getSequenceType() != seqType || sequence.getLength() != seqLen ) {
                 throw new IllegalArgumentException();
             }
-            writer.print(sequence.getTaxon().getName() + "\t");
+            writer.print(safeTaxonName(sequence.getTaxon()) + "\t");
             writer.println(sequence.getString());
         }
         writer.println(";\nend;");
