@@ -196,6 +196,7 @@ public class TreeViewer extends JPanel implements Printable {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
 
+
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
         public void setControlPalette(ControlPalette controlPalette) {
@@ -284,6 +285,8 @@ public class TreeViewer extends JPanel implements Printable {
                 final String zoomValuePrefKey = "zoomvalue";
                 final int zoomValue = PREFS.getInt(zoomValuePrefKey, 0);
                 zoomSlider.setValue(zoomValue);
+                zoom = ((double) zoomValue) / 100.0;
+                zoomPending = true;
 
                 zoomSlider.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
@@ -302,6 +305,7 @@ public class TreeViewer extends JPanel implements Printable {
                 final String expansionValuePrefKey = "vzoomvalue";
                 final int expansionValue = PREFS.getInt(expansionValuePrefKey, 0);
                 verticalExpansionSlider.setValue(expansionValue);
+                verticalExpansion = ((double)expansionValue) / 100.0;
 
                 verticalExpansionSlider.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
@@ -397,15 +401,25 @@ public class TreeViewer extends JPanel implements Printable {
         treePane.setNodeLabelPainter(nodeLabelPainter);
     }
 
+    private boolean zoomPending = false;
+    private double zoom = 0.0, verticalExpansion = 0.0;
+
     public void setZoom(double zoom) {
-        setZoom(zoom, zoom);
+        this.zoom = zoom;
+        refreshZoom();
     }
 
     public void setVerticalExpansion(double verticalExpansion) {
-        setZoom(0.0, verticalExpansion);
+        this.verticalExpansion = verticalExpansion;
+        refreshZoom();
+    }
+
+    private void refreshZoom() {
+       setZoom(zoom, zoom + verticalExpansion);
     }
 
     public void setZoom(double xZoom, double yZoom) {
+
         Dimension viewportSize = viewport.getViewSize();
         Point position = viewport.getViewPosition();
 
@@ -522,6 +536,14 @@ public class TreeViewer extends JPanel implements Printable {
 
     public JComponent getExportableComponent() {
         return treePane;
+    }
+
+    public void paint(Graphics g) {
+        if( zoomPending  ) {
+           refreshZoom();
+           zoomPending = false;
+        }
+        super.paint(g);
     }
 
     protected RootedTree tree = null;
