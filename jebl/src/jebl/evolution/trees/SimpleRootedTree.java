@@ -17,6 +17,7 @@ import java.util.*;
  */
 public class SimpleRootedTree implements RootedTree {
 
+
     public SimpleRootedTree() {
     }
 
@@ -155,6 +156,7 @@ public class SimpleRootedTree implements RootedTree {
     public Node getRootNode() {
         return rootNode;
     }
+
 
     /**
      * @return a set of all nodes that have degree 1.
@@ -334,7 +336,15 @@ public class SimpleRootedTree implements RootedTree {
 
     }
 
-	// Attributable IMPLEMENTATION
+    public void setConceptuallyUnrooted(boolean intent) {
+        conceptuallyUnrooted = intent;
+    }
+
+    public boolean conceptuallyUnrooted() {
+        return conceptuallyUnrooted;
+    }
+
+    // Attributable IMPLEMENTATION
 
 	public void setAttribute(String name, Object value) {
 		if (helper == null) {
@@ -384,4 +394,5 @@ public class SimpleRootedTree implements RootedTree {
     private boolean hasHeights = false;
     private boolean hasLengths = false;
 
+    private boolean conceptuallyUnrooted = false;
 }

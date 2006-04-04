@@ -384,6 +384,8 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
                 consTree.reRootWithOutgroup(out, a);
             }
 
+            consTree.setConceptuallyUnrooted(true);
+
             return consTree;
         } catch (Graph.NoEdgeException e) {
             // bug

@@ -16,10 +16,9 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -31,17 +30,26 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public static final String NODE_HEIGHTS = "Node Heights";
     public static final String BRANCH_LENGTHS = "Branch Lengths";
 
-    public BasicLabelPainter(String title, Tree tree) {
-        this(title, tree, false, 6);
+
+    public BasicLabelPainter(String title, Tree tree, PainterIntent intent) {
+        this(title, tree, intent, 6);
     }
 
-    public BasicLabelPainter(String title, Tree tree, boolean includeTaxonNames, int defaultSize) {
+    public enum PainterIntent {
+        NODE,
+        BRANCH,
+        TIP
+    }
+
+    public BasicLabelPainter(String title, Tree tree, PainterIntent intent, int defaultSize) {
         this.title = title;
 
         this.defaultFontSize = defaultSize;
         taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
 
         this.tree = tree;
+
+        boolean hasNumericAttributs = false;
 
         Set<String> names = new TreeSet<String>();
         for (Node node : tree.getNodes()) {
@@ -51,17 +59,35 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         this.attribute = null;
 
         List<String> sources = new ArrayList<String>();
-        if (includeTaxonNames) {
-            sources.add(TAXON_NAMES);
+        boolean wantHeightsIfPossible = false;
+        boolean wantBranchesIfPossible = false;
+        switch( intent ) {
+            case TIP: {
+               sources.add(TAXON_NAMES);
+               wantHeightsIfPossible = true;
+               break;
+            }
+            case NODE: {
+                wantHeightsIfPossible = true;
+                break;
+            }
+            case BRANCH: {
+              wantBranchesIfPossible = true;
+                break;
+            }
         }
 
-        if (tree instanceof RootedTree && ((RootedTree) tree).hasHeights()) {
-            sources.add(NODE_HEIGHTS);
-            this.attribute = NODE_HEIGHTS;
-        }
+        if (tree instanceof RootedTree ) {
+            final RootedTree rtree = (RootedTree) tree;
+            if( wantHeightsIfPossible && rtree.hasHeights() && !rtree.conceptuallyUnrooted() ) {
+                sources.add(NODE_HEIGHTS);
+                hasNumericAttributs = true;
+            }
 
-        if (tree instanceof RootedTree && ((RootedTree) tree).hasLengths()) {
-            sources.add(BRANCH_LENGTHS);
+            if( wantBranchesIfPossible && rtree.hasLengths()) {
+                sources.add(BRANCH_LENGTHS);
+                hasNumericAttributs = true;
+            }
         }
 
         sources.addAll(names);
@@ -74,37 +100,51 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         this.attributes = new String[sources.size()];
         sources.toArray(this.attributes);
+
+        if( hasNumericAttributs ) {
+          formatter = new NumberFormatter(4);
+        }
     }
 
     protected String getLabel(Node node) {
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
             return tree.getTaxon(node).getName();
-        } else if (attribute.equalsIgnoreCase(NODE_HEIGHTS) && tree instanceof RootedTree) {
-            return formatter.getFormattedValue(((RootedTree) tree).getHeight(node));
-        } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) && tree instanceof RootedTree) {
-            return formatter.getFormattedValue(((RootedTree) tree).getLength(node));
-        } else {
-            Object value = node.getAttribute(attribute);
-            if (value != null) {
-                return value.toString();
+        }
+
+        if ( tree instanceof RootedTree) {
+            final RootedTree rtree = (RootedTree) tree;
+
+            if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
+                return formatter.getFormattedValue(rtree.getHeight(node));
+            } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
+                return formatter.getFormattedValue(rtree.getLength(node));
             }
+        }
+
+        Object value = node.getAttribute(attribute);
+        if (value != null) {
+            return value.toString();
         }
         return null;
     }
 
     private int defaultFontSize;
+    private int defaultDigits = 4;
 
     public boolean isVisible() {
         return visible;
     }
 
+    private static final String isOPenKey = "_isopen";
+
     public void setVisible(boolean visible) {
         this.visible = visible;
         firePainterChanged();
+        PREFS.putBoolean(getTitle() + isOPenKey, visible);
     }
 
     public void calibrate(Graphics2D g2, Node item) {
-        Font oldFont = g2.getFont();
+        final Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
 
         FontMetrics fm = g2.getFontMetrics();
@@ -117,7 +157,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             preferredWidth = rect.getWidth();
         }
 
-        yOffset = (float) (fm.getAscent());
+        yOffset = (float)fm.getAscent();
 
         g2.setFont(oldFont);
     }
@@ -130,8 +170,19 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return preferredHeight;
     }
 
+    public double getHeightBound() {
+        return preferredHeight + yOffset;
+    }
+
     public void setFontSize(float size) {
         taxonLabelFont = taxonLabelFont.deriveFont(size);
+        firePainterChanged();
+    }
+
+    private void setSignificantDigits(int digits) {
+        assert formatter != null;
+        
+        formatter.setSignificantFigures(digits);
         firePainterChanged();
     }
 
@@ -174,9 +225,12 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
             float xOffset;
+            float y = yOffset + (float) bounds.getY();
             switch (justification) {
                 case CENTER:
-                    xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+                    xOffset = (float)(-rect.getWidth()/2.0);
+                    y = yOffset + (float) rect.getY();
+                    //xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
                     break;
                 case FLUSH:
                 case LEFT:
@@ -189,7 +243,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                     throw new IllegalArgumentException("Unrecognized alignment enum option");
             }
 
-            g2.drawString(label, xOffset, yOffset + (float) bounds.getY());
+            g2.drawString(label, xOffset, y);
         }
 
         g2.setFont(oldFont);
@@ -208,6 +262,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         // nothing to do
     }
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(BasicLabelPainter.class);
+
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
         List<Controls> controlsList = new ArrayList<Controls>();
@@ -215,49 +271,94 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JCheckBox checkBox1 = new JCheckBox("Show " + getTitle());
+            final JCheckBox showTextCHeckBox = new JCheckBox("Show " + getTitle());
             if (! detachPrimaryCheckbox) {
-                optionsPanel.addComponent(checkBox1);
+                optionsPanel.addComponent(showTextCHeckBox);
             }
 
-            checkBox1.setSelected(isVisible());
+            visible = PREFS.getBoolean(getTitle() + isOPenKey, isVisible());
+            showTextCHeckBox.setSelected(visible);
 
-            final JComboBox combo1 = new JComboBox(getAttributes());
+            showTextCHeckBox.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    final boolean selected = showTextCHeckBox.isSelected();
+                    //label1.setEnabled(selected);
+                    //fontSizeSpinner.setEnabled(selected);
+                    //label2.setEnabled(selected);
+                    //digitsSpinner.setEnabled(selected);
+                    setVisible(selected);
+                }
+            });
+
+            final String whatPrefKey = getTitle() + "_whatToDisplay";
+            String[] attributes = getAttributes();
+            final JComboBox combo1 = new JComboBox(attributes);
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     String attribute = (String) combo1.getSelectedItem();
                     setAttribute(attribute);
+                    PREFS.put(whatPrefKey, attribute);
                 }
             });
+
+            final String whatToDisplay = PREFS.get(whatPrefKey, null);
+            if( whatToDisplay != null ) {
+                int i = Arrays.asList(attributes).indexOf(whatToDisplay);
+                if( i >= 0 ) {
+                    combo1.setSelectedIndex(i);
+                }
+            }
 
             optionsPanel.addComponentWithLabel("Display:", combo1);
-            final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
+            final JSpinner fontSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
 
-            final JLabel label1 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
-            label1.setEnabled(checkBox1.isSelected());
-            spinner1.setEnabled(checkBox1.isSelected());
+            final JLabel label1 = optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
+            //final boolean xselected = showTextCHeckBox.isSelected();
+            //label1.setEnabled(selected);
+            //fontSizeSpinner.setEnabled(selected);
 
-            checkBox1.addChangeListener(new ChangeListener() {
+            final String fontSizePrefKey = getTitle() + "_fontsize";
+            final float fontsize = PREFS.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
+            setFontSize(fontsize);
+            fontSizeSpinner.setValue(fontsize);
+
+            fontSizeSpinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    label1.setEnabled(checkBox1.isSelected());
-                    spinner1.setEnabled(checkBox1.isSelected());
-                    setVisible(checkBox1.isSelected());
+                    final float size = ((Double) fontSizeSpinner.getValue()).floatValue();
+                    setFontSize(size);
+                    PREFS.putFloat(fontSizePrefKey, size);
                 }
             });
 
-            spinner1.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    setFontSize(((Double) spinner1.getValue()).floatValue());
-                }
-            });
+            final JSpinner digitsSpinner = new JSpinner(new SpinnerNumberModel(defaultDigits, 2, 14, 1));
 
-            controls = new Controls(getTitle(), optionsPanel, false, false, detachPrimaryCheckbox ? checkBox1 : null);
+            if( formatter != null ) {
+                final JLabel label2 = optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
+                // label2.setEnabled(selected);
+                //  digitsSpinner.setEnabled(selected);
+
+                final String digitsPrefKey = getTitle() + "_sigDigits";
+                final int digits = PREFS.getInt(digitsPrefKey, defaultDigits);
+                setSignificantDigits(digits);
+                digitsSpinner.setValue(digits);
+
+                digitsSpinner.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        final int digits = (Integer)digitsSpinner.getValue();
+                        setSignificantDigits(digits);
+                        PREFS.putInt(digitsPrefKey, digits);
+                    }
+                });
+            }
+
+            controls = new Controls(getTitle(), optionsPanel, false, false, detachPrimaryCheckbox ? showTextCHeckBox : null);
         }
 
         controlsList.add(controls);
 
         return controlsList;
     }
+
 
     public void setSettings(ControlsSettings settings) {
     }
@@ -285,7 +386,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private boolean visible = true;
 
-    private NumberFormatter formatter = new NumberFormatter(6);
+    private NumberFormatter formatter = null;
 
     private final Tree tree;
     protected String attribute;

@@ -1,11 +1,11 @@
 package jebl.evolution.trees;
 
+import jebl.evolution.align.PairwiseAligner;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
-import jebl.evolution.align.PairwiseAligner;
-import jebl.util.ProgressListener;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 import java.util.List;
 
@@ -70,21 +70,21 @@ public class TreeBuilder {
      * @return A tree builder using method and distance matrix
      */
     static public ClusteringTreeBuilder getBuilder(Method method, DistanceMatrix distances) {
-        ClusteringTreeBuilder c;
+        ClusteringTreeBuilder builder;
         switch( method ) {
             case UPGMA:
             {
-                c = new UPGMATreeBuilder(distances);
+                builder = new UPGMATreeBuilder(distances);
                 break;
             }
             case NEIGHBOR_JOINING:
             default:
             {
-                c = new NeighborJoiningBuilder(distances);
+                builder = new NeighborJoiningBuilder(distances);
                 break;
             }
         }
-        return c;
+        return builder;
     }
 
     static public Tree build(Alignment alignment, Method method, DistanceModel model, ProgressListener progress) {

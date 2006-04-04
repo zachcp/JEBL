@@ -1,9 +1,9 @@
 package jebl.gui.trees.treeviewer.painters;
 
+import org.virion.jam.controlpanels.ControlsProvider;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-
-import org.virion.jam.controlpanels.ControlsProvider;
 
 
 /**
@@ -36,6 +36,7 @@ public interface Painter<T> extends ControlsProvider {
 
     double getPreferredWidth();
     double getPreferredHeight();
+    double getHeightBound();
 
     void addPainterListener(PainterListener listener);
     void removePainterListener(PainterListener listener);

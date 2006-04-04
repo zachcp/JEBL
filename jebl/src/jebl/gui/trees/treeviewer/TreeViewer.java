@@ -39,12 +39,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
 public class TreeViewer extends JPanel implements Printable {
+
 
     public enum TreeLayoutType {
         RECTILINEAR("Rectangle"),
@@ -80,7 +82,7 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     static final int defaultPaletteSize = 200;
-
+    private TreeLayoutType treeLayoutType;
     /**
      * Creates new TreeViewer
      */
@@ -133,7 +135,7 @@ public class TreeViewer extends JPanel implements Printable {
         } else {
             add(controlPalette.getPanel(), BorderLayout.EAST);
         }
-        setTreeLayoutType(TreeLayoutType.RECTILINEAR);
+        setTreeLayoutType(TreeLayoutType.values()[PREFS.getInt(treeLayoutPrefKey,0)]) ; // TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
@@ -159,22 +161,29 @@ public class TreeViewer extends JPanel implements Printable {
             tree = Utils.rootTheTree(inTree);
         }
 
-        //System.out.println(Utils.toNewick(tree));
         treePane.setTree(tree);
 
-        BasicLabelPainter taxonLabelPainter = new BasicLabelPainter("Tip Labels", tree, true, defaultLabelSize);
+        BasicLabelPainter taxonLabelPainter =
+                new BasicLabelPainter("Tip Labels", tree, BasicLabelPainter.PainterIntent.TIP, defaultLabelSize);
         taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
         treePane.setTaxonLabelPainter(taxonLabelPainter);
 
-        BasicLabelPainter nodeLabelPainter = new BasicLabelPainter("Node Labels", tree);
-        nodeLabelPainter.setVisible(false);
-        treePane.setNodeLabelPainter(nodeLabelPainter);
+        BasicLabelPainter nodeLabelPainter =
+                new BasicLabelPainter("Node Labels", tree, BasicLabelPainter.PainterIntent.NODE, defaultLabelSize);
 
-        BasicLabelPainter branchLabelPainter = new BasicLabelPainter("Branch Labels", tree);
-        branchLabelPainter.setVisible(false);
-        treePane.setBranchLabelPainter(branchLabelPainter);
+        // don't show controls when there is nothing to choose from
+        treePane.setNodeLabelPainter(nodeLabelPainter.getAttributes().length > 0 ? nodeLabelPainter : null);
+
+        BasicLabelPainter branchLabelPainter =
+                new BasicLabelPainter("Branch Labels", tree, BasicLabelPainter.PainterIntent.BRANCH, defaultLabelSize);
+
+        treePane.setBranchLabelPainter(branchLabelPainter.getAttributes().length > 0 ? branchLabelPainter : null);
 
         treePane.setScaleBarPainter(new ScaleBarPainter());
+
+         if( tree.conceptuallyUnrooted() && treeLayoutType != TreeLayoutType.RADIAL ) {
+           setTreeLayoutType(TreeLayoutType.RADIAL);
+        }
     }
 
     public void setTree(Tree tree) {
@@ -185,10 +194,18 @@ public class TreeViewer extends JPanel implements Printable {
         return controlPalette;
     }
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
+
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
         public void setControlPalette(ControlPalette controlPalette) {
             // do nothing
+        }
+
+        private void setExpansion() {
+            final boolean enabled = !treePane.maintainAspectRatio();
+            verticalExpansionLabel.setEnabled(enabled);
+            verticalExpansionSlider.setEnabled(enabled);
         }
 
         public java.util.List<Controls> getControls(boolean detachPrimaryCheckbox) {
@@ -198,8 +215,8 @@ public class TreeViewer extends JPanel implements Printable {
             if (controls == null) {
                 OptionsPanel optionsPanel = new OptionsPanel();
 
-                JPanel panel1 = new JPanel();
-                panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+                JPanel treeViewPanel = new JPanel();
+                treeViewPanel.setLayout(new BoxLayout(treeViewPanel, BoxLayout.LINE_AXIS));
                 Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
                 Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
                 Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
@@ -213,14 +230,50 @@ public class TreeViewer extends JPanel implements Printable {
                 buttonGroup.add(toggle1);
                 buttonGroup.add(toggle2);
                 buttonGroup.add(toggle3);
-                toggle1.setSelected(true);
-                panel1.add(Box.createHorizontalStrut(0));
-                panel1.add(toggle1);
-                panel1.add(toggle2);
-                panel1.add(toggle3);
-                panel1.add(Box.createHorizontalStrut(0));
 
-                optionsPanel.addSpanningComponent(panel1);
+                if( ! tree.conceptuallyUnrooted() ) {
+                    switch ( TreeLayoutType.values()[PREFS.getInt(treeLayoutPrefKey,0)] ) {
+                        case RECTILINEAR:  toggle1.setSelected(true); break;
+                        case POLAR:        toggle2.setSelected(true); break;
+                        case RADIAL:       toggle3.setSelected(true); break;
+                    }
+                } else {
+                  toggle3.setSelected(true);
+                }
+
+                treeViewPanel.add(Box.createHorizontalStrut(0));
+
+                treeViewPanel.add(toggle1);
+                treeViewPanel.add(toggle2);
+                treeViewPanel.add(toggle3);
+                treeViewPanel.add(Box.createHorizontalStrut(0));
+                optionsPanel.addSpanningComponent(treeViewPanel);
+
+                if( tree.conceptuallyUnrooted() ) {
+                    final JCheckBox allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
+                    allowCB.setSelected(false);
+                    optionsPanel.addSpanningComponent(allowCB);
+                    //allowCB.setToolTipText("Enable all layouts for unrooted trees");
+                    allowCB.addChangeListener(new ChangeListener() {
+                        public void stateChanged(ChangeEvent e) {
+                            final boolean s = allowCB.isSelected();
+                            toggle1.setEnabled(s);
+                            toggle2.setEnabled(s);
+                            toggle3.setEnabled(s);
+                            if( !s ) {
+                                setTreeLayoutType(TreeLayoutType.RADIAL);
+                                setExpansion();
+                                toggle3.setSelected(true);
+                                toggle1.setSelected(false);
+                                toggle2.setSelected(false);
+                            }
+                        }
+                    } );
+
+                    toggle1.setEnabled(false);
+                    toggle2.setEnabled(false);
+                    toggle3.setEnabled(false);
+                }
 
                 zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
                 zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -228,9 +281,15 @@ public class TreeViewer extends JPanel implements Printable {
                 zoomSlider.setPaintTicks(true);
                 zoomSlider.setPaintLabels(true);
 
+                final String zoomValuePrefKey = "zoomvalue";
+                final int zoomValue = PREFS.getInt(zoomValuePrefKey, 0);
+                zoomSlider.setValue(zoomValue);
+
                 zoomSlider.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        setZoom(((double) zoomSlider.getValue()) / 100.0);
+                        final int value = zoomSlider.getValue();
+                        setZoom(((double) value) / 100.0);
+                        PREFS.putInt(zoomValuePrefKey, value);
                     }
                 });
 
@@ -240,39 +299,41 @@ public class TreeViewer extends JPanel implements Printable {
                 verticalExpansionSlider.setPaintTicks(true);
                 verticalExpansionSlider.setPaintLabels(true);
 
+                final String expansionValuePrefKey = "vzoomvalue";
+                final int expansionValue = PREFS.getInt(expansionValuePrefKey, 0);
+                verticalExpansionSlider.setValue(expansionValue);
+
                 verticalExpansionSlider.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        setVerticalExpansion(((double) verticalExpansionSlider.getValue()) / 100.0);
+                        final int value = verticalExpansionSlider.getValue();
+                        setVerticalExpansion(((double) value) / 100.0);
+                        PREFS.putInt(expansionValuePrefKey, value);
                     }
                 });
 
-                final JLabel label = new JLabel("Expansion:");
-                optionsPanel.addComponents(label, false, verticalExpansionSlider, true);
-                label.setEnabled(!treePane.maintainAspectRatio());
-                verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+                verticalExpansionLabel = new JLabel("Expansion:");
+                optionsPanel.addComponents(verticalExpansionLabel, false, verticalExpansionSlider, true);
+                setExpansion();
 
                 toggle1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         if (toggle1.isSelected())
                             setTreeLayoutType(TreeLayoutType.RECTILINEAR);
-                        label.setEnabled(!treePane.maintainAspectRatio());
-                        verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+                        setExpansion();
                     }
                 });
                 toggle2.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         if (toggle2.isSelected())
                             setTreeLayoutType(TreeLayoutType.POLAR);
-                        label.setEnabled(!treePane.maintainAspectRatio());
-                        verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+                        setExpansion();
                     }
                 });
                 toggle3.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         if (toggle3.isSelected())
                             setTreeLayoutType(TreeLayoutType.RADIAL);
-                        label.setEnabled(!treePane.maintainAspectRatio());
-                        verticalExpansionSlider.setEnabled(!treePane.maintainAspectRatio());
+                        setExpansion();
                     }
                 });
 
@@ -296,11 +357,16 @@ public class TreeViewer extends JPanel implements Printable {
 
         private JSlider zoomSlider;
         private JSlider verticalExpansionSlider;
+        private JLabel verticalExpansionLabel;
 
         private Controls controls = null;
     };
 
+    static private String treeLayoutPrefKey = "treelayout";
+
+
     public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
+        this.treeLayoutType = treeLayoutType;
         TreeLayout treeLayout;
         switch (treeLayoutType) {
             case RECTILINEAR:
@@ -315,6 +381,7 @@ public class TreeViewer extends JPanel implements Printable {
             default:
                 throw new IllegalArgumentException("Unknown TreeLayoutType: " + treeLayoutType);
         }
+        PREFS.putInt(treeLayoutPrefKey, treeLayoutType.ordinal());
         treePane.setTreeLayout(treeLayout);
     }
 

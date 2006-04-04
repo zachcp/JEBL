@@ -139,6 +139,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         return preferredHeight;
     }
 
+    public double getHeightBound() {
+        return preferredHeight + yOffset;
+    }
+
     public void setScaleRange(double scaleRange) {
         this.scaleRange = scaleRange;
         firePainterChanged();

@@ -40,12 +40,15 @@ public final class Utils {
         buffer.append(" [&");
         boolean first = true;
         for (Map.Entry<String, Object> o : map.entrySet()) {
-            if (! first) buffer.append(",");
+            if (! first) {
+                buffer.append(",");
+            }
             first = false;
+
             String val = o.getValue().toString();
             // we have no way to quote commas right now, throw them away if inside value.
             val = val.replace(',', ' ');
-            buffer.append(o.getKey() + "=" + val);
+            buffer.append(o.getKey()).append("=").append(val);
         }
         buffer.append("] ");
     }
@@ -63,18 +66,17 @@ public final class Utils {
         } else {
             buffer.append('(');
             List<Node> children = tree.getChildren(node);
-            for (int i = 0; i < children.size() - 1; i++) {
+            final int last = children.size() - 1;
+            for (int i = 0; i < children.size(); i++) {
                 toNewick(tree, children.get(i), buffer);
-                buffer.append(',');
+                buffer.append(i == last ? ')' : ',');
             }
-            toNewick(tree, children.get(children.size() - 1), buffer);
-            buffer.append(")");
 
             Node parent = tree.getParent(node);
             // Don't write root length. This is ignored elsewhere and the nexus importer fails
             // whet it is present.
             if (parent != null) {
-                buffer.append(":" + tree.getLength(node));
+                buffer.append(":").append(tree.getLength(node));
             }
             addMetaComment(node, buffer);
         }
@@ -238,7 +240,7 @@ public final class Utils {
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
         if (d2.size() == 1) {
-            return new RootedFromUnrooted(tree, d2.iterator().next());
+            return new RootedFromUnrooted(tree, d2.iterator().next(), true);
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
@@ -248,7 +250,7 @@ public final class Utils {
 
         // Root at central internal node. The root of the tree has at least 3 children.
         // WARNING: using the implementation fact that childern of RootedFromUnrooted are in fact nodes from tree.
-        return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0));
+        return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
     }
 
     public static RootedTree rootTreeAtCenter(Tree tree) {
@@ -328,7 +330,7 @@ public final class Utils {
             double d = (minOfMaxes - distToSecond) / 2;
             if (d > tree.getEdgeLength(best.first, best.second) ||
                     Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2) {
-                return new RootedFromUnrooted(tree, best.first);
+                return new RootedFromUnrooted(tree, best.first, true);
             }
 
             return new RootedFromUnrooted(tree, best.first, best.second, d);
@@ -447,4 +449,16 @@ public final class Utils {
         };
     }
 
+    // debig aid - print a representetion of node omitrting branches
+    static public String DEBUGsubTreeRep(RootedTree t, Node n) {
+        if (t.isExternal(n)) {
+            return t.getTaxon(n).getName();
+        }
+        StringBuilder b = new StringBuilder();
+        for (Node x : t.getChildren(n)) {
+            if (b.length() > 0) b.append(",");
+            b.append(DEBUGsubTreeRep(t, x));
+        }
+        return '(' + b.toString() + ')';
+    }
 }

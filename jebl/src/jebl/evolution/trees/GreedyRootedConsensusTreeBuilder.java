@@ -61,20 +61,6 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
 
     private final boolean debug = false;
 
-    // debug
-    private String subTreeRep(RootedTree t, Node n) {
-
-        if (t.isExternal(n)) {
-            return t.getTaxon(n).getName();
-        }
-        StringBuilder b = new StringBuilder();
-        for (Node x : t.getChildren(n)) {
-            if (b.length() > 0) b.append(",");
-            b.append(subTreeRep(t, x));
-        }
-        return '(' + b.toString() + ')';
-    }
-
     private String tipsAsText(FixedBitSet b) {
         String names = "(";
         for (int i = b.nextOnBit(0); i >= 0; i = b.nextOnBit(i + 1)) {
@@ -132,7 +118,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
         Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();
         for (RootedTree tree : rtrees) {
             if (debug) {
-                System.out.println("Tree: " + subTreeRep(tree, tree.getRootNode()));
+                System.out.println("Tree: " + Utils.DEBUGsubTreeRep(tree, tree.getRootNode()));
             }
             rootedSupport(tree, tree.getRootNode(), support);
         }
@@ -264,7 +250,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
                     detached.setAttribute(supportAttributeName, 100 * psupport);
 
                     if (debug) {
-                        System.out.println("detached:" + subTreeRep(consTree, detached) + " len " + height + " sup " + psupport);
+                        System.out.println("detached:" + Utils.DEBUGsubTreeRep(consTree, detached) + " len " + height + " sup " + psupport);
                         System.out.println("tree: " + Utils.toNewick(consTree));
                     }
 
@@ -283,6 +269,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
         }
 
         insureConsistency(consTree, consTree.getRootNode());
+ 
         return consTree;
     }
 }

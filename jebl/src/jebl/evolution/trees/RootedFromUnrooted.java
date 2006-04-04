@@ -39,6 +39,7 @@ public class RootedFromUnrooted implements RootedTree {
      * branch lengths from synthetic root to it's children (when rooted between nodes)
      */
     private double rootToLeft, rootToRight;
+    private boolean intentUnrooted;
 
     /**
      * Set <arg>parent</arg> as parent of <arg>node</arg>, and recursivly set parents for node subtree
@@ -60,9 +61,10 @@ public class RootedFromUnrooted implements RootedTree {
      * @param source
      * @param root
      */
-    public RootedFromUnrooted(Tree source, Node root) {
+    public RootedFromUnrooted(Tree source, Node root, boolean intent) {
        this.source = source;
        this.root = root;
+       intentUnrooted = intent;
        topLeft = topRight  = null;
        rootToLeft = rootToRight = 0.0;
        parents = new HashMap<Node, Node>();
@@ -80,6 +82,7 @@ public class RootedFromUnrooted implements RootedTree {
      */
     public RootedFromUnrooted(Tree source, Node left, Node right, double fromLeft) {
         this.source = source;
+        intentUnrooted = false;
         topLeft = left;
         topRight = right;
         rootToLeft = fromLeft;
@@ -154,6 +157,10 @@ public class RootedFromUnrooted implements RootedTree {
 
     public Node getRootNode() {
         return root;
+    }
+
+    public boolean conceptuallyUnrooted() {
+        return intentUnrooted;
     }
 
     public Set<Node> getExternalNodes() {

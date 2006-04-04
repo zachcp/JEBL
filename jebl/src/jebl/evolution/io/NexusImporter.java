@@ -292,34 +292,25 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	public boolean startReadingTrees() throws IOException, ImportException
-	{
-		boolean done = false;
+    {
+        treeTaxonList = null;
 
-		treeTaxonList = null;
+        while (true) {
+            try {
+                NexusBlock block = findNextBlock();
+                switch( block )  {
+                    case TAXA: treeTaxonList = readTaxaBlock(); break;
+                    case TREES: return true;
+                        // Ignore the block..
+                    default: break;
+                }
+            } catch (EOFException ex) {
+                break;
+            }
+        }
 
-		while (!done) {
-			try {
-
-				NexusBlock block = findNextBlock();
-
-				if (block == NexusBlock.TAXA) {
-
-					treeTaxonList = readTaxaBlock();
-
-				} else if (block == NexusBlock.TREES) {
-
-					return true;
-				} else {
-					// Ignore the block..
-				}
-
-			} catch (EOFException ex) {
-				done = true;
-			}
-		}
-
-		return false;
-	}
+        return false;
+    }
 
     // **************************************************************
     // DistanceMatrixImporter IMPLEMENTATION
@@ -361,7 +352,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
         }
 
-        assert distanceMatrices != null;
+       // assert distanceMatrices != null;
        //   throw new MissingBlockException("DISTANCES block is missing");
 
         return distanceMatrices;
@@ -380,7 +371,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		boolean found = false;
 
 		do {
-
 			token = helper.readToken();
 
 			if ( (ignoreCase && token.equalsIgnoreCase(query)) || token.equals(query) ) {
@@ -886,17 +876,16 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		String[] lastToken = new String[1];
 		translationList = readTranslationList(taxonList, lastToken);
 
-		boolean done = false;
-		do {
+        while( true ) {
 
-			RootedTree tree = readNextTree(lastToken);
+            RootedTree tree = readNextTree(lastToken);
 
-			if (tree != null) {
-				trees.add(tree);
-			} else {
-				done = true;
-			}
-		} while ( !done);
+            if (tree == null) {
+                break;
+            }
+
+            trees.add(tree);
+        }
 
 		if (trees.size() == 0) {
 			throw new ImportException.BadFormatException("No trees defined in TREES block");
@@ -958,7 +947,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             SimpleRootedTree tree = null;
             String token = lastToken[0];
 
-            if ( token.equalsIgnoreCase("UTREE") || token.equalsIgnoreCase("TREE")) {
+            final boolean isUtree = token.equalsIgnoreCase("UTREE");
+            if ( isUtree || token.equalsIgnoreCase("TREE")) {
 
                 if (helper.nextCharacter() == '*') {
                     // Star is used to specify a default tree - ignore it
@@ -981,8 +971,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     final String comment = helper.getLastMetaComment();
                     helper.clearLastMetaComment();
 
-	                tree = new SimpleRootedTree();
-	                readInternalNode(tree);
+                    tree = new SimpleRootedTree();
+                    readInternalNode(tree);
 
                     // save name as attribute
                     tree.setAttribute("name", treeName);
@@ -1007,6 +997,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                             tree.setAttribute("comment", comment);
                         }
                     }
+
+                    tree.setConceptuallyUnrooted(isUtree);
+
                 } catch (EOFException e) {
                     // If we reach EOF we may as well return what we have?
                     return tree;

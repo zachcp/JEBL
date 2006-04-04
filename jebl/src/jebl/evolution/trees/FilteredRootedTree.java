@@ -22,7 +22,11 @@ public abstract class FilteredRootedTree implements RootedTree {
 		return source;
 	}
 
-	public List<Node> getChildren(Node node) {
+    public boolean conceptuallyUnrooted() {
+        return source.conceptuallyUnrooted();
+    }
+
+    public List<Node> getChildren(Node node) {
 	    return source.getChildren(node);
     }
 

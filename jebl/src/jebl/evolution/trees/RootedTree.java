@@ -68,4 +68,13 @@ public interface RootedTree extends Tree {
      * @return the root of the tree.
      */
     Node getRootNode();
+
+
+    /**
+     * Due to current implementation limitations, trees store "branch" information in nodes. So, internally rooted trees
+     * are genetrated when un-rooted would be more natural.
+     *
+     * @return true if tree(s) are to be viewed as unrooted
+     */
+    boolean conceptuallyUnrooted();
 }

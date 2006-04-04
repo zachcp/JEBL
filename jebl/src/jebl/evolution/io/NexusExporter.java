@@ -10,10 +10,7 @@ import jebl.evolution.trees.Utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Export sequences and trees to Nexus format.
@@ -35,12 +32,7 @@ public class NexusExporter implements SequenceExporter {
 
     // name suitable for printing - quotes if necessary.
     private static String safeTaxonName(Taxon tax) {
-        String name = tax.getName();
-
-        if(  ! name.matches("[a-zA-Z0-9_]+") ) {
-            name = "\"" + name + "\"";
-        }
-        return name;
+        return ImportHelper.safeName(tax.getName());
     }
 
     /**
@@ -144,11 +136,26 @@ public class NexusExporter implements SequenceExporter {
             }
             boolean isRooted = t instanceof RootedTree;
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
-            
+
             Object name = t.getAttribute("name");
+            String metacomment = null;
+            for( Map.Entry<String, Object> e : t.getAttributeMap().entrySet() ) {
+                if( !e.getKey().equals("name") ) {
+                    if( metacomment == null ) {
+                        metacomment = "";
+                    } else {
+                        metacomment += ",";
+                    }
+                    metacomment = metacomment + e.getKey() + '=' +
+                            ImportHelper.safeName(e.getValue().toString());
+                }
+            }
+
             ++nt;
-            writer.println("\t" + (isRooted ? "tree " : "utree ") + ((name != null) ? (String)name : "tree_" + nt)
-                    + "=" + Utils.toNewick(rtree) + ";");
+            final String treeName = (name != null) ? name.toString() : "tree_" + nt;
+            writer.println("\t" + (isRooted && !rtree.conceptuallyUnrooted() ? "" : "u") + "tree " + treeName
+                           + "=" + ((metacomment != null) ? ('[' + metacomment + ']') : "") +
+                           Utils.toNewick(rtree) + ";");
         }
         writer.println("end;");
     }

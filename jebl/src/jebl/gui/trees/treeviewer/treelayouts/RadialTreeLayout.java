@@ -5,7 +5,6 @@ import jebl.evolution.graphs.Node;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
-import org.virion.jam.panels.OptionsPanel;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -48,8 +47,11 @@ public class RadialTreeLayout extends AbstractTreeLayout {
     }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
+        return new ArrayList<Controls>();
 
+        /*
         List<Controls> controlsList = new ArrayList<Controls>();
+
 
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
@@ -60,6 +62,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         controlsList.add(controls);
 
         return controlsList;
+        */
     }
 
     public void setSettings(ControlsSettings settings) {
@@ -76,25 +79,34 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         taxonLabelPaths.clear();
 
         try {
-            Node root = this.tree.getRootNode();
+            final Node root = tree.getRootNode();
 
             constructNode(root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0);
 
-            Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
+            if( !tree.conceptuallyUnrooted() ) {
+                Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
 
-            // add the branchPath to the map of branch paths
-            branchPaths.put(root, branchPath);
+                // add the branchPath to the map of branch paths
+                branchPaths.put(root, branchPath);
+            }
 
         } catch (Graph.NoEdgeException e) {
             e.printStackTrace();
         }
     }
 
-    private Point2D constructNode(Node node, double angleStart, double angleFinish, double xPosition, double yPosition, double length) throws Graph.NoEdgeException {
 
-        double branchAngle = (angleStart + angleFinish) / 2.0;
 
-        Point2D nodePoint = new Point2D.Double(xPosition + (length * Math.cos(branchAngle)), yPosition + (length * Math.sin(branchAngle)));
+    private Point2D constructNode(Node node, double angleStart, double angleFinish, double xPosition,
+                                  double yPosition, double length) throws Graph.NoEdgeException {
+
+        final double branchAngle = (angleStart + angleFinish) / 2.0;
+
+        final double directionX = Math.cos(branchAngle);
+        final double directionY = Math.sin(branchAngle);
+        Point2D nodePoint = new Point2D.Double(xPosition + (length * directionX), yPosition + (length * directionY));
+
+        // System.out.println("Node: " + Utils.DEBUGsubTreeRep(tree, node) + " at " + nodePoint);
 
         if (!tree.isExternal(node)) {
 
@@ -109,43 +121,37 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 i++;
             }
 
-            double span = (angleFinish - angleStart);
-            double a1 = angleStart;
+            final double span = (angleFinish - angleStart);
             double a2 = angleStart;
 
             i = 0;
             for (Node child : children) {
 
-                double childLength = tree.getLength(child);
-                a1 = a2;
+                final double childLength = tree.getLength(child);
+                double a1 = a2;
                 a2 = a1 + (span * leafCounts[i] / sumLeafCount);
 
                 Point2D childPoint = constructNode(child, a1, a2, nodePoint.getX(), nodePoint.getY(), childLength);
 
-                Line2D branchPath = new Line2D.Double(nodePoint.getX(), nodePoint.getY(), childPoint.getX(), childPoint.getY());
+                Line2D branchPath =
+                        new Line2D.Double(nodePoint.getX(), nodePoint.getY(), childPoint.getX(), childPoint.getY());
 
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
-                Point2D branchLabelPoint1 = new Point2D.Double(xPosition + (length * 0.5 * Math.cos(branchAngle)),
-                        yPosition + (length * 0.5 * Math.sin(branchAngle)));
-                Point2D branchLabelPoint2 = new Point2D.Double(xPosition + (((length * 0.5) + 1.0) * Math.cos(branchAngle)),
-                        yPosition + (((length * 0.5) + 1.0) * Math.sin(branchAngle)));
-                Line2D branchLabelPath = new Line2D.Double(branchLabelPoint1, branchLabelPoint2);
-
-                branchLabelPaths.put(child, branchLabelPath);
+                branchLabelPaths.put(child, (Line2D)branchPath.clone());
                 i++;
             }
 
-            Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
-                    yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+            Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
+                    yPosition + ((length + 1.0) * directionY));
 
             Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
             nodeLabelPaths.put(node, nodeLabelPath);
         } else {
 
-            Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * Math.cos(branchAngle)),
-                    yPosition + ((length + 1.0) * Math.sin(branchAngle)));
+            Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
+                    yPosition + ((length + 1.0) * directionY));
 
             Line2D taxonLabelPath = new Line2D.Double(nodePoint, taxonPoint);
             taxonLabelPaths.put(node, taxonLabelPath);
@@ -156,6 +162,4 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
         return nodePoint;
     }
-
-
 }

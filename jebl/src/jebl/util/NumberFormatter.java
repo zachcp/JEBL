@@ -45,7 +45,7 @@ public class NumberFormatter {
 		upperCutoff = Math.pow(10,sf-1);
 		cutoffTable = new double[sf];
 		long num = 10;
-		for (int i =0; i < cutoffTable.length; i++) {
+		for (int i = 0; i < cutoffTable.length; i++) {
 			cutoffTable[i] = (double)num;
 			num *= 10;
 		}
@@ -118,7 +118,7 @@ public class NumberFormatter {
 
 	private int getNumFractionDigits(double value) {
 		value = Math.abs(value);
-		for (int i =0; i < cutoffTable.length; i++) {
+		for (int i = 0; i < cutoffTable.length; i++) {
 			if (value < cutoffTable[i]) return sf-i-1;
 		}
 		return sf - 1;

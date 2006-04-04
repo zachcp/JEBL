@@ -592,7 +592,14 @@ public class ImportHelper {
     public void clearLastMetaComment() {
         lastMetaComment = null;
     }
-    
+
+    static String safeName(String name) {
+        if( ! name.matches("[a-zA-Z0-9_]+") ) {
+            name = "\"" + name + "\"";
+        }
+        return name;
+    }
+
     // Private stuff
 
 	private LineNumberReader reader;
