@@ -66,31 +66,33 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-            slider1.setValue((int) (180.0 - (rootAngle * 10)));
-            slider1.setPaintTicks(true);
-            slider1.setPaintLabels(true);
+            if( ! tree.conceptuallyUnrooted() ) {
+                final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+                slider1.setValue((int) (180.0 - (rootAngle * 10)));
+                slider1.setPaintTicks(true);
+                slider1.setPaintLabels(true);
 
-            slider1.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    double value = 180 + (slider1.getValue() / 10.0);
-                    setRootAngle(value % 360);
-                }
-            });
-            optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
+                slider1.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        double value = 180 + (slider1.getValue() / 10.0);
+                        setRootAngle(value % 360);
+                    }
+                });
+                optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
 
-            final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
-            slider2.setValue((int) (rootLength * 10000));
-            slider2.setPaintTicks(true);
-            slider2.setPaintLabels(true);
+                final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 0);
+                slider2.setValue((int) (rootLength * 10000));
+                slider2.setPaintTicks(true);
+                slider2.setPaintLabels(true);
 
-            slider2.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    double value = slider2.getValue();
-                    setRootLength(value / 10000.0);
-                }
-            });
-            optionsPanel.addComponentWithLabel("Root Length:", slider2, true);
+                slider2.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        double value = slider2.getValue();
+                        setRootLength(value / 10000.0);
+                    }
+                });
+                optionsPanel.addComponentWithLabel("Root Length:", slider2, true);
+            }
 
             final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
             slider3.setValue((int) (360.0 - (angularRange * 10)));
@@ -237,7 +239,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 i++;
             }
 
-            Line2D nodeLabelPath = new Line2D.Double(transform(maxXPosition, yPos), transform(maxXPosition + 1.0, yPos));
+            // Line2D nodeLabelPath = new Line2D.Double(transform(maxXPosition, yPos), transform(maxXPosition + 1.0, yPos));
+            Line2D nodeLabelPath = new Line2D.Double(transform(nodePoint.getX(), yPos), transform(nodePoint.getX()+ 1.0, yPos));
 
             nodeLabelPaths.put(node, nodeLabelPath);
         } else {
