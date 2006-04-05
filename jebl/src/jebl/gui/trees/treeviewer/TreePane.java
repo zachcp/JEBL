@@ -164,8 +164,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         addSelectedTaxa(selectedNode);
     }
 
+    private boolean canSelectNode(Node selectedNode) {
+       return selectedNode != null && !(tree.conceptuallyUnrooted() && selectedNode == tree.getRootNode());
+    }
     public void addSelectedNode(Node selectedNode) {
-        if (selectedNode != null) {
+        if ( canSelectNode(selectedNode) ) {
             selectedNodes.add(selectedNode);
         }
         fireSelectionChanged();
@@ -181,7 +184,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void addSelectedClade(Node selectedNode) {
-        if (selectedNode != null) {
+        if ( canSelectNode(selectedNode) ) {
             addSelectedChildClades(selectedNode);
         }
         fireSelectionChanged();
