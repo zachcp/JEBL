@@ -58,20 +58,23 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             OptionsPanel optionsPanel = new OptionsPanel();
 
             final int slider1max = 10000;
-            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, slider1max, 0);
-            slider1.setValue((int) (rootLength * slider1max));
+            if( !tree.conceptuallyUnrooted() ) {
+                final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, slider1max, 0);
+                slider1.setValue((int) (rootLength * slider1max));
 
-            // don't make sense without setting spacing
-            //slider1.setPaintTicks(true);
-            //slider1.setPaintLabels(true);
+                // don't make sense without setting spacing
+                //slider1.setPaintTicks(true);
+                //slider1.setPaintLabels(true);
 
-            slider1.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    double value = slider1.getValue();
-                    setRootLength(value / slider1max);
-                }
-            });
-            optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
+
+                slider1.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent changeEvent) {
+                        double value = slider1.getValue();
+                        setRootLength(value / slider1max);
+                    }
+                });
+                optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
+            }
 
             final int slider2max = 100;
             final JSlider slider2 = new JSlider(SwingConstants.HORIZONTAL, 0, slider2max, 0);

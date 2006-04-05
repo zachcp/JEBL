@@ -1033,7 +1033,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             globalTransform.transform(origin, origin);
         }
 
-        final double angle = Math.atan((line.getY2() - line.getY1()) / (line.getX2() - line.getX1()));
+        final double dx = line.getX2() - line.getX1();
+        final double angle = dx != 0.0 ? Math.atan((line.getY2() - line.getY1()) / dx) : 0.0;
         lineTransform.rotate(angle, origin.getX(), origin.getY());
 
         // Now add a translate to the transform - if it is on the left then we need
