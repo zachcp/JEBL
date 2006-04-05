@@ -993,8 +993,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         if( comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) {
                             tree.setAttribute("weight", new Float(comment.substring(2)) );
                         } else {
-                            // set generic comment attribute
-                            tree.setAttribute("comment", comment);
+                            try {
+                                String[] pairs = metaCommentPairs(comment);
+                                for(int n = 0; n < pairs.length/2; ++n) {
+                                    tree.setAttribute(pairs[2*n], pairs[2*n+1]);
+                                }
+                            } catch(ImportException.BadFormatException e) {
+                                 // set generic comment attribute
+                                tree.setAttribute("comment", comment);
+                            }
                         }
                     }
 
@@ -1050,29 +1057,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		if (helper.getLastMetaComment() != null) {
 			// There was a meta-comment which should be in the form:
 			// \[&label[=value][,label[=value]>[,/..]]\]
-			String[] pairs = helper.getLastMetaComment().split(",");
-			for (String pair : pairs) {
-				String[] parts = pair.split("=");
-                if (parts.length == 1) {
-                    String label = parts[0].trim();
-
-                    if (label.length() == 0) {
-                        throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
-                    }
-                    labelNode(branch, label, "true");
-                } else if (parts.length == 2) {
-                    String label = parts[0].trim();
-                    String value = parts[1].trim();
-
-                    if (label.length() == 0 || value.length() == 0) {
-                        throw new ImportException.BadFormatException("Badly formatted attribute pair: '"+pair+"'");
-                    }
-                    labelNode(branch, label, value);
-                } else {
-                    throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
-                }
-
+            String[] pairs = metaCommentPairs(helper.getLastMetaComment());
+            for(int n = 0; n < pairs.length/2; ++n) {
+                labelNode(branch, pairs[2*n], pairs[2*n+1] != null ? pairs[2*n+1] : "true");
             }
+
             helper.clearLastMetaComment();
         }
 
@@ -1163,17 +1152,46 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         return tree.createExternalNode(taxon);
 	}
 
+    public static String[] metaCommentPairs(String meta) throws ImportException.BadFormatException {
+        String[] pairs = meta.split(",");
+        String[] result = new String[pairs.length*2];
+        int i = 0;
+        for (String pair : pairs) {
+            String[] parts = pair.split("=");
+            if (parts.length == 1) {
+                String label = parts[0].trim();
 
-	// private stuff
+                if (label.length() == 0) {
+                    throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
+                }
+                result[i++] = label;
+                result[i++] = null;
+            } else if (parts.length == 2) {
+                String label = parts[0].trim();
+                String value = parts[1].trim();
 
-	private NexusBlock nextBlock = null;
+                if (label.length() == 0 || value.length() == 0) {
+                    throw new ImportException.BadFormatException("Badly formatted attribute pair: '"+pair+"'");
+                }
+                result[i++] = label;
+                result[i++] = value;
+            } else {
+                throw new ImportException.BadFormatException("Badly formatted attribute: '"+pair+"'");
+            }
+        }
+        return result;
+    }
 
-	private int taxonCount = 0, siteCount = 0;
-	private SequenceType sequenceType = null;
-	private String gapCharacters = "-";
-	private String matchCharacters = ".";
-	private String missingCharacters = "?";
-	private boolean isInterleaved = false;
+    // private stuff
 
-	private final ImportHelper helper;
+    private NexusBlock nextBlock = null;
+
+    private int taxonCount = 0, siteCount = 0;
+    private SequenceType sequenceType = null;
+    private String gapCharacters = "-";
+    private String matchCharacters = ".";
+    private String missingCharacters = "?";
+    private boolean isInterleaved = false;
+
+    private final ImportHelper helper;
 }
