@@ -31,7 +31,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public static final String BRANCH_LENGTHS = "Branch Lengths";
 
 
-    public BasicLabelPainter(String title, Tree tree, PainterIntent intent) {
+    public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent) {
         this(title, tree, intent, 6);
     }
 
@@ -41,7 +41,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         TIP
     }
 
-    public BasicLabelPainter(String title, Tree tree, PainterIntent intent, int defaultSize) {
+    public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent, int defaultSize) {
         this.title = title;
 
         this.defaultFontSize = defaultSize;
@@ -52,43 +52,50 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         boolean hasNumericAttributs = false;
 
         Set<String> names = new TreeSet<String>();
-        for (Node node : tree.getNodes()) {
-            names.addAll(node.getAttributeNames());
-        }
 
+        // by default, node properties are on nodes for rooted trees, on branches for unrooted trees
         this.attribute = null;
 
         List<String> sources = new ArrayList<String>();
         boolean wantHeightsIfPossible = false;
         boolean wantBranchesIfPossible = false;
+        boolean addNodeAttributes = false;
         switch( intent ) {
             case TIP: {
-               sources.add(TAXON_NAMES);
-               wantHeightsIfPossible = true;
-               break;
-            }
-            case NODE: {
+                sources.add(TAXON_NAMES);
                 wantHeightsIfPossible = true;
                 break;
             }
+            case NODE: {
+                wantHeightsIfPossible = true;
+                addNodeAttributes = !tree.conceptuallyUnrooted();
+                break;
+            }
             case BRANCH: {
-              wantBranchesIfPossible = true;
+                wantBranchesIfPossible = true;
+                addNodeAttributes = tree.conceptuallyUnrooted();
                 break;
             }
         }
 
-        if (tree instanceof RootedTree ) {
-            final RootedTree rtree = (RootedTree) tree;
-            if( wantHeightsIfPossible && rtree.hasHeights() && !rtree.conceptuallyUnrooted() ) {
+        if( addNodeAttributes ) {
+            for (Node node : tree.getNodes()) {
+                names.addAll(node.getAttributeNames());
+            }
+        }
+
+      //  if (tree instanceof RootedTree ) {
+     //       final RootedTree rtree = (RootedTree) tree;
+            if( wantHeightsIfPossible && tree.hasHeights() && !tree.conceptuallyUnrooted() ) {
                 sources.add(NODE_HEIGHTS);
                 hasNumericAttributs = true;
             }
 
-            if( wantBranchesIfPossible && rtree.hasLengths()) {
+            if( wantBranchesIfPossible && tree.hasLengths()) {
                 sources.add(BRANCH_LENGTHS);
                 hasNumericAttributs = true;
             }
-        }
+    //    }
 
         sources.addAll(names);
 
