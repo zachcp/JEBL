@@ -1,6 +1,5 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer.TreePane;
 import org.virion.jam.components.RealNumberField;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -25,6 +24,7 @@ import java.util.List;
 public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private int defaultFontSize;
     private double scaleRange;
+    private double userScaleRange = 0.0;
 
     public ScaleBarPainter() {
         this(0.0, 12);
@@ -60,9 +60,27 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         FontMetrics fm = g2.getFontMetrics();
         double labelHeight = fm.getHeight();
 
-        if (scaleRange == 0.0) {
-            RootedTree tree = treePane.getTree();
-            scaleRange = tree.getHeight(tree.getRootNode()) / 10.0;
+        if( userScaleRange != 0.0 ) {
+            scaleRange = userScaleRange;
+        } else {
+            final double treeScale = treePane.getTreeScale();
+            if( treeScale == 0.0 ) {
+                scaleRange = 0.0;
+            } else {
+                int w10 = treePane.getWidth() / 10;
+
+                double low = w10 /treeScale;
+                double b = -(Math.ceil(Math.log10(low)) - 1);
+                for(int n = 0; n < 3; ++n) {
+                    double factor = Math.pow(10, b);
+                    double x = ((int)(low * factor) + 1)/factor;
+                    if( n == 2 || x < w10 * 2 ) {
+                        scaleRange = x;
+                        break;
+                    }
+                    ++b;
+                }
+            }
         }
 
         preferredWidth = treePane.getTreeScale() * scaleRange;
@@ -91,8 +109,8 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
         g2.setFont(scaleFont);
 
-        // show less precision - nicer to view (and exact number is not that important)
-        final String label = String.format("%.5g", scaleRange); //Double.toString(scaleRange);
+        // we don't need accuracy but a nice short number
+        final String label = Double.toString(scaleRange);
 
         Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
@@ -144,7 +162,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     }
 
     public void setScaleRange(double scaleRange) {
-        this.scaleRange = scaleRange;
+        this.userScaleRange = scaleRange;
         firePainterChanged();
     }
 
