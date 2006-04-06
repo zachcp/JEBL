@@ -63,7 +63,7 @@ public class NucleotideScores extends Scores {
         return Nucleotides.isPurine(Nucleotides.CANONICAL_STATES[state]);
     }
 
-    public final String getAlphabet() { return residues; }
+    public final String getAlphabet() { return residues+ getExtraResidues (); }
 
     public String toString() {
         String result = match + "/" + mismatchTransition;

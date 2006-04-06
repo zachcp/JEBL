@@ -1,5 +1,8 @@
 package jebl.evolution.align.scores;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Base class for all score matrices in the package.
  *
@@ -12,6 +15,7 @@ package jebl.evolution.align.scores;
 public abstract class Scores implements ScoreMatrix {
 
     public float[][] score;
+    private String extraResidues= "";
 
     protected void buildScores(float[][] scores) {
 
@@ -63,6 +67,7 @@ public abstract class Scores implements ScoreMatrix {
         else
             result =new NucleotideScores();
         result.score = new float[127][127];
+        result.extraResidues= scores.getExtraResidues();
         for (int i = 0; i < 127; i++) {
             for (int j = 0; j < 127; j++) {
                 result.score[i][j]= scores.score[i][j];
@@ -90,6 +95,37 @@ public abstract class Scores implements ScoreMatrix {
         result.score['-']['-'] = gapVersusGapCost;
         return result;
     }
+
+    public static Scores includeAdditionalCharacters(Scores scores, String characters, float score) {
+        Scores result =duplicate(scores);
+        String states = scores.getAlphabet();
+        char[] unique =new char[characters.length ()];
+        int index = 0;
+        for (char character : characters.toCharArray()) {
+            if(states.indexOf(character)< 0) unique[index++ ]= character;
+        }
+        String newStates =new String(unique, 0,index);
+        for (int i = 0; i < states.length(); i++) {
+            char res1 = states.charAt(i);
+            for (char c : unique) {
+                result.score[res1][c]=score;
+                result.score[c][res1]=score;
+            }
+        }
+        for (char c : unique) {
+            for (char c1 : unique) {
+                result.score[c][c1]=score;
+            }
+        }
+        result.extraResidues = newStates;
+        return result;
+    }
+
+
+    protected String getExtraResidues() {
+         return extraResidues;
+     }
+
 
     /**
      * extends the given score matrix to include gap Versus gap and gap Versus residue costs

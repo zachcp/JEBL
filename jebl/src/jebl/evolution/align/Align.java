@@ -236,6 +236,9 @@ abstract class Align {
                 res.append(s.charAt(i));
             }
         }
+        //System.out.println("from =" +s);
+        //System.out.println("to =" +res.toString());
+
         return res.toString();
     }
 }
