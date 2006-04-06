@@ -61,7 +61,7 @@ public abstract class Scores implements ScoreMatrix {
     }
 
     public static Scores duplicate(Scores scores){
-        Scores result = null;
+        Scores result;
         if(scores instanceof AminoAcidScores)
             result =new AminoAcidScores();
         else
@@ -96,7 +96,24 @@ public abstract class Scores implements ScoreMatrix {
         return result;
     }
 
-    public static Scores includeAdditionalCharacters(Scores scores, String characters, float score) {
+    /**
+     * includes additional characters in the score matrix which will all have scored zero when compared to other
+     * characters.
+     *
+     * Current system does not handle special characters well, such as ? Or "R" for NucleotideSequences,
+     *   which represents a "A" or "G".
+     *   Currently, we just add all characters to the allowed set of characters, and they are scored as
+     *   zero cost when comparing to other characters, including themselves. One-day, we should probably
+     *   introduce better scoring system so that "R" is a positive score compared to "A" or "G",
+     *   but a negative score compared to "C" or "T".
+     *
+     * example usage:
+     * scores = Scores.includeAdditionalCharacters(scores, "?ABCDEFGHIJKLMNOPQRSTUVWXYZ"); 
+     * @param scores
+     * @param characters
+     * @return a new score matrix.
+     */
+    public static Scores includeAdditionalCharacters(Scores scores, String characters) {
         Scores result =duplicate(scores);
         String states = scores.getAlphabet();
         char[] unique =new char[characters.length ()];
@@ -104,20 +121,8 @@ public abstract class Scores implements ScoreMatrix {
         for (char character : characters.toCharArray()) {
             if(states.indexOf(character)< 0) unique[index++ ]= character;
         }
-        String newStates =new String(unique, 0,index);
-        for (int i = 0; i < states.length(); i++) {
-            char res1 = states.charAt(i);
-            for (char c : unique) {
-                result.score[res1][c]=score;
-                result.score[c][res1]=score;
-            }
-        }
-        for (char c : unique) {
-            for (char c1 : unique) {
-                result.score[c][c1]=score;
-            }
-        }
-        result.extraResidues = newStates;
+        result.extraResidues = new String(unique, 0,index);
+        // don't need to modify any of the "scores" values, since they all default to zero anyway.
         return result;
     }
 
