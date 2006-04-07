@@ -5,7 +5,11 @@ import jebl.evolution.graphs.Node;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
+import org.virion.jam.panels.OptionsPanel;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -46,15 +50,33 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         // do nothing...
     }
 
+    // radians
+    private double rootAngle = 0.0;
+    public void setRootAngle(double angleInDeg) {
+        this.rootAngle = angleInDeg* (Math.PI/180.0) ;
+        invalidate();
+    }
+
+
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
-        return new ArrayList<Controls>();
 
-        /*
         List<Controls> controlsList = new ArrayList<Controls>();
-
 
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
+
+            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+            slider1.setValue((int) (rootAngle * 10));
+            slider1.setPaintTicks(true);
+            slider1.setPaintLabels(true);
+
+            slider1.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    double value = (slider1.getValue() / 10.0);
+                    setRootAngle(value % 360);
+                }
+            });
+            optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
 
             controls = new Controls("Layout", optionsPanel, true);
         }
@@ -62,7 +84,6 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         controlsList.add(controls);
 
         return controlsList;
-        */
     }
 
     public void setSettings(ControlsSettings settings) {
@@ -81,7 +102,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         try {
             final Node root = tree.getRootNode();
 
-            constructNode(root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0);
+            constructNode(root, rootAngle, rootAngle + Math.PI * 2, 0.0, 0.0, 0.0);
 
             if( !tree.conceptuallyUnrooted() ) {
                 Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
