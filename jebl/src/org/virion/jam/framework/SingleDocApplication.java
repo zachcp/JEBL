@@ -69,7 +69,10 @@ public class SingleDocApplication extends Application {
     }
 
     public void doQuit() {
-        if (documentFrame.requestClose()) {
+        if (documentFrame == null) {
+            return;
+        }
+        if (documentFrame.requestClose()) {           
 
             documentFrame.setVisible(false);
             documentFrame.dispose();
