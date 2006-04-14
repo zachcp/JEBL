@@ -1,6 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
@@ -85,6 +86,22 @@ class SimpleRootedNode extends BaseNode {
     }
 
     /**
+     * returns the edge connecting this node to the parent node
+     * @return the edge
+     */
+    public Edge getEdge() {
+        if (edge == null) {
+            edge = new BaseEdge() {
+                public double getLength() {
+                    return length;
+                }
+            };
+        }
+
+        return edge;
+    }
+
+    /**
      * For a rooted tree, getting the adjacencies is not the most efficient
      * operation as it makes a new set containing the children and the parent.
      * @return the adjacaencies
@@ -106,4 +123,6 @@ class SimpleRootedNode extends BaseNode {
     private Node parent;
     private double height;
     private double length;
+
+    private Edge edge = null;
 }

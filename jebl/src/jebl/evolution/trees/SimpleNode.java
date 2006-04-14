@@ -1,6 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;

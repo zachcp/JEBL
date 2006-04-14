@@ -1,6 +1,8 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Graph;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
@@ -22,7 +24,87 @@ public class SimpleRootedTree implements RootedTree {
     }
 
     /**
-     * Creates a new external node with the given taxon and height. See createInternalNode
+     * Make a copy of the given rooted tree
+     * @param tree a rooted tree
+     */
+    public SimpleRootedTree(RootedTree tree) {
+        createNodes(tree, tree.getRootNode());
+    }
+
+    /**
+     * Make a copy of the given unrooted tree
+     * @param tree an unrooted tree
+     * @param ingroupNode the node on one side of the root
+     * @param outgroupNode the node on the other side of the root
+     * @param ingroupBranchLength the branch length from the root to the ingroup node
+     */
+    public SimpleRootedTree(Tree tree, Node ingroupNode, Node outgroupNode, double ingroupBranchLength) throws NoEdgeException {
+        List<Node> children = new ArrayList<Node>();
+
+        Node node1 = createNodes(tree, outgroupNode, ingroupNode);
+        setLength(node1, ingroupBranchLength);
+        children.add(node1);
+
+        Node node2 = createNodes(tree, ingroupNode, outgroupNode);
+        setLength(node1, Math.max(tree.getEdgeLength(ingroupNode, outgroupNode) - ingroupBranchLength, 0.0));
+        children.add(node2);
+
+        createInternalNode(children);
+    }
+
+    /**
+     * Clones the entire tree structure from the given RootedTree.
+     * @param tree
+     * @param node
+     */
+    public Node createNodes(RootedTree tree, Node node) {
+
+        Node newNode = null;
+        if (tree.isExternal(node)) {
+            newNode = createExternalNode(tree.getTaxon(node));
+        } else {
+            List<Node> children = new ArrayList<Node>();
+            for (Node child : tree.getChildren(node)) {
+                children.add(createNodes(tree, child));
+            }
+            newNode = createInternalNode(children);
+        }
+
+        setHeight(newNode, tree.getHeight(node));
+
+        return newNode;
+    }
+
+    /**
+     * Clones the entire tree structure from the given (unrooted) Tree.
+     * @param tree the unrooted tree
+     * @param parent the parent node
+     * @param child the child node
+     */
+    public Node createNodes(Tree tree, Node parent, Node child) throws NoEdgeException {
+
+        Node newNode = null;
+        if (tree.isExternal(child)) {
+            newNode = createExternalNode(tree.getTaxon(child));
+        } else {
+            List<Node> adjacencies = tree.getAdjacencies(child);
+            List<Node> children = new ArrayList<Node>();
+
+            for (Node child2 : adjacencies) {
+                if (child2 != parent) {
+                    children.add(createNodes(tree, child, child2));
+                }
+            }
+            newNode = createInternalNode(children);
+        }
+
+        setLength(newNode, tree.getEdgeLength(parent, child));
+
+        return newNode;
+    }
+
+    /**
+     * Creates a new external node with the given taxon. See createInternalNode
      * for a description of how to use these methods.
      * @param taxon the taxon associated with this node
      * @return the created node reference
@@ -210,11 +292,45 @@ public class SimpleRootedTree implements RootedTree {
     }
 
     /**
+     * Returns a list of edges connected to this node
+     *
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
+    public List<Edge> getEdges(Node node) {
+        List<Edge> edges = new ArrayList<Edge>();
+        for (Node adjNode : getAdjacencies(node)) {
+            edges.add(((SimpleRootedNode)adjNode).getEdge());
+
+        }
+        return edges;
+    }
+
+    /**
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
     public List<Node> getAdjacencies(Node node) {
         return ((SimpleRootedNode)node).getAdjacencies();
+    }
+
+    /**
+     * Returns the Edge that connects these two nodes
+     *
+     * @param node1
+     * @param node2
+     * @return the edge object.
+     * @throws jebl.evolution.graphs.Graph.NoEdgeException
+     *          if the nodes are not directly connected by an edge.
+     */
+    public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
+        if (((SimpleRootedNode)node1).getParent() == node2) {
+            return ((SimpleRootedNode)node1).getEdge();
+        } else if (((SimpleRootedNode)node2).getParent() == node1) {
+            return ((SimpleRootedNode)node2).getEdge();
+        } else {
+            throw new NoEdgeException();
+        }
     }
 
     /**
@@ -226,16 +342,16 @@ public class SimpleRootedTree implements RootedTree {
      */
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
         if (((SimpleRootedNode)node1).getParent() == node2) {
-	        if (heightsKnown) {
-		        return ((SimpleRootedNode)node2).getHeight() - ((SimpleRootedNode)node1).getHeight();
-	        } else {
-		        return ((SimpleRootedNode)node1).getLength();
-	        }
+            if (heightsKnown) {
+                return ((SimpleRootedNode)node2).getHeight() - ((SimpleRootedNode)node1).getHeight();
+            } else {
+                return ((SimpleRootedNode)node1).getLength();
+            }
         } else if (((SimpleRootedNode)node2).getParent() == node1) {
             if (heightsKnown) {
-	            return ((SimpleRootedNode)node1).getHeight() - ((SimpleRootedNode)node2).getHeight();
+                return ((SimpleRootedNode)node1).getHeight() - ((SimpleRootedNode)node2).getHeight();
             } else {
-	            return ((SimpleRootedNode)node2).getLength();
+                return ((SimpleRootedNode)node2).getLength();
             }
         } else {
             throw new NoEdgeException();
@@ -249,6 +365,20 @@ public class SimpleRootedTree implements RootedTree {
         Set<Node> nodes = new HashSet<Node>(internalNodes);
         nodes.addAll(externalNodes.values());
         return nodes;
+    }
+
+    /**
+     * @return the set of all edges in this graph.
+     */
+    public Set<Edge> getEdges() {
+        Set<Edge> edges = new HashSet<Edge>();
+        for (Node node : getNodes()) {
+            if (node != getRootNode()) {
+                edges.add(((SimpleRootedNode)node).getEdge());
+            }
+
+        }
+        return edges;
     }
 
     /**
@@ -346,19 +476,19 @@ public class SimpleRootedTree implements RootedTree {
 
     // Attributable IMPLEMENTATION
 
-	public void setAttribute(String name, Object value) {
-		if (helper == null) {
-			helper = new AttributableHelper();
-		}
-		helper.setAttribute(name, value);
-	}
+    public void setAttribute(String name, Object value) {
+        if (helper == null) {
+            helper = new AttributableHelper();
+        }
+        helper.setAttribute(name, value);
+    }
 
-	public Object getAttribute(String name) {
-		if (helper == null) {
-			return null;
-		}
-		return helper.getAttribute(name);
-	}
+    public Object getAttribute(String name) {
+        if (helper == null) {
+            return null;
+        }
+        return helper.getAttribute(name);
+    }
 
     public void removeAttribute(String name) {
         if( helper != null ) {
@@ -373,16 +503,16 @@ public class SimpleRootedTree implements RootedTree {
         return helper.getAttributeNames();
     }
 
-	public Map<String, Object> getAttributeMap() {
-		if (helper == null) {
-			return Collections.emptyMap();
-		}
-		return helper.getAttributeMap();
-	}
+    public Map<String, Object> getAttributeMap() {
+        if (helper == null) {
+            return Collections.emptyMap();
+        }
+        return helper.getAttributeMap();
+    }
 
-	// PRIVATE members
+    // PRIVATE members
 
-	private AttributableHelper helper = null;
+    private AttributableHelper helper = null;
 
     protected SimpleRootedNode rootNode = null;
     protected final Set<Node> internalNodes = new HashSet<Node>();
@@ -395,4 +525,5 @@ public class SimpleRootedTree implements RootedTree {
     private boolean hasLengths = false;
 
     private boolean conceptuallyUnrooted = false;
+
 }

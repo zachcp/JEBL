@@ -1,6 +1,8 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Graph;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
@@ -53,38 +55,47 @@ public class SimpleTree implements Tree {
     }
 
     /**
-     * A mapping between edges and edge length.
-     */
-    Map<HashPair, Double> edges = new HashMap<HashPair, Double>();
-
-    /**
      * Set edge distance between two nodes.
      * @param node1
      * @param node2
-     * @param distance
+     * @param length
      */
-    public void setEdge(Node node1, Node node2, double distance) {
-        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && distance >= 0;
+    public void setEdge(Node node1, Node node2, final double length) {
+        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && length >= 0;
 
-        edges.put(new HashPair<Node>(node1, node2), distance);
-        edges.put(new HashPair<Node>(node2, node1), distance);
+        Edge edge = new BaseEdge() {
+            public double getLength() { return length; }
+        };
+
+        edges.put(new HashPair<Node>(node1, node2), edge);
+        edges.put(new HashPair<Node>(node2, node1), edge);
     }
 
     /**
      * Add a new edge between two existing nodes.
      * @param node1
      * @param node2
-     * @param distance
+     * @param length
      */
-    public void addEdge(Node node1, Node node2, double distance) {
+    public void addEdge(Node node1, Node node2, double length) {
         assert !getAdjacencies(node1).contains(node2);
 
         ((SimpleNode)node1).addAdacency(node2);
         ((SimpleNode)node2).addAdacency(node1);
-        setEdge(node1, node2, distance);
+        setEdge(node1, node2, length);
     }
 
     /* Graph IMPLEMENTATION */
+
+    /**
+     * Returns a list of edges connected to this node
+     *
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
+    public List<Edge> getEdges(Node node) {
+        return null;
+    }
 
     /**
      * @param node
@@ -92,6 +103,24 @@ public class SimpleTree implements Tree {
      */
     public List<Node> getAdjacencies(Node node) {
         return ((SimpleNode)node).getAdjacencies();
+    }
+
+    /**
+     * Returns the Edge that connects these two nodes
+     *
+     * @param node1
+     * @param node2
+     * @return the edge object.
+     * @throws jebl.evolution.graphs.Graph.NoEdgeException
+     *          if the nodes are not directly connected by an edge.
+     */
+    public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
+        Edge edge = edges.get(new HashPair<Node>(node1, node2));
+        if( edge == null ) {
+            // not connected
+            throw new NoEdgeException();
+        }
+        return edge;
     }
 
     /**
@@ -151,12 +180,7 @@ public class SimpleTree implements Tree {
      * @throws NoEdgeException if the nodes are not directly connected by an edge.
      */
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-        Double e = edges.get(new HashPair<Node>(node1, node2));
-        if( e == null ) {
-            // not connected
-            throw new NoEdgeException();
-        }
-        return e;
+        return getEdge(node1, node2).getLength();
     }
 
     /**
@@ -166,6 +190,13 @@ public class SimpleTree implements Tree {
         Set<Node> nodes = new HashSet<Node>(internalNodes);
         nodes.addAll(externalNodes.values());
         return nodes;
+    }
+
+    /**
+     * @return the set of all edges in this graph.
+     */
+    public Set<Edge> getEdges() {
+        return Collections.unmodifiableSet(new HashSet<Edge>(edges.values()));
     }
 
     /**
@@ -201,7 +232,7 @@ public class SimpleTree implements Tree {
             helper.removeAttribute(name);
         }
     }
-    
+
     public Set<String> getAttributeNames() {
         if (helper == null) {
             return Collections.emptySet();
@@ -221,4 +252,8 @@ public class SimpleTree implements Tree {
     private AttributableHelper helper = null;
     private final Set<Node> internalNodes = new HashSet<Node>();
     private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
+    /**
+     * A mapping between edges and edge length.
+     */
+    Map<HashPair, Edge> edges = new HashMap<HashPair, Edge>();
 }

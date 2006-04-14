@@ -21,24 +21,49 @@ import java.util.List;
  */
 public interface Graph extends Attributable {
 
+
     /**
+     * Returns a list of edges connected to this node
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
+    List<Edge> getEdges(Node node);
+
+    /**
+     * Returns a list of nodes connected to this node by an edge
      * @param node
      * @return the set of nodes that are attached by edges to the given node.
      */
     List<Node> getAdjacencies(Node node);
 
     /**
+     * Returns the Edge that connects these two nodes
      * @param node1
      * @param node2
-     * @return the length of the edge connecting node1 and node2.
+     * @return the edge object.
+     * @throws NoEdgeException if the nodes are not directly connected by an edge.
+     */
+    Edge getEdge(Node node1, Node node2) throws NoEdgeException;
+
+    /**
+     * Returns the length of the edge that connects these two nodes
+     * @param node1
+     * @param node2
+     * @return the edge length.
      * @throws NoEdgeException if the nodes are not directly connected by an edge.
      */
     double getEdgeLength(Node node1, Node node2) throws NoEdgeException;
+
 
     /**
      * @return the set of all nodes in this graph.
      */
     Set<Node> getNodes();
+
+    /**
+     * @return the set of all edges in this graph.
+     */
+    Set<Edge> getEdges();
 
     /**
      * @param degree the number of edges connected to a node

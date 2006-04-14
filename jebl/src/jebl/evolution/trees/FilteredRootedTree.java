@@ -1,6 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.List;
@@ -80,6 +81,18 @@ public abstract class FilteredRootedTree implements RootedTree {
 
     public List<Node> getAdjacencies(Node node) {
         return source.getAdjacencies(node);
+    }
+
+    public List<Edge> getEdges(Node node) {
+        return source.getEdges(node);
+    }
+
+    public Set<Edge> getEdges() {
+        return source.getEdges();
+    }
+
+    public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
+        return source.getEdge(node1, node2);
     }
 
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {

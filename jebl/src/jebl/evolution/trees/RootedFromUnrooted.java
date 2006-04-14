@@ -1,6 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
@@ -62,15 +63,15 @@ public class RootedFromUnrooted implements RootedTree {
      * @param root
      */
     public RootedFromUnrooted(Tree source, Node root, boolean intent) {
-       this.source = source;
-       this.root = root;
-       intentUnrooted = intent;
-       topLeft = topRight  = null;
-       rootToLeft = rootToRight = 0.0;
-       parents = new HashMap<Node, Node>();
-       for( Node adj : source.getAdjacencies(root) ) {
-           setParent(adj, root);
-       }
+        this.source = source;
+        this.root = root;
+        intentUnrooted = intent;
+        topLeft = topRight  = null;
+        rootToLeft = rootToRight = 0.0;
+        parents = new HashMap<Node, Node>();
+        for( Node adj : source.getAdjacencies(root) ) {
+            setParent(adj, root);
+        }
     }
 
     /**
@@ -152,7 +153,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public Node getParent(Node node) {
-       return parents.get(node);
+        return parents.get(node);
     }
 
     public Node getRootNode() {
@@ -189,6 +190,16 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getNode(taxon);
     }
 
+    /**
+     * Returns a list of edges connected to this node
+     *
+     * @param node
+     * @return the set of nodes that are attached by edges to the given node.
+     */
+    public List<Edge> getEdges(Node node) {
+        return source.getEdges(node);
+    }
+
     public List<Node> getAdjacencies(Node node) {
         // special case when syntetic root
         if( topLeft != null ) {
@@ -207,7 +218,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-         // special case when syntetic root
+        // special case when syntetic root
         if( topLeft != null ) {
             if( node2 == root ) {
                 Node tmp = node1;
@@ -224,13 +235,24 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getEdgeLength(node1, node2);
     }
 
+    public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
+        return source.getEdge(node1, node2);
+    }
+
     public Set<Node> getNodes() {
-       Set<Node> nodes = new HashSet<Node>(getInternalNodes());
-       nodes.addAll(getExternalNodes());
+        Set<Node> nodes = new HashSet<Node>(getInternalNodes());
+        nodes.addAll(getExternalNodes());
         if( topLeft != null ) {
             nodes.add(root);
         }
-       return nodes;
+        return nodes;
+    }
+
+    /**
+     * @return the set of all edges in this graph.
+     */
+    public Set<Edge> getEdges() {
+        return source.getEdges();
     }
 
     public Set<Node> getNodes(int degree) {
@@ -241,7 +263,7 @@ public class RootedFromUnrooted implements RootedTree {
         return nodes;
     }
 
-   // Attributable IMPLEMENTATION
+    // Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {
         source.setAttribute(name, value);
@@ -254,7 +276,7 @@ public class RootedFromUnrooted implements RootedTree {
     public void removeAttribute(String name) {
         source.removeAttribute(name);
     }
-    
+
     public Set<String> getAttributeNames() {
         return source.getAttributeNames();
     }
@@ -262,4 +284,5 @@ public class RootedFromUnrooted implements RootedTree {
     public Map<String, Object> getAttributeMap() {
         return source.getAttributeMap();
     }
+
 }

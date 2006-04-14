@@ -1,21 +1,22 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 import jebl.util.AttributableHelper;
 
+import java.util.Set;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Common implementation of Attributable interface used by Nodes.
- * 
+ *
  * @author Joseph Heled
  * @version $Id$
  *
  */
 
-abstract class BaseNode implements Node {
+abstract class BaseEdge implements Edge {
     // Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {
@@ -31,7 +32,7 @@ abstract class BaseNode implements Node {
         }
         return helper.getAttribute(name);
     }
-    
+
     public void removeAttribute(String name) {
         if( helper != null ) {
             helper.removeAttribute(name);
