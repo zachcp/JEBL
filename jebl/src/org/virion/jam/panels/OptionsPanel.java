@@ -5,7 +5,6 @@
 package org.virion.jam.panels;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
@@ -48,7 +47,9 @@ public class OptionsPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
 
         c.gridwidth = GridBagConstraints.REMAINDER;
-        comp.setBorder(new EmptyBorder(6, 24, 6, 24));
+
+	    // it is now up to the calling code to add a border
+        //comp.setBorder(new EmptyBorder(6, 24, 6, 24));
         gridbag.setConstraints(comp, c);
         add(comp);
     }
