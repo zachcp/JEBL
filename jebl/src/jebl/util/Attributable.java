@@ -11,6 +11,8 @@ package jebl.util;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Interface for associating attributes with an object.
@@ -21,18 +23,18 @@ import java.util.Set;
  */
 public interface Attributable {
 
-	/**
-	 * Sets an named attribute for this object.
-	 * @param name the name of the attribute.
-	 * @param value the new value of the attribute.
-	 */
-	void setAttribute(String name, Object value);
+    /**
+     * Sets an named attribute for this object.
+     * @param name the name of the attribute.
+     * @param value the new value of the attribute.
+     */
+    void setAttribute(String name, Object value);
 
-	/**
-	 * @return an object representing the named attributed for this object.
-	 * @param name the name of the attribute of interest.
-	 */
-	Object getAttribute(String name);
+    /**
+     * @return an object representing the named attributed for this object.
+     * @param name the name of the attribute of interest.
+     */
+    Object getAttribute(String name);
 
     /**
      * @param name name of attribute to remove
@@ -40,15 +42,27 @@ public interface Attributable {
     void removeAttribute(String name);
 
     /**
-	 * @return an array of the attributes that this object has.
-	 */
+     * @return an array of the attributes that this object has.
+     */
     Set<String> getAttributeNames();
 
-	/**
-	 * Gets the entire attribute map.
-	 * @return an unmodifiable map
-	 */
-	Map<String, Object> getAttributeMap();
+    /**
+     * Gets the entire attribute map.
+     * @return an unmodifiable map
+     */
+    Map<String, Object> getAttributeMap();
+
+    public static class Utils {
+        Set<String> getAttributeNames(Collection<Attributable> attributables) {
+            Set<String> names = new HashSet<String>();
+
+            for (Attributable attributable : attributables) {
+                names.addAll(attributable.getAttributeNames());
+            }
+
+            return names;
+        }
+    }
 }
 
 

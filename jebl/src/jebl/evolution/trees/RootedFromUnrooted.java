@@ -93,7 +93,10 @@ public class RootedFromUnrooted implements RootedTree {
             // bug
         }
         parents = new HashMap<Node, Node>();
-        root = new SimpleNode(new ArrayList<Node>());
+
+        // This is just a handle used to refer to the root so create the simplest possible implementation...
+        root = new BaseNode() { public int getDegree() { return 0; } };
+        
         parents.put(root, null);
         setParent(left, root);
         setParent(right, root);

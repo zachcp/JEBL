@@ -16,7 +16,7 @@ import java.util.*;
  *
  */
 
-public class SimpleTree implements Tree {
+public final class SimpleTree implements Tree {
 
     public SimpleTree() {}
 
@@ -256,4 +256,51 @@ public class SimpleTree implements Tree {
      * A mapping between edges and edge length.
      */
     Map<HashPair, Edge> edges = new HashMap<HashPair, Edge>();
+
+    final class SimpleNode extends BaseNode {
+
+        /**
+         * A tip having a taxon
+         * @param taxon
+         */
+        public SimpleNode(Taxon taxon) {
+            this.adjacencies = Collections.unmodifiableList(new ArrayList<Node>());
+            this.taxon = taxon;
+        }
+
+        /**
+         * An internal node.
+         * @param adjacencies set of adjacent noeds
+         */
+        public SimpleNode(List<Node> adjacencies) {
+            this.adjacencies = Collections.unmodifiableList(adjacencies);
+            this.taxon = null;
+        }
+
+        /**
+         * Add an adjacency.
+         * @param node
+         */
+        public void addAdacency(Node node) {
+            List<Node> a = new ArrayList<Node>(adjacencies);
+            a.add(node);
+            adjacencies = Collections.unmodifiableList(a);
+        }
+
+        public Taxon getTaxon() {
+            return taxon;
+        }
+
+        public int getDegree() {
+            return (adjacencies == null ? 0 : adjacencies.size());
+        }
+
+        public List<Node> getAdjacencies() {
+            return adjacencies;
+        }
+
+        // PRIVATE members
+        private List<Node> adjacencies;
+        private final Taxon taxon;
+    };
 }

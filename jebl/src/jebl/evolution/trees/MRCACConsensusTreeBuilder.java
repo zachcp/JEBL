@@ -250,7 +250,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder {
             final double maxChild = Math.max(consensus.getHeight(children[0]), consensus.getHeight(children[1]));
             mostRecentAnncestorHeight = Math.max(mostRecentAnncestorHeight, maxChild);
 
-            final SimpleRootedNode sub = consensus.createInternalNode(Arrays.asList(children));
+            final Node sub = consensus.createInternalNode(Arrays.asList(children));
 
             consensus.setHeight(sub, mostRecentAnncestorHeight);
             // root always 100%

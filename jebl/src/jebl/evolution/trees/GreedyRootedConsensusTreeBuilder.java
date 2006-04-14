@@ -96,7 +96,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
      * @param node
      * @return height of node
      */
-    private double insureConsistency(SimpleRootedTree tree, Node node) {
+    private double insureConsistency(MutableRootedTree tree, Node node) {
         double hieght = tree.getHeight(node);
         if (tree.isExternal(node)) {
             return hieght;
