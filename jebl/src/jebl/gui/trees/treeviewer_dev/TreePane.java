@@ -52,11 +52,18 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	}
 
 	public void setTree(RootedTree tree) {
-		this.originalTree = tree;
-		if (!originalTree.hasLengths()) {
-			transformBranchesOn = true;
+		if (tree != null) {
+			this.originalTree = tree;
+			if (!originalTree.hasLengths()) {
+				transformBranchesOn = true;
+			}
+			setupTree();
+		} else {
+			originalTree = null;
+			this.tree = null;
+			invalidate();
+			repaint();
 		}
-		setupTree();
 	}
 
 	private void setupTree() {

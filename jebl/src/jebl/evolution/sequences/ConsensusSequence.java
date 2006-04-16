@@ -38,7 +38,7 @@ public abstract class ConsensusSequence implements Sequence {
      */
     public String getString() {
         if (sequence == null) {
-            sequence = Utils.getStateIndices(constructConsensus(source));
+            sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
 
         SequenceType sequenceType = getSequenceType();
@@ -54,14 +54,14 @@ public abstract class ConsensusSequence implements Sequence {
      */
     public State[] getStates() {
         if (sequence == null) {
-            sequence = Utils.getStateIndices(constructConsensus(source));
+            sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
         return getSequenceType().toStateArray(sequence);
     }
 
     public int[] getStateIndices() {
         if (sequence == null) {
-            sequence = Utils.getStateIndices(constructConsensus(source));
+            sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
         return sequence;
     }
@@ -71,7 +71,7 @@ public abstract class ConsensusSequence implements Sequence {
      */
     public State getState(int site) {
         if (sequence == null) {
-            sequence = Utils.getStateIndices(constructConsensus(source));
+            sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
         return getSequenceType().getState(sequence[site]);
     }
@@ -83,7 +83,7 @@ public abstract class ConsensusSequence implements Sequence {
      */
     public int getLength() {
         if (sequence == null) {
-            sequence = Utils.getStateIndices(constructConsensus(source));
+            sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
         return sequence.length;
     }

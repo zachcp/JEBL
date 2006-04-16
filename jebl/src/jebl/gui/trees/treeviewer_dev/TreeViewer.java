@@ -74,19 +74,13 @@ public class TreeViewer extends JPanel implements Printable {
 		treePaneSelector = new TreePaneSelector(treePane);
 	}
 
-	public void setTree(Tree inTree) {
-		if (inTree instanceof RootedTree) {
-			tree = (RootedTree) inTree;
-		} else {
-			tree = Utils.rootTheTree(inTree);
+	public void setTree(Tree tree) {
+		if (tree != null && !(tree instanceof RootedTree)) {
+			treePane.setTree(Utils.rootTheTree(tree));
 		}
 
-		treePane.setTree(tree);
+		treePane.setTree((RootedTree)tree);
 
-	}
-
-	public Tree getTree() {
-		return tree;
 	}
 
 	public void setTreeLayout(TreeLayout treeLayout) {
@@ -153,6 +147,8 @@ public class TreeViewer extends JPanel implements Printable {
 
 		String query = (caseSensitive ? searchString : searchString.toUpperCase());
 
+		Tree tree = treePane.getTree();
+
 		for (Taxon taxon : tree.getTaxa()) {
 			String target = (caseSensitive ?
 					taxon.getName() : taxon.getName().toUpperCase());
@@ -189,6 +185,8 @@ public class TreeViewer extends JPanel implements Printable {
 		}
 
 		String query = (caseSensitive ? searchString : searchString.toUpperCase());
+
+		Tree tree = treePane.getTree();
 
 		for (Node node : tree.getNodes()) {
 			Object value = node.getAttribute(attribute);
@@ -249,8 +247,6 @@ public class TreeViewer extends JPanel implements Printable {
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
 		return treePane.print(g, pageFormat, pageIndex);
 	}
-
-	protected RootedTree tree = null;
 
 	protected TreePane treePane;
 	protected TreePaneSelector treePaneSelector;

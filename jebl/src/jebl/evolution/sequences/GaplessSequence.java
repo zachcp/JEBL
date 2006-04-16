@@ -12,7 +12,7 @@ public class GaplessSequence extends FilteredSequence {
 	}
 
 	protected State[] filterSequence(Sequence source) {
-		return Utils.stripGaps(source.getStates());
+		return jebl.evolution.sequences.Utils.stripGaps(source.getStates());
 	}
 
 }

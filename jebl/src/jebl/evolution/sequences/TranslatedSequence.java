@@ -14,7 +14,7 @@ public class TranslatedSequence extends FilteredSequence {
 	}
 
 	protected State[] filterSequence(Sequence source) {
-		return Utils.translate(source.getStates(), geneticCode);
+		return jebl.evolution.sequences.Utils.translate(source.getStates(), geneticCode);
 	}
 
     /**
