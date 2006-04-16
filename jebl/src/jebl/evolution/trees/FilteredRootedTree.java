@@ -107,6 +107,10 @@ public abstract class FilteredRootedTree implements RootedTree {
         return source.getNodes(degree);
     }
 
+	public boolean isRoot(Node node) {
+		return source.isRoot(node);
+	}
+
 	// Attributable IMPLEMENTATION
 
 	public void setAttribute(String name, Object value) {

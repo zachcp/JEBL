@@ -333,6 +333,9 @@ public class MutableRootedTree implements RootedTree {
         return rootNode;
     }
 
+	public boolean isRoot(Node node) {
+		return node == rootNode;
+	}
 
     /**
      * @return a set of all nodes that have degree 1.

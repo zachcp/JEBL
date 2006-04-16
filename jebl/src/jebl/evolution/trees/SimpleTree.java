@@ -1,8 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
-import jebl.evolution.graphs.Graph;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
@@ -60,12 +59,10 @@ public final class SimpleTree implements Tree {
      * @param node2
      * @param length
      */
-    public void setEdge(Node node1, Node node2, final double length) {
+    public void setEdge(final Node node1, final Node node2, final double length) {
         assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && length >= 0;
 
-        Edge edge = new BaseEdge() {
-            public double getLength() { return length; }
-        };
+        Edge edge = new SimpleEdge(node1, node2, length);
 
         edges.put(new HashPair<Node>(node1, node2), edge);
         edges.put(new HashPair<Node>(node2, node1), edge);
@@ -139,14 +136,14 @@ public final class SimpleTree implements Tree {
         return new HashSet<Node>(internalNodes);
     }
 
-    /**
-     * @return the set of taxa associated with the external
-     *         nodes of this tree. The size of this set should be the
-     *         same as the size of the external nodes set.
-     */
-    public Set<Taxon> getTaxa() {
-        return new HashSet<Taxon>(externalNodes.keySet());
-    }
+	/**
+	 * @return the set of taxa associated with the external
+	 *         nodes of this tree. The size of this set should be the
+	 *         same as the size of the external nodes set.
+	 */
+	public Set<Taxon> getTaxa() {
+	    return new HashSet<Taxon>(externalNodes.keySet());
+	}
     /**
      * @param node the node whose associated taxon is being requested.
      * @return the taxon object associated with the given node, or null
@@ -163,6 +160,14 @@ public final class SimpleTree implements Tree {
     public boolean isExternal(Node node) {
         return ((SimpleNode)node).getDegree() == 1;
     }
+
+	/**
+	 * @param edge the edge
+	 * @return true if the edge has a node of degree 1.
+	 */
+	public boolean isExternal(Edge edge) {
+	    return ((SimpleEdge)edge).isExternal();
+	}
 
     /**
      * @param taxon the taxon
@@ -196,7 +201,7 @@ public final class SimpleTree implements Tree {
      * @return the set of all edges in this graph.
      */
     public Set<Edge> getEdges() {
-        return Collections.unmodifiableSet(new HashSet<Edge>(edges.values()));
+        return new HashSet<Edge>(edges.values());
     }
 
     /**
@@ -210,6 +215,36 @@ public final class SimpleTree implements Tree {
         }
         return nodes;
     }
+
+	/**
+	 * The set of external edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of external edges.
+	 */
+	public Set<Edge> getExternalEdges() {
+		Set<Edge> externalEdges = new HashSet<Edge>();
+		for (Edge edge : getEdges()) {
+			if (((SimpleEdge)edge).isExternal()) {
+ 				externalEdges.add(edge);
+			}
+		}
+		return externalEdges;
+	}
+
+	/**
+	 * The set of internal edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of internal edges.
+	 */
+	public Set<Edge> getInternalEdges() {
+		Set<Edge> internalEdges = new HashSet<Edge>();
+		for (Edge edge : getEdges()) {
+			if (!((SimpleEdge)edge).isExternal()) {
+ 				internalEdges.add(edge);
+			}
+		}
+		return internalEdges;
+	}
 
     // Attributable IMPLEMENTATION
 
@@ -263,7 +298,7 @@ public final class SimpleTree implements Tree {
          * A tip having a taxon
          * @param taxon
          */
-        public SimpleNode(Taxon taxon) {
+        private SimpleNode(Taxon taxon) {
             this.adjacencies = Collections.unmodifiableList(new ArrayList<Node>());
             this.taxon = taxon;
         }
@@ -272,7 +307,7 @@ public final class SimpleTree implements Tree {
          * An internal node.
          * @param adjacencies set of adjacent noeds
          */
-        public SimpleNode(List<Node> adjacencies) {
+        private SimpleNode(List<Node> adjacencies) {
             this.adjacencies = Collections.unmodifiableList(adjacencies);
             this.taxon = null;
         }
@@ -303,4 +338,24 @@ public final class SimpleTree implements Tree {
         private List<Node> adjacencies;
         private final Taxon taxon;
     };
+
+	final class SimpleEdge extends BaseEdge {
+
+		private SimpleEdge(Node node1, Node node2, double length) {
+			this.node1 = node1;
+			this.node2 = node2;
+			this.length = length;
+		}
+
+		public double getLength() {
+			return length;
+		}
+
+		private boolean isExternal() {
+			return (node1.getDegree() == 1 || node2.getDegree() == 1);
+		}
+
+		private double length;
+		Node node1, node2;
+	}
 }

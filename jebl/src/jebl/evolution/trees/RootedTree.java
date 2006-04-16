@@ -81,4 +81,10 @@ public interface RootedTree extends Tree {
      * @return true if tree(s) are to be viewed as unrooted
      */
     boolean conceptuallyUnrooted();
+
+	/**
+	 * @param node the node
+	 * @return true if the node is the root of this tree.
+	 */
+	boolean isRoot(Node node);
 }

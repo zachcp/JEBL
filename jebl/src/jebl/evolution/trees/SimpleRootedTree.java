@@ -1,8 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
-import jebl.evolution.graphs.Graph;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
@@ -381,6 +380,34 @@ final public class SimpleRootedTree implements RootedTree {
         return edges;
     }
 
+	/**
+	 * The set of external edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of external edges.
+	 */
+	public Set<Edge> getExternalEdges() {
+		Set<Edge> edges = new HashSet<Edge>();
+		for (Node node : getExternalNodes()) {
+			edges.add(((SimpleRootedNode)node).getEdge());
+		}
+		return edges;
+	}
+
+	/**
+	 * The set of internal edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of internal edges.
+	 */
+	public Set<Edge> getInternalEdges() {
+		Set<Edge> edges = new HashSet<Edge>();
+		for (Node node : getInternalNodes()) {
+			if (node != getRootNode()) {
+			    edges.add(((SimpleRootedNode)node).getEdge());
+			}
+		}
+		return edges;
+	}
+
     /**
      * @param degree the number of edges connected to a node
      * @return a set containing all nodes in this graph of the given degree.
@@ -474,7 +501,11 @@ final public class SimpleRootedTree implements RootedTree {
         return conceptuallyUnrooted;
     }
 
-    // Attributable IMPLEMENTATION
+	public boolean isRoot(Node node) {
+		return node == rootNode;
+	}
+
+	// Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {
         if (helper == null) {

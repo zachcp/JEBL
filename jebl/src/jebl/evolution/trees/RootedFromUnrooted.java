@@ -96,7 +96,7 @@ public class RootedFromUnrooted implements RootedTree {
 
         // This is just a handle used to refer to the root so create the simplest possible implementation...
         root = new BaseNode() { public int getDegree() { return 0; } };
-        
+
         parents.put(root, null);
         setParent(left, root);
         setParent(right, root);
@@ -265,6 +265,10 @@ public class RootedFromUnrooted implements RootedTree {
         }
         return nodes;
     }
+
+	public boolean isRoot(Node node) {
+		return node == root;
+	}
 
     // Attributable IMPLEMENTATION
 

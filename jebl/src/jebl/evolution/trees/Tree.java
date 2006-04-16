@@ -8,8 +8,7 @@
  */
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Graph;
-import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.*;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.Set;
@@ -35,6 +34,16 @@ public interface Tree extends Graph {
      * These nodes are often refered to as internal nodes.
      */
     Set<Node> getInternalNodes();
+
+	/**
+	 * @return a set of all edges that have a degree 1 node.
+	 */
+	Set<Edge> getExternalEdges();
+
+	/**
+	 * @return a set of all edges for which both nodes have degree 2 or more.
+	 */
+	Set<Edge> getInternalEdges();
 
     /**
      * @return the set of taxa associated with the external
