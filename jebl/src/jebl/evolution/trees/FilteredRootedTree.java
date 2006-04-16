@@ -63,6 +63,14 @@ public abstract class FilteredRootedTree implements RootedTree {
         return source.getInternalNodes();
     }
 
+	public Set<Edge> getExternalEdges() {
+		return source.getExternalEdges();
+	}
+
+	public Set<Edge> getInternalEdges() {
+		return source.getInternalEdges();
+	}
+
     public Node getNode(Taxon taxon) {
         return source.getNode(taxon);
     }

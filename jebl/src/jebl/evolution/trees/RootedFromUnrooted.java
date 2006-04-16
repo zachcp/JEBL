@@ -258,6 +258,22 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getEdges();
     }
 
+	/**
+	 * The set of external edges.
+	 * @return the set of external edges.
+	 */
+	public Set<Edge> getExternalEdges() {
+		return source.getExternalEdges();
+	}
+
+	/**
+	 * The set of internal edges.
+	 * @return the set of internal edges.
+	 */
+	public Set<Edge> getInternalEdges() {
+		return source.getInternalEdges();
+	}
+
     public Set<Node> getNodes(int degree) {
         Set<Node> nodes = source.getNodes(degree);
         if( degree == 2 ) {

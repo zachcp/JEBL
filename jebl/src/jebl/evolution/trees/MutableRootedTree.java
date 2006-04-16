@@ -478,6 +478,34 @@ public class MutableRootedTree implements RootedTree {
         return edges;
     }
 
+	/**
+	 * The set of external edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of external edges.
+	 */
+	public Set<Edge> getExternalEdges() {
+		Set<Edge> edges = new HashSet<Edge>();
+		for (Node node : getExternalNodes()) {
+			edges.add(((MutableRootedNode)node).getEdge());
+		}
+		return edges;
+	}
+
+	/**
+	 * The set of internal edges. This is a pretty inefficient implementation because
+	 * a new set is constructed each time this is called.
+	 * @return the set of internal edges.
+	 */
+	public Set<Edge> getInternalEdges() {
+		Set<Edge> edges = new HashSet<Edge>();
+		for (Node node : getInternalNodes()) {
+			if (node != getRootNode()) {
+			    edges.add(((MutableRootedNode)node).getEdge());
+			}
+		}
+		return edges;
+	}
+
     /**
      * @param degree the number of edges connected to a node
      * @return a set containing all nodes in this graph of the given degree.
