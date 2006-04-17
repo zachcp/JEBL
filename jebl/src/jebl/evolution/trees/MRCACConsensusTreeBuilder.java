@@ -16,7 +16,7 @@ import java.util.List;
  * @version $Id$
  **/
 
-public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder {
+public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> {
     RootedTree[] trees;
     private double supportThreshold;
     private List<FixedBitSet> tipsInCluster;
@@ -39,8 +39,8 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder {
         }
     }
 
-    public Tree build() {
-        return earliestCommonAnncesstorClustering(supportThreshold);
+    public RootedTree build() {
+        return earliestCommonAncestorClustering(supportThreshold);
     }
 
 
@@ -200,7 +200,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder {
         return distances;
     }
 
-    private Tree earliestCommonAnncesstorClustering(double supportThreshold) {
+    private RootedTree earliestCommonAncestorClustering(double supportThreshold) {
 
         MutableRootedTree consensus = new MutableRootedTree();
         List<Node> subTrees = new ArrayList<Node>(nExternalNodes);

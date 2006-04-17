@@ -7,7 +7,7 @@ import jebl.evolution.io.ImportException;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.trees.TreeBuilder;
+import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Utils;
 import jebl.evolution.graphs.Node;
@@ -142,7 +142,7 @@ public class BartonSternberg {
             }
             compoundProgress.setSectionSize(treeWork);
             // We want a binary rooted tree
-            RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilder.build(sequencesForGuideTree, TreeBuilder.Method.NEIGHBOR_JOINING,
+            RootedTree guideTree = Utils.rootTreeAtCenter(TreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                     aligner, compoundProgress.getMinorProgress()).tree);
             compoundProgress.incrementSectionsCompleted(treeWork);
             compoundProgress.setSectionSize(1);

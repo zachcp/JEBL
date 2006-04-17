@@ -4,12 +4,15 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Andrew Rambaut
@@ -26,6 +29,45 @@ public class NewickImporter implements TreeImporter {
         this.unquotedLables = unquotedLables;
     }
 
+    /**
+     * Returns an iterator over a set of elements of type T.
+     *
+     * @return an Iterator.
+     */
+    public Iterator<Tree> iterator() {
+        return new Iterator<Tree>() {
+
+            public boolean hasNext() {
+                boolean hasNext = false;
+                try {
+                    hasNext = hasTree();
+                } catch (IOException e) {
+                    // deal with errors by stopping the iteration
+                } catch (ImportException e) {
+                    // deal with errors by stopping the iteration
+                }
+                return hasNext;
+            }
+
+            public Tree next() {
+                Tree tree = null;
+                try {
+                    tree = importNextTree();
+                } catch (IOException e) {
+                    // deal with errors by stopping the iteration
+                } catch (ImportException e) {
+                    // deal with errors by stopping the iteration
+                }
+                if (tree == null) throw new NoSuchElementException("No more trees in this file");
+                return tree;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("operation is not supported by this Iterator");
+            }
+        };
+    }
+
     public boolean hasTree() throws IOException, ImportException {
         try {
             helper.skipUntil("(");
@@ -37,7 +79,7 @@ public class NewickImporter implements TreeImporter {
         return true;
     }
 
-    public RootedTree importNextTree() throws IOException, ImportException {
+    public Tree importNextTree() throws IOException, ImportException {
 
         try {
             helper.skipUntil("(");
@@ -50,11 +92,11 @@ public class NewickImporter implements TreeImporter {
         }
     }
 
-    public List<RootedTree> importTrees() throws IOException, ImportException {
-        List<RootedTree> trees = new ArrayList<RootedTree>();
+    public List<Tree> importTrees() throws IOException, ImportException {
+        List<Tree> trees = new ArrayList<Tree>();
 
         while (hasTree()) {
-            final RootedTree t = importNextTree();
+            final Tree t = importNextTree();
             if( t != null ) {
               trees.add(t);
             }

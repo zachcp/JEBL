@@ -45,7 +45,7 @@ import java.util.*;
  * @version $Id$
  */
 
-public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder {
+public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree> {
     /**
      * Set of trees.
      */

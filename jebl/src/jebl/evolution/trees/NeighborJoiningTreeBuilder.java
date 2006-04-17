@@ -1,6 +1,12 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
+
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * Constructs an unrooted tree by neighbor-joining using pairwise distances.
@@ -13,15 +19,19 @@ import jebl.evolution.distances.DistanceMatrix;
  *
  * @version $Id$
  */
-public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
+public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
+
+    private final SimpleTree tree;
 
     /**
      * construct NJ tree
      *
      * @param distanceMatrix distance matrix
      */
-    public NeighborJoiningBuilder(DistanceMatrix distanceMatrix) {
+    public NeighborJoiningTreeBuilder(DistanceMatrix distanceMatrix) {
         super(distanceMatrix, 3);
+
+        this.tree = new SimpleTree();
 
         r = new double[distanceMatrix.getSize()];
     }
@@ -60,6 +70,23 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
         }
     }
 
+    protected Tree getTree() {
+        return tree;
+    }
+
+    protected Node createExternalNode(Taxon taxon) {
+        return tree.createExternalNode(taxon);
+    }
+
+    protected Node createInternalNode(Node[] nodes, double[] distances) {
+        List<Node> a = Arrays.asList(nodes);
+        Node node = tree.createInternalNode(a);
+        for(int k = 0; k < nodes.length; ++k) {
+            tree.setEdge(node, nodes[k], distances[k]);
+        }
+        return node;
+    }
+
     protected void finish() {
         // Connect up the final two clusters
         int abi = alias[0];
@@ -90,4 +117,5 @@ public class NeighborJoiningBuilder extends ClusteringTreeBuilder {
         // Some large distances foil the method
         return Math.max(d, 0.0);
     }
+
 }

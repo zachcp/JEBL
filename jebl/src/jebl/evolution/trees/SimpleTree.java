@@ -39,15 +39,15 @@ public final class SimpleTree implements Tree {
      *
      * It is the caller responsibility to insure no cycles are created.
      *
-     * @param children the child nodes of this nodes
+     * @param adjacencies the child nodes of this nodes
      * @return the created node.
      */
-    public Node createInternalNode(List<Node> children) {
-        SimpleNode node = new SimpleNode(children);
+    public Node createInternalNode(List<Node> adjacencies) {
+        SimpleNode node = new SimpleNode(adjacencies);
 
         internalNodes.add(node);
 
-        for( Node c : children ) {
+        for( Node c : adjacencies ) {
             ((SimpleNode)c).addAdacency(node);
         }
         return node;

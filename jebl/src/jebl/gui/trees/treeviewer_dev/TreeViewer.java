@@ -87,6 +87,10 @@ public class TreeViewer extends JPanel implements Printable {
 		treePane.setTreeLayout(treeLayout);
 	}
 
+    public Tree getTree() {
+        return treePane.getTree();
+    }
+
 	public TreePane getTreePane() {
 		return treePane;
 	}

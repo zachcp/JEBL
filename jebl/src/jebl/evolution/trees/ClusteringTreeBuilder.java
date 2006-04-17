@@ -3,9 +3,11 @@ package jebl.evolution.trees;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * An abstract base class for clustering algorithms from pairwise distances
@@ -19,41 +21,23 @@ import java.util.List;
  * Adapted from Alexei Drummond BEAST code.
  */
 
-abstract class ClusteringTreeBuilder {
-    protected SimpleTree tree = null;
-    protected SimpleRootedTree rtree = null;
-    private boolean buildUsingBranches = true;
+public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuilder<T> {
 
     /**
-     * constructor ClusteringTree
-     *
-     * @param distanceMatrix distance matrix
+     * Supported methods for tree building
      */
-    public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa, boolean useBranches) throws IllegalArgumentException {
-        this.distanceMatrix = distanceMatrix;
-        buildUsingBranches = useBranches;
-
-        if (minimumTaxa == 2) {
-            this.rtree = new SimpleRootedTree();
-        } else {
-            if( !buildUsingBranches ) {
-                throw new IllegalArgumentException("Only rooted trees can use heights");
-            }
-            this.tree = new SimpleTree();
-        }
-        this.minimumTaxa = minimumTaxa;
-
-        if (distanceMatrix.getSize() < minimumTaxa) {
-            throw new IllegalArgumentException("less than " + minimumTaxa + " taxa in distance matrix");
-        }
+    public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
+        Method(String name) { this.name = name; }
+        public String toString() { return getName(); }
+        public String getName() { return name; }
+        private String name;
     }
 
-    public ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
-      this(distanceMatrix, minimumTaxa, true);
-    }
-
-    public Tree build() {
+    public T build() {
         init(distanceMatrix);
+
+        double totalPairs = numClusters;
+        double progress = 0.0;
 
         while (true) {
             findNextPair();
@@ -64,10 +48,123 @@ abstract class ClusteringTreeBuilder {
                 break;
 
             newCluster();
+
+            fireSetProgress(progress / totalPairs);
+            progress++;
         }
         finish();
 
-        return tree != null ? tree : rtree;
+        return getTree();
+    }
+
+    public void addProgressListener(ProgressListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeProgressListener(ProgressListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void fireSetProgress(double fractionCompleted) {
+        for (ProgressListener listener : listeners) {
+            listener.setProgress(fractionCompleted);
+        }
+    }
+
+    private final List<ProgressListener> listeners = new ArrayList<ProgressListener>();
+
+    /**
+     * A factory method to create a ClusteringTreeBuilder
+     * @param method build method to use.
+     * @param distances Pre computed pairwise distances.
+     * @return A tree builder using method and distance matrix
+     */
+    static public ClusteringTreeBuilder getBuilder(ClusteringTreeBuilder.Method method, DistanceMatrix distances) {
+        ClusteringTreeBuilder builder;
+        switch( method ) {
+            case UPGMA:
+            {
+                builder = new UPGMATreeBuilder(distances);
+                break;
+            }
+            case NEIGHBOR_JOINING:
+            default:
+            {
+                builder = new NeighborJoiningTreeBuilder(distances);
+                break;
+            }
+        }
+        return builder;
+    }
+    //
+    // Protected and Private stuff
+    //
+
+    /**
+     * Constructor
+     * @param distanceMatrix
+     * @param minimumTaxa
+     * @throws IllegalArgumentException
+     */
+    protected ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
+        this.distanceMatrix = distanceMatrix;
+
+        this.minimumTaxa = minimumTaxa;
+
+        if (distanceMatrix.getSize() < minimumTaxa) {
+            throw new IllegalArgumentException("less than " + minimumTaxa + " taxa in distance matrix");
+        }
+    }
+
+    protected abstract T getTree();
+
+    protected abstract Node createExternalNode(Taxon taxon);
+
+    protected abstract Node createInternalNode(Node[] nodes, double[] distances);
+
+    /**
+     * Inform derived class that clusters besti,bestj are being joinded into a new cluster.
+     * New cluster will be (the smaller) besti while clusters greater than bestj are shifted one space back.
+     *
+     * @return  branch distances to new internal node [besti - dist , bestj dist]
+     */
+    protected abstract double[] joinClusters();
+
+    /**
+     * compute updated distance between the new cluster (besti,bestj)
+     * to any other cluster k.
+     *  (i,j,k) are cluster indices in [0..numClusters-1]
+     */
+    protected abstract double updatedDistance(int k);
+
+    protected double getDist(int a, int b) {
+        return distance[alias[a]][alias[b]];
+    }
+
+    protected void init(final DistanceMatrix distanceMatrix) {
+
+        numClusters = distanceMatrix.getSize();
+        clusters = new Node[numClusters];
+
+        distance = new double[numClusters][numClusters];
+        for (int i = 0; i < numClusters; i++) {
+            for (int j = 0; j < numClusters; j++) {
+                distance[i][j] = distanceMatrix.getDistance(i, j);
+            }
+        }
+
+        final List<Taxon> taxa = distanceMatrix.getTaxa();
+        for (int i = 0; i < numClusters; i++) {
+            clusters[i] = createExternalNode(taxa.get(i));
+        }
+
+        alias = new int[numClusters];
+        tipCount = new int[numClusters];
+
+        for (int i = 0; i < numClusters; i++) {
+            alias[i] = i;
+            tipCount[i] = 1;
+        }
     }
 
     /**
@@ -90,83 +187,10 @@ abstract class ClusteringTreeBuilder {
         }
     }
 
-    /**
-     * Inform derived class that clusters besti,bestj are being joinded into a new cluster.
-     * New cluster will be (the smaller) besti while clusters greater than bestj are shifted one space back.
-     *
-     * @return  branch distances to new internal node [besti - dist , bestj dist]
-     */
-    protected abstract double[] joinClusters();
-
-    /**
-     * compute updated distance between the new cluster (besti,bestj)
-     * to any other cluster k.
-     *  (i,j,k) are cluster indices in [0..numClusters-1]
-     */
-    protected abstract double updatedDistance(int k);
-
-    /**
-     *
-     * @param node
-     */
-    protected void clusterCreated(Node node) {}
-
-    //
-    // Protected and Private stuff
-    //
-
-    protected double getDist(int a, int b) {
-        return distance[alias[a]][alias[b]];
-    }
-
-    protected void init(final DistanceMatrix distanceMatrix) {
-
-        numClusters = distanceMatrix.getSize();
-        clusters = new Node[numClusters];
-
-        distance = new double[numClusters][numClusters];
-        for (int i = 0; i < numClusters; i++) {
-            for (int j = 0; j < numClusters; j++) {
-                distance[i][j] = distanceMatrix.getDistance(i, j);
-            }
-        }
-
-        final List<Taxon> taxa = distanceMatrix.getTaxa();
-        for (int i = 0; i < numClusters; i++) {
-            clusters[i] = (tree != null) ? tree.createExternalNode(taxa.get(i)) :
-                                           rtree.createExternalNode(taxa.get(i));
-        }
-
-        alias = new int[numClusters];
-        tipCount = new int[numClusters];
-
-        for (int i = 0; i < numClusters; i++) {
-            alias[i] = i;
-            tipCount[i] = 1;
-        }
-    }
-
     protected void newCluster() {
         double[] d = joinClusters();
         Node[] n = { clusters[abi], clusters[abj] };
-        List<Node> a = Arrays.asList(n);
-        if( tree != null ) {
-            newCluster = tree.createInternalNode(a);
-            for(int k = 0; k < 2; ++k) {
-                tree.setEdge(newCluster, n[k], d[k]);
-            }
-        } else {
-          newCluster = rtree.createInternalNode(a);
-            if( buildUsingBranches )  {
-          for(int k = 0; k < 2; ++k) {
-             rtree.setLength(n[k], d[k]);
-                }
-            } else {
-                rtree.setHeight(newCluster, d[0]);
-          }
-        }
-
-        clusterCreated(newCluster);
+        newCluster = createInternalNode(n, d);
 
         clusters[abi] = newCluster;
         clusters[abj] = null;

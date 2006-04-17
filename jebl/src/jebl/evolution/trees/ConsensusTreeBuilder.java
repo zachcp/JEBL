@@ -1,6 +1,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +16,37 @@ import java.util.Set;
  * @version $Id$
  */
 
-public abstract class ConsensusTreeBuilder {
+public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilder<T> {
+
+    /** Name of attribute specifing amount of support for branch */
+    final static public String supportAttributeName = "Consensus support(%)";
+
+    /**
+     * Supported consesus methods.
+     */
+    public enum Method { GREEDY("Greedy"), MRCAC("MRCA Clustering");
+
+        Method(String name) {
+           this.name = name;
+        }
+
+        public String toString() {
+            return getName();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        private String name;
+    }
+
     /** Number of external nodes/taxa */
     protected final int nExternalNodes;
 
     /** List of common taxa in all trees */
     protected List<Taxon> taxons;
 
-    /** Name of attribute specifing amount of support for branch */
-    final static public String supportAttributeName = "Consensus support(%)";
 
     /**
      * Check for consistmcy and establish the common taxa
@@ -45,8 +68,21 @@ public abstract class ConsensusTreeBuilder {
         }
     }
 
-    /**
-     * @return  The consensus tree
-     */
-    abstract public Tree build();
+    public void addProgressListener(ProgressListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeProgressListener(ProgressListener listener) {
+        listeners.remove(listener);
+    }
+
+    protected void fireSetProgress(double fractionCompleted) {
+        for (ProgressListener listener : listeners) {
+            listener.setProgress(fractionCompleted);
+        }
+    }
+
+    private final List<ProgressListener> listeners = new ArrayList<ProgressListener>();
+
+
 }

@@ -17,7 +17,7 @@ import java.util.*;
  *          Implementation shares some code with GreedyUnrootedConsensusTreeBuilder (which preceded it), and perhaps I will
  *          find a way to merge the two at a later stage when I have the time.
  */
-public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
+public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> {
     /**
      * Set of trees.
      */
@@ -112,7 +112,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder {
     }
 
 
-    public final Tree build() {
+    public final RootedTree build() {
 
         // establish support
         Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();

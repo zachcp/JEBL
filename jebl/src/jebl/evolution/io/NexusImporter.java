@@ -63,6 +63,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		helper.setCommentDelimiters('[', ']', '\0', '!', '&');
 	}
 
+
 	/**
 	 * This function returns an integer to specify what the
 	 * next block in the file is. The internal variable nextBlock is also set to this
@@ -96,6 +97,45 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return nextBlock;
 	}
 
+    /**
+     * Returns an iterator over a set of elements of type T.
+     *
+     * @return an Iterator.
+     */
+    public Iterator<Tree> iterator() {
+        return new Iterator<Tree>() {
+
+            public boolean hasNext() {
+                boolean hasNext = false;
+                try {
+                    hasNext = hasTree();
+                } catch (IOException e) {
+                    // deal with errors by stopping the iteration
+                } catch (ImportException e) {
+                    // deal with errors by stopping the iteration
+                }
+                return hasNext;
+            }
+
+            public Tree next() {
+                Tree tree = null;
+                try {
+                    tree = importNextTree();
+                } catch (IOException e) {
+                    // deal with errors by stopping the iteration
+                } catch (ImportException e) {
+                    // deal with errors by stopping the iteration
+                }
+                if (tree == null) throw new NoSuchElementException("No more trees in this file");
+                return tree;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("operation is not supported by this Iterator");
+            }
+        };
+    }
+
 	/**
 	 * Parses a 'TAXA' block.
 	 */
@@ -123,7 +163,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Parses a 'TREES' block.
 	 */
-	public List<RootedTree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+	public List<Tree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
 		return readTreesBlock(taxonList);
 	}
@@ -283,7 +323,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return tree;
 	}
 
-	public List<RootedTree> importTrees() throws IOException, ImportException {
+	public List<Tree> importTrees() throws IOException, ImportException {
 		isReadingTreesBlock = false;
 		if (!startReadingTrees()) {
 			throw new MissingBlockException("TREES block is missing");
@@ -869,9 +909,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Reads a 'TREES' block.
 	 */
-	private List<RootedTree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
-		List<RootedTree> trees = new ArrayList<RootedTree>();
+		List<Tree> trees = new ArrayList<Tree>();
 
 		String[] lastToken = new String[1];
 		translationList = readTranslationList(taxonList, lastToken);

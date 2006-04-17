@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @version $Id$
  */
-public interface TreeImporter {
+public interface TreeImporter extends Iterable<Tree> {
 
 	/**
      * This can be used to read one tree at a time in a loop:
@@ -51,5 +51,5 @@ public interface TreeImporter {
      * @throws ImportException
      * Any type of tree is fine.
      */
-	List<? extends Tree> importTrees() throws IOException, ImportException;
+	List<Tree> importTrees() throws IOException, ImportException;
 }
