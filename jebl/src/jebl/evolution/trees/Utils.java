@@ -163,7 +163,7 @@ public final class Utils {
         return b.toString();
     }
 
-    // NUmber of branches from node to most remote tip.
+    // Number of branches from node to most remote tip.
     private static int nodeDistance(final RootedTree tree, final Node node) {
         if (tree.isExternal(node)) {
             return 0;
@@ -176,12 +176,16 @@ public final class Utils {
         return d + 1;
     }
 
+    public static double safeNodeHeight(final RootedTree tree, final Node node) {
+       if (tree.hasHeights()) {
+            return tree.getHeight(node);
+        }
+        return nodeDistance(tree, node);
+    }
+
     private static double safeTreeHeight(final RootedTree tree) {
         final Node root = tree.getRootNode();
-        if (tree.hasHeights()) {
-            return tree.getHeight(root);
-        }
-        return nodeDistance(tree, root);
+        return safeNodeHeight(tree, root);
     }
 
     public static String[] asText(Tree tree, int widthGuide) {

@@ -20,10 +20,20 @@ import java.util.List;
 
 public class TreeBuilderFactory {
 
-    /**
+    /*
      * Supported methods for tree building
      */
-    public enum Method { NEIGHBOR_JOINING, UPGMA; }
+   // public enum Method { NEIGHBOR_JOINING, UPGMA; }
+
+    /**
+         * Supported methods for tree building
+         */
+        public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
+            Method(String name) { this.name = name; }
+            public String toString() { return getName(); }
+            public String getName() { return name; }
+            private String name;
+        }
 
     /**
      * Supported pairwise distance methods
@@ -34,11 +44,6 @@ public class TreeBuilderFactory {
      * Supported consensus methods.
      */
     public enum ConsensusMethod { GREEDY, MRCAC }
-
-
-    public static String niceName(ClusteringTreeBuilder.Method method) {
-        return method.getName();
-    }
 
     /**
      *

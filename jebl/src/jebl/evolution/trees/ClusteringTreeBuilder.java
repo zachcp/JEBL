@@ -5,9 +5,8 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.ProgressListener;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An abstract base class for clustering algorithms from pairwise distances
@@ -23,15 +22,6 @@ import java.util.ArrayList;
 
 public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuilder<T> {
 
-    /**
-     * Supported methods for tree building
-     */
-    public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
-        Method(String name) { this.name = name; }
-        public String toString() { return getName(); }
-        public String getName() { return name; }
-        private String name;
-    }
 
     public T build() {
         init(distanceMatrix);
@@ -79,7 +69,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
      * @param distances Pre computed pairwise distances.
      * @return A tree builder using method and distance matrix
      */
-    static public ClusteringTreeBuilder getBuilder(ClusteringTreeBuilder.Method method, DistanceMatrix distances) {
+    static public ClusteringTreeBuilder getBuilder(TreeBuilderFactory.Method method, DistanceMatrix distances) {
         ClusteringTreeBuilder builder;
         switch( method ) {
             case UPGMA:

@@ -85,30 +85,30 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
             s = new Support();
             support.put(clade, s);
         }
-        s.add(tree.getHeight(node));
+        s.add(Utils.safeNodeHeight(tree, node));
         return clade;
     }
 
     /**
-     * Make sure subtree belowe node has consistent heights, i.e. node height is higher than it's descendants
+     * Make sure subtree below node has consistent heights, i.e. node height is higher than it's descendants
      *
      * @param tree
      * @param node
      * @return height of node
      */
     private double insureConsistency(MutableRootedTree tree, Node node) {
-        double hieght = tree.getHeight(node);
+        double height = Utils.safeNodeHeight(tree, node);
         if (tree.isExternal(node)) {
-            return hieght;
+            return height;
         } else {
             for (Node n : tree.getChildren(node)) {
                 final double childHeight = insureConsistency(tree, n);
-                hieght = Math.max(hieght, childHeight);
+                height = Math.max(height, childHeight);
             }
         }
 
-        tree.setHeight(node, hieght);
-        return hieght;
+        tree.setHeight(node, height);
+        return height;
     }
 
 
