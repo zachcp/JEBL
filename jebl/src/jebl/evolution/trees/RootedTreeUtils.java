@@ -2,7 +2,7 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.consensus.MissingTaxonException;
+import jebl.evolution.taxa.MissingTaxonException;
 
 import java.util.*;
 
