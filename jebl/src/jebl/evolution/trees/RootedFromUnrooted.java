@@ -186,6 +186,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public boolean isExternal(Node node) {
+        if( node == root ) return false;
         return source.isExternal(node);
     }
 
