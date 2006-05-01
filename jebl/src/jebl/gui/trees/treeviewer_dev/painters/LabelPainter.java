@@ -1,5 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
+import jebl.evolution.trees.Tree;
+
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -42,7 +44,9 @@ public abstract class LabelPainter<T> extends AbstractPainter<T> {
 
 	public abstract String[] getAttributes();
 
-	public abstract void setDisplayAttribute(String displayAttribute);
+    public abstract void setupAttributes(Tree tree);
+
+    public abstract void setDisplayAttribute(String displayAttribute);
 
 	// Getters
 

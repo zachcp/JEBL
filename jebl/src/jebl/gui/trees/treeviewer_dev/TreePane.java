@@ -6,6 +6,7 @@ import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer_dev.painters.Painter;
 import jebl.gui.trees.treeviewer_dev.painters.PainterListener;
+import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayoutListener;
 
@@ -77,7 +78,19 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			tree = new TransformedRootedTree(tree, branchTransform);
 		}
 
-		if (treeLayout != null) {
+        if (tipLabelPainter != null) {
+            tipLabelPainter.setupAttributes(tree);
+        }
+
+        if (nodeLabelPainter != null) {
+            nodeLabelPainter.setupAttributes(tree);
+        }
+
+        if (branchLabelPainter != null) {
+            branchLabelPainter.setupAttributes(tree);
+        }
+
+        if (treeLayout != null) {
 			treeLayout.setTree(tree);
 
 			calibrated = false;
@@ -310,7 +323,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return treeLayout.maintainAspectRatio();
 	}
 
-	public void setTipLabelPainter(Painter<Node> tipLabelPainter) {
+	public void setTipLabelPainter(LabelPainter<Node> tipLabelPainter) {
 		tipLabelPainter.setTreePane(this);
 		if (this.tipLabelPainter != null) {
 			this.tipLabelPainter.removePainterListener(this);
@@ -327,7 +340,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return tipLabelPainter;
 	}
 
-	public void setNodeLabelPainter(Painter<Node> nodeLabelPainter) {
+	public void setNodeLabelPainter(LabelPainter<Node> nodeLabelPainter) {
 		nodeLabelPainter.setTreePane(this);
 		if (this.nodeLabelPainter != null) {
 			this.nodeLabelPainter.removePainterListener(this);
@@ -344,7 +357,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return nodeLabelPainter;
 	}
 
-	public void setBranchLabelPainter(Painter<Node> branchLabelPainter) {
+	public void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter) {
 		branchLabelPainter.setTreePane(this);
 		if (this.branchLabelPainter != null) {
 			this.branchLabelPainter.removePainterListener(this);
@@ -1008,10 +1021,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private BranchDecorator branchDecorator = null;
 
 	private float labelXOffset = 5.0F;
-	private Painter<Node> tipLabelPainter = null;
+	private LabelPainter<Node> tipLabelPainter = null;
 	private double tipLabelWidth;
-	private Painter<Node> nodeLabelPainter = null;
-	private Painter<Node> branchLabelPainter = null;
+	private LabelPainter<Node> nodeLabelPainter = null;
+	private LabelPainter<Node> branchLabelPainter = null;
 
 	private Painter<TreePane> scaleBarPainter = null;
 	private Rectangle2D scaleBarBounds = null;

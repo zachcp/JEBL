@@ -7,7 +7,7 @@ import jebl.gui.trees.treeviewer_dev.TreePane;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -31,39 +31,56 @@ public class BasicLabelPainter extends LabelPainter<Node> {
     };
 
     public BasicLabelPainter(PainterIntent intent) {
-        List<String> sources = new ArrayList<String>();
-        switch( intent ) {
-            case TIP: {
-                sources.add(TAXON_NAMES);
-	            sources.add(NODE_HEIGHTS);
-	            sources.add(BRANCH_LENGTHS);
-                break;
-            }
-            case NODE: {
-	            sources.add(NODE_HEIGHTS);
-	            sources.add(BRANCH_LENGTHS);
-                break;
-            }
-            case BRANCH: {
-	            sources.add(BRANCH_LENGTHS);
-	            sources.add(NODE_HEIGHTS);
-                break;
-            }
-        }
+        this.intent = intent;
 
-        if (this.displayAttribute == null && sources.size() > 0) {
-            this.displayAttribute = sources.get(0);
+        setupAttributes(null);
+
+        if (this.displayAttribute == null) {
+            this.displayAttribute = attributes[0];
         } else {
             this.displayAttribute = "";
         }
 
-        this.attributes = new String[sources.size()];
-        sources.toArray(this.attributes);
     }
 
-	public void setTreePane(TreePane treePane) {
-		this.treePane = treePane;
-	}
+    public void setupAttributes(Tree tree) {
+        List<String> attributeNames = new ArrayList<String>();
+        switch( intent ) {
+            case TIP: {
+                attributeNames.add(TAXON_NAMES);
+                attributeNames.add(NODE_HEIGHTS);
+                attributeNames.add(BRANCH_LENGTHS);
+                break;
+            }
+            case NODE: {
+                attributeNames.add(NODE_HEIGHTS);
+                attributeNames.add(BRANCH_LENGTHS);
+                break;
+            }
+            case BRANCH: {
+                attributeNames.add(BRANCH_LENGTHS);
+                attributeNames.add(NODE_HEIGHTS);
+                break;
+            }
+        }
+
+        if (tree != null) {
+            Set<String> nodeAttributes = new TreeSet<String>();
+            for (Node node : tree.getNodes()) {
+                nodeAttributes.addAll(node.getAttributeNames());
+            }
+            attributeNames.addAll(nodeAttributes);
+        }
+
+        this.attributes = new String[attributeNames.size()];
+        attributeNames.toArray(this.attributes);
+
+        firePainterChanged();
+    }
+
+    public void setTreePane(TreePane treePane) {
+        this.treePane = treePane;
+    }
 
     protected String getLabel(Tree tree, Node node) {
         if (displayAttribute.equalsIgnoreCase(TAXON_NAMES)) {
@@ -87,26 +104,26 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         return null;
     }
 
-	public void calibrate(Graphics2D g2, Node item) {
-		Tree tree = treePane.getTree();
+    public void calibrate(Graphics2D g2, Node item) {
+        Tree tree = treePane.getTree();
 
-	    final Font oldFont = g2.getFont();
-	    g2.setFont(getFont());
+        final Font oldFont = g2.getFont();
+        g2.setFont(getFont());
 
-	    FontMetrics fm = g2.getFontMetrics();
-	    preferredHeight = fm.getHeight();
-	    preferredWidth = 0;
+        FontMetrics fm = g2.getFontMetrics();
+        preferredHeight = fm.getHeight();
+        preferredWidth = 0;
 
-	    String label = getLabel(tree, item);
-	    if (label != null) {
-	        Rectangle2D rect = fm.getStringBounds(label, g2);
-	        preferredWidth = rect.getWidth();
-	    }
+        String label = getLabel(tree, item);
+        if (label != null) {
+            Rectangle2D rect = fm.getStringBounds(label, g2);
+            preferredWidth = rect.getWidth();
+        }
 
-	    yOffset = (float)fm.getAscent();
+        yOffset = (float)fm.getAscent();
 
-	    g2.setFont(oldFont);
-	}
+        g2.setFont(oldFont);
+    }
 
     public double getPreferredWidth() {
         return preferredWidth;
@@ -120,54 +137,54 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         return preferredHeight + yOffset;
     }
 
-	public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
-		Tree tree = treePane.getTree();
+    public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
+        Tree tree = treePane.getTree();
 
-	    Font oldFont = g2.getFont();
+        Font oldFont = g2.getFont();
 
-	    if (getBackground() != null) {
-	        g2.setPaint(getBackground());
-	        g2.fill(bounds);
-	    }
+        if (getBackground() != null) {
+            g2.setPaint(getBackground());
+            g2.fill(bounds);
+        }
 
-	    if (getBorderPaint() != null && getBorderStroke() != null) {
-	        g2.setPaint(getBorderPaint());
-	        g2.setStroke(getBorderStroke());
-	        g2.draw(bounds);
-	    }
+        if (getBorderPaint() != null && getBorderStroke() != null) {
+            g2.setPaint(getBorderPaint());
+            g2.setStroke(getBorderStroke());
+            g2.draw(bounds);
+        }
 
-	    g2.setPaint(getForeground());
-	    g2.setFont(getFont());
+        g2.setPaint(getForeground());
+        g2.setFont(getFont());
 
-	    String label = getLabel(tree, item);
-	    if (label != null) {
+        String label = getLabel(tree, item);
+        if (label != null) {
 
-	        Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
+            Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
-	        float xOffset;
-	        float y = yOffset + (float) bounds.getY();
-	        switch (justification) {
-	            case CENTER:
-	                xOffset = (float)(-rect.getWidth()/2.0);
-	                y = yOffset + (float) rect.getY();
-	                //xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
-	                break;
-	            case FLUSH:
-	            case LEFT:
-	                xOffset = (float) bounds.getX();
-	                break;
-	            case RIGHT:
-	                xOffset = (float) (bounds.getX() + bounds.getWidth() - rect.getWidth());
-	                break;
-	            default:
-	                throw new IllegalArgumentException("Unrecognized alignment enum option");
-	        }
+            float xOffset;
+            float y = yOffset + (float) bounds.getY();
+            switch (justification) {
+                case CENTER:
+                    xOffset = (float)(-rect.getWidth()/2.0);
+                    y = yOffset + (float) rect.getY();
+                    //xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+                    break;
+                case FLUSH:
+                case LEFT:
+                    xOffset = (float) bounds.getX();
+                    break;
+                case RIGHT:
+                    xOffset = (float) (bounds.getX() + bounds.getWidth() - rect.getWidth());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unrecognized alignment enum option");
+            }
 
-	        g2.drawString(label, xOffset, y);
-	    }
+            g2.drawString(label, xOffset, y);
+        }
 
-	    g2.setFont(oldFont);
-	}
+        g2.setFont(oldFont);
+    }
 
     public String[] getAttributes() {
         return attributes;
@@ -178,6 +195,8 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         firePainterChanged();
     }
 
+    private PainterIntent intent;
+
     private double preferredWidth;
     private double preferredHeight;
     private float yOffset;
@@ -185,5 +204,5 @@ public class BasicLabelPainter extends LabelPainter<Node> {
     protected String displayAttribute;
     protected String[] attributes;
 
-	protected TreePane treePane;
+    protected TreePane treePane;
 }

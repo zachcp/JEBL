@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.gui.trees.treeviewer_dev.TreePane;
+import jebl.evolution.trees.Tree;
 import org.virion.jam.controlpalettes.ControlPalette;
 
 import java.awt.*;
@@ -173,8 +174,12 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 		return new String[0];
 	}
 
-	public void setDisplayAttribute(String displayAttribute) {
-	}
+    public void setupAttributes(Tree tree) {
+        // nothing to do...
+    }
+
+    public void setDisplayAttribute(String displayAttribute) {
+    }
 
 	private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
