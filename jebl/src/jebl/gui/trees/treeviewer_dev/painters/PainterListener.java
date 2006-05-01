@@ -8,4 +8,6 @@ public interface PainterListener {
 
     void painterChanged();
 
+    void painterSettingsChanged();
+
 }

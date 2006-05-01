@@ -75,7 +75,7 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         this.attributes = new String[attributeNames.size()];
         attributeNames.toArray(this.attributes);
 
-        firePainterChanged();
+        firePainterSettingsChanged();
     }
 
     public void setTreePane(TreePane treePane) {

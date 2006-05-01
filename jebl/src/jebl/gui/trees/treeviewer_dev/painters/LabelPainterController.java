@@ -90,8 +90,11 @@ public class LabelPainterController implements Controller {
         });
 
         labelPainter.addPainterListener(new PainterListener() {
-
             public void painterChanged() {
+                
+            }
+
+            public void painterSettingsChanged() {
                 displayAttributeCombo.removeAllItems();
                 for (String name : labelPainter.getAttributes()) {
                     displayAttributeCombo.addItem(name);
