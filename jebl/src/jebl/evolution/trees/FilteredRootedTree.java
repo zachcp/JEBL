@@ -99,6 +99,10 @@ public abstract class FilteredRootedTree implements RootedTree {
         return source.getEdges();
     }
 
+	public Node[] getNodes(Edge edge) {
+	    return source.getNodes(edge);
+	}
+
     public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
         return source.getEdge(node1, node2);
     }

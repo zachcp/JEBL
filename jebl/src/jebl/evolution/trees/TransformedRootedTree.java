@@ -1,10 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
-
-import java.util.Set;
-import java.util.List;
+import jebl.evolution.graphs.Node;
 
 /**
  * This RootedTree class wraps another RootedTree and transforms
@@ -19,19 +16,19 @@ import java.util.List;
  */
 public class TransformedRootedTree extends FilteredRootedTree {
 
-    public enum Transform {
-        EQUAL_LENGTHS("equal"),
-        CLADOGRAM("cladogram"),
-        PROPORTIONAL("proportional");
+	public enum Transform {
+	    EQUAL_LENGTHS("equal"),
+	    CLADOGRAM("cladogram"),
+	    PROPORTIONAL("proportional");
 
-        Transform(String name) {
-            this.name = name;
-        }
+	    Transform(String name) {
+	        this.name = name;
+	    }
 
-        public String toString() { return name; }
+	    public String toString() { return name; }
 
-        private String name;
-    }
+	    private String name;
+	}
 
     public TransformedRootedTree(final RootedTree source, Transform transform) {
         super(source);

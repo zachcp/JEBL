@@ -25,8 +25,12 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
 
     private boolean debug = false;
 
-    MRCACConsensusTreeBuilder(Tree[] trees, double supportThreshold) {
-        super(trees);
+	public MRCACConsensusTreeBuilder(Tree[] trees, double supportThreshold) {
+	    this(trees, supportThreshold, DEFAULT_SUPPORT_ATTRIBUTE_NAME, true);
+	}
+
+    public MRCACConsensusTreeBuilder(Tree[] trees, double supportThreshold, String supportAttributeName, boolean asPercent) {
+        super(trees, supportAttributeName, asPercent);
         this.trees = new RootedTree[trees.length];
         for(int i = 0; i < trees.length; ++i) {
             this.trees[i] = (RootedTree)trees[i];
@@ -255,7 +259,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
             consensus.setHeight(sub, mostRecentAnncestorHeight);
             // root always 100%
             if( nClusters > 2 ) {
-                sub.setAttribute(supportAttributeName, 100.0*supportForClade);
+	            sub.setAttribute(getSupportAttributeName(), isSupportAsPercent() ? 100 * supportForClade : supportForClade);
             }
             subTrees.set(besti, sub);
             tipsInCluster.get(besti).union(tipsInCluster.get(bestj));
@@ -281,7 +285,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
         // Remove nodes with low support
         supportThreshold *= 100;
         for( Node node : consensus.getInternalNodes() ) {
-            Object sup = node.getAttribute(supportAttributeName);
+            Object sup = node.getAttribute(getSupportAttributeName());
             if( sup != null && (Double)sup < supportThreshold ) {
                 consensus.removeInternalNode(node);
             }

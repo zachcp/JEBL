@@ -403,6 +403,22 @@ public class MutableRootedTree implements RootedTree {
         return edges;
     }
 
+	/**
+	 * Returns an array of 2 nodes which are the nodes at either end of the edge.
+	 *
+	 * @param edge
+	 * @return an array of 2 edges
+	 */
+	public Node[] getNodes(Edge edge) {
+		for (Node node : getNodes()) {
+			if (((MutableRootedNode)node).getEdge() == edge) {
+				return new Node[] { node, ((MutableRootedNode)node).getParent() };
+			}
+		}
+		return null;
+	}
+
+
     /**
      * @param node
      * @return the set of nodes that are attached by edges to the given node.

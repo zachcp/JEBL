@@ -54,6 +54,12 @@ public interface Graph extends Attributable {
      */
     double getEdgeLength(Node node1, Node node2) throws NoEdgeException;
 
+	/**
+	 * Returns an array of 2 nodes which are the nodes at either end of the edge.
+	 * @param edge
+	 * @return an array of 2 edges
+	 */
+	Node[] getNodes(Edge edge);
 
     /**
      * @return the set of all nodes in this graph.

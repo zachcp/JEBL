@@ -61,8 +61,15 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
      */
     private final double supportThreshold;
 
-    GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
-        super(trees);
+	GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
+	    super(trees);
+	    this.trees = trees;
+	    this.outGroup = outGroup;
+	    this.supportThreshold = supportThreshold;
+	}
+
+    GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold, String supportAttributeName, boolean asPercent) {
+        super(trees, supportAttributeName, asPercent);
         this.trees = trees;
         this.outGroup = outGroup;
         this.supportThreshold = supportThreshold;
@@ -350,7 +357,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
                         final double length = s.sumBranches / s.nTreesWithClade;
                         consTree.setLength(detached, length);
 
-                        detached.setAttribute(supportAttributeName, 100 * psupport);
+	                    detached.setAttribute(getSupportAttributeName(), isSupportAsPercent() ? 100 * psupport : psupport);
 
                         if (debug) {
                             System.out.println("detached:" + subTreeRep(consTree, detached, n) + " len " + length + " sup " + psupport);
@@ -380,7 +387,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
             if (outGroup != null) {
                 Node out = consTree.getNode(outGroup);
                 Set<String> a = new HashSet<String>();
-                a.add(supportAttributeName);
+                a.add(getSupportAttributeName());
                 consTree.reRootWithOutgroup(out, a);
             }
 

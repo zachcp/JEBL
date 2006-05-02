@@ -188,14 +188,24 @@ public final class SimpleTree implements Tree {
         return getEdge(node1, node2).getLength();
     }
 
-    /**
-     * @return the set of all nodes in this graph.
-     */
-    public Set<Node> getNodes() {
-        Set<Node> nodes = new HashSet<Node>(internalNodes);
-        nodes.addAll(externalNodes.values());
-        return nodes;
-    }
+	/**
+	 * Returns an array of 2 nodes which are the nodes at either end of the edge.
+	 *
+	 * @param edge
+	 * @return an array of 2 edges
+	 */
+	public Node[] getNodes(Edge edge) {
+		return new Node[] { ((SimpleEdge)edge).getNode1(), ((SimpleEdge)edge).getNode2() };
+	}
+
+	/**
+	 * @return the set of all nodes in this graph.
+	 */
+	public Set<Node> getNodes() {
+	    Set<Node> nodes = new HashSet<Node>(internalNodes);
+	    nodes.addAll(externalNodes.values());
+	    return nodes;
+	}
 
     /**
      * @return the set of all edges in this graph.
@@ -345,6 +355,14 @@ public final class SimpleTree implements Tree {
 			this.node1 = node1;
 			this.node2 = node2;
 			this.length = length;
+		}
+
+		public Node getNode1() {
+			return node1;
+		}
+
+		public Node getNode2() {
+			return node2;
 		}
 
 		public double getLength() {

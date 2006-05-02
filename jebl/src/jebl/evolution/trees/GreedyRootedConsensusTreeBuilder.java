@@ -35,6 +35,12 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
         this.supportThreshold = supportThreshold;
     }
 
+	GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold, String supportAttributeName, boolean asPercent) {
+	    super(trees, supportAttributeName, asPercent);
+	    this.rtrees = trees;
+	    this.supportThreshold = supportThreshold;
+	}
+
     /**
      * One clade support.
      */
@@ -247,7 +253,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
                     final double height = s.sumBranches / s.nTreesWithClade;
                     consTree.setHeight(detached, height);
 
-                    detached.setAttribute(supportAttributeName, 100 * psupport);
+                    detached.setAttribute(getSupportAttributeName(), isSupportAsPercent() ? 100 * psupport : psupport);
 
                     if (debug) {
                         System.out.println("detached:" + Utils.DEBUGsubTreeRep(consTree, detached) + " len " + height + " sup " + psupport);
@@ -269,7 +275,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
         }
 
         insureConsistency(consTree, consTree.getRootNode());
- 
+
         return consTree;
     }
 }

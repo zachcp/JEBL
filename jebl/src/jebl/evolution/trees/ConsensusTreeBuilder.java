@@ -19,9 +19,12 @@ import java.util.Set;
 public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilder<T> {
 
     /** Name of attribute specifing amount of support for branch */
-    final static public String supportAttributeName = "Consensus support(%)";
+    final static public String DEFAULT_SUPPORT_ATTRIBUTE_NAME = "Consensus support(%)";
 
-    /**
+	private String supportAttributeName;
+	private boolean supportAsPercent;
+
+	/**
      * Supported consesus methods.
      */
     public enum Method { GREEDY("Greedy"), MRCAC("MRCA Clustering");
@@ -48,12 +51,22 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
     protected List<Taxon> taxons;
 
 
+	/**
+	 * Check for consistancy and establish the common taxa
+	 * @param trees
+	 */
+	ConsensusTreeBuilder(Tree[] trees) {
+		this(trees, DEFAULT_SUPPORT_ATTRIBUTE_NAME, true);
+	}
+
     /**
      * Check for consistmcy and establish the common taxa
      * @param trees
      */
-    ConsensusTreeBuilder(Tree[] trees) {
+    ConsensusTreeBuilder(Tree[] trees, String supportAttributeName, boolean asPercent) {
         Tree first = trees[0];
+	    this.supportAttributeName = supportAttributeName;
+	    this.supportAsPercent = asPercent;
 
         nExternalNodes = first.getExternalNodes().size();
 
@@ -67,6 +80,14 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
             }
         }
     }
+
+	public String getSupportAttributeName() {
+		return supportAttributeName;
+	}
+
+	public boolean isSupportAsPercent() {
+		return supportAsPercent;
+	}
 
     public void addProgressListener(ProgressListener listener) {
         listeners.add(listener);

@@ -357,14 +357,29 @@ final public class SimpleRootedTree implements RootedTree {
         }
     }
 
-    /**
-     * @return the set of all nodes in this graph.
-     */
-    public Set<Node> getNodes() {
-        Set<Node> nodes = new HashSet<Node>(internalNodes);
-        nodes.addAll(externalNodes.values());
-        return nodes;
-    }
+	/**
+	 * Returns an array of 2 nodes which are the nodes at either end of the edge.
+	 *
+	 * @param edge
+	 * @return an array of 2 edges
+	 */
+	public Node[] getNodes(Edge edge) {
+		for (Node node : getNodes()) {
+			if (((SimpleRootedNode)node).getEdge() == edge) {
+				return new Node[] { node, ((SimpleRootedNode)node).getParent() };
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the set of all nodes in this graph.
+	 */
+	public Set<Node> getNodes() {
+	    Set<Node> nodes = new HashSet<Node>(internalNodes);
+	    nodes.addAll(externalNodes.values());
+	    return nodes;
+	}
 
     /**
      * @return the set of all edges in this graph.

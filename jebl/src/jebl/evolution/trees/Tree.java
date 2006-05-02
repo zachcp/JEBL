@@ -71,4 +71,5 @@ public interface Tree extends Graph {
      * if the taxon is not a member of the taxa set associated with this tree.
      */
     Node getNode(Taxon taxon);
+
 }

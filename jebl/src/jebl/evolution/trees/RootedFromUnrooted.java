@@ -204,6 +204,10 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getEdges(node);
     }
 
+	public Node[] getNodes(Edge edge) {
+	    return source.getNodes(edge);
+	}
+
     public List<Node> getAdjacencies(Node node) {
         // special case when syntetic root
         if( topLeft != null ) {
