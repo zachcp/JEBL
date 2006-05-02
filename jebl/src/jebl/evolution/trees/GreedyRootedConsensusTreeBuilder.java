@@ -29,13 +29,13 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
      */
     private final double supportThreshold;
 
-    GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold) {
+    public GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold) {
         super(trees);
         this.rtrees = trees;
         this.supportThreshold = supportThreshold;
     }
 
-	GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold, String supportAttributeName, boolean asPercent) {
+	public GreedyRootedConsensusTreeBuilder(RootedTree[] trees, double supportThreshold, String supportAttributeName, boolean asPercent) {
 	    super(trees, supportAttributeName, asPercent);
 	    this.rtrees = trees;
 	    this.supportThreshold = supportThreshold;

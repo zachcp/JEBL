@@ -338,6 +338,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.tipLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
+        this.tipLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
@@ -355,6 +356,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.nodeLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
+        this.nodeLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
@@ -372,6 +374,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.branchLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
+        this.branchLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
