@@ -6,7 +6,7 @@
  * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
  */
-package jebl.evolution.trees.gui;
+package jebl.gui.trees.treecomponent;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;

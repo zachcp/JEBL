@@ -118,5 +118,36 @@ public interface DemographicFunction {
 		}
 
 	};
+	
+	public static class Utils
+	{
+
+		/**
+		 * This function tests the consistency of the
+		 * getIntensity and getInverseIntensity methods
+		 * of this demographic model. If the model is
+		 * inconsistent then a RuntimeException will be thrown.
+		 * @param demographicFunction the demographic model to test.
+		 * @param steps the number of steps between 0.0 and maxTime to test.
+		 * @param maxTime the maximum time to test.
+		 */
+		public static void testConsistency(DemographicFunction demographicFunction, int steps, double maxTime) {
+
+			double delta = maxTime / (double)steps;
+
+			for (int i =0; i <= steps; i++) {
+				double time = (double)i * delta;
+				double intensity = demographicFunction.getIntensity(time);
+				double newTime = demographicFunction.getInverseIntensity(intensity);
+
+				if (Math.abs(time-newTime) > 1e-12) {
+					throw new RuntimeException(
+						"Demographic model not consistent! error size = " +
+						Math.abs(time-newTime));
+				}
+			}
+		}
+	};
+
 
 }
