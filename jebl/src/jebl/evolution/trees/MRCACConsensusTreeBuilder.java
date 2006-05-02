@@ -283,7 +283,9 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
         }
 
         // Remove nodes with low support
-        supportThreshold *= 100;
+        if (isSupportAsPercent()) {
+            supportThreshold *= 100;
+        }
         for( Node node : consensus.getInternalNodes() ) {
             Object sup = node.getAttribute(getSupportAttributeName());
             if( sup != null && (Double)sup < supportThreshold ) {
