@@ -19,6 +19,15 @@ public final class SimpleTree implements Tree {
 
     public SimpleTree() {}
 
+	/**
+	 * Make a copy of the given rooted tree. This joins the two edges either side of the root,
+	 * forming a single edge.
+	 * @param tree a rooted tree
+	 */
+	public SimpleTree(RootedTree tree) throws NoEdgeException {
+		throw new UnsupportedOperationException("not implemented yet");
+	}
+
     /**
      * Creates a new external node with the given taxon. See createInternalNode
      * for a description of how to use these methods.
