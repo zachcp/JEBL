@@ -1,4 +1,4 @@
-package jebl.evolution.trees.clades;
+package jebl.evolution.trees;
 
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Node;

@@ -1,4 +1,4 @@
-package jebl.evolution.trees.splits;
+package jebl.evolution.trees;
 
 import jebl.evolution.taxa.Taxon;
 
