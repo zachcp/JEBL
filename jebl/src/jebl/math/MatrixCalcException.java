@@ -1,4 +1,4 @@
-package jebl.evolution.characters;
+package jebl.math;
 
 
 public class MatrixCalcException extends Exception{
