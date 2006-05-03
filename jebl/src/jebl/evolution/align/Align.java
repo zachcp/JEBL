@@ -2,7 +2,7 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
-abstract class Align {
+public abstract class Align {
 
     Scores sub;                     // scores matrix
     float d;                          // gap cost

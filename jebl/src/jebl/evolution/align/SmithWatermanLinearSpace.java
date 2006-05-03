@@ -2,7 +2,7 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 
-class SmithWatermanLinearSpace extends AlignLinearSpace {
+public class SmithWatermanLinearSpace extends AlignLinearSpace {
 
     TracebackSimple[][] start = null; 	// Best alignment ending at (i,j) begins at start[i][j]
     float maxval;           	// Score of best alignment

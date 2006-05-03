@@ -84,7 +84,7 @@ public class JExceptionDialog extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        new JExceptionDialog(new javax.swing.JFrame(), true, "Exception", "test").show();
+        new JExceptionDialog(new javax.swing.JFrame(), true, "Exception", "test").setVisible(true);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

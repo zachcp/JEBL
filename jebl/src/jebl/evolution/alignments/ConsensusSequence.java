@@ -1,8 +1,11 @@
-package jebl.evolution.sequences;
+package jebl.evolution.alignments;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
 
 import java.util.Collections;
 import java.util.HashMap;
