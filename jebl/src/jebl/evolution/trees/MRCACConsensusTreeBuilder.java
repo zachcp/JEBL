@@ -131,7 +131,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
                 for (int lTip = left.nextOnBit(0); lTip >= 0; lTip = left.nextOnBit(lTip + 1)) {
                     for (int rTip = right.nextOnBit(0); rTip >= 0; rTip = right.nextOnBit(rTip + 1)) {
 
-                        final double h = (trees[iTree]).getHeight(info.allNodes[nodeIndex]);
+                        final double h = trees[iTree].getHeight(info.allNodes[nodeIndex]);
                         height[Math.min(lTip, rTip)][Math.max(lTip, rTip)] += h;
                     }
                 }
