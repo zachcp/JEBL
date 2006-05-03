@@ -1,7 +1,7 @@
 /*
  * Alignment.java
  *
- * (c) 2005 JEBL Development Team
+ * (c) 2005-2006 JEBL Development Team
  *
  * This package is distributed under the
  * Lesser Gnu Public Licence (LGPL)
@@ -9,7 +9,6 @@
 package jebl.evolution.alignments;
 
 import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.Sequences;
 
 import java.util.List;
@@ -23,8 +22,6 @@ import java.util.List;
 public interface Alignment extends Sequences, Patterns {
 
     List<Sequence> getSequenceList();
-
-	SequenceType getSequenceType();
 
 	int getSiteCount();
 }
