@@ -65,9 +65,9 @@ public abstract class Scores implements ScoreMatrix {
         if(scores instanceof AminoAcidScores)
             result =new AminoAcidScores();
         else
-            result =new NucleotideScores();
-        result.score = new float[127][127];
+            result =new NucleotideScores((NucleotideScores) scores);
         result.extraResidues= scores.getExtraResidues();
+        result.score = new float[127][127];
         for (int i = 0; i < 127; i++) {
             for (int j = 0; j < 127; j++) {
                 result.score[i][j]= scores.score[i][j];

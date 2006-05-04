@@ -53,6 +53,19 @@ public abstract class State implements Comparable {
         return ambiguities;
     }
 
+    /**
+     * @param other another state to check for the quality with.
+     * @return true if the other state is or possibly is equal to this state, taking ambiguities into account.
+     */
+    public boolean possiblyEqual(State other) {
+        for (State state : getCanonicalStates()) {
+            for (State state1 : other.getCanonicalStates()) {
+                if(state.equals (state1)) return true;
+            }
+        }
+        return false;
+    }
+
     public int compareTo(Object o) {
         return index - ((State)o).index;
     }

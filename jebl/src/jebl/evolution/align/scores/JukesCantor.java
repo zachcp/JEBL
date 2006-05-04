@@ -23,7 +23,7 @@ public class JukesCantor extends NucleotideScores {
 		double q = (1.0 - p)/3.0;                                   //off-diagonal values.
 		float mismatch = (float)(Math.log(q/0.25)/Math.log(2.0));
 		
-		buildScores(match, mismatch, mismatch);
+		buildScores(match, 0,mismatch, mismatch, false);
 	}
     
 }

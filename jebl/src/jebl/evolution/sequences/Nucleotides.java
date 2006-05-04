@@ -107,10 +107,24 @@ public final class Nucleotides {
     }
 
     public static boolean isPurine(State state) {
+        if (state.isAmbiguous()) {
+            // return true only if all its ambiguities are isPurine()
+            for (State state1 : state.getCanonicalStates()) {
+                if(! isPurine(state1)) return false;
+            }
+            return true;
+        }
         return state == A_STATE || state == G_STATE;
     }
 
     public static boolean isPyrimidine(State state) {
+        if (state.isAmbiguous()) {
+            // return true only if all its ambiguities are isPyrimidine()
+            for (State state1 : state.getCanonicalStates()) {
+                if (! isPyrimidine(state1)) return false;
+            }
+            return true;
+        }
         return state == C_STATE || state == T_STATE;
     }
 
