@@ -1,20 +1,16 @@
-package jebl.evolution.distances;
+package jebl.evolution.align;
 
+import jebl.evolution.distances.BasicDistanceMatrix;
+import jebl.evolution.distances.F84DistanceMatrix;
+import jebl.evolution.distances.JukesCantorDistanceMatrix;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.align.PairwiseAligner;
 import jebl.util.ProgressListener;
-import jebl.evolution.align.CompoundAlignmentProgressListener;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
- * Date: 18/01/2006
- * Time: 09:09:37
- *
  * @author Joseph Heled
  * @version $Id$
  *

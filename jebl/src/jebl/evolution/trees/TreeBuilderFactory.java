@@ -1,13 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.align.PairwiseAligner;
-import jebl.evolution.alignments.Alignment;
-import jebl.evolution.distances.*;
-import jebl.evolution.sequences.Sequence;
+import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.taxa.Taxon;
-import jebl.util.ProgressListener;
-
-import java.util.List;
 
 /**
  * A meeting point for tree building from sequence data. A very initial form which will develope to encompass more
@@ -20,20 +14,15 @@ import java.util.List;
 
 public class TreeBuilderFactory {
 
-    /*
+    /**
      * Supported methods for tree building
      */
-   // public enum Method { NEIGHBOR_JOINING, UPGMA; }
-
-    /**
-         * Supported methods for tree building
-         */
-        public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
-            Method(String name) { this.name = name; }
-            public String toString() { return getName(); }
-            public String getName() { return name; }
-            private String name;
-        }
+    public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
+        Method(String name) { this.name = name; }
+        public String toString() { return getName(); }
+        public String getName() { return name; }
+        private String name;
+    }
 
     /**
      * Supported pairwise distance methods
@@ -88,41 +77,6 @@ public class TreeBuilderFactory {
         return builder;
     }
 
-    static public Tree build(Alignment alignment, Method method, DistanceModel model, ProgressListener progress) {
-        progress.setMessage("Computing genetic distance for all pairs");
-        DistanceMatrix d;
-
-        boolean timeit = false;
-
-        if( timeit ) progress = null;
-        long start = timeit ? System.currentTimeMillis() : 0;
-
-        switch( model ) {
-            case JukesCantor:
-            default:
-                d = new JukesCantorDistanceMatrix(alignment, progress);
-                break;
-            case F84:
-                d = new F84DistanceMatrix(alignment, progress);
-                break;
-            case HKY:
-                d = new HKYDistanceMatrix(alignment, progress);
-                break;
-            case TamuraNei:
-                d = new TamuraNeiDistanceMatrix(alignment, progress);
-                break;
-        }
-        if( timeit ) {
-            System.out.println("took " +(System.currentTimeMillis() - start) + " to build distance matrix");
-        }
-
-        if( progress != null ) progress.setMessage("Building tree");
-
-        TreeBuilder treeBuilder = getBuilder(method, d);
-        treeBuilder.addProgressListener(progress);
-        return treeBuilder.build();
-    }
-
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold, ConsensusMethod method) {
         switch( method ) {
             case GREEDY: {
@@ -159,26 +113,5 @@ public class TreeBuilderFactory {
             rtrees[i] = (RootedTree)trees[i];
         }
         return buildRooted(rtrees, supportThreshold, method);
-    }
-
-    static public class Result {
-        public final Tree tree;
-        public final DistanceMatrix distance;
-
-        Result(Tree tree, DistanceMatrix distance) {
-            this.tree = tree;
-            this.distance = distance;
-        }
-    }
-
-    static public Result build(List<Sequence> seqs, Method method, PairwiseAligner aligner,
-                               ProgressListener progress) {
-        progress.setMessage("Computing genetic distance for all pairs");
-        final DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
-        progress.setMessage("Building tree");
-        TreeBuilder treeBuilder = getBuilder(method, d);
-        treeBuilder.addProgressListener(progress);
-        final Tree t = treeBuilder.build();
-        return new Result(t, d);
     }
 }
