@@ -114,8 +114,16 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
 		JPanel titlePanel = new JPanel(new BorderLayout(6, 0));
 		titlePanel.add(controller.getTitleComponent(), BorderLayout.CENTER);
 
+//		JCheckBox pinnedCheck = new JCheckBox();
+//		pinnedCheck.setFocusPainted(false);
+//
+//		// This tells Quaqua L&F to use a small check box (ignored otherwise)
+//		pinnedCheck.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+//		pinnedCheck.setSelected(controller.isInitiallyVisible());
+//		titlePanel.add(pinnedCheck, BorderLayout.EAST);
 		PinnedButton pinnedButton = new PinnedButton();
 
+		// This tells Quaqua L&F to use a small check box (ignored otherwise)
 		pinnedButton.setSelected(controller.isInitiallyVisible());
 		titlePanel.add(pinnedButton, BorderLayout.EAST);
 
@@ -159,10 +167,11 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
 			});
 		}
 
-		final ControlsState controlsState = new ControlsState(false, false);
+		final ControlsState controlsState = new ControlsState(
+				controller.isInitiallyVisible(),
+				pinnedButton.isSelected());
 
-        controlsState.setPinned(pinnedButton.isSelected());
-        pinnedButton.addItemListener(new ItemListener() {
+		pinnedButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
 				controlsState.setPinned(itemEvent.getStateChange() == ItemEvent.SELECTED);
 			}
