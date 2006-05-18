@@ -10,9 +10,6 @@ package jebl.evolution.sequences;
 
 import jebl.evolution.taxa.Taxon;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
@@ -163,4 +160,43 @@ public class Utils {
         return gapped;
     }
 
+    /**
+     * Guess type of sequence from contents
+     * @param seq the sequence
+     * @return type of sequence, null if sequence contains illegal characters.
+     */
+    public static SequenceType guessSequenceType(final String seq) {
+
+        int canonicalNucStates = 0;
+        boolean isAminoSequence = false;
+        final int canonicalStateCount = Nucleotides.getCanonicalStateCount();
+
+        for( char c : seq.toCharArray() ) {
+            final NucleotideState nucState = Nucleotides.getState(c);
+            final boolean isNucState = nucState != null;
+            final boolean isAminoState = AminoAcids.getState(c) != null;
+
+            if( ! (isNucState || isAminoState) ) {
+                return null;
+            }
+            if (! isAminoSequence) {
+                if (!isNucState) {
+                    // must be amino
+                    isAminoSequence = true;
+                } else {
+
+                    if (nucState.getIndex() < canonicalStateCount) {
+                        ++canonicalNucStates;
+                    }
+                }
+            }
+        }
+
+        final double threshold = 0.7;
+
+        if (canonicalNucStates >= seq.length() * threshold) {
+            return SequenceType.NUCLEOTIDE;
+        }
+        return SequenceType.AMINO_ACID;
+    }
 }

@@ -185,7 +185,10 @@ public class ImportHelper {
 
 		char ch = read();
 
-		try {
+        final String gapCode = sequenceType.getGapState().getCode();
+        final String unknownCode = sequenceType.getUnknownState().getCode();
+
+        try {
 			int n = 0;
 
 			while (n < maxSites && delimiters.indexOf(ch) == -1) {
@@ -198,9 +201,9 @@ public class ImportHelper {
 				if (!Character.isWhitespace(ch)) {
 
 					if (gapCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getGapState().getCode());
+                        sequence.append(gapCode);
 					} else if (missingCharacters.indexOf(ch) != -1) {
-						sequence.append(sequenceType.getUnknownState().getCode());
+                        sequence.append(unknownCode);
 					} else if (matchCharacters.indexOf(ch) != -1) {
 						if (matchSequence == null) {
 							throw new ImportException("Match character in first sequences");

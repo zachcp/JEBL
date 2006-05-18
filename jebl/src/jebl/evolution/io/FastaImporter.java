@@ -7,6 +7,7 @@ package jebl.evolution.io;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.Utils;
 import jebl.evolution.taxa.Taxon;
 
 import java.io.EOFException;
@@ -56,6 +57,7 @@ public class FastaImporter implements SequenceImporter {
         List<Sequence> sequences = new ArrayList<Sequence>();
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
+        final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
 
         try {
             // find fasta line start
@@ -72,15 +74,17 @@ public class FastaImporter implements SequenceImporter {
 
                 final StringBuffer seq = new StringBuffer();
 
-                helper.readSequence(seq, sequenceType, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
+                helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
 
                 final Taxon taxon = Taxon.getTaxon(name);
                 if (description != null && description.length() > 0) {
                     taxon.setAttribute(descriptionPropertyName, description);
                 }
 
-                sequences.add(new BasicSequence(sequenceType, taxon, seq.toString()));
+                final String sequenceString = seq.toString();
+                SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(sequenceString);
 
+                sequences.add(new BasicSequence(type, taxon, sequenceString));
             } while (helper.getLastDelimiter() == fastaFirstChar);
 
         } catch (EOFException e) {
