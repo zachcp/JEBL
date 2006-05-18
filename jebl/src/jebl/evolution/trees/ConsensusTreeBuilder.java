@@ -97,10 +97,14 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
         listeners.remove(listener);
     }
 
-    protected void fireSetProgress(double fractionCompleted) {
+    protected boolean fireSetProgress(double fractionCompleted) {
+	    boolean requestStop = false;
         for (ProgressListener listener : listeners) {
-            listener.setProgress(fractionCompleted);
+            if (listener.setProgress(fractionCompleted)) {
+	            requestStop = true;
+            }
         }
+	    return requestStop;
     }
 
     private final List<ProgressListener> listeners = new ArrayList<ProgressListener>();

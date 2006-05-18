@@ -127,6 +127,10 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
                 System.out.println("Tree: " + Utils.DEBUGsubTreeRep(tree, tree.getRootNode()));
             }
             rootedSupport(tree, tree.getRootNode(), support);
+
+	        if (fireSetProgress(0.0)) {
+		        return null;
+	        }
         }
 
         final int nTrees = rtrees.length;
@@ -181,6 +185,10 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
             } else {
                 queue.add(se);
             }
+
+	        if (fireSetProgress(0.0)) {
+		        return null;
+	        }
         }
 
         while (queue.peek() != null) {
@@ -272,6 +280,10 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
                 System.out.println("Bug??");
                 assert(false);
             }
+
+	        if (fireSetProgress(0.0)) {
+		        return null;
+	        }
         }
 
         insureConsistency(consTree, consTree.getRootNode());
