@@ -28,7 +28,7 @@ public class NucleotideScores extends Scores {
                     Nucleotides.CANONICAL_STATES[2].getCode() +
                     Nucleotides.CANONICAL_STATES[3].getCode();
 
-    public NucleotideScores() {
+    protected NucleotideScores() {
     }
 
     public NucleotideScores(NucleotideScores scores) {

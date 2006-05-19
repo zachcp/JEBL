@@ -75,7 +75,9 @@ public class ProfileCharacter {
         float score = 0;
         int totalCharacters = character1.totalCharacters*character2.totalCharacters;
         if(totalCharacters == 1) {
-            return scores.score [ character1.characters [0]] [ character2.characters [0]];
+            return scores.score
+                    [ character1.characters [0]]
+                    [ character2.characters [0]];
         }
         for (int i = 0; i < character1.numberOfUniqueCharacters; i++) {
             for (int j = 0; j < character2.numberOfUniqueCharacters; j++) {

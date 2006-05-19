@@ -293,7 +293,7 @@ public class BartonSternberg implements MultipleAligner {
     }
 
     public Alignment doAlign(Alignment alignment, Sequence sequence, ProgressListener progress) {
-        final Profile aprofile = new Profile(alignment, scores.getAlphabet().length());
+        final Profile aprofile = new Profile(alignment, scores.getAlphabet().length(),1);
 
         final Profile sprofile = new Profile(scores.getAlphabet().length());
         sprofile.addSequence(0, sequence.getString());
