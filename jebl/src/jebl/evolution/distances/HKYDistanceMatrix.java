@@ -120,7 +120,12 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 sumWeight += weight;
             }
 
+           if( sumWeight <= 0.0 ) {
+              return MAX_DISTANCE;
+           }
+            
             while( true ) {
+
                 double P = sumTs / sumWeight;
                 double Q = sumTv / sumWeight;
 
