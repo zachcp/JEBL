@@ -1,7 +1,11 @@
 package jebl.evolution.align;
 
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
+
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Matt Kearse
@@ -15,15 +19,29 @@ class Profile {
     int alphabetSize;
 //    int length;
     int sequenceCount;
-    Map<Integer, String> paddedSequences=new HashMap<Integer, String>();
+    Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
 
     public Profile(int alphabetSize) {
         this.alphabetSize = alphabetSize;
     }
+
     public Profile(int sequenceNumber,String sequence) {
         this(calculateAlphabetSize(new String[] {sequence}));
         addSequence(sequenceNumber,sequence);
     }
+
+    public Profile(Alignment alignment, int alphabetSize) {
+        this(alignment, alphabetSize , 0);
+    }
+
+    public Profile(Alignment alignment, int alphabetSize, int offset) {
+        this.alphabetSize = alphabetSize;
+        final List<Sequence> sequenceList = alignment.getSequenceList();
+        for(int i = 0; i < sequenceList.size(); ++i) {
+            addSequence(i + offset, sequenceList.get(i).getString());
+        }
+    }
+
     public int length () {
         return profile.length;
     }
@@ -38,6 +56,7 @@ class Profile {
         }
         return results;
     }
+
     public void addSequence(int sequenceNumber,String sequence) {
         sequenceCount++;
         if (sequenceCount == 1) {
@@ -122,12 +141,12 @@ class Profile {
     public static Profile combine(Profile profile1, Profile profile2, AlignmentResult result1, AlignmentResult result2) {
         int size = result1.size;
         int alphabetSize = profile1.alphabetSize;
-        Profile result =new Profile(alphabetSize);
-        result.profile =new ProfileCharacter[size];
+        Profile result = new Profile(alphabetSize);
+        result.profile = new ProfileCharacter[size];
         int index1= 0;
         int index2= 0;
         for (int i = 0; i < size; i++) {
-            ProfileCharacter character =new ProfileCharacter(alphabetSize);
+            ProfileCharacter character = new ProfileCharacter(alphabetSize);
             if(result1.values[i]) {
                 character.addProfileCharacter(profile1.profile[index1++]);
             }
@@ -144,12 +163,12 @@ class Profile {
         }
         for (Map.Entry<Integer, String> entry : profile1.paddedSequences.entrySet()) {
             String sequence = entry.getValue();
-            sequence =buildAlignmentString(sequence, result1);
+            sequence = buildAlignmentString(sequence, result1);
             result.paddedSequences.put(entry.getKey(), sequence);
         }
         for (Map.Entry<Integer, String> entry : profile2.paddedSequences.entrySet()) {
             String sequence = entry.getValue();
-            sequence =buildAlignmentString(sequence, result2);
+            sequence = buildAlignmentString(sequence, result2);
             result.paddedSequences.put(entry.getKey(), sequence);
         }
         result.sequenceCount= profile1.sequenceCount + profile2.sequenceCount;
@@ -172,7 +191,7 @@ class Profile {
 
     public static String buildAlignmentString(String sequence, AlignmentResult result) {
 
-        StringBuilder builder =new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 //        System.out.println("sequence =" + sequence);
 //        result.print ();
 //        if(true) return "";

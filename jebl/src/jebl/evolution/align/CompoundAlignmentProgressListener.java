@@ -9,7 +9,7 @@ import jebl.util.ProgressListener;
 public class CompoundAlignmentProgressListener  {
     private boolean cancelled = false;
     private int sectionsCompleted = 0;
-    private int totalSections ;
+    private int totalSections;
     private ProgressListener progress;
     private int sectionSize= 1;
 
@@ -17,12 +17,13 @@ public class CompoundAlignmentProgressListener  {
         this.totalSections = totalSections;
         this.progress = progress;
     }
+
     public void setSectionSize(int size) {
         this.sectionSize = size;
     }
 
     public void incrementSectionsCompleted(int count) {
-        sectionsCompleted+= count;
+        sectionsCompleted += count;
     }
 
     public boolean isCancelled() {
@@ -38,6 +39,9 @@ public class CompoundAlignmentProgressListener  {
         public boolean setProgress(double fractionCompleted) {
 //            System.out.println("progress =" + fractionCompleted+ " sections =" + sectionsCompleted+ "/" + totalSections);
             double totalProgress = (sectionsCompleted + fractionCompleted*sectionSize) / totalSections;
+            if( totalProgress > 1.0 ) {
+                System.out.println(totalProgress);
+            }
             if (progress.setProgress(totalProgress)) cancelled = true;
             return cancelled;
         }
