@@ -312,7 +312,7 @@ public class BartonSternberg implements MultipleAligner {
         List<Sequence> aSeqs = new ArrayList<Sequence>(count);
         for (int i = 0; i < count; i++) {
             final String seq = profile.paddedSequences.get(i);
-            final Sequence s = (i < size1) ? seqs1.get(i) : seqs2.get(i - size1);
+            final Sequence s = (i < count-1) ? seqs1.get(i) : seqs2.get(0);
             aSeqs.add(new BasicSequence(s.getSequenceType(), s.getTaxon(), seq));
         }
         return new BasicAlignment(aSeqs);
