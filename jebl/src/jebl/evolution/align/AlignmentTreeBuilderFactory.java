@@ -113,6 +113,9 @@ public class AlignmentTreeBuilderFactory {
         progress.setMessage("Building alignment for guide");
         p.setSectionSize(alignWork);
         final Alignment alignment = aligner.doAlign(seqs, gtree, minorProgress);
+        if (p.isCancelled()) {
+            return null;
+        }
         p.incrementSectionsCompleted(alignWork);
 
         final boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount() > 4;

@@ -10,7 +10,6 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Utils;
-import jebl.evolution.trees.Tree;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.alignments.Alignment;
@@ -151,19 +150,18 @@ public class BartonSternberg implements MultipleAligner {
 
             long start = System.currentTimeMillis();
 
-            final AlignmentTreeBuilderFactory.Result guidTree =
+            final AlignmentTreeBuilderFactory.Result unrootedGuideTree =
                     fastGuide ?
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     this, false, compoundProgress.getMinorProgress()) :
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     aligner, compoundProgress.getMinorProgress());
-
+            if (compoundProgress.isCancelled()) return null;
             long duration = System.currentTimeMillis() - start;
             System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
 
-            RootedTree guideTree = Utils.rootTreeAtCenter(guidTree.tree);
+            RootedTree guideTree = Utils.rootTreeAtCenter(unrootedGuideTree.tree);
             compoundProgress.incrementSectionsCompleted(treeWork);
-
 
             progress.setMessage("Building alignment");
             profile = align(guideTree, guideTree.getRootNode(), sequencesForGuideTree, compoundProgress);
@@ -258,6 +256,9 @@ public class BartonSternberg implements MultipleAligner {
         final CompoundAlignmentProgressListener p = new CompoundAlignmentProgressListener(progress, count - 1);
 
         Profile profile = align(guideTree, guideTree.getRootNode(), seqs, p);
+        if (p.isCancelled()) {
+            return null;
+        }
 
         List<Sequence> aSeqs = new ArrayList<Sequence>(count);
         for (int i = 0; i < count; i++) {
