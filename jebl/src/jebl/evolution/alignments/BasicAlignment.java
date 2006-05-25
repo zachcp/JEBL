@@ -113,7 +113,13 @@ public class BasicAlignment implements Alignment {
         if (sequenceType == null) {
             sequenceType = sequence.getSequenceType();
         }
-        if (sequenceType != sequence.getSequenceType()) throw new IllegalArgumentException("Type of sequence " + sequence.getTaxon().getName() + " does not match that of other sequences in the alignment.");
+        if (sequenceType != sequence.getSequenceType()) {
+            throw new IllegalArgumentException(
+                    "Type of sequence " + sequence.getTaxon().getName() +
+                            " does not match that of other sequences in the alignment" +
+                            " (data type = " + sequence.getSequenceType().getName() +
+                            ", but expected " + sequenceType.getName() + ").");
+        }
         sequences.put(sequence.getTaxon(), sequence);
         taxonList.add(sequence.getTaxon());
     }
