@@ -21,4 +21,17 @@ public interface ProgressListener {
      * @return true if the user has requested that this operation be cancelled.
      */
     boolean setMessage(String message);
+
+    /**
+     * a useful class to use when you don't care about the progress results or cancelling the operation.
+     */
+    public static class EmptyProgressListener implements  ProgressListener {
+        public boolean setProgress(double fractionCompleted) {
+            return false;
+        }
+
+        public boolean setMessage(String message) {
+            return false;
+        }
+    }
 }
