@@ -294,6 +294,13 @@ public class BartonSternberg implements MultipleAligner {
     }
 
     public Alignment doAlign(Alignment alignment, Sequence sequence, ProgressListener progress) {
+
+        for (Sequence seq : alignment.getSequenceList()) {
+            if (seq.getTaxon().getName().equals(sequence.getTaxon().getName())) {
+                throw new IllegalArgumentException("Sequence taxon " + sequence.getTaxon().getName() + " appears in alignment and sequence.");
+            }
+        }
+
         final Profile aprofile = new Profile(alignment, scores.getAlphabet().length(),1);
 
         final Profile sprofile = new Profile(scores.getAlphabet().length());
