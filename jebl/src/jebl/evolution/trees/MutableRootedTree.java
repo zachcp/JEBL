@@ -1,7 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
 
@@ -40,7 +40,7 @@ public class MutableRootedTree implements RootedTree {
 
             // Add the outgroup in
             MutableRootedNode out = (MutableRootedNode)createExternalNode( tree.getTaxon(outGroup) );
-            setHeight(out, tree.getEdgeLength(outGroup, root));
+            setLength(out, tree.getEdgeLength(outGroup, root));
             newRoot.addChild( out );
 
         } catch (NoEdgeException e) {
@@ -123,14 +123,14 @@ public class MutableRootedTree implements RootedTree {
             return (MutableRootedNode)createExternalNode( tree.getTaxon(node) );
         }
 
-        List<Node> ch = new ArrayList<Node>();
-        for( Node a : tree.getAdjacencies(node) ) {
-            if( a == parent ) continue;
-            MutableRootedNode x = rootAdjaceincesWith(tree, a, node);
-            setHeight(x, tree.getEdgeLength(a, node));
-            ch.add(x);
+        List<Node> children = new ArrayList<Node>();
+        for( Node adj : tree.getAdjacencies(node) ) {
+            if( adj == parent ) continue;
+            MutableRootedNode rootedAdj = rootAdjaceincesWith(tree, adj, node);
+            setLength(rootedAdj, tree.getEdgeLength(adj, node));
+            children.add(rootedAdj);
         }
-        return createInternalNode(ch);
+        return createInternalNode(children);
     }
 
     /**
