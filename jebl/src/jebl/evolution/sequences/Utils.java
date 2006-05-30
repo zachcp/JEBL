@@ -168,8 +168,9 @@ public class Utils {
     public static SequenceType guessSequenceType(final String seq) {
 
         int canonicalNucStates = 0;
-        int gapCount = 0;
-//        boolean isAminoSequence = false;
+        // true length, excluding any gaps
+        int sequenceLength = seq.length();
+
         final int canonicalStateCount = Nucleotides.getCanonicalStateCount();
 
         for( char c : seq.toCharArray() ) {
@@ -180,26 +181,22 @@ public class Utils {
             if( ! (isNucState || isAminoState) ) {
                 return null;
             }
-//            if (! isAminoSequence) {
-            if (!isNucState) {
+
+            if( !isNucState ) {
                 // must be amino
                 return SequenceType.AMINO_ACID;
-            } else {
-
-                if (nucState.getIndex() < canonicalStateCount) {
-                    ++canonicalNucStates;
-                } else if (nucState == Nucleotides.GAP_STATE) {
-                    gapCount ++;
-                }
             }
-//            }
+
+            if (nucState.getIndex() < canonicalStateCount) {
+                ++canonicalNucStates;
+            } else if (nucState == Nucleotides.GAP_STATE) {
+                --sequenceLength;
+            }
+
         }
 
         final double threshold = 0.7;
 
-        if (canonicalNucStates >= (seq.length() - gapCount) * threshold) {
-            return SequenceType.NUCLEOTIDE;
-        }
-        return SequenceType.AMINO_ACID;
+        return canonicalNucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
     }
 }
