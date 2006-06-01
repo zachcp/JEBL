@@ -54,7 +54,9 @@ public class AlignmentTreeBuilderFactory {
         }
 
         TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, d);
-        treeBuilder.addProgressListener(progress);
+        if( progress != null ) {
+            treeBuilder.addProgressListener(progress);
+        }
         return treeBuilder.build();
     }
 

@@ -202,6 +202,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
                                     notDone = a;
                                 }
                             }
+
                             final double branch;
 
                             branch = tree.getEdgeLength(n, notDone);
@@ -284,6 +285,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
                 final Support s = e.getValue();
 
                 final double psupport = (1.0 * s.nTreesWithClade) / trees.length;
+
                 if (psupport < supportThreshold) {
                     break;
                 }
