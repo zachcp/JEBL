@@ -111,7 +111,13 @@ public class FixedBitSet {
         for (k = 0; k < bits.length - 1; ++k) {
             bits[k] = ~ bits[k];
         }
-        bits[k] = (~bits[k]) & (bit(size) - 1);
+
+        bits[k] = ~bits[k];
+        // reset all higher order bits
+        final int mask = bit(size) - 1;
+        if( mask != 0 ) {
+            bits[k] &= mask;
+        }
     }
 
     private final static byte firstBitLocation[] = {
