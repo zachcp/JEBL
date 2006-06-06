@@ -33,6 +33,9 @@ public class NucleotideScores extends Scores {
 
     public NucleotideScores(NucleotideScores scores) {
         alphabet = scores.getAlphabet();
+        match = scores.match;
+        mismatchTransition= scores.mismatchTransition;
+        mismatchTransversion= scores.mismatchTransversion;
     }
 
     /**
