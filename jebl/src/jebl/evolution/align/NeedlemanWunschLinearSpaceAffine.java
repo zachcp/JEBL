@@ -18,7 +18,7 @@ import java.util.List;
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine implements PairwiseAligner {
     private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
-    private boolean debug;
+    private boolean debug= false;
     private boolean freeGapsAtEnds;
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
@@ -116,9 +116,11 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         this.m = profile2.length();
 //        System.out.println("aligning " + n + "," + m);
         if (n > previousn || m > previousm) {
-            F = new float[3][2][m + 1];
-            C = new int [3] [ 2] [m + 1];
-            Ctype = new int [3] [3] [m + 1];
+            int maximum = Math.max(m,n);//would normally use "m", but "invert = true;" later on requires taking the maximum.
+
+            F = new float[3][2][ maximum + 1];
+            C = new int [3] [ 2] [maximum + 1];
+            Ctype = new int [3] [3] [maximum + 1];
             previousn = n;
             previousm = m;
         }
@@ -138,21 +140,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         return matchResult;
     }
 
-    /*public void prepareAlignment(String sq1, String sq2) {
-        this.seq1 = sq1;
-        this.seq2 = sq2;
 
-        this.n = sq1.length();
-        this.m = sq2.length();
-        char[] s1 = sq1.toCharArray();
-        char[] s2 = sq2.toCharArray();
-    }
-*/
-//    private String[] doAlignment(String sq1, String sq2, int startType, int endType) {
     private float doAlignment(Profile profile1, Profile profile2,
                               int offset1, int offset2, int n, int m, int startType, int endType,
                               AlignmentResult result1, AlignmentResult result2, boolean scoreOnly, boolean freeStartGap, boolean freeEndGap) {
-//        prepareAlignment(sq1, sq2);
         this.n = n;
         this.m = m;
 
@@ -164,16 +155,11 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         int[][] cmtype = Ctype[0], cxtype = Ctype[1], cytype = Ctype[2];
         float val;
         float s, a, b, c;
-        int u = n / 2;
-
-        if (debug) {
-            System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1) + " u=" + u);
-        }
         boolean calculateResults = false;
         boolean invert = false;
         if (n < RECURSION_THRESHOLD || m < RECURSION_THRESHOLD) {
             calculateResults = true;
-            if (false && n > m) {
+            if (n > m) {
                 //swap the ordering, to prevent nasty allocation of matrices.
                 // for example, if we do a 100000 by 10 alignment, followed by a 10 x 100000 alignment, we end up
                 // allocating a 100000 x 100000 matrix
@@ -194,20 +180,12 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
             }
             allocateMatrices(n, m);
-/*//            NeedlemanWunschAffine align = new NeedlemanWunschAffine (sub,d,e);
-            quadraticAlign.setScores(sub);
-            quadraticAlign.setGapOpen(d);
-            quadraticAlign.setGapExtend(e);
-//            align.doAlignment(sq1,sq2);
-//            quadraticAlign.doAlignment(sq1,sq2, startType, endType);
-            quadraticAlign.doAlignment(profile1, profile2, offset1, offset2,n,m, startType, endType, freeStartGap, freeEndGap);
-            if(addProgress(n*m)) return 0;
-//            setScore (quadraticAlign.getScore());
-            quadraticAlign.appendMatch(result1, result2);
-//            result1.print();
-//            result2.print();
-            return quadraticAlign.getScore();*/
-//            return quadraticAlign.getMatch();
+        }
+
+        int u = n / 2;
+
+        if (debug) {
+            System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1) + " u=" + u);
         }
 
         //all that the remainder of this function does is to calculate the midpoint
