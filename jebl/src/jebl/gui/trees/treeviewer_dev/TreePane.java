@@ -4,9 +4,7 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer_dev.painters.Painter;
-import jebl.gui.trees.treeviewer_dev.painters.PainterListener;
-import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
+import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayoutListener;
 
@@ -90,6 +88,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             branchLabelPainter.setupAttributes(tree);
         }
 
+		if (nodeShapePainter != null) {
+		    nodeShapePainter.setupAttributes(tree);
+		}
+
         if (treeLayout != null) {
 			treeLayout.setTree(tree);
 
@@ -97,6 +99,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			invalidate();
 			repaint();
 		}
+	}
+
+	public TreeLayout getTreeLayout() {
+		return treeLayout;
 	}
 
 	public void setTreeLayout(TreeLayout treeLayout) {
@@ -380,6 +386,24 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	public Painter<Node> getBranchLabelPainter() {
 		return branchLabelPainter;
+	}
+
+	public void setNodeShapePainter(NodePainter nodeShapePainter) {
+		nodeShapePainter.setTreePane(this);
+		if (this.nodeShapePainter != null) {
+			this.nodeShapePainter.removePainterListener(this);
+		}
+		this.nodeShapePainter = nodeShapePainter;
+		if (this.nodeShapePainter != null) {
+			this.nodeShapePainter.addPainterListener(this);
+		}
+		calibrated = false;
+        this.nodeShapePainter.setupAttributes(tree);
+		repaint();
+	}
+
+	public Painter<Node> getNodeShapePainter() {
+		return nodeShapePainter;
 	}
 
 	public void setScaleBarPainter(Painter<TreePane> scaleBarPainter) {
@@ -1033,6 +1057,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private double tipLabelWidth;
 	private LabelPainter<Node> nodeLabelPainter = null;
 	private LabelPainter<Node> branchLabelPainter = null;
+
+	private NodePainter nodeShapePainter = null;
 
 	private Painter<TreePane> scaleBarPainter = null;
 	private Rectangle2D scaleBarBounds = null;
