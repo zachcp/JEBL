@@ -184,8 +184,11 @@ public final class Utils {
     }
 
     private static double safeTreeHeight(final RootedTree tree) {
-        final Node root = tree.getRootNode();
-        return safeNodeHeight(tree, root);
+        return safeNodeHeight(tree, tree.getRootNode());
+    }
+
+    public static int maxLevels(final RootedTree tree) {
+        return nodeDistance(tree, tree.getRootNode());
     }
 
     public static String[] asText(Tree tree, int widthGuide) {
@@ -453,7 +456,7 @@ public final class Utils {
         };
     }
 
-    // debig aid - print a representetion of node omitrting branches
+    // debig aid - print a representetion of node omitting branches
     static public String DEBUGsubTreeRep(RootedTree t, Node n) {
         if (t.isExternal(n)) {
             return t.getTaxon(n).getName();
