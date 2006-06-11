@@ -1,26 +1,26 @@
 package jebl.evolution.align;
 
-import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.Blosum60;
-import jebl.evolution.io.FastaImporter;
-import jebl.evolution.io.ImportException;
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.trees.TreeBuilderFactory;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.Utils;
-import jebl.evolution.graphs.Node;
-import jebl.evolution.taxa.Taxon;
+import jebl.evolution.align.scores.Scores;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.io.FastaImporter;
+import jebl.evolution.io.ImportException;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.TreeBuilderFactory;
+import jebl.evolution.trees.Utils;
 import jebl.util.ProgressListener;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Matt Kearse
@@ -158,7 +158,7 @@ public class BartonSternberg implements MultipleAligner {
                                     aligner, compoundProgress.getMinorProgress());
             if (compoundProgress.isCancelled()) return null;
             long duration = System.currentTimeMillis() - start;
-            System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
+            //System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
 
             RootedTree guideTree = Utils.rootTreeAtCenter(unrootedGuideTree.tree);
             compoundProgress.incrementSectionsCompleted(treeWork);
