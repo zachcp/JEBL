@@ -15,6 +15,9 @@ public class SimpleListenerManager {
         this.listeners = new ArrayList<SimpleListener>(manager.listeners);
     }
 
+    public SimpleListenerManager() {
+    }
+
     public synchronized void add(SimpleListener listener) {
         listeners.add(listener);
     }
