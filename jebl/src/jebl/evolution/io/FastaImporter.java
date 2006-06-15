@@ -68,7 +68,7 @@ public class FastaImporter implements SequenceImporter {
                 final String line = helper.readLine();
 
                 final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
-                final String name = tokenizer.nextToken();
+                final String name = tokenizer.nextToken().replace('_', ' ');
 
                 final String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
 

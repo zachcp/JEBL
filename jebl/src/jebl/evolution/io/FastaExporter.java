@@ -32,11 +32,10 @@ public class FastaExporter implements SequenceExporter {
      * export alignment or set of sequences.
      */
     public void exportSequences(List<Sequence> sequences) throws IOException {
-
         for (Sequence sequence : sequences) {
             final Taxon taxon = sequence.getTaxon();
             final String desc = (String) taxon.getAttribute(FastaImporter.descriptionPropertyName);
-            writer.println(">" + taxon.getName() + ((desc != null) ? (" " + desc) : ""));
+            writer.println(">" + taxon.getName().replace(' ','_') + ((desc != null) ? (" " + desc) : ""));
             writer.println(sequence.getString());
         }
     }
