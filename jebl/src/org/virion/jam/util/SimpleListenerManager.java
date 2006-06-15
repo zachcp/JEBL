@@ -11,6 +11,10 @@ public class SimpleListenerManager {
 
     List<SimpleListener> listeners = new ArrayList<SimpleListener>();
 
+    public SimpleListenerManager(SimpleListenerManager manager) {
+        this.listeners = new ArrayList<SimpleListener>(manager.listeners);
+    }
+
     public synchronized void add(SimpleListener listener) {
         listeners.add(listener);
     }
