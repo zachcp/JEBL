@@ -633,6 +633,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     protected void drawTree(Graphics2D g2, double width, double height) {
+        RenderingHints rhints = g2.getRenderingHints();
+        boolean antialiasOn = rhints.containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
+        if( ! antialiasOn ) {
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        }
 
         if (!calibrated) calibrate(g2, width, height);
 
@@ -734,6 +739,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         g2.setStroke(oldStroke);
         g2.setPaint(oldPaint);
         g2.setFont(oldFont);
+
+        if( ! antialiasOn ) {
+           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF); 
+        }
     }
 
     private void calibrate(Graphics2D g2, double width, double height) {
