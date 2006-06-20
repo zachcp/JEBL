@@ -850,14 +850,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             bounds.add(scaleBarBounds);
         }
 
+        // small tree, long labels, label bounds may get larger that window, protect against that 
+        final double avilableW = width - insets.left - insets.right;
+        final double avaialbeH = height - insets.top - insets.bottom;
+
         // get the difference between the tree's bounds and the overall bounds
-        double xDiff = bounds.getWidth() - treeBounds.getWidth();
-        double yDiff = bounds.getHeight() - treeBounds.getHeight();
+        final double xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
+        final double yDiff = Math.min(avaialbeH, bounds.getHeight()) - treeBounds.getHeight();
 
         // Get the amount of canvas that is going to be taken up by the tree -
         // The rest is taken up by taxon labels which don't scale
-        double w = width - insets.left - insets.right - xDiff;
-        double h = height - insets.top - insets.bottom - yDiff;
+
+        final double w = avilableW - xDiff;
+        final double h = avaialbeH - yDiff;
 
         double xScale;
         double yScale;
@@ -877,7 +882,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 xScale = yScale;
             }
 
-            treeScale = xScale;
+            treeScale = xScale;   assert treeScale > 0;
 
             // and set the origin so that the center of the tree is in
             // the center of the canvas
@@ -893,7 +898,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             xOffset = -bounds.getX();
             yOffset = -bounds.getY();
 
-            treeScale = xScale;
+            treeScale = xScale;   assert treeScale > 0;
         }
 
         // Create the overall transform
