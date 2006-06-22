@@ -6,6 +6,11 @@ package jebl.evolution.align.scores;
  * @version $Id$
  */
 public interface ScoreMatrix {
+    /**
+     *
+     * @return human readable name
+     */
+    public String getName();
 
     /**
      * @return the score for matching char x with char y

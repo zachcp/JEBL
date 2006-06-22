@@ -1,8 +1,5 @@
 package jebl.evolution.align.scores;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * Base class for all score matrices in the package.
  *
@@ -60,12 +57,12 @@ public abstract class Scores implements ScoreMatrix {
         return name.substring(name.lastIndexOf(".")+1);
     }
 
-    public static Scores duplicate(Scores scores){
+    public static Scores duplicate(Scores scores) {
         Scores result;
         if(scores instanceof AminoAcidScores)
-            result =new AminoAcidScores();
+            result = new AminoAcidScores();
         else
-            result =new NucleotideScores((NucleotideScores) scores);
+            result = new NucleotideScores((NucleotideScores) scores);
         result.extraResidues= scores.getExtraResidues();
         result.score = new float[127][127];
         for (int i = 0; i < 127; i++) {
@@ -114,7 +111,7 @@ public abstract class Scores implements ScoreMatrix {
      * @return a new score matrix.
      */
     public static Scores includeAdditionalCharacters(Scores scores, String characters) {
-        Scores result =duplicate(scores);
+        Scores result = duplicate(scores);
         String states = scores.getAlphabet();
         char[] unique =new char[characters.length ()];
         int index = 0;
