@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
@@ -84,11 +85,16 @@ public class FastaImporter implements SequenceImporter {
                 final String sequenceString = seq.toString();
                 SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(sequenceString);
 
-                sequences.add(new BasicSequence(type, taxon, sequenceString));
+                if( type == null ) {
+                    throw new ImportException("Sequence contains illegal characters (near line " + helper.getLineNumber() + ")");
+                }
+                  sequences.add(new BasicSequence(type, taxon, sequenceString));
             } while (helper.getLastDelimiter() == fastaFirstChar);
 
         } catch (EOFException e) {
             // catch end of file the ugly way.
+        } catch (NoSuchElementException e) {
+            throw new ImportException("Incorrectly formatted fasta file (near line " + helper.getLineNumber() + ")");
         }
 
         return sequences;
