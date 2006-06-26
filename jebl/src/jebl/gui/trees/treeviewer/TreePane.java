@@ -850,14 +850,25 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             bounds.add(scaleBarBounds);
         }
 
-        // small tree, long labels, label bounds may get larger that window, protect against that 
+
         final double avilableW = width - insets.left - insets.right;
         final double avaialbeH = height - insets.top - insets.bottom;
 
         // get the difference between the tree's bounds and the overall bounds
-        final double xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
-        final double yDiff = Math.min(avaialbeH, bounds.getHeight()) - treeBounds.getHeight();
 
+        double xDiff = bounds.getWidth() - treeBounds.getWidth();
+        double yDiff = bounds.getHeight() - treeBounds.getHeight();
+        assert xDiff >= 0 && yDiff >= 0;
+
+        // small tree, long labels, label bounds may get larger that window, protect against that         
+
+        if( xDiff >= avilableW ) {
+           xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
+        }
+
+        if( yDiff >= avaialbeH ) {
+           yDiff = Math.min(avaialbeH, bounds.getHeight()) - treeBounds.getHeight();
+        }
         // Get the amount of canvas that is going to be taken up by the tree -
         // The rest is taken up by taxon labels which don't scale
 
