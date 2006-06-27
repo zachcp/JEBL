@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer_dev.painters;
 
 import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
+import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ import jebl.evolution.graphs.Node;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class LabelPainterController implements Controller {
+public class LabelPainterController extends AbstractController {
 
     public LabelPainterController(String title, final LabelPainter labelPainter) {
         this.title = title;

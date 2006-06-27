@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer_dev.treelayouts;
 import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.Controller;
+import org.virion.jam.controlpalettes.AbstractController;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -14,7 +15,7 @@ import java.awt.event.ItemListener;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class PolarTreeLayoutController implements Controller {
+public class PolarTreeLayoutController extends AbstractController {
 
 	public PolarTreeLayoutController(final PolarTreeLayout treeLayout) {
 		this.treeLayout = treeLayout;

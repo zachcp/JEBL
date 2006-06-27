@@ -42,4 +42,18 @@ public interface Controller {
 	 * @param settings
 	 */
 	void setSettings(ControllerSettings settings);
+
+    /**
+     * Add a ControllerListener to this controllers list of listeners
+     * The main listener will be the ControlPalette itself which will use
+     * this to resize the panels if the components changed
+     * @param listener
+     */
+    void addControllerListener(ControllerListener listener);
+
+    /**
+     * Remove a listener
+     * @param listener
+     */
+    void removeControllerListener(ControllerListener listener);
 }

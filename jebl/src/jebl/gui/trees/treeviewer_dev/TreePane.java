@@ -255,8 +255,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		addSelectedTaxa(selectedNode);
 	}
 
+    private boolean canSelectNode(Node selectedNode) {
+       return selectedNode != null;
+    }
 	public void addSelectedNode(Node selectedNode) {
-		if (selectedNode != null) {
+        if ( canSelectNode(selectedNode) ) {
 			selectedNodes.add(selectedNode);
 		}
 		fireSelectionChanged();
@@ -272,7 +275,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	}
 
 	public void addSelectedClade(Node selectedNode) {
-		if (selectedNode != null) {
+        if ( canSelectNode(selectedNode) ) {
 			addSelectedChildClades(selectedNode);
 		}
 		fireSelectionChanged();
@@ -661,7 +664,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 							g2.setTransform(oldTransform);
 						}
 					}
-				}
+
+                    if (nodeShapePainter != null && nodeShapePainter.isVisible()) {
+                        nodeShapePainter.paint(g2, node, NodePainter.Justification.CENTER,
+                                new Rectangle2D.Double(0.0, 0.0, nodeShapePainter.getPreferredWidth(), nodeShapePainter.getPreferredHeight()));
+                    }
+                }
 
 				if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 
@@ -731,18 +739,16 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				tipLabelWidth = Math.max(tipLabelWidth, tipLabelPainter.getPreferredWidth());
 			}
 
-			final double labelHeight = tipLabelPainter.getPreferredHeight();
+			final double tipLabelHeight = tipLabelPainter.getPreferredHeight();
 
 			for (Node node : externalNodes) {
-				// don't see why is that needed here? taxonLabelPainternot used in this loop (YH)?
-				//tipLabelPainter.calibrate(g2, node);
-				Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, labelHeight);
+				Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelHeight);
 
 				// Get the line that represents the path for the taxon label
 				Line2D taxonPath = treeLayout.getTipLabelPath(node);
 
 				// Work out how it is rotated and create a transform that matches that
-				AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, labelHeight, true);
+				AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, tipLabelHeight, true);
 
 				// and add the translated bounds to the overall bounds
 				bounds.add(taxonTransform.createTransformedShape(labelBounds).getBounds2D());
@@ -769,6 +775,15 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				}
 			}
 		}
+
+        if (nodeShapePainter != null && nodeShapePainter.isVisible()) {
+            // Iterate though the nodes
+            for (Node node : tree.getNodes()) {
+                nodeShapePainter.calibrate(g2, node);
+
+                bounds.add(new Rectangle2D.Double(0.0, 0.0, branchLabelPainter.getPreferredWidth(), branchLabelPainter.getPreferredHeight()));
+            }
+        }
 
 		if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 			// Iterate though the nodes
@@ -799,14 +814,30 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			bounds.add(scaleBarBounds);
 		}
 
+
+        final double avilableW = width - insets.left - insets.right;
+        final double avaialbeH = height - insets.top - insets.bottom;
+
 		// get the difference between the tree's bounds and the overall bounds
+
 		double xDiff = bounds.getWidth() - treeBounds.getWidth();
 		double yDiff = bounds.getHeight() - treeBounds.getHeight();
+        assert xDiff >= 0 && yDiff >= 0;
 
+        // small tree, long labels, label bounds may get larger that window, protect against that
+
+        if( xDiff >= avilableW ) {
+           xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
+        }
+
+        if( yDiff >= avaialbeH ) {
+           yDiff = Math.min(avaialbeH, bounds.getHeight()) - treeBounds.getHeight();
+        }
 		// Get the amount of canvas that is going to be taken up by the tree -
 		// The rest is taken up by taxon labels which don't scale
-		double w = width - insets.left - insets.right - xDiff;
-		double h = height - insets.top - insets.bottom - yDiff;
+
+        final double w = avilableW - xDiff;
+        final double h = avaialbeH - yDiff;
 
 		double xScale;
 		double yScale;
@@ -826,7 +857,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				xScale = yScale;
 			}
 
-			treeScale = xScale;
+            treeScale = xScale;   assert treeScale > 0;
 
 			// and set the origin so that the center of the tree is in
 			// the center of the canvas
@@ -842,7 +873,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			xOffset = -bounds.getX();
 			yOffset = -bounds.getY();
 
-			treeScale = xScale;
+            treeScale = xScale;   assert treeScale > 0;
 		}
 
 		// Create the overall transform
@@ -896,6 +927,17 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
+        nodeShapeBounds.clear();
+        if (nodeShapePainter != null && nodeShapePainter.isVisible()) {
+            // Iterate though the nodes
+            for (Node node : tree.getNodes()) {
+                // Store the transformed bounds in the map for use when selecting
+                nodeShapeBounds.put(node, transform.createTransformedShape(new Rectangle2D.Double(0.0, 0.0,
+                        branchLabelPainter.getPreferredWidth(),
+                        branchLabelPainter.getPreferredHeight())));
+            }
+        }
+
 		// Clear the map of individual node label bounds and transforms
 		nodeLabelBounds.clear();
 		nodeLabelTransforms.clear();
@@ -931,6 +973,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
+        branchLabelBounds.clear();
+        branchLabelTransforms.clear();
+        branchLabelJustifications.clear();
+
 		if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 
 
@@ -941,7 +987,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				Line2D labelPath = treeLayout.getBranchLabelPath(node);
 
 				if (labelPath != null) {
-					branchLabelPainter.calibrate(g2, node);
+                    // AR - I don't think we need to recalibrate this here
+                    // branchLabelPainter.calibrate(g2, node);
 					final double labelHeight = branchLabelPainter.getPreferredHeight();
 					final double labelWidth = branchLabelPainter.getPreferredWidth();
 					final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
@@ -1082,7 +1129,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Map<Node, Shape> nodeLabelBounds = new HashMap<Node, Shape>();
 	private Map<Node, Painter.Justification> nodeLabelJustifications = new HashMap<Node, Painter.Justification>();
 
-	private Map<Node, AffineTransform> branchLabelTransforms = new HashMap<Node, AffineTransform>();
+    private Map<Node, Shape> nodeShapeBounds = new HashMap<Node, Shape>();
+
+    private Map<Node, AffineTransform> branchLabelTransforms = new HashMap<Node, AffineTransform>();
 	private Map<Node, Shape> branchLabelBounds = new HashMap<Node, Shape>();
 	private Map<Node, Painter.Justification> branchLabelJustifications = new HashMap<Node, Painter.Justification>();
 

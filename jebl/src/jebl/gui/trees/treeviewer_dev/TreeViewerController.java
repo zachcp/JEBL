@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer_dev;
 import jebl.gui.trees.treeviewer_dev.treelayouts.*;
 import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
+import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.util.IconUtils;
 
@@ -16,7 +17,7 @@ import java.awt.event.*;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreeViewerController implements Controller {
+public class TreeViewerController extends AbstractController {
 
 	public enum TreeLayoutType {
 		RECTILINEAR("Rectangle"),

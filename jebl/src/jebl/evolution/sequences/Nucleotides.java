@@ -55,18 +55,6 @@ public final class Nucleotides {
         H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
 
-	/*
-	public static final NucleotideState[] COMPLEMENTARY_STATES = new NucleotideState[] {
-	    G_STATE, T_STATE, A_STATE, C_STATE,
-	    Y_STATE, R_STATE, K_STATE, S_STATE,
-	    W_STATE, M_STATE, H_STATE, V_STATE,
-	    B_STATE, D_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
-	};
-	*/
-
-    // The above states change to the below states by Matt, since they appear wrong to me.
-    // I can only assume whoever wrote the original code never used it!
-
     public static final NucleotideState[] COMPLEMENTARY_STATES = new NucleotideState[]{
             T_STATE, G_STATE, C_STATE, A_STATE,
             Y_STATE, R_STATE, K_STATE, W_STATE,

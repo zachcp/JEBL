@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
+import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -12,7 +13,7 @@ import javax.swing.event.ChangeEvent;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class RadialTreeLayoutController implements Controller {
+public class RadialTreeLayoutController extends AbstractController {
 
 	public RadialTreeLayoutController(final RadialTreeLayout treeLayout) {
 		this.treeLayout = treeLayout;

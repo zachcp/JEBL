@@ -4,6 +4,7 @@ import jebl.evolution.trees.SortedRootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
+import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -17,7 +18,7 @@ import java.awt.event.ItemListener;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreePaneController implements Controller {
+public class TreePaneController extends AbstractController {
 
 	public TreePaneController(final TreePane treePane) {
 		this.treePane = treePane;

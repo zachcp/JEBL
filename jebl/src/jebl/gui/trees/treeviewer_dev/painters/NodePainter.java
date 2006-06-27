@@ -21,7 +21,7 @@ public abstract class NodePainter extends AbstractPainter<Node> {
 
     public abstract void setupAttributes(Tree tree);
 
-    public abstract void setDisplayAttribute(String displayAttribute);
+    public abstract void setDisplayAttribute(String display, String attribute);
 
 	// Getters
 

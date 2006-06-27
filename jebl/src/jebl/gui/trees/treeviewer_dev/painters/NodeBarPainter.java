@@ -17,112 +17,121 @@ import java.util.regex.Matcher;
  */
 public class NodeBarPainter extends NodePainter {
 
-	public NodeBarPainter() {
+    public static final String LOWER_ATTRIBUTE = "lower";
+    public static final String UPPER_ATTRIBUTE = "upper";
 
-	    setupAttributes(null);
-	}
+    public NodeBarPainter() {
 
-	public void setupAttributes(Tree tree) {
-	    java.util.List<String> attributeNames = new ArrayList<String>();
-	    if (tree != null) {
-	        Set<String> nodeAttributes = new TreeSet<String>();
-	        for (Node node : tree.getNodes()) {
-	            nodeAttributes.addAll(node.getAttributeNames());
-	        }
-	        attributeNames.addAll(nodeAttributes);
-	    }
+        setupAttributes(null);
+    }
 
-	    this.attributes = new String[attributeNames.size()];
-	    attributeNames.toArray(this.attributes);
+    public void setupAttributes(Tree tree) {
+        java.util.List<String> attributeNames = new ArrayList<String>();
+        if (tree != null) {
+            Set<String> nodeAttributes = new TreeSet<String>();
+            for (Node node : tree.getNodes()) {
+                nodeAttributes.addAll(node.getAttributeNames());
+            }
+            attributeNames.addAll(nodeAttributes);
+        }
 
-	    firePainterSettingsChanged();
-	}
+        this.attributes = new String[attributeNames.size()];
+        attributeNames.toArray(this.attributes);
 
-	public void setTreePane(TreePane treePane) {
-	    this.treePane = treePane;
-	}
+        firePainterSettingsChanged();
+    }
 
-	public void calibrate(Graphics2D g2, Node item) {
-	    RootedTree tree = treePane.getTree();
+    public void setTreePane(TreePane treePane) {
+        this.treePane = treePane;
+    }
 
-	    FontMetrics fm = g2.getFontMetrics();
-	    preferredHeight = fm.getHeight();
-	    preferredWidth = 0;
+    public void calibrate(Graphics2D g2, Node item) {
+        RootedTree tree = treePane.getTree();
 
-		double upper = tree.getHeight(item);
-		double lower = tree.getHeight(item);
+        FontMetrics fm = g2.getFontMetrics();
+        preferredHeight = fm.getHeight();
+        preferredWidth = 0;
 
-		Object value = item.getAttribute(displayAttribute);
-		if (value != null ) {
-			Pattern p = Pattern.compile("{\\s*(\\S+)\\s*,\\s*(\\S+)\\s*}");
-			Matcher m = p.matcher(value.toString());
-			if (m.matches()) {
-			    try {
-			        lower = Integer.parseInt(m.group(1));
-				    upper = Integer.parseInt(m.group(2));
-			    } catch (NumberFormatException nfe) {
-			        // ignore (just use the current state).
-			    }
-			} else {
-				// todo - warn the user somehow?
-			}
-		}
+        double upper = tree.getHeight(item);
+        double lower = tree.getHeight(item);
 
-		Rectangle2D rect = treePane.getTreeLayout().getHeightArea(lower, upper).getBounds2D();
+        Object value = item.getAttribute(displayAttributes.get("LOWER_ATTRIBUTE"));
+        if (value != null ) {
+            if (value instanceof Number) {
+                lower = ((Number)value).doubleValue();
+            } else {
+                lower = Double.parseDouble(value.toString());
+            }
+        } else {
+            // todo - warn the user somehow?
+        }
 
-		preferredWidth = rect.getWidth();
-		preferredHeight = rect.getHeight();
-		preferredWidth = 40;
-		preferredHeight = 20;
-	}
+        value = item.getAttribute(displayAttributes.get("UPPER_ATTRIBUTE"));
+        if (value != null ) {
+            if (value instanceof Number) {
+                upper = ((Number)value).doubleValue();
+            } else {
+                upper = Double.parseDouble(value.toString());
+            }
+        } else {
+            // todo - warn the user somehow?
+        }
 
-	public double getPreferredWidth() {
-	    return preferredWidth;
-	}
+        Rectangle2D rect = treePane.getTreeLayout().getHeightArea(lower, upper).getBounds2D();
 
-	public double getPreferredHeight() {
-	    return preferredHeight;
-	}
+        preferredWidth = rect.getWidth();
+        preferredHeight = rect.getHeight();
+        preferredWidth = 40;
+        preferredHeight = 20;
+    }
 
-	public double getHeightBound() {
-	    return preferredHeight;
-	}
+    public double getPreferredWidth() {
+        return preferredWidth;
+    }
 
-	/**
-	 * The bounds define the shape of the bar so just draw it
-	 * @param g2
-	 * @param item
-	 * @param justification
-	 * @param bounds
-	 */
-	public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
-	    if (getBackground() != null) {
-	        g2.setPaint(getBackground());
-	        g2.fill(bounds);
-	    }
+    public double getPreferredHeight() {
+        return preferredHeight;
+    }
 
-	    if (getBorderPaint() != null && getBorderStroke() != null) {
-	        g2.setPaint(getBorderPaint());
-	        g2.setStroke(getBorderStroke());
-	    }
+    public double getHeightBound() {
+        return preferredHeight;
+    }
 
-		g2.draw(bounds);
-	}
+    /**
+     * The bounds define the shape of the bar so just draw it
+     * @param g2
+     * @param item
+     * @param justification
+     * @param bounds
+     */
+    public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
+        if (getBackground() != null) {
+            g2.setPaint(getBackground());
+            g2.fill(bounds);
+        }
 
-	public String[] getAttributes() {
-	    return attributes;
-	}
+        if (getBorderPaint() != null && getBorderStroke() != null) {
+            g2.setPaint(getBorderPaint());
+            g2.setStroke(getBorderStroke());
+        }
 
-	public void setDisplayAttribute(String displayAttribute) {
-	    this.displayAttribute = displayAttribute;
-	    firePainterChanged();
-	}
+        g2.draw(bounds);
+    }
 
-	private double preferredWidth;
-	private double preferredHeight;
+    public String[] getAttributes() {
+        return attributes;
+    }
 
-	protected String displayAttribute;
-	protected String[] attributes;
+    public void setDisplayAttribute(String display, String attribute) {
+        displayAttributes.put(display, attribute);
+        firePainterChanged();
+    }
 
-	protected TreePane treePane;
+    private double preferredWidth;
+    private double preferredHeight;
+
+    protected Map<String, String> displayAttributes = new HashMap<String, String>();
+    protected String[] attributes;
+
+    protected TreePane treePane;
 }

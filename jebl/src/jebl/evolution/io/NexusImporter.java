@@ -25,6 +25,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Class for importing NEXUS file format
@@ -46,45 +48,45 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         TREES
     }
 
-	// NEXUS specific ImportException classes
-	public static class MissingBlockException extends ImportException {
-		public MissingBlockException() { super(); }
-		public MissingBlockException(String message) { super(message); }
-	}
+    // NEXUS specific ImportException classes
+    public static class MissingBlockException extends ImportException {
+        public MissingBlockException() { super(); }
+        public MissingBlockException(String message) { super(message); }
+    }
 
-	/**
-	 * Constructor
-	 */
-	public NexusImporter(Reader reader) {
-		helper = new ImportHelper(reader);
+    /**
+     * Constructor
+     */
+    public NexusImporter(Reader reader) {
+        helper = new ImportHelper(reader);
 
-		// ! defines a comment to be written out to a log file
-		// & defines a meta comment
-		helper.setCommentDelimiters('[', ']', '\0', '!', '&');
-	}
+        // ! defines a comment to be written out to a log file
+        // & defines a meta comment
+        helper.setCommentDelimiters('[', ']', '\0', '!', '&');
+    }
 
 
-	/**
-	 * This function returns an integer to specify what the
-	 * next block in the file is. The internal variable nextBlock is also set to this
-	 * value. This should be overridden to provide support for other blocks. Once
-	 * the block is read in, nextBlock is automatically set to UNKNOWN_BLOCK by
-	 * findEndBlock.
-	 */
-	public NexusBlock findNextBlock() throws IOException
-	{
-		findToken("BEGIN", true);
-		String blockName = helper.readToken(";");
-		return findBlockName(blockName);
-	}
+    /**
+     * This function returns an integer to specify what the
+     * next block in the file is. The internal variable nextBlock is also set to this
+     * value. This should be overridden to provide support for other blocks. Once
+     * the block is read in, nextBlock is automatically set to UNKNOWN_BLOCK by
+     * findEndBlock.
+     */
+    public NexusBlock findNextBlock() throws IOException
+    {
+        findToken("BEGIN", true);
+        String blockName = helper.readToken(";");
+        return findBlockName(blockName);
+    }
 
-	/**
-	 * This function returns an enum class to specify what the
-	 * block given by blockName is.
-	 */
-	public NexusBlock findBlockName(String blockName)
-	{
-	    try {
+    /**
+     * This function returns an enum class to specify what the
+     * block given by blockName is.
+     */
+    public NexusBlock findBlockName(String blockName)
+    {
+        try {
           nextBlock = NexusBlock.valueOf(blockName.toUpperCase());
         } catch( IllegalArgumentException e ) {
           // handle unknown blocks. java 1.5 throws an exception in valueOf
@@ -92,10 +94,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         }
 
         if (nextBlock == null) {
-			nextBlock = NexusBlock.UNKNOWN;
-		}
-		return nextBlock;
-	}
+            nextBlock = NexusBlock.UNKNOWN;
+        }
+        return nextBlock;
+    }
 
     /**
      * Returns an iterator over a set of elements of type T.
@@ -136,202 +138,202 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         };
     }
 
-	/**
-	 * Parses a 'TAXA' block.
-	 */
-	public List<Taxon> parseTaxaBlock() throws ImportException, IOException
-	{
-		return readTaxaBlock();
-	}
+    /**
+     * Parses a 'TAXA' block.
+     */
+    public List<Taxon> parseTaxaBlock() throws ImportException, IOException
+    {
+        return readTaxaBlock();
+    }
 
-	/**
-	 * Parses a 'CHARACTERS' block.
-	 */
-	public List<Sequence> parseCharactersBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
-		return readCharactersBlock(taxonList);
-	}
+    /**
+     * Parses a 'CHARACTERS' block.
+     */
+    public List<Sequence> parseCharactersBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        return readCharactersBlock(taxonList);
+    }
 
-	/**
-	 * Parses a 'DATA' block.
-	 */
-	public List<Sequence> parseDataBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
-		return readDataBlock(taxonList);
-	}
+    /**
+     * Parses a 'DATA' block.
+     */
+    public List<Sequence> parseDataBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        return readDataBlock(taxonList);
+    }
 
-	/**
-	 * Parses a 'TREES' block.
-	 */
-	public List<Tree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
-		return readTreesBlock(taxonList);
-	}
+    /**
+     * Parses a 'TREES' block.
+     */
+    public List<Tree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        return readTreesBlock(taxonList);
+    }
 
     // **************************************************************
     // SequenceImporter IMPLEMENTATION
     // **************************************************************
 
-	/**
-	 * importAlignment.
-	 */
-	public List<Alignment> importAlignments() throws IOException, ImportException
-	{
-		boolean done = false;
+    /**
+     * importAlignment.
+     */
+    public List<Alignment> importAlignments() throws IOException, ImportException
+    {
+        boolean done = false;
 
-		List<Taxon> taxonList = null;
-		List<Alignment> alignments = new ArrayList<Alignment>();
+        List<Taxon> taxonList = null;
+        List<Alignment> alignments = new ArrayList<Alignment>();
 
-		while (!done) {
-			try {
+        while (!done) {
+            try {
 
-				NexusBlock block = findNextBlock();
+                NexusBlock block = findNextBlock();
 
-				if (block == NexusBlock.TAXA) {
+                if (block == NexusBlock.TAXA) {
 
-					taxonList = readTaxaBlock();
+                    taxonList = readTaxaBlock();
 
-				} else if (block == NexusBlock.CHARACTERS) {
+                } else if (block == NexusBlock.CHARACTERS) {
 
-					if (taxonList == null) {
-						throw new MissingBlockException("TAXA block is missing");
-					}
+                    if (taxonList == null) {
+                        throw new MissingBlockException("TAXA block is missing");
+                    }
 
-					List<Sequence> sequences = readCharactersBlock(taxonList);
-					alignments.add(new BasicAlignment(sequences));
+                    List<Sequence> sequences = readCharactersBlock(taxonList);
+                    alignments.add(new BasicAlignment(sequences));
 
-				} else if (block == NexusBlock.DATA) {
+                } else if (block == NexusBlock.DATA) {
 
-					// A data block doesn't need a taxon block before it
-					// but if one exists then it will use it.
-					List<Sequence> sequences = readDataBlock(taxonList);
-					alignments.add(new BasicAlignment(sequences));
+                    // A data block doesn't need a taxon block before it
+                    // but if one exists then it will use it.
+                    List<Sequence> sequences = readDataBlock(taxonList);
+                    alignments.add(new BasicAlignment(sequences));
 
-				} else {
-					// Ignore the block..
-				}
+                } else {
+                    // Ignore the block..
+                }
 
-			} catch (EOFException ex) {
-				done = true;
-			}
-		}
+            } catch (EOFException ex) {
+                done = true;
+            }
+        }
 
-		if (alignments.size() == 0) {
-			throw new MissingBlockException("DATA or CHARACTERS block is missing");
-		}
+        if (alignments.size() == 0) {
+            throw new MissingBlockException("DATA or CHARACTERS block is missing");
+        }
 
-		return alignments;
-	}
+        return alignments;
+    }
 
-	/**
-	 * importSequences.
-	 */
-	public List<Sequence> importSequences() throws IOException, ImportException {
-		boolean done = false;
+    /**
+     * importSequences.
+     */
+    public List<Sequence> importSequences() throws IOException, ImportException {
+        boolean done = false;
 
-		List<Taxon> taxonList = null;
-		List<Sequence> sequences = null;
+        List<Taxon> taxonList = null;
+        List<Sequence> sequences = null;
 
-		while (!done) {
-			try {
+        while (!done) {
+            try {
 
-				NexusBlock block = findNextBlock();
+                NexusBlock block = findNextBlock();
 
-				if (block == NexusBlock.TAXA) {
+                if (block == NexusBlock.TAXA) {
 
-					taxonList = readTaxaBlock();
+                    taxonList = readTaxaBlock();
 
-				} else if (block == NexusBlock.CHARACTERS) {
+                } else if (block == NexusBlock.CHARACTERS) {
 
-					if (taxonList == null) {
-						throw new MissingBlockException("TAXA block is missing");
-					}
+                    if (taxonList == null) {
+                        throw new MissingBlockException("TAXA block is missing");
+                    }
 
-					sequences = readCharactersBlock(taxonList);
+                    sequences = readCharactersBlock(taxonList);
 
-					done = true;
+                    done = true;
 
-				} else if (block == NexusBlock.DATA) {
+                } else if (block == NexusBlock.DATA) {
 
-					// A data block doesn't need a taxon block before it
-					// but if one exists then it will use it.
-					sequences = readDataBlock(taxonList);
+                    // A data block doesn't need a taxon block before it
+                    // but if one exists then it will use it.
+                    sequences = readDataBlock(taxonList);
 
-					done = true;
+                    done = true;
 
-				} else {
-					// Ignore the block..
-				}
+                } else {
+                    // Ignore the block..
+                }
 
-			} catch (EOFException ex) {
-				done = true;
-			}
-		}
+            } catch (EOFException ex) {
+                done = true;
+            }
+        }
 
-		if (sequences == null) {
-			throw new MissingBlockException("DATA or CHARACTERS block is missing");
-		}
+        if (sequences == null) {
+            throw new MissingBlockException("DATA or CHARACTERS block is missing");
+        }
 
-		return sequences;
-	}
+        return sequences;
+    }
 
     // **************************************************************
     // TreeImporter IMPLEMENTATION
     // **************************************************************
 
-	private boolean isReadingTreesBlock = false;
-	private List<Taxon> treeTaxonList = null;
-	private Map<String, Taxon> translationList = Collections.emptyMap();
-	private Tree nextTree = null;
-	private String[] lastToken = new String[1];
+    private boolean isReadingTreesBlock = false;
+    private List<Taxon> treeTaxonList = null;
+    private Map<String, Taxon> translationList = Collections.emptyMap();
+    private Tree nextTree = null;
+    private String[] lastToken = new String[1];
 
-	/**
-	 * return whether another tree is available.
-	 */
-	public boolean hasTree() throws IOException, ImportException
-	{
-		if (!isReadingTreesBlock) {
-			isReadingTreesBlock = startReadingTrees();
-			translationList = readTranslationList(treeTaxonList, lastToken);
-		}
+    /**
+     * return whether another tree is available.
+     */
+    public boolean hasTree() throws IOException, ImportException
+    {
+        if (!isReadingTreesBlock) {
+            isReadingTreesBlock = startReadingTrees();
+            translationList = readTranslationList(treeTaxonList, lastToken);
+        }
 
-		if (!isReadingTreesBlock) return false;
+        if (!isReadingTreesBlock) return false;
 
-		if (nextTree == null) {
-			nextTree = readNextTree(lastToken);
-		}
+        if (nextTree == null) {
+            nextTree = readNextTree(lastToken);
+        }
 
-		return (nextTree != null);
-	}
+        return (nextTree != null);
+    }
 
 
-	/**
-	 * import the next tree.
-	 * return the tree or null if no more trees are available
-	 */
-	public Tree importNextTree() throws IOException, ImportException
-	{
-		// call hasTree to do the hard work...
-		if (!hasTree()) {
-			isReadingTreesBlock = false;
-			return null;
-		}
+    /**
+     * import the next tree.
+     * return the tree or null if no more trees are available
+     */
+    public Tree importNextTree() throws IOException, ImportException
+    {
+        // call hasTree to do the hard work...
+        if (!hasTree()) {
+            isReadingTreesBlock = false;
+            return null;
+        }
 
-		Tree tree = nextTree;
-		nextTree = null;
+        Tree tree = nextTree;
+        nextTree = null;
 
-		return tree;
-	}
+        return tree;
+    }
 
-	public List<Tree> importTrees() throws IOException, ImportException {
-		isReadingTreesBlock = false;
-		if (!startReadingTrees()) {
-			throw new MissingBlockException("TREES block is missing");
-		}
-		return readTreesBlock(treeTaxonList);
-	}
+    public List<Tree> importTrees() throws IOException, ImportException {
+        isReadingTreesBlock = false;
+        if (!startReadingTrees()) {
+            throw new MissingBlockException("TREES block is missing");
+        }
+        return readTreesBlock(treeTaxonList);
+    }
 
-	public boolean startReadingTrees() throws IOException, ImportException
+    public boolean startReadingTrees() throws IOException, ImportException
     {
         treeTaxonList = null;
 
@@ -402,188 +404,188 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     // PRIVATE Methods
     // **************************************************************
 
-	/**
-	 * Finds the end of the current block.
-	 */
-	private void findToken(String query, boolean ignoreCase) throws IOException
-	{
-		String token;
-		boolean found = false;
+    /**
+     * Finds the end of the current block.
+     */
+    private void findToken(String query, boolean ignoreCase) throws IOException
+    {
+        String token;
+        boolean found = false;
 
-		do {
-			token = helper.readToken();
+        do {
+            token = helper.readToken();
 
-			if ( (ignoreCase && token.equalsIgnoreCase(query)) || token.equals(query) ) {
-				found = true;
-			}
-		} while (!found);
-	}
+            if ( (ignoreCase && token.equalsIgnoreCase(query)) || token.equals(query) ) {
+                found = true;
+            }
+        } while (!found);
+    }
 
-	/**
-	 * Finds the end of the current block.
-	 */
-	public void findEndBlock() throws IOException
-	{
-		try {
-			String token;
+    /**
+     * Finds the end of the current block.
+     */
+    public void findEndBlock() throws IOException
+    {
+        try {
+            String token;
 
-			do {
-				token = helper.readToken(";");
-			} while ( !token.equalsIgnoreCase("END") && !token.equalsIgnoreCase("ENDBLOCK") );
-		} catch (EOFException e) {
+            do {
+                token = helper.readToken(";");
+            } while ( !token.equalsIgnoreCase("END") && !token.equalsIgnoreCase("ENDBLOCK") );
+        } catch (EOFException e) {
             // Doesn't matter if the End is missing
         }
 
         nextBlock = NexusBlock.UNKNOWN;
-	}
+    }
 
-	/**
-	 * Reads the header information for a 'DATA', 'CHARACTERS' or 'TAXA' block.
-	 */
-	private void readDataBlockHeader(String tokenToLookFor, NexusBlock block) throws ImportException, IOException
-	{
+    /**
+     * Reads the header information for a 'DATA', 'CHARACTERS' or 'TAXA' block.
+     */
+    private void readDataBlockHeader(String tokenToLookFor, NexusBlock block) throws ImportException, IOException
+    {
 
-		boolean dim = false, ttl = false, fmt = false;
-		String token;
+        boolean dim = false, ttl = false, fmt = false;
+        String token;
 
-		do {
-			token = helper.readToken();
+        do {
+            token = helper.readToken();
 
-			if ( token.equalsIgnoreCase("TITLE") ) {
-				if (ttl) {
-					throw new ImportException.DuplicateFieldException("TITLE");
-				}
+            if ( token.equalsIgnoreCase("TITLE") ) {
+                if (ttl) {
+                    throw new ImportException.DuplicateFieldException("TITLE");
+                }
 
-				ttl = true;
-			} else if ( token.equalsIgnoreCase("DIMENSIONS") ) {
+                ttl = true;
+            } else if ( token.equalsIgnoreCase("DIMENSIONS") ) {
 
-				if (dim) {
-					throw new ImportException.DuplicateFieldException("DIMENSIONS");
-				}
+                if (dim) {
+                    throw new ImportException.DuplicateFieldException("DIMENSIONS");
+                }
 
-				boolean nchar = (block == NexusBlock.TAXA);
-				boolean ntax = (block == NexusBlock.CHARACTERS);
+                boolean nchar = (block == NexusBlock.TAXA);
+                boolean ntax = (block == NexusBlock.CHARACTERS);
 
-				do {
-					String token2 = helper.readToken( "=;" );
+                do {
+                    String token2 = helper.readToken( "=;" );
 
-					if (helper.getLastDelimiter() != '=') {
-						throw new ImportException.BadFormatException("Unknown subcommand, '" + token2 + "', or missing '=' in DIMENSIONS command");
-					}
+                    if (helper.getLastDelimiter() != '=') {
+                        throw new ImportException.BadFormatException("Unknown subcommand, '" + token2 + "', or missing '=' in DIMENSIONS command");
+                    }
 
-					if ( token2.equalsIgnoreCase("NTAX") ) {
+                    if ( token2.equalsIgnoreCase("NTAX") ) {
 
-						if (block == NexusBlock.CHARACTERS) {
-							throw new ImportException.BadFormatException("NTAX subcommand in CHARACTERS block");
-						}
+                        if (block == NexusBlock.CHARACTERS) {
+                            throw new ImportException.BadFormatException("NTAX subcommand in CHARACTERS block");
+                        }
 
-						taxonCount = helper.readInteger( ";" );
-						ntax = true;
+                        taxonCount = helper.readInteger( ";" );
+                        ntax = true;
 
-					} else if ( token2.equalsIgnoreCase("NCHAR") ) {
+                    } else if ( token2.equalsIgnoreCase("NCHAR") ) {
 
-						if (block == NexusBlock.TAXA) {
-							throw new ImportException.BadFormatException("NCHAR subcommand in TAXA block");
-						}
+                        if (block == NexusBlock.TAXA) {
+                            throw new ImportException.BadFormatException("NCHAR subcommand in TAXA block");
+                        }
 
-						siteCount = helper.readInteger( ";" );
-						nchar = true;
+                        siteCount = helper.readInteger( ";" );
+                        nchar = true;
 
-					} else {
-						throw new ImportException.BadFormatException("Unknown subcommand, '" + token2 + "', in DIMENSIONS command");
-					}
+                    } else {
+                        throw new ImportException.BadFormatException("Unknown subcommand, '" + token2 + "', in DIMENSIONS command");
+                    }
 
-				} while (helper.getLastDelimiter() != ';');
+                } while (helper.getLastDelimiter() != ';');
 
-				if (!ntax) {
-					throw new ImportException.BadFormatException("NTAX subcommand missing from DIMENSIONS command");
-				}
-				if (!nchar) {
-					throw new ImportException.BadFormatException("NCHAR subcommand missing from DIMENSIONS command");
-				}
-				dim = true;
+                if (!ntax) {
+                    throw new ImportException.BadFormatException("NTAX subcommand missing from DIMENSIONS command");
+                }
+                if (!nchar) {
+                    throw new ImportException.BadFormatException("NCHAR subcommand missing from DIMENSIONS command");
+                }
+                dim = true;
 
-			} else if ( token.equalsIgnoreCase("FORMAT") ) {
+            } else if ( token.equalsIgnoreCase("FORMAT") ) {
 
-				if (fmt) {
-					throw new ImportException.DuplicateFieldException("FORMAT");
-				}
+                if (fmt) {
+                    throw new ImportException.DuplicateFieldException("FORMAT");
+                }
 
-				sequenceType = null;
+                sequenceType = null;
 
-				do {
-					String token2 = helper.readToken("=;");
+                do {
+                    String token2 = helper.readToken("=;");
 
-					if (token2.equalsIgnoreCase("GAP")) {
+                    if (token2.equalsIgnoreCase("GAP")) {
 
-						if (helper.getLastDelimiter() != '=') {
-							throw new ImportException.BadFormatException("Expecting '=' after GAP subcommand in FORMAT command");
-						}
+                        if (helper.getLastDelimiter() != '=') {
+                            throw new ImportException.BadFormatException("Expecting '=' after GAP subcommand in FORMAT command");
+                        }
 
-						gapCharacters = helper.readToken(";");
+                        gapCharacters = helper.readToken(";");
 
-					} else if (token2.equalsIgnoreCase("MISSING")) {
+                    } else if (token2.equalsIgnoreCase("MISSING")) {
 
-						if (helper.getLastDelimiter() != '=') {
-							throw new ImportException.BadFormatException("Expecting '=' after MISSING subcommand in FORMAT command");
-						}
+                        if (helper.getLastDelimiter() != '=') {
+                            throw new ImportException.BadFormatException("Expecting '=' after MISSING subcommand in FORMAT command");
+                        }
 
-						missingCharacters = helper.readToken(";");
+                        missingCharacters = helper.readToken(";");
 
-					} else if (token2.equalsIgnoreCase("MATCHCHAR")) {
+                    } else if (token2.equalsIgnoreCase("MATCHCHAR")) {
 
-						if (helper.getLastDelimiter() != '=') {
-							throw new ImportException.BadFormatException("Expecting '=' after MATCHCHAR subcommand in FORMAT command");
-						}
+                        if (helper.getLastDelimiter() != '=') {
+                            throw new ImportException.BadFormatException("Expecting '=' after MATCHCHAR subcommand in FORMAT command");
+                        }
 
-						matchCharacters = helper.readToken(";");
+                        matchCharacters = helper.readToken(";");
 
-					} else if (token2.equalsIgnoreCase("DATATYPE")) {
+                    } else if (token2.equalsIgnoreCase("DATATYPE")) {
 
-						if (helper.getLastDelimiter() != '=') {
-							throw new ImportException.BadFormatException("Expecting '=' after DATATYPE subcommand in FORMAT command");
-						}
+                        if (helper.getLastDelimiter() != '=') {
+                            throw new ImportException.BadFormatException("Expecting '=' after DATATYPE subcommand in FORMAT command");
+                        }
 
-						String token3 = helper.readToken(";");
-						if (token3.equalsIgnoreCase("NUCLEOTIDE") ||
-							token3.equalsIgnoreCase("DNA") ||
-							token3.equalsIgnoreCase("RNA")) {
+                        String token3 = helper.readToken(";");
+                        if (token3.equalsIgnoreCase("NUCLEOTIDE") ||
+                            token3.equalsIgnoreCase("DNA") ||
+                            token3.equalsIgnoreCase("RNA")) {
 
-							sequenceType = SequenceType.NUCLEOTIDE;
+                            sequenceType = SequenceType.NUCLEOTIDE;
 
-						} else if (token3.equalsIgnoreCase("PROTEIN")) {
+                        } else if (token3.equalsIgnoreCase("PROTEIN")) {
 
-							sequenceType = SequenceType.AMINO_ACID;
+                            sequenceType = SequenceType.AMINO_ACID;
 
-						} else if (token3.equalsIgnoreCase("CONTINUOUS")) {
+                        } else if (token3.equalsIgnoreCase("CONTINUOUS")) {
 
-							throw new ImportException.UnparsableDataException("Continuous data cannot be parsed at present");
+                            throw new ImportException.UnparsableDataException("Continuous data cannot be parsed at present");
 
-						}
-					} else if (token2.equalsIgnoreCase("INTERLEAVE")) {
-						isInterleaved = true;
-					}
+                        }
+                    } else if (token2.equalsIgnoreCase("INTERLEAVE")) {
+                        isInterleaved = true;
+                    }
 
-				} while (helper.getLastDelimiter() != ';');
+                } while (helper.getLastDelimiter() != ';');
 
-				fmt = true;
-			}
-		} while ( !token.equalsIgnoreCase(tokenToLookFor) );
+                fmt = true;
+            }
+        } while ( !token.equalsIgnoreCase(tokenToLookFor) );
 
-		if ( !dim ) {
-			throw new ImportException.MissingFieldException("DIMENSIONS");
-		}
-		if ( block != NexusBlock.TAXA && sequenceType == null ) {
-			throw new ImportException.MissingFieldException("DATATYPE. Only Nucleotide or Protein sequences are supported.");
-		}
-	}
+        if ( !dim ) {
+            throw new ImportException.MissingFieldException("DIMENSIONS");
+        }
+        if ( block != NexusBlock.TAXA && sequenceType == null ) {
+            throw new ImportException.MissingFieldException("DATATYPE. Only Nucleotide or Protein sequences are supported.");
+        }
+    }
 
-	/**
-	 * Reads sequences in a 'DATA' or 'CHARACTERS' block.
-	 */
-	private List<Sequence> readSequenceData(List<Taxon> taxonList) throws ImportException, IOException
-	{
-		String firstSequence = null;
+    /**
+     * Reads sequences in a 'DATA' or 'CHARACTERS' block.
+     */
+    private List<Sequence> readSequenceData(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        String firstSequence = null;
         List<Sequence> sequences = new ArrayList<Sequence>();
 
         if (isInterleaved) {
@@ -597,14 +599,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                charsRead[i] = 0;
             }
             //throw new ImportException.UnparsableDataException("At present, interleaved data is not parsable");
-			boolean firstLoop = true;
+            boolean firstLoop = true;
 
-			int readCount = 0;
-			while (readCount < siteCount * taxonCount) {
+            int readCount = 0;
+            while (readCount < siteCount * taxonCount) {
 
-				for (int i = 0; i < taxonCount; i++) {
+                for (int i = 0; i < taxonCount; i++) {
 
-					String token = helper.readToken();
+                    String token = helper.readToken();
 
                     int sequenceIndex;
                     Taxon taxon = Taxon.getTaxon(token);
@@ -626,156 +628,156 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                                 + " (expecting " + taxList.get(i).getName() + ")");
                     }
 
-					StringBuffer buffer = new StringBuffer();
+                    StringBuffer buffer = new StringBuffer();
 
                     helper.readSequenceLine(buffer, sequenceType, ";", gapCharacters, missingCharacters,
-										    matchCharacters, firstSequence);
+                                            matchCharacters, firstSequence);
 
                     String seqString = buffer.toString();
                     readCount += seqString.length();
                     charsRead[sequenceIndex] += seqString.length();
 
                     sequencesData.set(sequenceIndex, sequencesData.get(sequenceIndex).concat(seqString));
-					if (i == 0) {
-					   firstSequence = seqString;
-					}
+                    if (i == 0) {
+                       firstSequence = seqString;
+                    }
 
-					if (helper.getLastDelimiter() == ';') {
-						if (i < taxonCount - 1) {
-							throw new ImportException.TooFewTaxaException();
-						}
+                    if (helper.getLastDelimiter() == ';') {
+                        if (i < taxonCount - 1) {
+                            throw new ImportException.TooFewTaxaException();
+                        }
                         for (int k = 0; k < taxonCount; k++) {
                           if (charsRead[k] != siteCount) {
                             throw new ImportException.ShortSequenceException(taxList.get(k).getName());
                           }
                         }
                     }
-				}
+                }
 
-				firstLoop = false;
-			}
+                firstLoop = false;
+            }
 
             if (helper.getLastDelimiter() != ';') {
-				throw new ImportException.BadFormatException("Expecting ';' after sequences data");
-			}
+                throw new ImportException.BadFormatException("Expecting ';' after sequences data");
+            }
 
             for (int k = 0; k < taxonCount; k++) {
               Sequence sequence = new BasicSequence(sequenceType, taxList.get(k), sequencesData.get(k));
-		      sequences.add(sequence);
+              sequences.add(sequence);
             }
 
         } else {
 
-			for (int i = 0; i < taxonCount; i++) {
-				String token = helper.readToken();
+            for (int i = 0; i < taxonCount; i++) {
+                String token = helper.readToken();
 
-				Taxon taxon = Taxon.getTaxon(token);
+                Taxon taxon = Taxon.getTaxon(token);
 
-				if (taxonList != null && !taxonList.contains(taxon)) {
-					// taxon not found in taxon list...
-					// ...perhaps it is a numerical taxon reference?
-					throw new ImportException.UnknownTaxonException(token);
-				}
+                if (taxonList != null && !taxonList.contains(taxon)) {
+                    // taxon not found in taxon list...
+                    // ...perhaps it is a numerical taxon reference?
+                    throw new ImportException.UnknownTaxonException(token);
+                }
 
-				StringBuffer buffer = new StringBuffer();
-				helper.readSequence(buffer, sequenceType, ";", siteCount, gapCharacters,
-								    missingCharacters, matchCharacters, firstSequence);
-				String seqString = buffer.toString();
+                StringBuffer buffer = new StringBuffer();
+                helper.readSequence(buffer, sequenceType, ";", siteCount, gapCharacters,
+                                    missingCharacters, matchCharacters, firstSequence);
+                String seqString = buffer.toString();
 
-				if (seqString.length() != siteCount) {
-					throw new ImportException.ShortSequenceException(taxon.getName());
-				}
+                if (seqString.length() != siteCount) {
+                    throw new ImportException.ShortSequenceException(taxon.getName());
+                }
 
-				if (i == 0) {
-					firstSequence = seqString;
-				}
+                if (i == 0) {
+                    firstSequence = seqString;
+                }
 
-				if (helper.getLastDelimiter() == ';' && i < taxonCount - 1) {
-					throw new ImportException.TooFewTaxaException();
-				}
+                if (helper.getLastDelimiter() == ';' && i < taxonCount - 1) {
+                    throw new ImportException.TooFewTaxaException();
+                }
 
-				Sequence sequence = new BasicSequence(sequenceType, taxon, seqString);
-				sequences.add(sequence);
-			}
+                Sequence sequence = new BasicSequence(sequenceType, taxon, seqString);
+                sequences.add(sequence);
+            }
 
-			if (helper.getLastDelimiter() != ';') {
-				throw new ImportException.BadFormatException("Expecting ';' after sequences data");
-			}
+            if (helper.getLastDelimiter() != ';') {
+                throw new ImportException.BadFormatException("Expecting ';' after sequences data");
+            }
 
-		}
+        }
 
-		return sequences;
-	}
+        return sequences;
+    }
 
 
-	/**
-	 * Reads a 'TAXA' block.
-	 */
-	private List<Taxon> readTaxaBlock() throws ImportException, IOException
-	{
+    /**
+     * Reads a 'TAXA' block.
+     */
+    private List<Taxon> readTaxaBlock() throws ImportException, IOException
+    {
 
-		taxonCount = 0;
+        taxonCount = 0;
 
-		readDataBlockHeader("TAXLABELS", NexusBlock.TAXA);
+        readDataBlockHeader("TAXLABELS", NexusBlock.TAXA);
 
-		if (taxonCount == 0) {
-			throw new ImportException.MissingFieldException("NTAXA");
-		}
+        if (taxonCount == 0) {
+            throw new ImportException.MissingFieldException("NTAXA");
+        }
 
-		List<Taxon> taxa = new ArrayList<Taxon>();
+        List<Taxon> taxa = new ArrayList<Taxon>();
 
-		do {
-			String name = helper.readToken(";");
+        do {
+            String name = helper.readToken(";");
 
-			Taxon taxon = Taxon.getTaxon(name);
-			taxa.add(taxon);
-		} while (helper.getLastDelimiter() != ';');
+            Taxon taxon = Taxon.getTaxon(name);
+            taxa.add(taxon);
+        } while (helper.getLastDelimiter() != ';');
 
-		if (taxa.size() != taxonCount) {
-			throw new ImportException.BadFormatException("Number of taxa doesn't match NTAXA field");
-		}
+        if (taxa.size() != taxonCount) {
+            throw new ImportException.BadFormatException("Number of taxa doesn't match NTAXA field");
+        }
 
-		findEndBlock();
+        findEndBlock();
 
-		return taxa;
-	}
+        return taxa;
+    }
 
-	/**
-	 * Reads a 'CHARACTERS' block.
-	 */
-	private List<Sequence> readCharactersBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
+    /**
+     * Reads a 'CHARACTERS' block.
+     */
+    private List<Sequence> readCharactersBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
 
-		siteCount = 0;
-		sequenceType = null;
+        siteCount = 0;
+        sequenceType = null;
 
-		readDataBlockHeader("MATRIX", NexusBlock.CHARACTERS);
+        readDataBlockHeader("MATRIX", NexusBlock.CHARACTERS);
 
-		List<Sequence> sequences = readSequenceData(taxonList);
+        List<Sequence> sequences = readSequenceData(taxonList);
 
-		findEndBlock();
+        findEndBlock();
 
-		return sequences;
-	}
+        return sequences;
+    }
 
-	/**
-	 * Reads a 'DATA' block.
-	 */
-	private List<Sequence> readDataBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
+    /**
+     * Reads a 'DATA' block.
+     */
+    private List<Sequence> readDataBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
 
-		taxonCount = 0;
-		siteCount = 0;
-		sequenceType = null;
+        taxonCount = 0;
+        siteCount = 0;
+        sequenceType = null;
 
-		readDataBlockHeader("MATRIX", NexusBlock.DATA);
+        readDataBlockHeader("MATRIX", NexusBlock.DATA);
 
-		List<Sequence> sequences = readSequenceData(taxonList);
+        List<Sequence> sequences = readSequenceData(taxonList);
 
-		findEndBlock();
+        findEndBlock();
 
-		return sequences;
-	}
+        return sequences;
+    }
 
     /**
      * Reads a 'DISTANCES' block.
@@ -906,15 +908,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     }
 
 
-	/**
-	 * Reads a 'TREES' block.
-	 */
-	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
-		List<Tree> trees = new ArrayList<Tree>();
+    /**
+     * Reads a 'TREES' block.
+     */
+    private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        List<Tree> trees = new ArrayList<Tree>();
 
-		String[] lastToken = new String[1];
-		translationList = readTranslationList(taxonList, lastToken);
+        String[] lastToken = new String[1];
+        translationList = readTranslationList(taxonList, lastToken);
 
         while( true ) {
 
@@ -927,61 +929,61 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             trees.add(tree);
         }
 
-		if (trees.size() == 0) {
-			throw new ImportException.BadFormatException("No trees defined in TREES block");
-		}
+        if (trees.size() == 0) {
+            throw new ImportException.BadFormatException("No trees defined in TREES block");
+        }
 
-		nextBlock = NexusBlock.UNKNOWN;
+        nextBlock = NexusBlock.UNKNOWN;
 
-		return trees;
-	}
+        return trees;
+    }
 
-	private Map<String, Taxon> readTranslationList(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException
-	{
-		Map<String, Taxon> translationList = new HashMap<String, Taxon>();
+    private Map<String, Taxon> readTranslationList(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException
+    {
+        Map<String, Taxon> translationList = new HashMap<String, Taxon>();
 
-		String token = helper.readToken(";");
+        String token = helper.readToken(";");
 
-		if ( token.equalsIgnoreCase("TRANSLATE") ) {
+        if ( token.equalsIgnoreCase("TRANSLATE") ) {
 
-			do {
-				String token2 = helper.readToken(",;");
+            do {
+                String token2 = helper.readToken(",;");
 
-				if (helper.getLastDelimiter() == ',' || helper.getLastDelimiter() == ';') {
-					throw new ImportException.BadFormatException("Missing taxon label in TRANSLATE command of TREES block");
-				}
+                if (helper.getLastDelimiter() == ',' || helper.getLastDelimiter() == ';') {
+                    throw new ImportException.BadFormatException("Missing taxon label in TRANSLATE command of TREES block");
+                }
 
-				String token3 = helper.readToken(",;");
+                String token3 = helper.readToken(",;");
 
-				if (helper.getLastDelimiter() != ',' && helper.getLastDelimiter() != ';') {
-					throw new ImportException.BadFormatException("Expecting ',' or ';' after taxon label in TRANSLATE command of TREES block");
-				}
+                if (helper.getLastDelimiter() != ',' && helper.getLastDelimiter() != ';') {
+                    throw new ImportException.BadFormatException("Expecting ',' or ';' after taxon label in TRANSLATE command of TREES block");
+                }
 
-				Taxon taxon = Taxon.getTaxon(token3);
+                Taxon taxon = Taxon.getTaxon(token3);
 
-				if (taxonList != null && !taxonList.contains(taxon)) {
-					// taxon not found in taxon list...
-					// ...perhaps it is a numerical taxon reference?
-					throw new ImportException.UnknownTaxonException(token3);
-				}
-				translationList.put(token2, taxon);
+                if (taxonList != null && !taxonList.contains(taxon)) {
+                    // taxon not found in taxon list...
+                    // ...perhaps it is a numerical taxon reference?
+                    throw new ImportException.UnknownTaxonException(token3);
+                }
+                translationList.put(token2, taxon);
 
-			} while (helper.getLastDelimiter() != ';');
+            } while (helper.getLastDelimiter() != ';');
 
-			token = helper.readToken(";");
+            token = helper.readToken(";");
 
-		} else if (taxonList != null) {
-			for (Taxon taxon : taxonList) {
-				translationList.put(taxon.getName(), taxon);
-			}
-		}
+        } else if (taxonList != null) {
+            for (Taxon taxon : taxonList) {
+                translationList.put(taxon.getName(), taxon);
+            }
+        }
 
-		lastToken[0] = token;
+        lastToken[0] = token;
 
-		return translationList;
-	}
+        return translationList;
+    }
 
-	private RootedTree readNextTree(String[] lastToken) throws ImportException, IOException
+    private RootedTree readNextTree(String[] lastToken) throws ImportException, IOException
     {
         try {
             SimpleRootedTree tree = null;
@@ -1067,36 +1069,38 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         } catch (EOFException e) {
             return null;
         }
-	}
+    }
 
-	/**
-	 * Reads a branch in. This could be a node or a tip (calls readNode or readTip
-	 * accordingly). It then reads the branch length and SimpleNode that will
-	 * point at the new node or tip.
-	 */
-	private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
-	{
+    /**
+     * Reads a branch in. This could be a node or a tip (calls readNode or readTip
+     * accordingly). It then reads the branch length and SimpleNode that will
+     * point at the new node or tip.
+     */
+    private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
+    {
 
-	    Node branch;
+        Node branch;
 
         helper.clearLastMetaComment();
-	    if (helper.nextCharacter() == '(') {
-	        // is an internal node
-	        branch = readInternalNode(tree);
+        if (helper.nextCharacter() == '(') {
+            // is an internal node
+            branch = readInternalNode(tree);
 
-	    } else {
-	        // is an external node
-	        branch = readExternalNode(tree);
-	    }
+        } else {
+            // is an external node
+            branch = readExternalNode(tree);
+        }
 
         if (helper.getLastDelimiter() == ':') {
             double length = helper.readDouble(",():;");
-	        tree.setLength(branch, length);
+            tree.setLength(branch, length);
         }
 
-		if (helper.getLastMetaComment() != null) {
-			// There was a meta-comment which should be in the form:
-			// \[&label[=value][,label[=value]>[,/..]]\]
+        // If there is a metacomment after the branch length indicator (:), then it is a branch attribute
+        // however, in the present implementation, this simply gets added to the node attributes.
+        if (helper.getLastMetaComment() != null) {
+            // There was a meta-comment which should be in the form:
+            // \[&label[=value][,label[=value]>[,/..]]\]
             String[] pairs = metaCommentPairs(helper.getLastMetaComment());
             for(int n = 0; n < pairs.length/2; ++n) {
                 labelNode(branch, pairs[2*n], pairs[2*n+1] != null ? pairs[2*n+1] : "true");
@@ -1105,53 +1109,64 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             helper.clearLastMetaComment();
         }
 
+        return branch;
+    }
 
-	    return branch;
-	}
+    /**
+     * Reads a node in. This could be a polytomy. Calls readBranch on each branch
+     * in the node.
+     */
+    private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
+    {
+        List<Node> children = new ArrayList<Node>();
 
-	/**
-	 * Reads a node in. This could be a polytomy. Calls readBranch on each branch
-	 * in the node.
-	 */
-	private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
-	{
-	    List<Node> children = new ArrayList<Node>();
+        // read the opening '('
+        helper.readCharacter();
 
-	    // read the opening '('
-	    helper.readCharacter();
+        // read the first child
+        children.add( readBranch(tree) );
 
-	    // read the first child
-	    children.add( readBranch(tree) );
+        // an internal node must have at least 2 children
+        if (helper.getLastDelimiter() != ',') {
+            throw new ImportException.BadFormatException("Missing ',' in tree");
+        }
 
-	    // an internal node must have at least 2 children
-	    if (helper.getLastDelimiter() != ',') {
-	        throw new ImportException.BadFormatException("Missing ',' in tree");
-	    }
+        // read subsequent children
+        do {
+            children.add( readBranch(tree) );
 
-	    // read subsequent children
-	    do {
-	        children.add( readBranch(tree) );
+        } while (helper.getLastDelimiter() == ',');
 
-	    } while (helper.getLastDelimiter() == ',');
-
-	    // should have had a closing ')'
-	    if (helper.getLastDelimiter() != ')') {
-	        throw new ImportException.BadFormatException("Missing closing ')' in tree");
-	    }
+        // should have had a closing ')'
+        if (helper.getLastDelimiter() != ')') {
+            throw new ImportException.BadFormatException("Missing closing ')' in tree");
+        }
 
         Node node = tree.createInternalNode(children);
 
         // find the next delimiter
-	    String token = helper.readToken(":(),;").trim();
+        String token = helper.readToken(":(),;").trim();
 
-        // if there is a token before the branch lenght, treat it as a node label
+        // if there is a token before the branch length, treat it as a node label
         // and store it as an attribute of the node...
         if (token.length() > 0) {
             labelNode(node, "label", token);
         }
 
+        // If there is a metacomment before the branch length indicator (:), then it is a node attribute
+        if (helper.getLastMetaComment() != null) {
+            // There was a meta-comment which should be in the form:
+            // \[&label[=value][,label[=value]>[,/..]]\]
+            String[] pairs = metaCommentPairs(helper.getLastMetaComment());
+            for(int n = 0; n < pairs.length/2; ++n) {
+                labelNode(node, pairs[2*n], pairs[2*n+1] != null ? pairs[2*n+1] : "true");
+            }
+
+            helper.clearLastMetaComment();
+        }
+
         return node;
-	}
+    }
 
     private void labelNode(Node node, String label, String value) {
         // Attempt to format the value as a number
@@ -1173,24 +1188,24 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     }
 
     /**
-	 * Reads an external node in.
-	 */
-	private Node readExternalNode(SimpleRootedTree tree) throws ImportException, IOException
-	{
-	    String label = helper.readToken(":(),;");
-		Taxon taxon = Taxon.getTaxon(label);
+     * Reads an external node in.
+     */
+    private Node readExternalNode(SimpleRootedTree tree) throws ImportException, IOException
+    {
+        String label = helper.readToken(":(),;");
+        Taxon taxon = Taxon.getTaxon(label);
 
-		if (translationList.size() > 0) {
-			taxon = translationList.get(label);
+        if (translationList.size() > 0) {
+            taxon = translationList.get(label);
 
-			if (taxon == null) {
-				// taxon not found in taxon list...
-				throw new ImportException.UnknownTaxonException("Taxon in tree, '" + label + "' is unknown");
-			}
-		}
+            if (taxon == null) {
+                // taxon not found in taxon list...
+                throw new ImportException.UnknownTaxonException("Taxon in tree, '" + label + "' is unknown");
+            }
+        }
 
         return tree.createExternalNode(taxon);
-	}
+    }
 
     public static String[] metaCommentPairs(String meta) throws ImportException.BadFormatException {
         String[] pairs = meta.split(",");

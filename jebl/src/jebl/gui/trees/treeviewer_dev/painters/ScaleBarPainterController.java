@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer_dev.painters;
 import org.virion.jam.components.RealNumberField;
 import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
+import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ import java.text.NumberFormat;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class ScaleBarPainterController implements Controller {
+public class ScaleBarPainterController extends AbstractController {
 
 	public ScaleBarPainterController(final ScaleBarPainter scaleBarPainter) {
 		this.scaleBarPainter = scaleBarPainter;
