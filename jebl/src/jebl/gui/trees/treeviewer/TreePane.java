@@ -741,7 +741,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         g2.setFont(oldFont);
 
         if( ! antialiasOn ) {
-           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF); 
+           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         }
     }
 
@@ -850,7 +850,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             bounds.add(scaleBarBounds);
         }
 
-
         final double avilableW = width - insets.left - insets.right;
         final double avaialbeH = height - insets.top - insets.bottom;
 
@@ -860,7 +859,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         double yDiff = bounds.getHeight() - treeBounds.getHeight();
         assert xDiff >= 0 && yDiff >= 0;
 
-        // small tree, long labels, label bounds may get larger that window, protect against that         
+        // small tree, long labels, label bounds may get larger that window, protect against that
 
         if( xDiff >= avilableW ) {
            xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();

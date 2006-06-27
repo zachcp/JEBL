@@ -1,9 +1,8 @@
 package jebl.gui.trees.treeviewer_dev;
 
 import jebl.gui.trees.treeviewer_dev.treelayouts.*;
-import org.virion.jam.controlpalettes.Controller;
-import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.AbstractController;
+import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.util.IconUtils;
 
@@ -11,7 +10,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 
 /**
  * @author Andrew Rambaut
@@ -127,7 +126,7 @@ public class TreeViewerController extends AbstractController {
 				setExpansion();
 				layoutPanel.removeAll();
 				layoutPanel.add(rectilinearTreeLayoutController.getPanel(), BorderLayout.CENTER);
-				optionsPanel.invalidate();
+				fireControllerChanged();
 
 			}
 		});
@@ -138,7 +137,7 @@ public class TreeViewerController extends AbstractController {
 				setExpansion();
 				layoutPanel.removeAll();
 				layoutPanel.add(polarTreeLayoutController.getPanel(), BorderLayout.CENTER);
-				optionsPanel.invalidate();
+				fireControllerChanged();
 			}
 		});
 		radialTreeToggle.addChangeListener(new ChangeListener() {
@@ -148,7 +147,7 @@ public class TreeViewerController extends AbstractController {
 				setExpansion();
 				layoutPanel.removeAll();
 				layoutPanel.add(radialTreeLayoutController.getPanel(), BorderLayout.CENTER);
-				optionsPanel.invalidate();
+				fireControllerChanged();
 			}
 		});
 

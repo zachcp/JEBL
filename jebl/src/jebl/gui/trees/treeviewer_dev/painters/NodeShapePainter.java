@@ -1,26 +1,49 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.gui.trees.treeviewer_dev.TreePane;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class NodeBarPainter extends NodePainter {
+public class NodeShapePainter extends NodePainter {
+
+	public static final String AREA_ATTRIBUTE = "area";
+	public static final String RADIUS_ATTRIBUTE = "radius";
+
+	public static final String WIDTH_ATTRIBUTE = "width";
+	public static final String HEIGHT_ATTRIBUTE = "height";
 
     public static final String LOWER_ATTRIBUTE = "lower";
     public static final String UPPER_ATTRIBUTE = "upper";
 
-    public NodeBarPainter() {
+	public enum NodeShape {
+	    CIRCLE("Circle"),
+	    BAR("Bar");
+
+	    NodeShape(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return name;
+	    }
+
+	    public String toString() {
+	        return name;
+	    }
+
+	    private final String name;
+	}
+
+    public NodeShapePainter() {
 
         setupAttributes(null);
     }

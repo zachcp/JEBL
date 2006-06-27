@@ -1,6 +1,5 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Node;
 
 /**

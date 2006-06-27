@@ -33,7 +33,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     public Shape getHeightArea(double height1, double height2) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+	    double x = height1;
+	    double y = 0.0;
+	    double w = height2 - height1;
+	    double h = 1.0;
+		return new Rectangle2D.Double(x, y, w, h);
     }
 
 	public boolean isAlignTipLabels() {

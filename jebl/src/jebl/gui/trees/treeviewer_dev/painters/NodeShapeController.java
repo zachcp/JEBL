@@ -1,6 +1,5 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import org.virion.jam.controlpalettes.Controller;
 import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
@@ -15,56 +14,37 @@ import java.awt.event.ItemListener;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class NodePainterController extends AbstractController {
+public class NodeShapeController extends AbstractController {
 
-    public enum NodeShape {
-        CIRCLE("Circle"),
-        BAR("Bar");
-
-        NodeShape(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String toString() {
-            return name;
-        }
-
-        private final String name;
-    }
-
-    public NodePainterController(String title, final NodePainter nodePainter) {
+    public NodeShapeController(String title, final NodeShapePainter nodeShapePainter) {
         this.title = title;
-        this.nodePainter = nodePainter;
+        this.nodeShapePainter = nodeShapePainter;
 
         optionsPanel = new OptionsPanel();
 
         titleCheckBox = new JCheckBox(getTitle());
 
-        titleCheckBox.setSelected(nodePainter.isVisible());
+        titleCheckBox.setSelected(this.nodeShapePainter.isVisible());
 
         titleCheckBox.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 final boolean selected = titleCheckBox.isSelected();
-                nodePainter.setVisible(selected);
+                nodeShapePainter.setVisible(selected);
             }
         });
 
-        shapeCombo = new JComboBox(new NodeShape[] {
-                NodeShape.CIRCLE,
-                NodeShape.BAR
+        shapeCombo = new JComboBox(new NodeShapePainter.NodeShape[] {
+                NodeShapePainter.NodeShape.CIRCLE,
+                NodeShapePainter.NodeShape.BAR
         });
 
-        String[] attributes = nodePainter.getAttributes();
+        String[] attributes = this.nodeShapePainter.getAttributes();
 
         displayAttributeCombo = new JComboBox(attributes);
         displayAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 String attribute = (String)displayAttributeCombo.getSelectedItem();
-                nodePainter.setDisplayAttribute(NodeBarPainter.LOWER_ATTRIBUTE, attribute);
+                nodeShapePainter.setDisplayAttribute(NodeShapePainter.LOWER_ATTRIBUTE, attribute);
             }
         });
 
@@ -72,7 +52,7 @@ public class NodePainterController extends AbstractController {
         displayLowerAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 String attribute = (String)displayLowerAttributeCombo.getSelectedItem();
-                nodePainter.setDisplayAttribute(NodeBarPainter.LOWER_ATTRIBUTE, attribute);
+                nodeShapePainter.setDisplayAttribute(NodeShapePainter.LOWER_ATTRIBUTE, attribute);
             }
         });
 
@@ -80,11 +60,11 @@ public class NodePainterController extends AbstractController {
         displayUpperAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 String attribute = (String)displayUpperAttributeCombo.getSelectedItem();
-                nodePainter.setDisplayAttribute(NodeBarPainter.UPPER_ATTRIBUTE, attribute);
+                nodeShapePainter.setDisplayAttribute(NodeShapePainter.UPPER_ATTRIBUTE, attribute);
             }
         });
 
-        nodePainter.addPainterListener(new PainterListener() {
+        this.nodeShapePainter.addPainterListener(new PainterListener() {
             public void painterChanged() {
 
             }
@@ -92,7 +72,7 @@ public class NodePainterController extends AbstractController {
             public void painterSettingsChanged() {
                 displayLowerAttributeCombo.removeAllItems();
                 displayUpperAttributeCombo.removeAllItems();
-                for (String name : nodePainter.getAttributes()) {
+                for (String name : nodeShapePainter.getAttributes()) {
                     displayLowerAttributeCombo.addItem(name);
                     displayUpperAttributeCombo.addItem(name);
                 }
@@ -114,7 +94,7 @@ public class NodePainterController extends AbstractController {
     private void setupOptions() {
         optionsPanel.removeAll();
         optionsPanel.addComponentWithLabel("Shape:", shapeCombo);
-        switch ((NodeShape) shapeCombo.getSelectedItem()) {
+        switch ((NodeShapePainter.NodeShape) shapeCombo.getSelectedItem()) {
             case CIRCLE:
                 optionsPanel.addComponentWithLabel("Radius:", displayAttributeCombo);
                 break;
@@ -160,5 +140,5 @@ public class NodePainterController extends AbstractController {
 
     private final String title;
 
-    private final NodePainter nodePainter;
+    private final NodeShapePainter nodeShapePainter;
 }

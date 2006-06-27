@@ -46,10 +46,10 @@ public class TreeViewerPanel extends JPanel {
 		treePane.setNodeLabelPainter(nodeLabelPainter);
 
 		// Create a node shape painter and its controller
-		NodeBarPainter nodeBarPainter = new NodeBarPainter();
-		nodeBarPainter.setVisible(false);
-		controlPalette.addController(new NodePainterController("Node Shapes", nodeBarPainter));
-		treePane.setNodeShapePainter(nodeBarPainter);
+		NodeShapePainter nodeShapePainter = new NodeShapePainter();
+		nodeShapePainter.setVisible(false);
+		controlPalette.addController(new NodeShapeController("Node Shapes", nodeShapePainter));
+		treePane.setNodeShapePainter(nodeShapePainter);
 
 		// Create a branch label painter and its controller
 		BasicLabelPainter branchLabelPainter = new BasicLabelPainter(BasicLabelPainter.PainterIntent.BRANCH);
