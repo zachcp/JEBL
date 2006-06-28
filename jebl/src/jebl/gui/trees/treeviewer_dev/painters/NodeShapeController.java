@@ -16,6 +16,25 @@ import java.awt.event.ItemListener;
  */
 public class NodeShapeController extends AbstractController {
 
+    public enum NodePainterType {
+        BAR("Bar"),
+        SHAPE("Shape");
+
+        NodePainterType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String toString() {
+            return name;
+        }
+
+        private final String name;
+    }
+
     public NodeShapeController(String title, final NodeShapePainter nodeShapePainter) {
         this.title = title;
         this.nodeShapePainter = nodeShapePainter;
@@ -33,9 +52,9 @@ public class NodeShapeController extends AbstractController {
             }
         });
 
-        shapeCombo = new JComboBox(new NodeShapePainter.NodeShape[] {
-                NodeShapePainter.NodeShape.CIRCLE,
-                NodeShapePainter.NodeShape.BAR
+        shapeCombo = new JComboBox(new NodePainterType[] {
+                NodePainterType.BAR,
+                NodePainterType.SHAPE
         });
 
         String[] attributes = this.nodeShapePainter.getAttributes();
@@ -94,15 +113,15 @@ public class NodeShapeController extends AbstractController {
     private void setupOptions() {
         optionsPanel.removeAll();
         optionsPanel.addComponentWithLabel("Shape:", shapeCombo);
-        switch ((NodeShapePainter.NodeShape) shapeCombo.getSelectedItem()) {
-            case CIRCLE:
-                optionsPanel.addComponentWithLabel("Radius:", displayAttributeCombo);
-                break;
+        switch ((NodePainterType) shapeCombo.getSelectedItem()) {
             case BAR:
                 optionsPanel.addComponentWithLabel("Lower:", displayLowerAttributeCombo);
                 optionsPanel.addComponentWithLabel("Upper:", displayUpperAttributeCombo);
 
+                break;
 
+            case SHAPE:
+                optionsPanel.addComponentWithLabel("Radius:", displayAttributeCombo);
                 break;
         }
         fireControllerChanged();

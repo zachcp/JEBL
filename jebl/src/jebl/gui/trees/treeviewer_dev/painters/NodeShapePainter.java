@@ -27,7 +27,7 @@ public class NodeShapePainter extends NodePainter {
 
 	public enum NodeShape {
 	    CIRCLE("Circle"),
-	    BAR("Bar");
+	    RECTANGLE("Rectangle");
 
 	    NodeShape(String name) {
 	        this.name = name;
@@ -157,12 +157,18 @@ public class NodeShapePainter extends NodePainter {
         firePainterChanged();
     }
 
+    public void setDisplayValues(String display, double value) {
+        displayValues.put(display, new Double(value));
+        firePainterChanged();
+    }
+
     private double preferredWidth;
     private double preferredHeight;
 
     private double xOffset, yOffset;
 
     protected Map<String, String> displayAttributes = new HashMap<String, String>();
+    protected Map<String, Number> displayValues = new HashMap<String, Number>();
     protected String[] attributes;
 
     protected TreePane treePane;
