@@ -666,8 +666,16 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 					}
 
                     if (nodeShapePainter != null && nodeShapePainter.isVisible()) {
-                        nodeShapePainter.paint(g2, node, NodePainter.Justification.CENTER,
-                                new Rectangle2D.Double(0.0, 0.0, nodeShapePainter.getPreferredWidth(), nodeShapePainter.getPreferredHeight()));
+                        AffineTransform shapeTransform = nodeShapeTransforms.get(node);
+                        if (shapeTransform != null) {
+                            g2.transform(shapeTransform);
+
+                            nodeShapePainter.paint(g2, node, NodePainter.Justification.CENTER,
+                                    new Rectangle2D.Double(0.0, 0.0, nodeShapePainter.getPreferredWidth(), nodeShapePainter.getPreferredHeight()));
+
+                            g2.setTransform(oldTransform);
+                        }
+
                     }
                 }
 
@@ -780,8 +788,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             // Iterate though the nodes
             for (Node node : tree.getNodes()) {
                 nodeShapePainter.calibrate(g2, node);
+                final Point2D nodePoint = treeLayout.getNodePoint(node);
 
-                bounds.add(new Rectangle2D.Double(0.0, 0.0, branchLabelPainter.getPreferredWidth(), branchLabelPainter.getPreferredHeight()));
+                Rectangle2D shapeBounds = nodeShapePainter.getBounds(nodePoint);
+                bounds.add(shapeBounds);
             }
         }
 
@@ -931,10 +941,18 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         if (nodeShapePainter != null && nodeShapePainter.isVisible()) {
             // Iterate though the nodes
             for (Node node : tree.getNodes()) {
+                final Point2D nodePoint = treeLayout.getNodePoint(node);
+
+                Rectangle2D shapeBounds = nodeShapePainter.getBounds(nodePoint);
+
+                AffineTransform shapeTransform = new AffineTransform(transform);
+                shapeTransform.translate(shapeBounds.getX(), shapeBounds.getY());
+
                 // Store the transformed bounds in the map for use when selecting
-                nodeShapeBounds.put(node, transform.createTransformedShape(new Rectangle2D.Double(0.0, 0.0,
-                        branchLabelPainter.getPreferredWidth(),
-                        branchLabelPainter.getPreferredHeight())));
+                nodeShapeBounds.put(node, shapeTransform.createTransformedShape(shapeBounds));
+
+                // Store the transform in the map for use when drawing
+                nodeShapeTransforms.put(node, shapeTransform);
             }
         }
 
@@ -1129,6 +1147,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Map<Node, Shape> nodeLabelBounds = new HashMap<Node, Shape>();
 	private Map<Node, Painter.Justification> nodeLabelJustifications = new HashMap<Node, Painter.Justification>();
 
+    private Map<Node, AffineTransform> nodeShapeTransforms = new HashMap<Node, AffineTransform>();
     private Map<Node, Shape> nodeShapeBounds = new HashMap<Node, Shape>();
 
     private Map<Node, AffineTransform> branchLabelTransforms = new HashMap<Node, AffineTransform>();

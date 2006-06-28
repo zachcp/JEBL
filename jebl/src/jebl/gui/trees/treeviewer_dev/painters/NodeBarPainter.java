@@ -1,50 +1,25 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer_dev.TreePane;
 
+import java.util.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
-import java.util.*;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class NodeShapePainter extends NodePainter {
-
-	public static final String AREA_ATTRIBUTE = "area";
-	public static final String RADIUS_ATTRIBUTE = "radius";
-
-	public static final String WIDTH_ATTRIBUTE = "width";
-	public static final String HEIGHT_ATTRIBUTE = "height";
+public class NodeBarPainter extends NodePainter {
 
     public static final String LOWER_ATTRIBUTE = "lower";
     public static final String UPPER_ATTRIBUTE = "upper";
 
-	public enum NodeShape {
-	    CIRCLE("Circle"),
-	    BAR("Bar");
-
-	    NodeShape(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return name;
-	    }
-
-	    public String toString() {
-	        return name;
-	    }
-
-	    private final String name;
-	}
-
-    public NodeShapePainter() {
+    public NodeBarPainter() {
 
         setupAttributes(null);
     }
@@ -80,7 +55,7 @@ public class NodeShapePainter extends NodePainter {
         double upper = height;
         double lower = height;
 
-        Object value = item.getAttribute(displayAttributes.get(LOWER_ATTRIBUTE));
+        Object value = item.getAttribute(displayAttributes.get(NodeBarPainter.LOWER_ATTRIBUTE));
         if (value != null ) {
             if (value instanceof Number) {
                 lower = ((Number)value).doubleValue();
@@ -91,7 +66,7 @@ public class NodeShapePainter extends NodePainter {
             // todo - warn the user somehow?
         }
 
-        value = item.getAttribute(displayAttributes.get(UPPER_ATTRIBUTE));
+        value = item.getAttribute(displayAttributes.get(NodeBarPainter.UPPER_ATTRIBUTE));
         if (value != null ) {
             if (value instanceof Number) {
                 upper = ((Number)value).doubleValue();

@@ -4,6 +4,8 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * @author Andrew Rambaut
@@ -12,67 +14,69 @@ import java.awt.*;
 public abstract class NodePainter extends AbstractPainter<Node> {
 
 
-	protected NodePainter() {
-	}
+    protected NodePainter() {
+    }
 
-	// Abstract
+    // Abstract
 
-	public abstract String[] getAttributes();
+    public abstract String[] getAttributes();
 
     public abstract void setupAttributes(Tree tree);
 
     public abstract void setDisplayAttribute(String display, String attribute);
 
-	// Getters
+    // Getters
 
-	public Paint getForeground() {
-		return foreground;
-	}
+    public Paint getForeground() {
+        return foreground;
+    }
 
-	public Paint getBackground() {
-		return background;
-	}
+    public Paint getBackground() {
+        return background;
+    }
 
-	public Paint getBorderPaint() {
-		return borderPaint;
-	}
+    public Paint getBorderPaint() {
+        return borderPaint;
+    }
 
-	public Stroke getBorderStroke() {
-		return borderStroke;
-	}
+    public Stroke getBorderStroke() {
+        return borderStroke;
+    }
 
-	public boolean isVisible() {
-	    return visible;
-	}
+    public boolean isVisible() {
+        return visible;
+    }
 
-	// Setters
+    public abstract Rectangle2D getBounds(Point2D nodePoint);
 
-	public void setBackground(Paint background) {
-	    this.background = background;
-	    firePainterChanged();
-	}
+    // Setters
 
-	public void setBorder(Paint borderPaint, Stroke borderStroke) {
-	    this.borderPaint = borderPaint;
-	    this.borderStroke = borderStroke;
-	    firePainterChanged();
-	}
+    public void setBackground(Paint background) {
+        this.background = background;
+        firePainterChanged();
+    }
 
-	public void setForeground(Paint foreground) {
-	    this.foreground = foreground;
-	    firePainterChanged();
-	}
+    public void setBorder(Paint borderPaint, Stroke borderStroke) {
+        this.borderPaint = borderPaint;
+        this.borderStroke = borderStroke;
+        firePainterChanged();
+    }
 
-	public void setVisible(boolean visible) {
-	    this.visible = visible;
-	    firePainterChanged();
-	}
+    public void setForeground(Paint foreground) {
+        this.foreground = foreground;
+        firePainterChanged();
+    }
 
-	private Paint foreground = Color.BLACK;
-	private Paint background = null;
-	private Paint borderPaint = null;
-	private Stroke borderStroke = null;
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        firePainterChanged();
+    }
 
-	private boolean visible = true;
+    private Paint foreground = Color.BLACK;
+    private Paint background = null;
+    private Paint borderPaint = null;
+    private Stroke borderStroke = null;
+
+    private boolean visible = true;
 
 }
