@@ -125,6 +125,13 @@ public final class Nucleotides {
         }
         return state == C_STATE || state == T_STATE;
     }
+    public static boolean isGCstate(State state) {
+        return ( state == G_STATE || state == C_STATE || state == S_STATE);
+    }
+    
+    public static boolean isATstate(State state) {
+        return (state == A_STATE || state == T_STATE || state == W_STATE);
+    }
 
     public String getName() { return "Nucleotides"; }
 
