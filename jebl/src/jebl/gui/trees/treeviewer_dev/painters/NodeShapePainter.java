@@ -103,8 +103,6 @@ public class NodeShapePainter extends NodePainter {
         Rectangle2D rect = treePane.getTreeLayout().getHeightArea(lower, upper).getBounds2D();
 
         preferredWidth = rect.getWidth();
-        preferredHeight = rect.getHeight();
-        preferredWidth = 40;
         preferredHeight = 20;
     }
 
