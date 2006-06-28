@@ -109,11 +109,11 @@ public class Utils {
         return reverseComplemented;
     }
 
-    public static int[] getStateIndices(final State[] sequence) {
-        int[] indices = new int[sequence.length];
+    public static byte[] getStateIndices(final State[] sequence) {
+        byte[] indices = new byte[sequence.length];
         int i = 0;
         for (State state : sequence) {
-            indices[i] = state.getIndex();
+            indices[i] = (byte)state.getIndex();
         }
 
         return indices;

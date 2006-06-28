@@ -44,7 +44,7 @@ public interface Sequence extends Attributable, Comparable {
 	/**
 	 * @return an array of state indices.
 	 */
-	int[] getStateIndices();
+	byte[] getStateIndices();
 
     /**
      * @return the state at site.
@@ -56,5 +56,4 @@ public interface Sequence extends Attributable, Comparable {
 	 * @return the length
 	 */
     int getLength();
-
 }

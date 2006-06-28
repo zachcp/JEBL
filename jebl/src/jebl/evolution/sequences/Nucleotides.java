@@ -136,7 +136,7 @@ public final class Nucleotides {
 		return seq;
 	}
 
-	public static NucleotideState[] toStateArray(int[] indexArray) {
+	public static NucleotideState[] toStateArray(byte[] indexArray) {
 	    NucleotideState[] seq = new NucleotideState[indexArray.length];
 	    for (int i = 0; i < seq.length; i++) {
 	        seq[i] = getState(indexArray[i]);

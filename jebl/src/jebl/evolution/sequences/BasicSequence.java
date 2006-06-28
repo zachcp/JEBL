@@ -40,7 +40,7 @@ public class BasicSequence implements Sequence {
         }
         this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequence = new int[sequenceString.length()];
+        this.sequence = new byte[sequenceString.length()];
         int k = 0;
         for (int i = 0; i < sequenceString.length(); i++) {
             State state = sequenceType.getState(sequenceString.substring(i, i + 1));
@@ -49,7 +49,7 @@ public class BasicSequence implements Sequence {
                 // Something is wrong. Keep original length by inserting an unknown state
                 state = sequenceType.getUnknownState();
             }
-            sequence[k] = state.getIndex();
+            sequence[k] = (byte)state.getIndex();
             k++;
         }
     }
@@ -65,9 +65,9 @@ public class BasicSequence implements Sequence {
 
         this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequence = new int[states.length];
+        this.sequence = new byte[states.length];
         for (int i = 0; i < sequence.length; i++) {
-            sequence[i] = states[i].getIndex();
+            sequence[i] = (byte)states[i].getIndex();
         }
     }
 
@@ -106,7 +106,7 @@ public class BasicSequence implements Sequence {
         return sequenceType.toStateArray(sequence);
     }
 
-    public int[] getStateIndices() {
+    public byte[] getStateIndices() {
         return sequence;
     }
 
@@ -185,7 +185,7 @@ public class BasicSequence implements Sequence {
 
     private final Taxon taxon;
     private final SequenceType sequenceType;
-    private final int[] sequence;
+    private final byte[] sequence;
 
     private Map<String, Object> attributeMap = null;
 }

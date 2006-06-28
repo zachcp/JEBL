@@ -105,7 +105,7 @@ public final class Codons {
 		return seq;
 	}
 
-	public static CodonState[] toStateArray(int[] indexArray) {
+	public static CodonState[] toStateArray(byte[] indexArray) {
 	    CodonState[] seq = new CodonState[indexArray.length];
 	    for (int i = 0; i < seq.length; i++) {
 	        seq[i] = getState(indexArray[i]);

@@ -160,7 +160,7 @@ public final class AminoAcids {
         return seq;
     }
 
-    public static AminoAcidState[] toStateArray(int[] indexArray) {
+    public static AminoAcidState[] toStateArray(byte[] indexArray) {
         AminoAcidState[] seq = new AminoAcidState[indexArray.length];
         for (int i = 0; i < seq.length; i++) {
             seq[i] = getState(indexArray[i]);

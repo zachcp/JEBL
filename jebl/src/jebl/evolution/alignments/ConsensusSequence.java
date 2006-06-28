@@ -1,11 +1,9 @@
 package jebl.evolution.alignments;
 
-import jebl.evolution.alignments.Alignment;
-import jebl.evolution.alignments.Pattern;
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.State;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +60,7 @@ public abstract class ConsensusSequence implements Sequence {
         return getSequenceType().toStateArray(sequence);
     }
 
-    public int[] getStateIndices() {
+    public byte[] getStateIndices() {
         if (sequence == null) {
             sequence = jebl.evolution.sequences.Utils.getStateIndices(constructConsensus(source));
         }
@@ -146,7 +144,7 @@ public abstract class ConsensusSequence implements Sequence {
 
     private final Taxon taxon;
     private final Alignment source;
-    private int[] sequence = null;
+    private byte[] sequence = null;
 
     private Map<String, Object> attributeMap = null;
 

@@ -120,7 +120,7 @@ public interface SequenceType {
      * @param indexArray
      * @return the State array
      */
-    State[] toStateArray(int[] indexArray);
+    State[] toStateArray(byte[] indexArray);
 
     public static final SequenceType NUCLEOTIDE = new SequenceType() {
         public int getStateCount() {
@@ -179,7 +179,7 @@ public interface SequenceType {
             return Nucleotides.toStateArray(sequenceString);
         }
 
-        public State[] toStateArray(int[] indexArray) {
+        public State[] toStateArray(byte[] indexArray) {
             return Nucleotides.toStateArray(indexArray);
         }
     };
@@ -241,7 +241,7 @@ public interface SequenceType {
             return AminoAcids.toStateArray(sequenceString);
         }
 
-        public State[] toStateArray(int[] indexArray) {
+        public State[] toStateArray(byte[] indexArray) {
             return AminoAcids.toStateArray(indexArray);
         }
     };
@@ -303,7 +303,7 @@ public interface SequenceType {
             return Codons.toStateArray(sequenceString);
         }
 
-        public State[] toStateArray(int[] indexArray) {
+        public State[] toStateArray(byte[] indexArray) {
             return Codons.toStateArray(indexArray);
         }
     };
