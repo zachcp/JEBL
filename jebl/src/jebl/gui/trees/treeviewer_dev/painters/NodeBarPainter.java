@@ -9,6 +9,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Line2D;
 
 /**
  * @author Andrew Rambaut
@@ -44,12 +45,39 @@ public class NodeBarPainter extends NodePainter {
         this.treePane = treePane;
     }
 
-    public void calibrate(Graphics2D g2, Node item) {
-        RootedTree tree = treePane.getTree();
+    public Rectangle2D calibrate(Graphics2D g2, Node item) {
+        Point2D nodePoint1 = treePane.getTreeLayout().getNodePoint(item);
+        Point2D nodePoint2 = treePane.getTreeLayout().getSecondaryNodePoint(item);
 
-        FontMetrics fm = g2.getFontMetrics();
-        preferredHeight = fm.getHeight();
-        preferredWidth = 0;
+        Line2D bar = new Line2D.Double(nodePoint1, nodePoint2);
+
+        return bar.getBounds2D();
+    }
+
+    public double getPreferredWidth() {
+        return 1.0;
+    }
+
+    public double getPreferredHeight() {
+        return 1.0;
+    }
+
+    public double getHeightBound() {
+        return 1.0;
+    }
+
+    /**
+     * The bounds define the shape of the bar so just draw it
+     * @param g2
+     * @param item
+     * @param justification
+     * @param bounds
+     */
+    public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
+        Point2D nodePoint1 = treePane.getTreeLayout().getNodePoint(item);
+        Point2D nodePoint2 = treePane.getTreeLayout().getSecondaryNodePoint(item);
+
+        RootedTree tree = treePane.getTree();
 
         double height = tree.getHeight(item);
         double upper = height;
@@ -77,50 +105,12 @@ public class NodeBarPainter extends NodePainter {
             // todo - warn the user somehow?
         }
 
-        Rectangle2D rect = treePane.getTreeLayout().getHeightArea(lower, upper).getBounds2D();
+        Line2D bar = new Line2D.Double(upper, nodePoint1.getY(), lower, nodePoint1.getY());
 
-        preferredWidth = rect.getWidth();
-        preferredHeight = 0.2;
+        g2.setPaint(getForeground());
+        g2.setStroke(getStroke());
 
-        xOffset = height - upper;
-        yOffset = -0.1;
-    }
-
-    public double getPreferredWidth() {
-        return preferredWidth;
-    }
-
-    public double getPreferredHeight() {
-        return preferredHeight;
-    }
-
-    public double getHeightBound() {
-        return preferredHeight;
-    }
-
-    public Rectangle2D getBounds(Point2D nodePoint) {
-        return new Rectangle2D.Double(nodePoint.getX() + xOffset, nodePoint.getY() + yOffset, preferredWidth, preferredHeight);
-    }
-
-    /**
-     * The bounds define the shape of the bar so just draw it
-     * @param g2
-     * @param item
-     * @param justification
-     * @param bounds
-     */
-    public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
-        if (getBackground() != null) {
-            g2.setPaint(getBackground());
-            g2.fill(bounds);
-        }
-
-        if (getBorderPaint() != null && getBorderStroke() != null) {
-            g2.setPaint(getBorderPaint());
-            g2.setStroke(getBorderStroke());
-        }
-
-        g2.draw(bounds);
+        g2.draw(bar);
     }
 
     public String[] getAttributes() {
@@ -134,8 +124,6 @@ public class NodeBarPainter extends NodePainter {
 
     private double preferredWidth;
     private double preferredHeight;
-
-    private double xOffset, yOffset;
 
     protected Map<String, String> displayAttributes = new HashMap<String, String>();
     protected String[] attributes;

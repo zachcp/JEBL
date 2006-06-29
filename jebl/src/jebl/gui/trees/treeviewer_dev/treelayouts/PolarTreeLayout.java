@@ -34,13 +34,17 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
-    public Line2D getHeightLine(double height) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    public Shape getHeightLine(double height) {
+        return new Ellipse2D.Double(0.0, 0.0, height * 2.0, height * 2.0);
     }
 
     public Shape getHeightArea(double height1, double height2) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+        Area area1 = new Area(new Ellipse2D.Double(0.0, 0.0, height2 * 2.0, height2 * 2.0));
+        Area area2 = new Area(new Ellipse2D.Double(0.0, 0.0, height1 * 2.0, height1 * 2.0));
+        area1.subtract(area2);
+        return area1;
     }
+
 
 	public double getRootAngle() {
 		return rootAngle;
@@ -108,6 +112,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         Point2D nodePoint;
         Point2D transformedNodePoint;
 
+        Point2D transformedSecondaryNodePoint;
+
         if (!tree.isExternal(node)) {
 
             double yPos = 0.0;
@@ -130,6 +136,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
             nodePoint = new Point2D.Double(xPosition, yPos);
             transformedNodePoint = transform(nodePoint);
+
+            transformedSecondaryNodePoint = transform(new Point2D.Double(xPosition + 1.0, yPos));
 
             final double start = getAngle(yPos);
 
@@ -170,6 +178,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             nodePoint = new Point2D.Double(xPosition, yPosition);
             transformedNodePoint = transform(nodePoint);
 
+            transformedSecondaryNodePoint = transform(new Point2D.Double(xPosition - 1.0, yPosition));
+
             Line2D tipLabelPath;
 
             if (tipLabelPosition == TipLabelPosition.FLUSH) {
@@ -200,6 +210,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
         // add the node point to the map of node points
         nodePoints.put(node, transformedNodePoint);
+
+        secondaryNodePoints.put(node, transformedSecondaryNodePoint);
 
         return nodePoint;
     }

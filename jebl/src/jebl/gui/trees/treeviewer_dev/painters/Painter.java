@@ -48,7 +48,7 @@ public interface Painter<T> {
 	 * @param g2
 	 * @param item
 	 */
-    void calibrate(Graphics2D g2, T item);
+    Rectangle2D calibrate(Graphics2D g2, T item);
 
 	/**
 	 * Called to actually paint into the current graphics context. The painter should

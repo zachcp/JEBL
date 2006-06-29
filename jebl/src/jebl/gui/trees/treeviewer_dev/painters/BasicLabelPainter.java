@@ -104,7 +104,7 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         return null;
     }
 
-    public void calibrate(Graphics2D g2, Node item) {
+    public Rectangle2D calibrate(Graphics2D g2, Node item) {
         Tree tree = treePane.getTree();
 
         final Font oldFont = g2.getFont();
@@ -123,6 +123,8 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         yOffset = (float)fm.getAscent();
 
         g2.setFont(oldFont);
+
+        return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
     }
 
     public double getPreferredWidth() {

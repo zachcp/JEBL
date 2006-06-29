@@ -32,6 +32,11 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         return nodePoints.get(node);
     }
 
+    public Point2D getSecondaryNodePoint(Node node) {
+        checkValidation();
+        return secondaryNodePoints.get(node);
+    }
+
     public Shape getBranchPath(Node node) {
         checkValidation();
         return branchPaths.get(node);
@@ -83,6 +88,7 @@ public abstract class AbstractTreeLayout implements TreeLayout {
     private boolean invalid = true;
     protected RootedTree tree = null;
     protected Map<Node, Point2D> nodePoints = new HashMap<Node, Point2D>();
+    protected Map<Node, Point2D> secondaryNodePoints = new HashMap<Node, Point2D>();
     protected Map<Node, Shape> branchPaths = new HashMap<Node, Shape>();
     protected Map<Node, Line2D> tipLabelPaths = new HashMap<Node, Line2D>();
     protected Map<Node, Line2D> branchLabelPaths = new HashMap<Node, Line2D>();

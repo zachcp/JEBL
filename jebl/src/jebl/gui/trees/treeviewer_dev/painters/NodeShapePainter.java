@@ -69,46 +69,14 @@ public class NodeShapePainter extends NodePainter {
         this.treePane = treePane;
     }
 
-    public void calibrate(Graphics2D g2, Node item) {
+    public Rectangle2D calibrate(Graphics2D g2, Node item) {
         RootedTree tree = treePane.getTree();
+        Point2D nodePoint = treePane.getTreeLayout().getNodePoint(item);
 
-        FontMetrics fm = g2.getFontMetrics();
-        preferredHeight = fm.getHeight();
-        preferredWidth = 0;
+        preferredWidth = 20;
+        preferredHeight = 20;
 
-        double height = tree.getHeight(item);
-        double upper = height;
-        double lower = height;
-
-        Object value = item.getAttribute(displayAttributes.get(LOWER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                lower = ((Number)value).doubleValue();
-            } else {
-                lower = Double.parseDouble(value.toString());
-            }
-        } else {
-            // todo - warn the user somehow?
-        }
-
-        value = item.getAttribute(displayAttributes.get(UPPER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                upper = ((Number)value).doubleValue();
-            } else {
-                upper = Double.parseDouble(value.toString());
-            }
-        } else {
-            // todo - warn the user somehow?
-        }
-
-        Rectangle2D rect = treePane.getTreeLayout().getHeightArea(lower, upper).getBounds2D();
-
-        preferredWidth = rect.getWidth();
-        preferredHeight = 0.2;
-
-        xOffset = height - upper;
-        yOffset = -0.1;
+        return new Rectangle2D.Double(nodePoint.getX() - 10, nodePoint.getY() - 10, preferredWidth, preferredHeight);
     }
 
     public double getPreferredWidth() {
@@ -121,10 +89,6 @@ public class NodeShapePainter extends NodePainter {
 
     public double getHeightBound() {
         return preferredHeight;
-    }
-
-    public Rectangle2D getBounds(Point2D nodePoint) {
-        return new Rectangle2D.Double(nodePoint.getX() + xOffset, nodePoint.getY() + yOffset, preferredWidth, preferredHeight);
     }
 
     /**
@@ -164,8 +128,6 @@ public class NodeShapePainter extends NodePainter {
 
     private double preferredWidth;
     private double preferredHeight;
-
-    private double xOffset, yOffset;
 
     protected Map<String, String> displayAttributes = new HashMap<String, String>();
     protected Map<String, Number> displayValues = new HashMap<String, Number>();

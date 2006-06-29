@@ -29,8 +29,10 @@ public class TreeViewerPanel extends JPanel {
 		TreePane treePane = treeViewer.getTreePane();
 
 		controlPalette.getPanel().setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+        controlPalette.getPanel().setBackground(new Color(231, 237, 246));
+        controlPalette.getPanel().setOpaque(true);
 
-		controlPalette.addController(new TreeViewerController(treeViewer));
+        controlPalette.addController(new TreeViewerController(treeViewer));
 
 		controlPalette.addController(new TreePaneController(treePane));
 
@@ -46,10 +48,11 @@ public class TreeViewerPanel extends JPanel {
 		treePane.setNodeLabelPainter(nodeLabelPainter);
 
 		// Create a node shape painter and its controller
-		NodeShapePainter nodeShapePainter = new NodeShapePainter();
-		nodeShapePainter.setVisible(false);
-		controlPalette.addController(new NodeShapeController("Node Shapes", nodeShapePainter));
-		treePane.setNodeShapePainter(nodeShapePainter);
+		NodeBarPainter nodeBarPainter = new NodeBarPainter();
+        nodeBarPainter.setForeground(new Color(24, 32, 228, 128));
+        nodeBarPainter.setVisible(false);
+		controlPalette.addController(new NodeBarController("Node Bars", nodeBarPainter));
+		treePane.setNodeBarPainter(nodeBarPainter);
 
 		// Create a branch label painter and its controller
 		BasicLabelPainter branchLabelPainter = new BasicLabelPainter(BasicLabelPainter.PainterIntent.BRANCH);

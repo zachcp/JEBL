@@ -27,6 +27,10 @@ public abstract class NodePainter extends AbstractPainter<Node> {
 
     // Getters
 
+    public Stroke getStroke() {
+        return stroke;
+    }
+
     public Paint getForeground() {
         return foreground;
     }
@@ -47,9 +51,12 @@ public abstract class NodePainter extends AbstractPainter<Node> {
         return visible;
     }
 
-    public abstract Rectangle2D getBounds(Point2D nodePoint);
-
     // Setters
+
+    public void setStroke(Stroke borderStroke) {
+        this.borderStroke = borderStroke;
+        firePainterChanged();
+    }
 
     public void setBackground(Paint background) {
         this.background = background;
@@ -72,6 +79,7 @@ public abstract class NodePainter extends AbstractPainter<Node> {
         firePainterChanged();
     }
 
+    private Stroke stroke = new BasicStroke(1.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
     private Paint foreground = Color.BLACK;
     private Paint background = null;
     private Paint borderPaint = null;

@@ -66,14 +66,6 @@ public interface TreeLayout {
      */
     boolean maintainAspectRatio();
 
-    /**
-     * Return the height (from the youngest tip) for the given
-     * 2d point. Some layouts won't be able to produce this and
-     * may throw an UnsupportedOperationException.
-     *
-     * @param point
-     * @return the height
-     */
     double getHeightOfPoint(Point2D point);
 
     /**
@@ -83,7 +75,7 @@ public interface TreeLayout {
      * @param height
      * @return the line
      */
-    Line2D getHeightLine(double height);
+    Shape getHeightLine(double height);
 
     /**
      * Return a shape that defines a particular height interval. Some layouts
@@ -102,6 +94,14 @@ public interface TreeLayout {
      * @return the point
      */
     Point2D getNodePoint(Node node);
+
+    /**
+     * Return the point in 2d space of a second point on the branch above the node
+     *
+     * @param node
+     * @return the point
+     */
+    Point2D getSecondaryNodePoint(Node node);
 
     /**
      * Return the shape that represents the given branch

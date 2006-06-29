@@ -39,7 +39,7 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 		this.treePane = treePane;
 	}
 
-    public void calibrate(Graphics2D g2, TreePane treePane) {
+    public Rectangle2D calibrate(Graphics2D g2, TreePane treePane) {
         Font oldFont = g2.getFont();
         g2.setFont(getFont());
 
@@ -75,6 +75,8 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
         yOffset = (float) (fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
+
+        return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
     }
 
 	public void paint(Graphics2D g2, TreePane treePane, Justification justification, Rectangle2D bounds) {

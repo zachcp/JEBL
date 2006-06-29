@@ -132,6 +132,8 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         // add the node point to the map of node points
         nodePoints.put(node, nodePoint);
 
+        secondaryNodePoints.put(node, new Point2D.Double(xPosition - ((length + 1.0) * directionX), yPosition - ((length + 1.0) * directionY)));
+
         return nodePoint;
     }
 

@@ -25,11 +25,14 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     public double getHeightOfPoint(Point2D point) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+        return point.getX();
     }
 
-    public Line2D getHeightLine(double height) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    public Shape getHeightLine(double height) {
+        double x = height;
+        double y1 = 0.0;
+        double y2 = 1.0;
+        return new Line2D.Double(x, y1, x, y2);
     }
 
     public Shape getHeightArea(double height1, double height2) {
@@ -73,6 +76,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     protected void validate() {
+
         nodePoints.clear();
         branchPaths.clear();
         tipLabelPaths.clear();
@@ -192,6 +196,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
         // add the node point to the map of node points
         nodePoints.put(node, nodePoint);
+        secondaryNodePoints.put(node, new Point2D.Double(nodePoint.getX() + 1.0, nodePoint.getY()));
 
         return nodePoint;
     }
