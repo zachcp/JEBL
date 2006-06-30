@@ -7,6 +7,7 @@ import jebl.gui.trees.treeviewer_dev.TreePane;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Line2D;
 import java.util.*;
 
 /**
@@ -44,8 +45,56 @@ public class NodeBarPainter extends NodePainter {
     }
 
     public Rectangle2D calibrate(Graphics2D g2, Node node) {
-	    Shape barPath = treePane.getTreeLayout().getNodeBarPath(node);
-        return barPath.getBounds2D();
+        RootedTree tree = treePane.getTree();
+
+        double height = tree.getHeight(node);
+        double upper = height;
+        double lower = height;
+
+        boolean hasBar = false;
+
+        Object value = node.getAttribute(displayAttributes.get(NodeBarPainter.LOWER_ATTRIBUTE));
+        if (value != null ) {
+            if (value instanceof Number) {
+                lower = ((Number)value).doubleValue();
+            } else {
+                lower = Double.parseDouble(value.toString());
+            }
+            hasBar = true;
+        } else {
+            // todo - warn the user somehow?
+        }
+
+        value = node.getAttribute(displayAttributes.get(NodeBarPainter.UPPER_ATTRIBUTE));
+        if (value != null ) {
+            if (value instanceof Number) {
+                upper = ((Number)value).doubleValue();
+            } else {
+                upper = Double.parseDouble(value.toString());
+            }
+            hasBar = true;
+        } else {
+            // todo - warn the user somehow?
+        }
+
+        if (hasBar) {
+            Line2D barPath = treePane.getTreeLayout().getNodeBarPath(node);
+            double x1 = barPath.getX1();
+            double y1 = barPath.getY1();
+            double x2 = barPath.getX2();
+            double y2 = barPath.getY2();
+
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+
+            Line2D bar = new Line2D.Double(
+                    x1 - (dx * (upper - height)), y1 - (dy * (upper - height)),
+                    x1 + (dx * (height - lower)), y1 + (dy * (height - lower)));
+
+            return bar.getBounds2D();
+        } else {
+            return new Rectangle2D.Double(0,0,0,0);
+        }
     }
 
     public double getPreferredWidth() {
@@ -69,34 +118,6 @@ public class NodeBarPainter extends NodePainter {
      */
     public void paint(Graphics2D g2, Node node, Justification justification, Rectangle2D bounds) {
 	    Shape barPath = treePane.getTreeLayout().getNodeBarPath(node);
-
-        RootedTree tree = treePane.getTree();
-
-        double height = tree.getHeight(node);
-        double upper = height;
-        double lower = height;
-
-        Object value = node.getAttribute(displayAttributes.get(NodeBarPainter.LOWER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                lower = ((Number)value).doubleValue();
-            } else {
-                lower = Double.parseDouble(value.toString());
-            }
-        } else {
-            // todo - warn the user somehow?
-        }
-
-        value = node.getAttribute(displayAttributes.get(NodeBarPainter.UPPER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                upper = ((Number)value).doubleValue();
-            } else {
-                upper = Double.parseDouble(value.toString());
-            }
-        } else {
-            // todo - warn the user somehow?
-        }
 
         g2.setPaint(getForeground());
         g2.setStroke(getStroke());
