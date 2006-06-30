@@ -163,6 +163,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             nodeLabelPaths.put(node, nodeLabelPath);
 
+	        Line2D nodeBarPath = new Line2D.Double(
+	                nodePoint.getX() - 1.0, nodePoint.getY(),
+	                nodePoint.getX() + 1.0, nodePoint.getY());
+
+	        nodeBarPaths.put(node, nodeBarPath);
         } else {
 
             nodePoint = new Point2D.Double(xPosition, yPosition);
@@ -196,7 +201,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
         // add the node point to the map of node points
         nodePoints.put(node, nodePoint);
-        secondaryNodePoints.put(node, new Point2D.Double(nodePoint.getX() + 1.0, nodePoint.getY()));
 
         return nodePoint;
     }

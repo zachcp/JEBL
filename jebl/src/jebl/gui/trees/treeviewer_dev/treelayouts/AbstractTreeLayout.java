@@ -32,11 +32,6 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         return nodePoints.get(node);
     }
 
-    public Point2D getSecondaryNodePoint(Node node) {
-        checkValidation();
-        return secondaryNodePoints.get(node);
-    }
-
     public Shape getBranchPath(Node node) {
         checkValidation();
         return branchPaths.get(node);
@@ -56,6 +51,11 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         checkValidation();
         return nodeLabelPaths.get(node);
     }
+
+	public Line2D getNodeBarPath(Node node) {
+	    checkValidation();
+	    return nodeBarPaths.get(node);
+	}
 
 	public Shape getCalloutPath(Node node) {
 	    checkValidation();
@@ -88,11 +88,11 @@ public abstract class AbstractTreeLayout implements TreeLayout {
     private boolean invalid = true;
     protected RootedTree tree = null;
     protected Map<Node, Point2D> nodePoints = new HashMap<Node, Point2D>();
-    protected Map<Node, Point2D> secondaryNodePoints = new HashMap<Node, Point2D>();
     protected Map<Node, Shape> branchPaths = new HashMap<Node, Shape>();
     protected Map<Node, Line2D> tipLabelPaths = new HashMap<Node, Line2D>();
     protected Map<Node, Line2D> branchLabelPaths = new HashMap<Node, Line2D>();
     protected Map<Node, Line2D> nodeLabelPaths = new HashMap<Node, Line2D>();
+	protected Map<Node, Line2D> nodeBarPaths = new HashMap<Node, Line2D>();
 	protected Map<Node, Shape> calloutPaths = new HashMap<Node, Shape>();
 
     private Set<TreeLayoutListener> listeners = new HashSet<TreeLayoutListener>();

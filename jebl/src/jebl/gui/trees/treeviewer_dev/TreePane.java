@@ -666,10 +666,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
                     }
 
                     if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
-                        g2.transform(transform);
                         Rectangle2D bounds = nodeBarPainter.calibrate(g2, node);
                         nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, bounds);
-                        g2.setTransform(oldTransform);
                     }
                 }
 

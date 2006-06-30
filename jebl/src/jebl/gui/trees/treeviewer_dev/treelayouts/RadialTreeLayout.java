@@ -120,6 +120,14 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
             Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
             nodeLabelPaths.put(node, nodeLabelPath);
+
+	        Point2D nodeBarPoint1 = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
+	                yPosition + ((length + 1.0) * directionY));
+	        Point2D nodeBarPoint2 = new Point2D.Double(xPosition + ((length - 1.0) * directionX),
+	                yPosition + ((length - 1.0) * directionY));
+	        Line2D nodeBarPath = new Line2D.Double(nodeBarPoint1, nodeBarPoint2);
+
+	        nodeBarPaths.put(node, nodeBarPath);
         } else {
 
             Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
@@ -131,8 +139,6 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
         // add the node point to the map of node points
         nodePoints.put(node, nodePoint);
-
-        secondaryNodePoints.put(node, new Point2D.Double(xPosition - ((length + 1.0) * directionX), yPosition - ((length + 1.0) * directionY)));
 
         return nodePoint;
     }

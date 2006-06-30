@@ -96,14 +96,6 @@ public interface TreeLayout {
     Point2D getNodePoint(Node node);
 
     /**
-     * Return the point in 2d space of a second point on the branch above the node
-     *
-     * @param node
-     * @return the point
-     */
-    Point2D getSecondaryNodePoint(Node node);
-
-    /**
      * Return the shape that represents the given branch
      *
      * @param node
@@ -117,5 +109,7 @@ public interface TreeLayout {
 
     Line2D getNodeLabelPath(Node node);
 
+	Line2D getNodeBarPath(Node node);
+	
     Shape getCalloutPath(Node node);
 }
