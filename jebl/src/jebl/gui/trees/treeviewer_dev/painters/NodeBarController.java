@@ -9,6 +9,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.*;
 
 /**
  * @author Andrew Rambaut
@@ -33,21 +34,21 @@ public class NodeBarController extends AbstractController {
             }
         });
 
-        String[] attributes = this.nodeBarPainter.getAttributes();
+        String[] attributeNames = this.nodeBarPainter.getAttributeNames();
 
-        displayLowerAttributeCombo = new JComboBox(attributes);
+        displayLowerAttributeCombo = new JComboBox(attributeNames);
         displayLowerAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 String attribute = (String)displayLowerAttributeCombo.getSelectedItem();
-                nodeBarPainter.setDisplayAttribute(NodeShapePainter.LOWER_ATTRIBUTE, attribute);
+                nodeBarPainter.setLowerAttributeName(attribute);
             }
         });
 
-        displayUpperAttributeCombo = new JComboBox(attributes);
+        displayUpperAttributeCombo = new JComboBox(attributeNames);
         displayUpperAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 String attribute = (String)displayUpperAttributeCombo.getSelectedItem();
-                nodeBarPainter.setDisplayAttribute(NodeShapePainter.UPPER_ATTRIBUTE, attribute);
+                nodeBarPainter.setUpperAttributeName(attribute);
             }
         });
 
@@ -59,7 +60,7 @@ public class NodeBarController extends AbstractController {
             public void painterSettingsChanged() {
                 displayLowerAttributeCombo.removeAllItems();
                 displayUpperAttributeCombo.removeAllItems();
-                for (String name : nodeBarPainter.getAttributes()) {
+                for (String name : nodeBarPainter.getAttributeNames()) {
                     displayLowerAttributeCombo.addItem(name);
                     displayUpperAttributeCombo.addItem(name);
                 }
@@ -68,8 +69,39 @@ public class NodeBarController extends AbstractController {
             }
         });
 
+	    if (nodeBarPainter.getLowerAttributeName() == null) {
+		    for (String name : attributeNames) {
+			    if (name.toUpperCase().contains("LOWER")) {
+				    displayLowerAttributeCombo.setSelectedItem(name);
+				    break;
+			    }
+		    }
+	    }
+
+	    if (nodeBarPainter.getUpperAttributeName() == null) {
+		    for (String name : attributeNames) {
+			    if (name.toUpperCase().contains("UPPER")) {
+				    displayUpperAttributeCombo.setSelectedItem(name);
+				    break;
+			    }
+		    }
+	    }
+
         optionsPanel.addComponentWithLabel("Lower:", displayLowerAttributeCombo);
         optionsPanel.addComponentWithLabel("Upper:", displayUpperAttributeCombo);
+
+	    branchLineWidthSpinner = new JSpinner(new SpinnerNumberModel(4.0, 0.01, 48.0, 1.0));
+
+	    branchLineWidthSpinner.addChangeListener(new ChangeListener() {
+		    public void stateChanged(ChangeEvent changeEvent) {
+			    float lineWidth = ((Double) branchLineWidthSpinner.getValue()).floatValue();
+			    nodeBarPainter.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+		    }
+	    });
+	    optionsPanel.addComponentWithLabel("Line Weight:", branchLineWidthSpinner);
+
+	    nodeBarPainter.setStroke(new BasicStroke(4.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+
     }
 
     public JComponent getTitleComponent() {
@@ -103,4 +135,6 @@ public class NodeBarController extends AbstractController {
     private final String title;
 
     private final NodeBarPainter nodeBarPainter;
+
+	private final JSpinner branchLineWidthSpinner;
 }

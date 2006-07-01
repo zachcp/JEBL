@@ -27,6 +27,6 @@ public abstract class AbstractPainter<T> implements Painter<T> {
             listener.painterSettingsChanged();
         }
     }
-    
+
     private final List<PainterListener> listeners = new ArrayList<PainterListener>();
 }

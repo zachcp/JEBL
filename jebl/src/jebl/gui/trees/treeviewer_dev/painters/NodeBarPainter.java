@@ -16,86 +16,90 @@ import java.util.*;
  */
 public class NodeBarPainter extends NodePainter {
 
-    public static final String LOWER_ATTRIBUTE = "lower";
-    public static final String UPPER_ATTRIBUTE = "upper";
-
     public NodeBarPainter() {
 
         setupAttributes(null);
     }
 
-    public void setupAttributes(Tree tree) {
-        java.util.List<String> attributeNames = new ArrayList<String>();
-        if (tree != null) {
-            Set<String> nodeAttributes = new TreeSet<String>();
-            for (Node node : tree.getNodes()) {
-                nodeAttributes.addAll(node.getAttributeNames());
-            }
-            attributeNames.addAll(nodeAttributes);
-        }
+	public void setupAttributes(Tree tree) {
+	    java.util.List<String> attributeNames = new ArrayList<String>();
+	    if (tree != null) {
+	        Set<String> nodeAttributes = new TreeSet<String>();
+	        for (Node node : tree.getNodes()) {
+	            nodeAttributes.addAll(node.getAttributeNames());
+	        }
+	        attributeNames.addAll(nodeAttributes);
+	    }
 
-        this.attributes = new String[attributeNames.size()];
-        attributeNames.toArray(this.attributes);
+	    this.attributeNames = new String[attributeNames.size()];
+	    attributeNames.toArray(this.attributeNames);
 
-        firePainterSettingsChanged();
-    }
+	    firePainterSettingsChanged();
+	}
 
     public void setTreePane(TreePane treePane) {
         this.treePane = treePane;
     }
 
-    public Rectangle2D calibrate(Graphics2D g2, Node node) {
-        RootedTree tree = treePane.getTree();
+	public Line2D getNodeBar() {
+		return nodeBar;
+	}
 
-        double height = tree.getHeight(node);
-        double upper = height;
-        double lower = height;
+	public Rectangle2D calibrate(Graphics2D g2, Node node) {
+		RootedTree tree = treePane.getTree();
 
-        boolean hasBar = false;
+		double height = tree.getHeight(node);
+		double upper = height;
+		double lower = height;
 
-        Object value = node.getAttribute(displayAttributes.get(NodeBarPainter.LOWER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                lower = ((Number)value).doubleValue();
-            } else {
-                lower = Double.parseDouble(value.toString());
-            }
-            hasBar = true;
-        } else {
-            // todo - warn the user somehow?
-        }
+		boolean hasBar = false;
 
-        value = node.getAttribute(displayAttributes.get(NodeBarPainter.UPPER_ATTRIBUTE));
-        if (value != null ) {
-            if (value instanceof Number) {
-                upper = ((Number)value).doubleValue();
-            } else {
-                upper = Double.parseDouble(value.toString());
-            }
-            hasBar = true;
-        } else {
-            // todo - warn the user somehow?
-        }
+		Object value = node.getAttribute(lowerAttributeName);
+		if (value != null ) {
+		    if (value instanceof Number) {
+		        lower = ((Number)value).doubleValue();
+		    } else {
+		        lower = Double.parseDouble(value.toString());
+		    }
+		    hasBar = true;
+		} else {
+		    // todo - warn the user somehow?
+		}
 
-        if (hasBar) {
-            Line2D barPath = treePane.getTreeLayout().getNodeBarPath(node);
-            double x1 = barPath.getX1();
-            double y1 = barPath.getY1();
-            double x2 = barPath.getX2();
-            double y2 = barPath.getY2();
+		value = node.getAttribute(upperAttributeName);
+		if (value != null ) {
+		    if (value instanceof Number) {
+		        upper = ((Number)value).doubleValue();
+		    } else {
+		        upper = Double.parseDouble(value.toString());
+		    }
+		    hasBar = true;
+		} else {
+		    // todo - warn the user somehow?
+		}
 
-            double dx = x2 - x1;
-            double dy = y2 - y1;
+		if (hasBar) {
+			Line2D barPath = treePane.getTreeLayout().getNodeBarPath(node);
+			double x1 = barPath.getX1();
+			double y1 = barPath.getY1();
+			double x2 = barPath.getX2();
+			double y2 = barPath.getY2();
 
-            Line2D bar = new Line2D.Double(
-                    x1 - (dx * (upper - height)), y1 - (dy * (upper - height)),
-                    x1 + (dx * (height - lower)), y1 + (dy * (height - lower)));
+			double dx = x2 - x1;
+			double dy = y2 - y1;
 
-            return bar.getBounds2D();
-        } else {
-            return new Rectangle2D.Double(0,0,0,0);
-        }
-    }
+			nodeBar = new Line2D.Double(
+			        x1 - (dx * (upper - height)), y1 - (dy * (upper - height)),
+			        x1 + (dx * (height - lower)), y1 + (dy * (height - lower)));
+
+		}
+
+		if (nodeBar == null) {
+			return new Rectangle2D.Double(0,0,0,0);
+		}
+
+			return nodeBar.getBounds2D();
+	}
 
     public double getPreferredWidth() {
         return 1.0;
@@ -110,35 +114,63 @@ public class NodeBarPainter extends NodePainter {
     }
 
     /**
-     * The bounds define the shape of the bar so just draw it
+     * The bounds define the shape of the nodeBar so just draw it
      * @param g2
      * @param node
      * @param justification
-     * @param bounds
+     * @param nodeBar
      */
-    public void paint(Graphics2D g2, Node node, Justification justification, Rectangle2D bounds) {
-	    Shape barPath = treePane.getTreeLayout().getNodeBarPath(node);
+    public void paint(Graphics2D g2, Node node, Justification justification, Shape nodeBar) {
+        if (nodeBar != null) {
+	        g2.setPaint(getForeground());
+	        g2.setStroke(getStroke());
 
-        g2.setPaint(getForeground());
-        g2.setStroke(getStroke());
+	        g2.draw(nodeBar);
+        }
 
-        g2.draw(barPath);
     }
 
-    public String[] getAttributes() {
-        return attributes;
+	/**
+	 * The bounds define the shape of the nodeBar so just draw it
+	 * @param g2
+	 * @param node
+	 * @param justification
+	 * @param bounds
+	 */
+	public void paint(Graphics2D g2, Node node, Justification justification, Rectangle2D bounds) {
+		throw new UnsupportedOperationException("This version of paint is not used in NodeBarPainter");
+	}
+
+    public String[] getAttributeNames() {
+        return attributeNames;
     }
 
-    public void setDisplayAttribute(String display, String attribute) {
-        displayAttributes.put(display, attribute);
+	public String getLowerAttributeName() {
+		return lowerAttributeName;
+	}
+
+	public String getUpperAttributeName() {
+		return upperAttributeName;
+	}
+
+    public void setLowerAttributeName(String attributeName) {
+        this.lowerAttributeName = attributeName;
         firePainterChanged();
     }
+
+	public void setUpperAttributeName(String attributeName) {
+	    this.upperAttributeName = attributeName;
+	    firePainterChanged();
+	}
 
     private double preferredWidth;
     private double preferredHeight;
 
-    protected Map<String, String> displayAttributes = new HashMap<String, String>();
-    protected String[] attributes;
+	private String lowerAttributeName = null;
+	private String upperAttributeName = null;
+    private String[] attributeNames;
 
-    protected TreePane treePane;
+    private TreePane treePane;
+
+	private Line2D nodeBar = null;
 }

@@ -112,7 +112,7 @@ public class NodeShapePainter extends NodePainter {
         g2.draw(bounds);
     }
 
-    public String[] getAttributes() {
+    public String[] getAttributeNames() {
         return attributes;
     }
 

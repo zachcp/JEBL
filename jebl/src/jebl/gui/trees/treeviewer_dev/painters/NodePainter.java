@@ -1,11 +1,8 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Tree;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 /**
  * @author Andrew Rambaut
@@ -16,14 +13,6 @@ public abstract class NodePainter extends AbstractPainter<Node> {
 
     protected NodePainter() {
     }
-
-    // Abstract
-
-    public abstract String[] getAttributes();
-
-    public abstract void setupAttributes(Tree tree);
-
-    public abstract void setDisplayAttribute(String display, String attribute);
 
     // Getters
 
@@ -53,8 +42,8 @@ public abstract class NodePainter extends AbstractPainter<Node> {
 
     // Setters
 
-    public void setStroke(Stroke borderStroke) {
-        this.borderStroke = borderStroke;
+    public void setStroke(Stroke stroke) {
+        this.stroke = stroke;
         firePainterChanged();
     }
 

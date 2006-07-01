@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * Interface for associating attributes with an object.
+ * Interface for associating attributeNames with an object.
  *
  * @version $Id$
  *
@@ -42,7 +42,7 @@ public interface Attributable {
     void removeAttribute(String name);
 
     /**
-     * @return an array of the attributes that this object has.
+     * @return an array of the attributeNames that this object has.
      */
     Set<String> getAttributeNames();
 

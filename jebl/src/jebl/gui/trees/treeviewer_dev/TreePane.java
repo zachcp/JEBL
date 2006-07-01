@@ -391,7 +391,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         return branchLabelPainter;
     }
 
-    public void setNodeBarPainter(NodePainter nodeBarPainter) {
+    public void setNodeBarPainter(NodeBarPainter nodeBarPainter) {
         nodeBarPainter.setTreePane(this);
         if (this.nodeBarPainter != null) {
             this.nodeBarPainter.removePainterListener(this);
@@ -666,8 +666,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
                     }
 
                     if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
-                        Rectangle2D bounds = nodeBarPainter.calibrate(g2, node);
-                        nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, bounds);
+						Shape nodeBar = nodeBars.get(node);
+	                    if (nodeBar != null) {
+		                    nodeBar = transform.createTransformedShape(nodeBar);
+                            nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, nodeBar);
+	                    }
                     }
                 }
 
@@ -732,11 +735,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
         // bounds on nodeShapes
         if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
+	        nodeBars.clear();
             // Iterate though the nodes
             for (Node node : tree.getInternalNodes()) {
 
                 Rectangle2D shapeBounds = nodeBarPainter.calibrate(g2, node);
                 treeBounds.add(shapeBounds);
+	            nodeBars.put(node, nodeBarPainter.getNodeBar());
             }
         }
 
@@ -1105,7 +1110,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private LabelPainter<Node> nodeLabelPainter = null;
     private LabelPainter<Node> branchLabelPainter = null;
 
-    private NodePainter nodeBarPainter = null;
+    private NodeBarPainter nodeBarPainter = null;
 
     private Painter<TreePane> scaleBarPainter = null;
     private Rectangle2D scaleBarBounds = null;
@@ -1132,6 +1137,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private Map<Node, AffineTransform> branchLabelTransforms = new HashMap<Node, AffineTransform>();
     private Map<Node, Shape> branchLabelBounds = new HashMap<Node, Shape>();
     private Map<Node, Painter.Justification> branchLabelJustifications = new HashMap<Node, Painter.Justification>();
+
+	private Map<Node, Shape> nodeBars = new HashMap<Node, Shape>();
 
     private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
 

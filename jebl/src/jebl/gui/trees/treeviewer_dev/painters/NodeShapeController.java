@@ -57,7 +57,7 @@ public class NodeShapeController extends AbstractController {
                 NodePainterType.SHAPE
         });
 
-        String[] attributes = this.nodeShapePainter.getAttributes();
+        String[] attributes = this.nodeShapePainter.getAttributeNames();
 
         displayAttributeCombo = new JComboBox(attributes);
         displayAttributeCombo.addItemListener(new ItemListener() {
@@ -91,7 +91,7 @@ public class NodeShapeController extends AbstractController {
             public void painterSettingsChanged() {
                 displayLowerAttributeCombo.removeAllItems();
                 displayUpperAttributeCombo.removeAllItems();
-                for (String name : nodeShapePainter.getAttributes()) {
+                for (String name : nodeShapePainter.getAttributeNames()) {
                     displayLowerAttributeCombo.addItem(name);
                     displayUpperAttributeCombo.addItem(name);
                 }

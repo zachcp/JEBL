@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * A simple implementation of LabelPainter that can be used to display
  * tip, node or branch labels. It can display, taxon names, branch lengths,
- * node heights or other attributes of nodes.
+ * node heights or other attributeNames of nodes.
  *
  * @author Andrew Rambaut
  * @version $Id$
