@@ -271,7 +271,7 @@ public class BartonSternberg implements MultipleAligner {
 
 
     public Alignment doAlign(Alignment a1, Alignment a2, ProgressListener progress) {
-         List<Sequence> seqs1 = a1.getSequenceList();
+        List<Sequence> seqs1 = a1.getSequenceList();
         List<Sequence> seqs2 = a2.getSequenceList();
 
         final int size1 = seqs1.size();
