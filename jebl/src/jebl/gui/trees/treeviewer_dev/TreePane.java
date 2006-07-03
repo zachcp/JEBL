@@ -44,6 +44,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         setBackground(new Color(backgroundRGB));
         setSelectionPaint(new Color(selectionRGB));
         setBranchStroke(new BasicStroke(branchLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
     }
 
     public RootedTree getTree() {
@@ -601,6 +602,16 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         Stroke oldStroke = g2.getStroke();
         Font oldFont = g2.getFont();
 
+        for (Node node : tree.getNodes() ) {
+            if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
+                Shape nodeBar = nodeBars.get(node);
+                if (nodeBar != null) {
+                    nodeBar = transform.createTransformedShape(nodeBar);
+                    nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, nodeBar);
+                }
+            }
+        }
+
         Set<Node> externalNodes = tree.getExternalNodes();
         for (Node node : externalNodes) {
 
@@ -665,13 +676,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
                         }
                     }
 
-                    if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
-						Shape nodeBar = nodeBars.get(node);
-	                    if (nodeBar != null) {
-		                    nodeBar = transform.createTransformedShape(nodeBar);
-                            nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, nodeBar);
-	                    }
-                    }
                 }
 
                 if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
@@ -735,13 +739,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
         // bounds on nodeShapes
         if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
-	        nodeBars.clear();
+            nodeBars.clear();
             // Iterate though the nodes
             for (Node node : tree.getInternalNodes()) {
 
                 Rectangle2D shapeBounds = nodeBarPainter.calibrate(g2, node);
                 treeBounds.add(shapeBounds);
-	            nodeBars.put(node, nodeBarPainter.getNodeBar());
+                nodeBars.put(node, nodeBarPainter.getNodeBar());
             }
         }
 
@@ -1138,7 +1142,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private Map<Node, Shape> branchLabelBounds = new HashMap<Node, Shape>();
     private Map<Node, Painter.Justification> branchLabelJustifications = new HashMap<Node, Painter.Justification>();
 
-	private Map<Node, Shape> nodeBars = new HashMap<Node, Shape>();
+    private Map<Node, Shape> nodeBars = new HashMap<Node, Shape>();
 
     private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
 

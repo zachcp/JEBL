@@ -55,7 +55,6 @@ public class TreeViewer extends JPanel implements Printable {
 	 * Creates new TreeViewer
 	 */
 	public TreeViewer(TreePane treePane) {
-		setOpaque(false);
 		setLayout(new BorderLayout());
 
 		this.treePane = treePane;

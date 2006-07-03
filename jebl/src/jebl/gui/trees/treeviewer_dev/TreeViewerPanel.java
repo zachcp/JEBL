@@ -66,7 +66,6 @@ public class TreeViewerPanel extends JPanel {
 		treePane.setScaleBarPainter(scaleBarPainter);
 
 		setLayout(new BorderLayout());
-		setOpaque(false);
 
 		add(treeViewer, BorderLayout.CENTER);
 		add(controlPalette.getPanel(), BorderLayout.WEST);
