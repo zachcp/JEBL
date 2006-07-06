@@ -120,6 +120,11 @@ public class BasicAlignment implements Alignment {
                             " (data type = " + sequence.getSequenceType().getName() +
                             ", but expected " + sequenceType.getName() + ").");
         }
+
+        if( taxonList.indexOf(sequence.getTaxon()) >= 0 ) {
+           throw new IllegalArgumentException("duplicate sequence name " + sequence.getTaxon());
+        }
+        
         sequences.put(sequence.getTaxon(), sequence);
         taxonList.add(sequence.getTaxon());
     }
