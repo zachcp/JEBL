@@ -24,6 +24,7 @@ public final class CompositeProgressListener implements ProgressListener {
     protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
     protected boolean aborted = false;
     protected double currentOperationProgress = 0.0;
+    protected double currentTotalProgress = 0.0;
 
     public CompositeProgressListener(ProgressListener listener, double[] operationDuration) {
         numOperations = operationDuration.length;
@@ -54,7 +55,7 @@ public final class CompositeProgressListener implements ProgressListener {
     }
 
     public boolean isAborted() {
-        return aborted;
+        return setProgress(currentOperationProgress);
     }
 
     public boolean setMessage(String message) {
