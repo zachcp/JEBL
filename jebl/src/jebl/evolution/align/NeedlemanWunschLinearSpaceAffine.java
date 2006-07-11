@@ -163,6 +163,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                 //swap the ordering, to prevent nasty allocation of matrices.
                 // for example, if we do a 100000 by 10 alignment, followed by a 10 x 100000 alignment, we end up
                 // allocating a 100000 x 100000 matrix
+//                System.out.println("invert = true at " + offset1+","+offset2+ "," +n+ "," +m);
                 invert = true;
                 int temp;
                 temp = m;
@@ -415,6 +416,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
             bestk = 1;
         if (endType == TYPE_Y)
             bestk = 2;
+        assert F[bestk][1][m]>Float.NEGATIVE_INFINITY;
 
         int v = C[bestk][1][m];
         int vtype = Ctype[bestk][1][m];
@@ -423,15 +425,27 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         }
         float finalScore = F[bestk][1][m];
 
+        if (freeEndGap && n == 0) finalScore = 0;
+        if (freeStartGap && n == 0) finalScore = 0;
+
         if (scoreOnly) return finalScore;
 
         if (calculateResults) {
             appendResults(invert, result1, result2, n, m, bestk);
         } else {
-            doAlignment(profile1, profile2, offset1, offset2, u, v, startType, vtype, result1, result2, false, freeStartGap, false);
+            boolean propagateFreeEndGap = freeEndGap && u == n || v == m;
+            boolean propagateFreeStartGap = freeStartGap && u == 0 || v == 0;
+            float score1=doAlignment(profile1, profile2, offset1, offset2, u, v, startType, vtype, result1, result2, false, freeStartGap, propagateFreeEndGap);
             if (cancelled) return 0;
-            doAlignment(profile1, profile2, offset1 + u, offset2 + v, n - u, m - v, vtype, endType, result1, result2, false, false, freeEndGap);
+            float score2=doAlignment(profile1, profile2, offset1 + u, offset2 + v, n - u, m - v, vtype, endType, result1, result2, false, propagateFreeStartGap, freeEndGap);
             if (cancelled) return 0;
+            float combinedScore = score1+ score2;
+            if (Math.abs(combinedScore - finalScore) > 0.01f) {
+                //todo: work out why this happens sometimes, possibly just cumulative floating point error.
+//                System.out.println("free =" + freeStartGap+ "," + freeEndGap);
+//                System.out.println("offset1="+ offset1+" offset2="+ offset2+" u="+u+" v="+v);
+//                System.out.println(""+ score1+ "," + score2+"!="+ finalScore);
+            }
         }
         //System.out.println("free =" +freeStartGap+ "," + freeEndGap+ ",score =" + finalScore);
 
