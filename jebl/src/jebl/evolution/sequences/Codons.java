@@ -68,7 +68,7 @@ public final class Codons {
 
     /**
      * Gets the state object for the given code. Returns null if the code is illegal.
-     * @param code
+     * @param code a three-character string of nucleotides in uppercase
      * @return the state
      */
     public static CodonState getState(String code) {
@@ -87,7 +87,7 @@ public final class Codons {
 
 	public static boolean isGap(CodonState state) { return state == GAP_STATE; }
 
-	public static NucleotideState[] toNucleotides(State state) {
+	public static NucleotideState[] toNucleotides(CodonState state) {
 		NucleotideState[] nucs = new NucleotideState[3];
 		String code = state.getCode();
 		nucs[0] = Nucleotides.getState(code.charAt(0));
