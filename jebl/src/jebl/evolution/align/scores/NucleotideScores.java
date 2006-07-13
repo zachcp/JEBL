@@ -53,14 +53,18 @@ public class NucleotideScores extends Scores {
         this("", match, misMatch, misMatch, ambiguousMatch);
     }
 
+    public NucleotideScores(String name, float match, float misMatch) {
+        this(name, match, misMatch, misMatch, 0);
+    }
+
     public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion) {
         this.name = name;
-        buildScores(match, mismatchTransition, mismatchTransversion, 0,false);
+        buildScores(match, mismatchTransition, mismatchTransversion, 0, false);
     }
 
     public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch) {
         this.name = name;
-        buildScores(match,mismatchTransition, mismatchTransversion, ambiguousMatch,true);
+        buildScores(match, mismatchTransition, mismatchTransversion, ambiguousMatch, true);
     }
 
     void buildScores(float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch, boolean includeAmbiguities) {
