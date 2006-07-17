@@ -22,10 +22,11 @@ public class LogisticGrowth extends ExponentialGrowth {
 	/**
 	 * Construct demographic model with default settings
 	 */
-	public LogisticGrowth() {
+	public LogisticGrowth(double N0, double r, double c) {
 
-		super();
-	}
+		super(N0, r);
+        this.c = c;
+    }
 
 	public void setShape(double value) { c = value; }
 	public double getShape() { return c; }
@@ -69,7 +70,7 @@ public class LogisticGrowth extends ExponentialGrowth {
 	 * (= integral 1/N(x) dx from 0 to t).
 	 */
 	public double getIntensity(double t) {
-		throw new RuntimeException("Not implemented!");
+        throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -77,9 +78,12 @@ public class LogisticGrowth extends ExponentialGrowth {
 	 * (= integral 1/N(x) dx from 0 to t).
 	 */
 	public double getInverseIntensity(double x) {
-
-		throw new RuntimeException("Not implemented!");
+        throw new UnsupportedOperationException();
 	}
+
+    public boolean hasIntegral() {
+        return true;
+    }
 
 	public double getIntegral(double start, double finish) {
 
@@ -92,76 +96,26 @@ public class LogisticGrowth extends ExponentialGrowth {
 		double expOfMinusRG = Math.exp(-r*intervalLength);
 
 		double term1 = nZero*(1.0+c);
-		if (term1==0.0) {
-			throw new RuntimeException("Infinite integral!");
-		}
+		assert(term1 > 0.0);
 
 		double term2 = c*(1.0 - expOfMinusRG);
 
 		double term3 = (term1*expOfMinusRT) * r * expOfMinusRG;
-		if (term3==0.0 && term2>0.0) {
-			throw new RuntimeException("Infinite integral!");
-		}
+
+        assert(term2 > 0.0 || term3 > 0.0);
 
 		double term4;
-		if (term3!=0.0 && term2==0.0) {term4=0.0;}
-		else if (term3==0.0 && term2==0.0) {
+		if (term3!=0.0 && term2==0.0) {
+            term4=0.0;
+        } else if (term3==0.0 && term2==0.0) {
 		    throw new RuntimeException("term3 and term2 are both zeros. N0=" + getN0() + " growthRate=" +  getGrowthRate() + "c=" + c);
-		}
-		else {term4 = term2 / term3;}
+		} else {
+            term4 = term2 / term3;
+        }
 
 		double term5 = intervalLength / term1;
 
 		return term5 + term4;
-	}
-
-	public int getNumArguments() {
-		return 3;
-	}
-
-	public String getArgumentName(int n) {
-		switch (n) {
-			case 0: return "N0";
-			case 1: return "r";
-			case 2: return "c";
-		}
-		throw new IllegalArgumentException("Argument " + n + " does not exist");
-	}
-
-	public double getArgument(int n) {
-		switch (n) {
-			case 0: return getN0();
-			case 1: return getGrowthRate();
-			case 2: return getShape();
-		}
-		throw new IllegalArgumentException("Argument " + n + " does not exist");
-	}
-
-	public void setArgument(int n, double value) {
-		switch (n) {
-			case 0: setN0(value); break;
-			case 1: setGrowthRate(value); break;
-			case 2: setShape(value); break;
-			default: throw new IllegalArgumentException("Argument " + n + " does not exist");
-
-		}
-	}
-
-	public double getLowerBound(int n) {
-		return 0.0;
-	}
-
-	public double getUpperBound(int n) {
-		return Double.POSITIVE_INFINITY;
-	}
-
-	public DemographicFunction getCopy() {
-		LogisticGrowth df = new LogisticGrowth();
-		df.setN0(getN0());
-		df.setGrowthRate(getGrowthRate());
-		df.c = c;
-
-		return df;
 	}
 
 	//

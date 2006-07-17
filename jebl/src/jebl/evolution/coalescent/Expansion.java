@@ -24,10 +24,11 @@ public class Expansion extends ExponentialGrowth {
 	/**
 	 * Construct demographic model with default settings
 	 */
-	public Expansion() {
+	public Expansion(double N0, double r, double N1) {
 
-		super();
-	}
+		super(N0, r);
+        this.N1 = N1;
+    }
 
 	public double getN1() { return N1; }
 	public void setN1(double N1) { this.N1 = N1; }
@@ -42,81 +43,25 @@ public class Expansion extends ExponentialGrowth {
 		double N1 = getN1();
 		double r = getGrowthRate();
 
-		if (N1 > N0) throw new IllegalArgumentException("N0 must be greater than N1!");
+		assert (N1 > N0);
 
 		return N1 + ((N0 - N1) * Math.exp(-r*t));
 	}
 
-	/**
-	 * Returns value of demographic intensity function at time t
-	 * (= integral 1/N(x) dx from 0 to t).
-	 */
 	public double getIntensity(double t) {
-
-		throw new RuntimeException("Not implemented!");
+        throw new UnsupportedOperationException();
 	}
 
 	public double getInverseIntensity(double x) {
-
-		/* AER - I think this is right but until someone checks it...
-		double nZero = getN0();
-		double nOne = getN1();
-		double r = getGrowthRate();
-
-		if (r == 0) {
-			return nZero*x;
-		} else if (alpha == 0) {
-			return Math.log(1.0+nZero*x*r)/r;
-		} else {
-			return Math.log(-(nOne/nZero) + Math.exp(nOne*x*r))/r;
-		}
-		*/
-		throw new RuntimeException("Not implemented!");
+        throw new UnsupportedOperationException();
 	}
+
+    public boolean hasIntegral() {
+        return false;
+    }
 
 	public double getIntegral(double start, double finish) {
-
-		return getNumericalIntegral(start, finish);
-	}
-
-	public int getNumArguments() {
-		return 3;
-	}
-
-	public String getArgumentName(int n) {
-		switch (n) {
-			case 0: return "N0";
-			case 1: return "r";
-			case 2: return "N1";
-		}
-		throw new IllegalArgumentException("Argument " + n + " does not exist");
-	}
-
-	public double getArgument(int n) {
-		switch (n) {
-			case 0: return getN0();
-			case 1: return getGrowthRate();
-			case 2: return getN1();
-		}
-		throw new IllegalArgumentException("Argument " + n + " does not exist");
-	}
-
-	public void setArgument(int n, double value) {
-		switch (n) {
-			case 0: setN0(value); break;
-			case 1: setGrowthRate(value); break;
-			case 2: setN1(value); break;
-			default: throw new IllegalArgumentException("Argument " + n + " does not exist");
-
-		}
-	}
-
-	public double getLowerBound(int n) {
-		return 0.0;
-	}
-
-	public double getUpperBound(int n) {
-		return Double.POSITIVE_INFINITY;
+        throw new UnsupportedOperationException();
 	}
 
 	//

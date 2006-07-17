@@ -23,19 +23,18 @@ package jebl.evolution.coalescent;
  * @version $Id$
  *
  */
-public class ConstantPopulation extends DemographicFunction.Abstract
+public class ConstantPopulation implements DemographicFunction
 {
 	//
 	// Public stuff
 	//
 
 	/**
-	 * Construct demographic model with default settings
+	 * Construct demographic model
 	 */
-	public ConstantPopulation() {
-
-		super();
-	}
+	public ConstantPopulation(double N0) {
+        this.N0 = N0;
+    }
 
 	/**
 	 * returns initial population size.
@@ -54,44 +53,17 @@ public class ConstantPopulation extends DemographicFunction.Abstract
 	public double getIntensity(double t) { return t/getN0(); }
 	public double getInverseIntensity(double x) { return getN0()*x; }
 
-	/**
+    public boolean hasIntegral() {
+        return true;
+    }
+
+    /**
 	 * Calculates the integral 1/N(x) dx between start and finish. The
 	 * inherited function in DemographicFunction.Abstract calls a
 	 * numerical integrater which is unecessary.
 	 */
 	public double getIntegral(double start, double finish) {
 		return getIntensity(finish) - getIntensity(start);
-	}
-
-	public int getNumArguments() {
-		return 1;
-	}
-
-	public String getArgumentName(int n) {
-		return "N0";
-	}
-
-	public double getArgument(int n) {
-		return getN0();
-	}
-
-	public void setArgument(int n, double value) {
-		setN0(value);
-	}
-
-	public double getLowerBound(int n) {
-		return 0.0;
-	}
-
-	public double getUpperBound(int n) {
-		return Double.POSITIVE_INFINITY;
-	}
-
-	public DemographicFunction getCopy() {
-		ConstantPopulation df = new ConstantPopulation();
-		df.N0 = N0;
-
-		return df;
 	}
 
 	//

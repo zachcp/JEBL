@@ -39,87 +39,18 @@ public interface DemographicFunction {
 	 */
 	double getInverseIntensity(double x);
 
-	/**
-	 * Calculates the integral 1/N(x) dx between start and finish.
-	 */
-	double getIntegral(double start, double finish);
+    /**
+     * returns whether an analytical expression for the integral is implemented
+     * @return a boolean
+     */
+    boolean hasIntegral();
 
-	/**
-	 * Returns the number of arguments for this function.
-	 */
-	int getNumArguments();
+    /**
+     * Calculates the integral 1/N(x) dx between start and finish
+     */
+    double getIntegral(double start, double finish);
 
-	/**
-	 * Returns the name of the nth argument of this function.
-	 */
-	String getArgumentName(int n);
-
-	/**
-	 * Returns the value of the nth argument of this function.
-	 */
-	double getArgument(int n);
-
-	/**
-	 * Sets the value of the nth argument of this function.
-	 */
-	void setArgument(int n, double value);
-
-	/**
-	 * Returns the lower bound of the nth argument of this function.
-	 */
-	double getLowerBound(int n);
-
-	/**
-	 * Returns the upper bound of the nth argument of this function.
-	 */
-	double getUpperBound(int n);
-
-	/**
-	 * Returns a copy of this function.
-	 */
-	DemographicFunction getCopy();
-
-	public abstract class Abstract implements DemographicFunction
-	{
-
-		/**
-		 * Construct demographic model with default settings
-		 */
-		public Abstract() {
-		}
-
-		// general functions
-
-		/**
-		 * Calculates the integral 1/N(x) dx between start and finish.
-		 */
-		public double getIntegral(double start, double finish)
-		{
-			return getIntensity(finish) - getIntensity(start);
-		}
-
-		/**
-		 * Numerically estimates the integral between start and finish.
-		 */
-		public double getNumericalIntegral(double start, double finish) {
-
-			throw new UnsupportedOperationException("getNumericalIntegral not implemented yet");
-//			int slices = 99;
-//			double[] intensities = new double[slices];
-//
-//			for (int i =0; i < intensities.length; i++) {
-//				double time = start + (i*finish / (slices-1));
-//				intensities[i] = 1.0 / getDemographic(time);
-//			}
-//			double integral = numericalMethods.calculus.integration.NewtonCotes.simpsonSum(intensities) * (finish-start);
-//
-//			return integral;
-
-		}
-
-	};
-	
-	public static class Utils
+    public static class Utils
 	{
 
 		/**

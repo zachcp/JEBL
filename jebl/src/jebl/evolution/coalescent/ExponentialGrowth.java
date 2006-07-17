@@ -24,10 +24,11 @@ public class ExponentialGrowth extends ConstantPopulation {
 	/**
 	 * Construct demographic model with default settings
 	 */
-	public ExponentialGrowth() {
+	public ExponentialGrowth(double N0, double r) {
 
-		super();
-	}
+		super(N0);
+        this.r = r;
+    }
 
 	/**
 	 * returns growth rate.
@@ -78,50 +79,6 @@ public class ExponentialGrowth extends ConstantPopulation {
 		} else {
 			return Math.log(1.0+getN0()*x*r)/r;
 		}
-	}
-
-	public int getNumArguments() {
-		return 2;
-	}
-
-	public String getArgumentName(int n) {
-		if (n == 0) {
-			return "N0";
-		} else {
-			return "r";
-		}
-	}
-
-	public double getArgument(int n) {
-		if (n == 0) {
-			return getN0();
-		} else {
-			return getGrowthRate();
-		}
-	}
-
-	public void setArgument(int n, double value) {
-		if (n == 0) {
-			setN0(value);
-		} else {
-			setGrowthRate(value);
-		}
-	}
-
-	public double getLowerBound(int n) {
-		return 0.0;
-	}
-
-	public double getUpperBound(int n) {
-		return Double.POSITIVE_INFINITY;
-	}
-
-	public DemographicFunction getCopy() {
-		ExponentialGrowth df = new ExponentialGrowth();
-		df.setN0(getN0());
-		df.r = r;
-
-		return df;
 	}
 
 	//

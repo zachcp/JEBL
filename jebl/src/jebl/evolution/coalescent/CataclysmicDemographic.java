@@ -28,10 +28,12 @@ public class CataclysmicDemographic extends ExponentialGrowth {
 	/**
 	 * Construct demographic model with default settings
 	 */
-	public CataclysmicDemographic() {
+	public CataclysmicDemographic(double N0, double r, double d, double t) {
 
-		super();
-	}
+		super(N0, r);
+        this.d = d;
+        this.catTime = t;
+    }
 
 	/**
 	 * returns the positive-valued decline rate
@@ -110,52 +112,11 @@ public class CataclysmicDemographic extends ExponentialGrowth {
 
 		throw new UnsupportedOperationException();
 	}
+    
+    public boolean hasIntegral() {
+        return false;
+    }
 
-	public int getNumArguments() {
-		return 4;
-	}
-
-	public String getArgumentName(int n) {
-
-		switch (n) {
-			case 0: return "N0";
-			case 1: return "r";
-			case 2: return "d";
-			case 3: return "t";
-			default: throw new IllegalArgumentException();
-		}
-
-	}
-
-	public double getArgument(int n) {
-		switch (n) {
-			case 0: return getN0();
-			case 1: return getGrowthRate();
-			case 2: return getDeclineRate();
-			case 3: return getCataclysmTime();
-			default: throw new IllegalArgumentException();
-		}
-	}
-
-	public void setArgument(int n, double value) {
-		switch (n) {
-			case 0: setN0(value); break;
-			case 1: setGrowthRate(value); break;
-			case 2: setDeclineRate(value); break;
-			case 3: setCataclysmTime(value); break;
-			default: throw new IllegalArgumentException();
-		}
-	}
-
-	public DemographicFunction getCopy() {
-		CataclysmicDemographic df = new CataclysmicDemographic();
-		df.setN0(getN0());
-		df.setGrowthRate(getGrowthRate());
-		df.d = d;
-		df.catTime = catTime;
-
-		return df;
-	}
 
 	//
 	// private stuff
