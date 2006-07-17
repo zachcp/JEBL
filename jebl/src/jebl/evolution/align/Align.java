@@ -20,10 +20,10 @@ public abstract class Align {
     /**
      * Performs the alignment, abstract.
      *
-     * @param seq1
-     * @param seq2
+     * @param sq1
+     * @param sq2
      */
-    public abstract void doAlignment(String seq1, String seq2);
+    public abstract void doAlignment(String sq1, String sq2);
 
     /**
      * Initialises the matrices for the alignment.

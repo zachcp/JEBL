@@ -5,11 +5,11 @@ import jebl.evolution.align.scores.Scores;
 abstract class AlignLinearSpace extends AlignSimple {
 
     float[][] F = null;		// the matrices used to compute the alignment
-    
+
     public AlignLinearSpace(Scores sub, float d) {
     	super(sub, d);
     }
-    
+
     /**
      * Performs the alignment. Abstract.
      * 
@@ -17,7 +17,7 @@ abstract class AlignLinearSpace extends AlignSimple {
      * @param seq2
      */
     public abstract void doAlignment(String seq1, String seq2);
-    
+
     public void prepareAlignment(String sq1, String sq2) {
     	this.n = sq1.length(); this.m = sq2.length();
 		this.seq1 = strip(sq1); this.seq2 = strip(sq2);

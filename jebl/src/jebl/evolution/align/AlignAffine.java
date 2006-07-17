@@ -16,18 +16,18 @@ abstract class AlignAffine extends Align {
     private int oldm = 0;
 
     public AlignAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {
-    	super(sub, openGapPenalty);
+        super(sub, openGapPenalty);
         setGapExtend(extendGapPenalty);
     }
-    
+
     /**
      * Performs the alignment. Abstract.
      * 
-     * @param seq1
-     * @param seq2
+     * @param sq1
+     * @param sq2
      */
-    public abstract void doAlignment(String seq1, String seq2);
-    
+    public abstract void doAlignment(String sq1, String sq2);
+
     public void prepareAlignment(String sq1, String sq2) {
 
         n = sq1.length();
@@ -35,43 +35,43 @@ abstract class AlignAffine extends Align {
         this.seq1 = sq1;
         this.seq2 = sq2;
 
-    	//first time running this alignment. Create all new matrices.
-    	if(F == null) {
-    		F = new float[3][n+1][m+1];
-    		B = new TracebackAffine[3][n+1][m+1];
-    		for(int k = 0; k < 3; k++) {
-    			for(int i = 0; i < n+1; i ++) {
-    				for(int j = 0; j < m+1; j++)
-    					B[k][i][j] = new TracebackAffine(0,0,0);
-    			}
-    		}
+        //first time running this alignment. Create all new matrices.
+        if(F == null) {
+            F = new float[3][n+1][m+1];
+            B = new TracebackAffine[3][n+1][m+1];
+            for(int k = 0; k < 3; k++) {
+                for(int i = 0; i < n+1; i ++) {
+                    for(int j = 0; j < m+1; j++)
+                        B[k][i][j] = new TracebackAffine(0,0,0);
+                }
+            }
             oldn = n;
             oldm = m;
         }
 
         //alignment already been run but matrices not big enough for new alignment.
         //create all new matrices.
-    	else if(sq1.length() > oldn || sq2.length() > oldm) {
+        else if(sq1.length() > oldn || sq2.length() > oldm) {
             int extram = 5;
             int extran = 5;
 //            System.out.println ("creating new arrays "+n+ "," +m+ " was " + oldn+ "," + oldm);
             F = new float[3][n+1+extran][m+1+extram];
-    		B = new TracebackAffine[3][n+1+extran][m+1+extram];
-    		for(int k = 0; k < 3; k++) {
-    			for(int i = 0; i < n+1+extran; i ++) {
-    				for(int j = 0; j < m+1+extram;j++)
-    					B[k][i][j] = new TracebackAffine(0,0,0);
-    			}
-    		}
+            B = new TracebackAffine[3][n+1+extran][m+1+extram];
+            for(int k = 0; k < 3; k++) {
+                for(int i = 0; i < n+1+extran; i ++) {
+                    for(int j = 0; j < m+1+extram;j++)
+                        B[k][i][j] = new TracebackAffine(0,0,0);
+                }
+            }
             oldn = n + extran;
             oldm = m + extram;
         }
     }
 
     public void setGapExtend(float e) {
-    	this.e = e;
+        this.e = e;
     }
-    
+
     /**
      * Get the next state in the traceback
      * 
@@ -80,13 +80,13 @@ abstract class AlignAffine extends Align {
      */
     public Traceback next(Traceback tb) {
         TracebackAffine tb3 = (TracebackAffine)tb;
-        
+
         //traceback has reached the origin, therefore stop.
         if(tb3.i + tb3.j + B[tb3.k][tb3.i][tb3.j].i + B[tb3.k][tb3.i][tb3.j].j == 0)
-        	return null;
-        
+            return null;
+
         else
-        	return B[tb3.k][tb3.i][tb3.j];
+            return B[tb3.k][tb3.i][tb3.j];
     }
 
     /**

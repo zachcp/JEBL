@@ -1,20 +1,22 @@
 package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
+import jebl.util.ProgressListener;
 
 public class SmithWaterman extends AlignSimple {
-	
-	public SmithWaterman(Scores sub, float d) {
-		super(sub, d);
-	}
-    
-	/**
-	 * @param sq1
-	 * @param sq2
-	 */
-    public void doAlignment(String sq1, String sq2) {
-    	
-    	super.prepareAlignment(sq1, sq2);
+
+    public SmithWaterman(Scores sub, float d) {
+        super(sub, d);
+    }
+
+    /**
+     * @param sq1
+     * @param sq2
+     * @param progress
+     */
+    public void doAlignment(String sq1, String sq2, ProgressListener progress) {
+
+        super.prepareAlignment(sq1, sq2);
 
         char[] s1 = sq1.toCharArray();
         char[] s2 = sq2.toCharArray();
@@ -46,5 +48,9 @@ public class SmithWaterman extends AlignSimple {
             }
         }
         B0 = new TracebackSimple(maxi, maxj);
+    }
+
+    public void doAlignment(String sq1, String sq2) {
+        doAlignment(sq1, sq2, null);
     }
 }

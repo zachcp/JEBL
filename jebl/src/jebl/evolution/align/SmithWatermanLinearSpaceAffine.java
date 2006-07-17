@@ -1,6 +1,7 @@
 package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
+import jebl.util.ProgressListener;
 
 /**
  * @author Alexei Drummond
@@ -15,16 +16,16 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
     int end1, end2;       		// Best alignment ends at (end1, end2)
 
     public SmithWatermanLinearSpaceAffine(Scores sub, float d, float e) {
-    	super(sub, d, e);
+        super(sub, d, e);
     }
 
     /**
-	 * @param sq1
-	 * @param sq2
-	 */
-    public void doAlignment(String sq1, String sq2) {
+     * @param sq1
+     * @param sq2
+     */
+    public void doAlignment(String sq1, String sq2, ProgressListener progress) {
 
-    	prepareAlignment(sq1, sq2);
+        prepareAlignment(sq1, sq2);
 
         char[] s1 = sq1.toCharArray();
         char[] s2 = sq2.toCharArray();
@@ -38,7 +39,13 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
         for (int j=0; j<=m; j++) {
             start[1][j] = new TracebackSimple(0, j);
         }
+
+
         for (int i=1; i<=n; i++) {
+            if( progress != null && progress.setProgress((double)i/n) ) {
+               return; 
+            }
+
             swap01(M); swap01(Ix); swap01(Iy); swap01(start);
             // F[k][1] represents (new) col i and F[k][0] represents (old) col i-1
             // Initialize first row (j=0):
@@ -70,6 +77,11 @@ public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
                 }
             }
         }
+    }
+
+
+    public void doAlignment(String sequence1, String sequence2) {
+        doAlignment(sequence1, sequence2, null);
     }
 
     /**
