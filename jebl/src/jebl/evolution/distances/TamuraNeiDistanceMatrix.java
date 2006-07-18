@@ -132,21 +132,19 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
                 throw new IllegalArgumentException("HKYDistanceMatrix must have nucleotide patterns");
             }
 
-            double[] freqs = getFrequencies(alignment);
+            double[] freqs = getFrequenciesSafe(alignment);
 
             double freqA = freqs[Nucleotides.A_STATE.getIndex()];
             double freqC = freqs[Nucleotides.C_STATE.getIndex()];
             double freqG = freqs[Nucleotides.G_STATE.getIndex()];
             double freqT = freqs[Nucleotides.T_STATE.getIndex()];
 
-            constA1 = (freqA * freqG) / freqR;
-            constA2 = (freqT * freqC) / freqY;
+            // avoid arithmetic underflow by dividing first
+            constA1 = freqA * (freqG / freqR);
+            constA2 = freqT * (freqC / freqY);
             constC =  (freqR * freqY);
 
-            if( constA1 == 0.0 || constA2 == 0.0 || constC == 0.0 ) {
-               throw new IllegalArgumentException("It is not possible to compute the Tamura Nei genetic distance " +
-                       "for those sequences (probably because they are too short).");
-            }
+            assert(constA1 > 0.0 && constA2 > 0.0 && constC > 0.0);
 
             final int dimension = alignment.getTaxa().size();
             double[][] distances = new double[dimension][dimension];

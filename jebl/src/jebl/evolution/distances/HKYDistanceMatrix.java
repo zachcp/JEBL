@@ -77,10 +77,10 @@ import jebl.util.ProgressListener;
 public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
     public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) {
-        super(alignment.getTaxa(), Initialaizer.getDistances(alignment, progress));
+        super(alignment.getTaxa(), Initializer.getDistances(alignment, progress));
     }
 
-    static class Initialaizer extends ModelBasedDistanceMatrix {
+    static class Initializer extends ModelBasedDistanceMatrix {
         //
         // Private stuff
         //
@@ -157,7 +157,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
 
         static double[][] getDistances(Alignment alignment, ProgressListener progress) {
-            Initialaizer.alignment = alignment;
+            Initializer.alignment = alignment;
 
             // ASK Alexei
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
@@ -166,7 +166,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 throw new IllegalArgumentException("HKYDistanceMatrix must have nucleotide patterns");
             }
 
-             double[] freqs = getFrequencies(alignment);
+            double[] freqs = getFrequenciesSafe(alignment);
 
             // Ask Alexei (mapping 0-a etc)
             double freqA = freqs[Nucleotides.A_STATE.getIndex()];

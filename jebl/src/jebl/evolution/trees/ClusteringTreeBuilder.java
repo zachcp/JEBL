@@ -140,6 +140,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         for (int i = 0; i < numClusters; i++) {
             for (int j = 0; j < numClusters; j++) {
                 distance[i][j] = distanceMatrix.getDistance(i, j);
+                assert (!Double.isNaN(distance[i][j]));
             }
         }
 
