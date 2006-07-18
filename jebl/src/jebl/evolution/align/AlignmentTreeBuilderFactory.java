@@ -127,7 +127,7 @@ public class AlignmentTreeBuilderFactory {
 
         p.setSectionSize(treeWork);
         progress.setMessage("Building guide tree from alignment");
-        final Tree guidTree = build(alignment, method, distanceModel, minorProgress);
+        final Tree guideTree = build(alignment, method, distanceModel, minorProgress);
         p.incrementSectionsCompleted(treeWork);
 
         DistanceMatrix distanceMatrix = null;
@@ -142,6 +142,6 @@ public class AlignmentTreeBuilderFactory {
             }
             p.incrementSectionsCompleted(matrixWork);
         }
-        return new Result(guidTree, distanceMatrix);
+        return new Result(guideTree, distanceMatrix);
     }
 }

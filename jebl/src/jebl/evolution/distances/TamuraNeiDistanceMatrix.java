@@ -145,7 +145,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
             if( constA1 == 0.0 || constA2 == 0.0 || constC == 0.0 ) {
                throw new IllegalArgumentException("It is not possible to compute the Tamura Nei genetic distance " +
-                       "for those sequences. (probably because they are too short)");
+                       "for those sequences (probably because they are too short).");
             }
 
             final int dimension = alignment.getTaxa().size();

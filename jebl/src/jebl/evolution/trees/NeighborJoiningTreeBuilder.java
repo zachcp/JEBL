@@ -3,9 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.util.ProgressListener;
 
-import java.util.List;
 import java.util.Arrays;
 
 /**
@@ -78,11 +76,20 @@ public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
         return tree.createExternalNode(taxon);
     }
 
+    /**
+     * Creates a new internal node that will have the specified nodes as its children
+     * @param nodes Nodes whose parent is about to be created
+     * @param distances Distances of those nodes to the parent. distances.length == nodes.length
+     *        must hold.
+     * @return the new node
+     */
     protected Node createInternalNode(Node[] nodes, double[] distances) {
-        List<Node> a = Arrays.asList(nodes);
-        Node node = tree.createInternalNode(a);
+        assert nodes.length == distances.length;
+
+        // create node with the specified children, but unspecified arc lengths
+        Node node = tree.createInternalNode(Arrays.asList(nodes));
         for(int k = 0; k < nodes.length; ++k) {
-            tree.setEdge(node, nodes[k], distances[k]);
+            tree.setEdgeLength(node, nodes[k], distances[k]);
         }
         return node;
     }

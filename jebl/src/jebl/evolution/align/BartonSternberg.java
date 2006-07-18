@@ -43,18 +43,18 @@ public class BartonSternberg implements MultipleAligner {
     private boolean fastGuide;
 
     public BartonSternberg(Scores scores, float gapOpen, float gapExtend, int refinementIterations,
-                           boolean freeGapsAtEnds, boolean fast) {
+                           boolean freeGapsAtEnds, boolean fastGuide) {
 //        if (true) throw new RuntimeException("testing");
         this.gapOpen = gapOpen;
         this.gapExtend = gapExtend;
-        fastGuide = fast;
+        this.fastGuide = fastGuide;
 
         this.scores = Scores.includeGaps(scores, -gapExtend, 0);
 //        this.scores = Scores.includeGaps(scores, 0,0);
 //        this.scores = Scores.includeGaps(scores);
         this.refinementIterations= refinementIterations;
         this.freeGapsAtEnds=freeGapsAtEnds;
-        aligner = new NeedlemanWunschLinearSpaceAffine(this.scores,gapOpen,gapExtend, freeGapsAtEnds);
+        aligner = new NeedlemanWunschLinearSpaceAffine(this.scores, gapOpen, gapExtend, freeGapsAtEnds);
 
     }
 

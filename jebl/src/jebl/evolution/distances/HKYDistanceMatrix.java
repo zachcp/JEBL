@@ -132,7 +132,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 double a = 1.0 - (P / (2.0 * constA)) - (((constA - constB) * Q) / (2.0 * constA * constC));
 
                 if( a <= 0 ) {
-                    // minimum number of sites whose removal restors consistency. see comments
+                    // minimum number of sites whose removal restores consistency. see comments
                     // in TamuraNei. 
                     final int adjustment = (int)(1 + (sumWeight * -a) / (1/(2.0*constA)  - 1));
                     sumTs -= adjustment;
@@ -174,9 +174,9 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             double freqG = freqs[Nucleotides.G_STATE.getIndex()];
             double freqT = freqs[Nucleotides.T_STATE.getIndex()];
 
-            constA =  ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
-            constB =  (freqA * freqG) + (freqC * freqT);
-            constC =  (freqR * freqY);
+            constA = ((freqA * freqG) / freqR) + ((freqC * freqT) / freqY);
+            constB = (freqA * freqG) + (freqC * freqT);
+            constC = (freqR * freqY);
 
             int dimension = alignment.getTaxa().size();
             double[][] distances = new double[dimension][dimension];

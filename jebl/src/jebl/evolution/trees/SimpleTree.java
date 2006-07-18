@@ -48,7 +48,7 @@ public final class SimpleTree implements Tree {
      *
      * It is the caller responsibility to insure no cycles are created.
      *
-     * @param adjacencies the child nodes of this nodes
+     * @param adjacencies the child nodes of this node
      * @return the created node.
      */
     public Node createInternalNode(List<Node> adjacencies) {
@@ -57,7 +57,7 @@ public final class SimpleTree implements Tree {
         internalNodes.add(node);
 
         for( Node c : adjacencies ) {
-            ((SimpleNode)c).addAdacency(node);
+            ((SimpleNode)c).addAdjacency(node);
         }
         return node;
     }
@@ -68,7 +68,7 @@ public final class SimpleTree implements Tree {
      * @param node2
      * @param length
      */
-    public void setEdge(final Node node1, final Node node2, final double length) {
+    public void setEdgeLength(final Node node1, final Node node2, final double length) {
         assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && length >= 0;
 
         Edge edge = new SimpleEdge(node1, node2, length);
@@ -86,9 +86,9 @@ public final class SimpleTree implements Tree {
     public void addEdge(Node node1, Node node2, double length) {
         assert !getAdjacencies(node1).contains(node2);
 
-        ((SimpleNode)node1).addAdacency(node2);
-        ((SimpleNode)node2).addAdacency(node1);
-        setEdge(node1, node2, length);
+        ((SimpleNode)node1).addAdjacency(node2);
+        ((SimpleNode)node2).addAdjacency(node1);
+        setEdgeLength(node1, node2, length);
     }
 
     /* Graph IMPLEMENTATION */
@@ -335,7 +335,7 @@ public final class SimpleTree implements Tree {
          * Add an adjacency.
          * @param node
          */
-        public void addAdacency(Node node) {
+        public void addAdjacency(Node node) {
             List<Node> a = new ArrayList<Node>(adjacencies);
             a.add(node);
             adjacencies = Collections.unmodifiableList(a);
