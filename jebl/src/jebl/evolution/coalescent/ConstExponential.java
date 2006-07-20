@@ -20,8 +20,15 @@ package jebl.evolution.coalescent;
  */
 public class ConstExponential extends ExponentialGrowth {
 
+    /**
+     * Construct demographic model with default settings
+     */
+    public ConstExponential() {
+        // empty constructor
+    }
+
 	/**
-	 * Construct demographic model with default settings
+	 * Construct demographic model with given settings
 	 */
 	public ConstExponential(double N0, double r, double N1) {
 
@@ -87,6 +94,52 @@ public class ConstExponential extends ExponentialGrowth {
 
     public double getIntegral(double start, double finish) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getArgumentCount() {
+        return 3;
+    }
+
+    @Override
+    public String getArgumentName(int n) {
+        switch (n) {
+            case 0: return "N0";
+            case 1: return "r";
+            case 2: return "N1";
+        }
+        throw new IllegalArgumentException("Argument " + n + " does not exist");
+    }
+
+    @Override
+    public double getArgument(int n) {
+        switch (n) {
+            case 0: return getN0();
+            case 1: return getGrowthRate();
+            case 2: return getN1();
+        }
+        throw new IllegalArgumentException("Argument " + n + " does not exist");
+    }
+
+    @Override
+    public void setArgument(int n, double value) {
+        switch (n) {
+            case 0: setN0(value); break;
+            case 1: setGrowthRate(value); break;
+            case 2: setN1(value); break;
+            default: throw new IllegalArgumentException("Argument " + n + " does not exist");
+
+        }
+    }
+
+    @Override
+    public double getLowerBound(int n) {
+        return 0.0;
+    }
+
+    @Override
+    public double getUpperBound(int n) {
+        return Double.POSITIVE_INFINITY;
     }
 
 	// private stuff

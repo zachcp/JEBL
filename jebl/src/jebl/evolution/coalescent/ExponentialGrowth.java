@@ -21,8 +21,15 @@ package jebl.evolution.coalescent;
  */
 public class ExponentialGrowth extends ConstantPopulation {
 
+    /**
+     * Construct demographic model with default settings
+     */
+    public ExponentialGrowth() {
+        // empty constructor
+    }
+
 	/**
-	 * Construct demographic model with default settings
+     * Construct demographic model with given settings
 	 */
 	public ExponentialGrowth(double N0, double r) {
 
@@ -81,6 +88,47 @@ public class ExponentialGrowth extends ConstantPopulation {
 		}
 	}
 
+    @Override
+    public int getArgumentCount() {
+        return 2;
+    }
+
+    @Override
+    public String getArgumentName(int n) {
+        if (n == 0) {
+            return "N0";
+        } else {
+            return "r";
+        }
+    }
+
+    @Override
+    public double getArgument(int n) {
+        if (n == 0) {
+            return getN0();
+        } else {
+            return getGrowthRate();
+        }
+    }
+
+    @Override
+    public void setArgument(int n, double value) {
+        if (n == 0) {
+            setN0(value);
+        } else {
+            setGrowthRate(value);
+        }
+    }
+
+    @Override
+    public double getLowerBound(int n) {
+        return 0.0;
+    }
+
+    @Override
+    public double getUpperBound(int n) {
+        return Double.POSITIVE_INFINITY;
+    }
 	//
 	// private stuff
 	//

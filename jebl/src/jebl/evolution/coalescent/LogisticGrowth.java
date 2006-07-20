@@ -19,8 +19,15 @@ package jebl.evolution.coalescent;
  */
 public class LogisticGrowth extends ExponentialGrowth {
 
+    /**
+     * Construct demographic model with default settings
+     */
+    public LogisticGrowth() {
+        // empty constructor
+    }
+
 	/**
-	 * Construct demographic model with default settings
+	 * Construct demographic model with given settings
 	 */
 	public LogisticGrowth(double N0, double r, double c) {
 

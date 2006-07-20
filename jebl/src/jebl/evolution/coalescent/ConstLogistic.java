@@ -18,8 +18,15 @@ package jebl.evolution.coalescent;
  */
 public class ConstLogistic extends LogisticGrowth {
 
+    /**
+     * Construct demographic model with default settings
+     */
+    public ConstLogistic() {
+        // empty constructor
+    }
+
 	/**
-	 * Construct demographic model with default settings
+     * Construct demographic model with given settings
 	 */
 	public ConstLogistic(double N0, double r, double c, double N1) {
 
@@ -58,6 +65,55 @@ public class ConstLogistic extends LogisticGrowth {
 	public double getIntegral(double start, double finish) {
         throw new UnsupportedOperationException();
 	}
+
+    @Override
+    public int getArgumentCount() {
+        return 4;
+    }
+
+    @Override
+    public String getArgumentName(int n) {
+        switch (n) {
+            case 0: return "N0";
+            case 1: return "r";
+            case 2: return "c";
+            case 3: return "N1";
+        }
+        throw new IllegalArgumentException("Argument " + n + " does not exist");
+    }
+
+    @Override
+    public double getArgument(int n) {
+        switch (n) {
+            case 0: return getN0();
+            case 1: return getGrowthRate();
+            case 2: return getShape();
+            case 3: return getN1();
+        }
+        throw new IllegalArgumentException("Argument " + n + " does not exist");
+    }
+
+    @Override
+    public void setArgument(int n, double value) {
+        switch (n) {
+            case 0: setN0(value); break;
+            case 1: setGrowthRate(value); break;
+            case 2: setShape(value); break;
+            case 3: setN1(value); break;
+            default: throw new IllegalArgumentException("Argument " + n + " does not exist");
+
+        }
+    }
+
+    @Override
+    public double getLowerBound(int n) {
+        return 0.0;
+    }
+
+    @Override
+    public double getUpperBound(int n) {
+        return Double.POSITIVE_INFINITY;
+    }
 
 	//
 	// private stuff

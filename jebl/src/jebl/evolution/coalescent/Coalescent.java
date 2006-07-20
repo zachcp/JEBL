@@ -124,26 +124,23 @@ public class Coalescent implements MultivariateFunction {
     // **************************************************************
 
 	public double evaluate(double[] argument) {
-//		for (int i = 0; i < argument.length; i++) {
-//			demographicFunction.setArgument(i, argument[i]);
-//		}
+		for (int i = 0; i < argument.length; i++) {
+			demographicFunction.setArgument(i, argument[i]);
+		}
 
 		return calculateLogLikelihood();
 	}
 
 	public int getNumArguments() {
-        return 0;
-//		return demographicFunction.getNumArguments();
+		return demographicFunction.getArgumentCount();
 	}
 
 	public double getLowerBound(int n) {
-//		return demographicFunction.getLowerBound(n);
-        return 0;
+		return demographicFunction.getLowerBound(n);
     }
 
 	public double getUpperBound(int n) {
-//		return demographicFunction.getUpperBound(n);
-        return 0;
+		return demographicFunction.getUpperBound(n);
     }
 
 	public OrthogonalHints getOrthogonalHints() {
@@ -151,8 +148,8 @@ public class Coalescent implements MultivariateFunction {
 	}
 
 	/** The demographic function. */
-	DemographicFunction demographicFunction = null;
+	private final DemographicFunction demographicFunction;
 
 	/** The intervals. */
-	IntervalList intervals = null;
+	private final IntervalList intervals;
 }

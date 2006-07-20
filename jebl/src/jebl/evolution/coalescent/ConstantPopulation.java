@@ -29,8 +29,15 @@ public class ConstantPopulation implements DemographicFunction
 	// Public stuff
 	//
 
+    /**
+     * Construct demographic model with default settings
+     */
+    public ConstantPopulation() {
+        // empty constructor
+    }
+
 	/**
-	 * Construct demographic model
+     * Construct demographic model with given settings
 	 */
 	public ConstantPopulation(double N0) {
         this.N0 = N0;
@@ -66,6 +73,29 @@ public class ConstantPopulation implements DemographicFunction
 		return getIntensity(finish) - getIntensity(start);
 	}
 
+    public int getArgumentCount() {
+        return 1;
+    }
+
+    public String getArgumentName(int n) {
+        return "N0";
+    }
+
+    public double getArgument(int n) {
+        return getN0();
+    }
+
+    public void setArgument(int n, double value) {
+        setN0(value);
+    }
+
+    public double getLowerBound(int n) {
+        return 0.0;
+    }
+
+    public double getUpperBound(int n) {
+        return Double.POSITIVE_INFINITY;
+    }
 	//
 	// private stuff
 	//

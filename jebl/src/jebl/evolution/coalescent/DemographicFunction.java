@@ -50,6 +50,36 @@ public interface DemographicFunction {
      */
     double getIntegral(double start, double finish);
 
+    /**
+     * Returns the number of arguments for this function.
+     */
+    int getArgumentCount();
+
+    /**
+     * Returns the name of the nth argument of this function.
+     */
+    String getArgumentName(int n);
+
+    /**
+     * Returns the value of the nth argument of this function.
+     */
+    double getArgument(int n);
+
+    /**
+     * Sets the value of the nth argument of this function.
+     */
+    void setArgument(int n, double value);
+
+    /**
+     * Returns the lower bound of the nth argument of this function.
+     */
+    double getLowerBound(int n);
+
+    /**
+     * Returns the upper bound of the nth argument of this function.
+     */
+    double getUpperBound(int n);
+
     public static class Utils
 	{
 
