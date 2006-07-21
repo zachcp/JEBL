@@ -32,10 +32,10 @@ import jebl.util.ProgressListener;
 public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
     public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress) {
-        super(alignment.getTaxa(), Initialaizer.getDistances(alignment, progress));
+        super(alignment.getTaxa(), Initializer.getDistances(alignment, progress));
     }
 
-    static class Initialaizer extends ModelBasedDistanceMatrix {
+    static class Initializer extends ModelBasedDistanceMatrix {
 
         private static Alignment alignment;
 
@@ -123,7 +123,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
 
         static double[][] getDistances(Alignment alignment, ProgressListener progress) {
-            Initialaizer.alignment = alignment;
+            Initializer.alignment = alignment;
 
             // ASK Alexei
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
