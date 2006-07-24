@@ -42,9 +42,11 @@ public class Utils {
         }
     }
 
-    public static String reverseComplement(final String nucleotideSequence) {
+     private static String reverseComplement(final String nucleotideSequence, boolean removeGaps) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
-        seq = new GaplessSequence(seq);
+        if( removeGaps ) {
+            seq = new GaplessSequence(seq);
+        }
         State[] states = seq.getStates();
         NucleotideState[] nucleotideStates = new NucleotideState[states.length];
         for (int i = 0; i < states.length; i++) {
@@ -54,6 +56,16 @@ public class Utils {
         seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideStates);
         return seq.getString();
     }
+
+    /* kills gaps */
+    public static String reverseComplement(final String nucleotideSequence) {
+        return reverseComplement(nucleotideSequence, true);
+    }
+
+    public static String reverseComplementWithGaps(final String nucleotideSequence) {
+        return reverseComplement(nucleotideSequence, false);
+    }
+
 
     public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
