@@ -83,6 +83,11 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             // Unfortuanetly adjusting number of sites for Purine/Pyrimidine may turn the other into negative - so
             // we iterate untile both estimates are consistent
             while( true ) {
+                if( sumWeight <= 0 ) {
+                    throw new IllegalArgumentException("It is not possible to compute the Tamura Nei genetic distance " +
+                            "for those sequences. (probably because they are too short)");
+                }
+
                 double P1 = sumTsAG / sumWeight;
                 double P2 = sumTsCT / sumWeight;
                 double Q  = sumTv / sumWeight;
@@ -129,7 +134,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
 
             if (stateCount != 4) {
-                throw new IllegalArgumentException("HKYDistanceMatrix must have nucleotide patterns");
+                throw new IllegalArgumentException("Tamura NeiDistanceMatrix must have nucleotide patterns");
             }
 
             double[] freqs = getFrequenciesSafe(alignment);
