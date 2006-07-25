@@ -60,8 +60,10 @@ public final class Utils {
                 name = "\"" + name + "\"";
             }
             buffer.append(name);
-            buffer.append(':');
-            buffer.append(tree.getLength(node));
+            if( tree.hasLengths() ) {
+              buffer.append(':');
+              buffer.append(tree.getLength(node));
+            }
             addMetaComment(node, buffer);
         } else {
             buffer.append('(');
