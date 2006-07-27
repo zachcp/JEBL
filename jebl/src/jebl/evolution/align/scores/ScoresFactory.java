@@ -84,11 +84,11 @@ public class ScoresFactory {
     }
     public static NucleotideScores[] getAvailableNucleotideScores () {
         return new NucleotideScores[] {
+                new NucleotideScores("51% similarity", 5.0f, -3.0f),
                 new NucleotideScores("65% similarity", 5.0f, -4.0f),
                 new NucleotideScores("70% similarity (IUB)", 1.0f, -0.9f),
-                new NucleotideScores("51% similarity", 5.0f, -3.0f),
                 new NucleotideScores("93% similarity, Transition/Transversion", 1, -1,-5, 0),
-                new NucleotideScores("Identity",1,0, 0, 0),
+/*                new NucleotideScores("Identity",1,0, 0, 0),*/
 
                 /*,new Hamming()*/};
     }
