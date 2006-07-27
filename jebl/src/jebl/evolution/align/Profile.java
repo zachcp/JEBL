@@ -233,4 +233,20 @@ class Profile {
         }
         System.out.println();
     }
+
+
+    /**
+     *
+     * @param offset in the range 0 to n - 1
+     * @param count number of characters to include
+     * @return string of the characters starting at offset
+     */
+    public String toString(int offset, int count) {
+        StringBuilder result =new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            ProfileCharacter character = profile[ offset +i];
+            result.append(character.toString());
+        }
+        return result.toString();
+    }
 }

@@ -114,12 +114,21 @@ public class ProfileCharacter {
 
 
     public int print() {
-        System.out.print("(");
-        for (int i = 0; i < numberOfUniqueCharacters; i++) {
-            System.out.printf("%c: %d ",characters[i], count[i]);
-        }
-        System.out.print(")");
+        System.out.print(toString());
         return numberOfUniqueCharacters;
+    }
+
+    public String toString() {
+        if(numberOfUniqueCharacters==1) {
+            return "" +characters[0];
+        }
+        StringBuilder result =new StringBuilder();
+        result.append("(");
+        for (int i = 0; i < numberOfUniqueCharacters; i++) {
+            result.append(String.format("%c: %d ", characters[i], count[i]));
+        }
+        result.append(")");
+        return result.toString();
     }
 
     public boolean isAllGaps() {

@@ -157,6 +157,14 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         float s, a, b, c;
         boolean calculateResults = false;
         boolean invert = false;
+        if (debug) {
+
+            System.out.println("start =" + startType+ ", end=" + endType+ " free =" + freeStartGap+ "," + freeEndGap);
+            System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1));
+            System.out.println("s1=" + profile1.toString(offset1, n));
+            System.out.println("s2=" + profile2.toString(offset2, m));
+        }
+
         if (n < RECURSION_THRESHOLD || m < RECURSION_THRESHOLD) {
             calculateResults = true;
             if (n > m) {
@@ -186,7 +194,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         int u = n / 2;
 
         if (debug) {
-            System.out.println("align from " + offset1 + " to " + (offset1 + n - 1) + " with from " + offset2 + " to " + (offset2 + m - 1) + " u=" + u);
+            System.out.println(" u=" + u);
         }
 
         //all that the remainder of this function does is to calculate the midpoint
@@ -412,6 +420,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         }
 
         //if the alignment must end with a particular type, force that type to be selected:
+        //System.out.println("end type ="+endType);
         if (endType == TYPE_X)
             bestk = 1;
         if (endType == TYPE_Y)
@@ -431,10 +440,11 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         if (scoreOnly) return finalScore;
 
         if (calculateResults) {
+            //System.out.println("append results " +n+ "," +m+ "," +bestk);
             appendResults(invert, result1, result2, n, m, bestk);
         } else {
-            boolean propagateFreeEndGap = freeEndGap && u == n || v == m;
-            boolean propagateFreeStartGap = freeStartGap && u == 0 || v == 0;
+            boolean propagateFreeEndGap = freeEndGap && (u == n || v == m);
+            boolean propagateFreeStartGap = freeStartGap && (u == 0 || v == 0);
             float score1=doAlignment(profile1, profile2, offset1, offset2, u, v, startType, vtype, result1, result2, false, freeStartGap, propagateFreeEndGap);
             if (cancelled) return 0;
             float score2=doAlignment(profile1, profile2, offset1 + u, offset2 + v, n - u, m - v, vtype, endType, result1, result2, false, propagateFreeStartGap, freeEndGap);
@@ -442,9 +452,9 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
             float combinedScore = score1+ score2;
             if (Math.abs(combinedScore - finalScore) > 0.01f) {
                 //todo: work out why this happens sometimes, possibly just cumulative floating point error.
-//                System.out.println("free =" + freeStartGap+ "," + freeEndGap);
-//                System.out.println("offset1="+ offset1+" offset2="+ offset2+" u="+u+" v="+v);
-//                System.out.println(""+ score1+ "," + score2+"!="+ finalScore);
+                System.out.println("free =" + freeStartGap+ "," + freeEndGap);
+                System.out.println("offset1="+ offset1+" offset2="+ offset2+" u="+u+" v="+v);
+                System.out.println(""+ score1+ "," + score2+"!="+ finalScore);
             }
         }
         //System.out.println("free =" +freeStartGap+ "," + freeEndGap+ ",score =" + finalScore);
