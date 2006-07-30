@@ -28,7 +28,7 @@ public class NucleotideScores extends Scores {
                     Nucleotides.CANONICAL_STATES[2].getCode() +
                     Nucleotides.CANONICAL_STATES[3].getCode();
 
-    public static final NucleotideScores IUB = new NucleotideScores(1.9f, 0.0f);
+    public static final NucleotideScores IUB = new NucleotideScores(1.0f, -0.9f);
     public static final NucleotideScores CLUSTALW = new NucleotideScores(1.0f, 0.0f);
 
     protected NucleotideScores() {
