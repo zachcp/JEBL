@@ -31,6 +31,28 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 //        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
 
+    /**
+     *
+    * @param applyGapExtendCostToFirstGapResidue Generally there is an ambiguity in bioinformatics whether "gap opening" already includes the first gap character - in other words, whether a gap of length N has
+     <pre>
+     (a) a cost of gapOpen + N * gapExtend
+     or
+     (b) gapOpen + (N-1) * gapExtend.
+     </pre>.
+     <code>applyGapExtendCostToFirstGapResidue</code> should be true if using interpretation (a).
+
+
+     * @param sub
+     * @param d
+     * @param e
+     * @param freeGapsAtEnds
+     */
+    public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds, boolean applyGapExtendCostToFirstGapResidue) {
+        super(sub, d+ (applyGapExtendCostToFirstGapResidue?e:0), e);
+        this.freeGapsAtEnds = freeGapsAtEnds;
+//        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
+    }
+
 //    private NeedlemanWunschAffine quadraticAlign;//we use the quadratic
     //  algorithm to calculate the alignment as the base recursion case.
     String[] matchResult;
