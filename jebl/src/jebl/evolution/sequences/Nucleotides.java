@@ -61,6 +61,7 @@ public final class Nucleotides {
             S_STATE, M_STATE, V_STATE, H_STATE,
             D_STATE, B_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
+    private static final int STATES_BY_CODE_SIZE = 128;
 
     // Static utility functions
 
@@ -73,11 +74,14 @@ public final class Nucleotides {
 	public static List<NucleotideState> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
 
 	public static NucleotideState getState(char code) {
-	    return statesByCode[code];
+        if (code < 0 || code >= STATES_BY_CODE_SIZE) {
+            return null;
+        }
+        return statesByCode[code];
 	}
 
     public static NucleotideState getState(String code) {
-        return statesByCode[code.charAt(0)];
+        return getState(code.charAt(0));
     }
 
     public static NucleotideState getState(int index) {
@@ -154,7 +158,7 @@ public final class Nucleotides {
     private static final NucleotideState[] statesByCode;
 
     static {
-        statesByCode = new NucleotideState[128];
+        statesByCode = new NucleotideState[STATES_BY_CODE_SIZE];
         for (int i = 0; i < statesByCode.length; i++) {
             // Undefined characters are mapped to null
             statesByCode[i] = null;

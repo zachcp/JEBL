@@ -102,6 +102,7 @@ public final class AminoAcids {
             //		W		Y		B		Z		X		*		?		-
             "Trp", "Tyr", "Asx", "Glx", " X ", " * ", " ? ", " - "
     };
+    private static final int STATE_BY_CODE_SIZE = 128;
 
     public static int getStateCount() {
         return STATE_COUNT;
@@ -121,11 +122,14 @@ public final class AminoAcids {
     }
 
     public static AminoAcidState getState(char code) {
+        if (code < 0 || code >= STATE_BY_CODE_SIZE) {
+            return null;
+        }
         return statesByCode[code];
     }
 
     public static AminoAcidState getState(String code) {
-        return statesByCode[code.charAt(0)];
+        return getState(code.charAt(0));
     }
 
     public static AminoAcidState getState(int index) {
@@ -171,7 +175,7 @@ public final class AminoAcids {
     private static final AminoAcidState[] statesByCode;
 
     static {
-        statesByCode = new AminoAcidState[128];
+        statesByCode = new AminoAcidState[STATE_BY_CODE_SIZE];
         for (int i = 0; i < statesByCode.length; i++) {
             // Undefined characters are mapped to null
             statesByCode[i] = null;
