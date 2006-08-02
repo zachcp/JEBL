@@ -25,6 +25,9 @@ public class CataclysmicDemographic extends ExponentialGrowth {
 	// Public stuff
 	//
 
+	public CataclysmicDemographic() {
+	}
+
 	/**
 	 * Construct demographic model with default settings
 	 */
@@ -112,7 +115,7 @@ public class CataclysmicDemographic extends ExponentialGrowth {
 
 		throw new UnsupportedOperationException();
 	}
-    
+
     public boolean hasIntegral() {
         return false;
     }
