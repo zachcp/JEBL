@@ -65,8 +65,9 @@ public class MultiDocApplication extends Application {
 
     public void doOpenFile(File file) {
         DocumentFrame documentFrame = createDocumentFrame();
-        documentFrame.openFile(file);
-        addDocumentFrame(documentFrame);
+        if (documentFrame.openFile(file)) {
+            addDocumentFrame(documentFrame);
+        }
     }
 
     public void doQuit() {

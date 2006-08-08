@@ -42,7 +42,7 @@ public class TreeViewerController extends AbstractController {
     private static final String EXPANSION_KEY = "expansion";
 
     // The defaults if there is nothing in the preferences
-    private static String DEFAULT_LAYOUT = TreeLayoutType.RECTILINEAR.toString();
+    private static String DEFAULT_LAYOUT = TreeLayoutType.RECTILINEAR.name();
 
     private final static int MAX_ZOOM_SLIDER = 10000;
     private final static int DELTA_ZOOM_SLIDER = 200;
@@ -121,12 +121,13 @@ public class TreeViewerController extends AbstractController {
 
         verticalExpansionLabel = new JLabel("Expansion:");
         optionsPanel.addComponents(verticalExpansionLabel, false, verticalExpansionSlider, true);
-        setExpansion();
 
         optionsPanel.addSeparator();
 
         layoutPanel = new JPanel(new BorderLayout());
         setTreeLayout(defaultLayout);
+        setExpansion();
+
         optionsPanel.addSpanningComponent(layoutPanel);
 
         rectangularTreeToggle.addChangeListener(new ChangeListener() {

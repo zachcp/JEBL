@@ -138,18 +138,20 @@ public class NexusExporter implements SequenceExporter {
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
 
             Object name = t.getAttribute("name");
-            String metacomment = null;
-            for( Map.Entry<String, Object> e : t.getAttributeMap().entrySet() ) {
-                if( !e.getKey().equals("name") ) {
-                    if( metacomment == null ) {
-                        metacomment = "";
-                    } else {
-                        metacomment += ",";
+            StringBuilder builder = new StringBuilder();
+            for( String key : t.getAttributeMap().keySet() ) {
+                if( !key.equals("name") ) {
+                    Object value = t.getAttributeMap().get(key);
+
+                    if( builder.length() > 0 ) {
+                        builder.append(",");
                     }
-                    metacomment = metacomment + e.getKey() + '=' +
-                            ImportHelper.safeName(e.getValue().toString());
+                    builder.append(key);
+                    builder.append('=');
+                    builder.append(ImportHelper.safeName(value.toString()));
                 }
             }
+            String metacomment = null;
 
             ++nt;
             final String treeName = (name != null) ? name.toString() : "tree_" + nt;
@@ -161,5 +163,5 @@ public class NexusExporter implements SequenceExporter {
     }
 
     private Set<Taxon> taxa = null;
-    private final PrintWriter writer;
+    protected final PrintWriter writer;
 }

@@ -50,13 +50,14 @@ public abstract class DocumentFrame extends AbstractFrame {
         return true;
     }
 
-    public void openFile(File file) {
+    public boolean openFile(File file) {
 
         try {
             if (readFromFile(file)) {
-
                 clearDirty();
                 documentFile = file;
+
+                return true;
             }
         } catch (FileNotFoundException fnfe) {
             JOptionPane.showMessageDialog(this, "Unable to open file: File not found",
@@ -67,6 +68,8 @@ public abstract class DocumentFrame extends AbstractFrame {
                     "Unable to read file",
                     JOptionPane.ERROR_MESSAGE);
         }
+
+        return false;
     }
 
     public final boolean doSave() {
@@ -75,7 +78,6 @@ public abstract class DocumentFrame extends AbstractFrame {
         } else {
             try {
                 if (writeToFile(documentFile)) {
-
                     clearDirty();
                 }
             } catch (IOException ioe) {

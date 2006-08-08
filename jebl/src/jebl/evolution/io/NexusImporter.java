@@ -25,8 +25,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * Class for importing NEXUS file format
@@ -65,7 +63,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         helper.setCommentDelimiters('[', ']', '\0', '!', '&');
     }
 
-
     /**
      * This function returns an integer to specify what the
      * next block in the file is. The internal variable nextBlock is also set to this
@@ -76,27 +73,32 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     public NexusBlock findNextBlock() throws IOException
     {
         findToken("BEGIN", true);
-        String blockName = helper.readToken(";");
-        return findBlockName(blockName);
+        nextBlockName = helper.readToken(";").toUpperCase();
+        return findBlockName(nextBlockName);
     }
 
     /**
      * This function returns an enum class to specify what the
      * block given by blockName is.
      */
-    public NexusBlock findBlockName(String blockName)
+    private NexusBlock findBlockName(String blockName)
     {
         try {
-          nextBlock = NexusBlock.valueOf(blockName.toUpperCase());
+            nextBlock = NexusBlock.valueOf(blockName);
         } catch( IllegalArgumentException e ) {
-          // handle unknown blocks. java 1.5 throws an exception in valueOf
-          nextBlock = null;
+            // handle unknown blocks. java 1.5 throws an exception in valueOf
+            nextBlock = null;
         }
 
         if (nextBlock == null) {
             nextBlock = NexusBlock.UNKNOWN;
         }
+
         return nextBlock;
+    }
+
+    public String getNextBlockName() {
+        return nextBlockName;
     }
 
     /**
@@ -394,8 +396,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
         }
 
-       // assert distanceMatrices != null;
-       //   throw new MissingBlockException("DISTANCES block is missing");
+        // assert distanceMatrices != null;
+        //   throw new MissingBlockException("DISTANCES block is missing");
 
         return distanceMatrices;
     }
@@ -548,8 +550,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
                         String token3 = helper.readToken(";");
                         if (token3.equalsIgnoreCase("NUCLEOTIDE") ||
-                            token3.equalsIgnoreCase("DNA") ||
-                            token3.equalsIgnoreCase("RNA")) {
+                                token3.equalsIgnoreCase("DNA") ||
+                                token3.equalsIgnoreCase("RNA")) {
 
                             sequenceType = SequenceType.NUCLEOTIDE;
 
@@ -595,8 +597,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
             int[] charsRead = new int[taxonCount];
             for (int i = 0; i < taxonCount; i++) {
-               sequencesData.add("");
-               charsRead[i] = 0;
+                sequencesData.add("");
+                charsRead[i] = 0;
             }
             //throw new ImportException.UnparsableDataException("At present, interleaved data is not parsable");
             boolean firstLoop = true;
@@ -631,7 +633,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     StringBuffer buffer = new StringBuffer();
 
                     helper.readSequenceLine(buffer, sequenceType, ";", gapCharacters, missingCharacters,
-                                            matchCharacters, firstSequence);
+                            matchCharacters, firstSequence);
 
                     String seqString = buffer.toString();
                     readCount += seqString.length();
@@ -639,7 +641,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
                     sequencesData.set(sequenceIndex, sequencesData.get(sequenceIndex).concat(seqString));
                     if (i == 0) {
-                       firstSequence = seqString;
+                        firstSequence = seqString;
                     }
 
                     if (helper.getLastDelimiter() == ';') {
@@ -647,9 +649,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                             throw new ImportException.TooFewTaxaException();
                         }
                         for (int k = 0; k < taxonCount; k++) {
-                          if (charsRead[k] != siteCount) {
-                            throw new ImportException.ShortSequenceException(taxList.get(k).getName());
-                          }
+                            if (charsRead[k] != siteCount) {
+                                throw new ImportException.ShortSequenceException(taxList.get(k).getName());
+                            }
                         }
                     }
                 }
@@ -662,8 +664,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
 
             for (int k = 0; k < taxonCount; k++) {
-              Sequence sequence = new BasicSequence(sequenceType, taxList.get(k), sequencesData.get(k));
-              sequences.add(sequence);
+                Sequence sequence = new BasicSequence(sequenceType, taxList.get(k), sequencesData.get(k));
+                sequences.add(sequence);
             }
 
         } else {
@@ -681,7 +683,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
                 StringBuffer buffer = new StringBuffer();
                 helper.readSequence(buffer, sequenceType, ";", siteCount, gapCharacters,
-                                    missingCharacters, matchCharacters, firstSequence);
+                        missingCharacters, matchCharacters, firstSequence);
                 String seqString = buffer.toString();
 
                 if (seqString.length() != siteCount) {
@@ -1041,7 +1043,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                                     tree.setAttribute(pairs[2*n], pairs[2*n+1]);
                                 }
                             } catch(ImportException.BadFormatException e) {
-                                 // set generic comment attribute
+                                // set generic comment attribute
                                 tree.setAttribute("comment", comment);
                             }
                         }
@@ -1177,7 +1179,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             try {
                 number = Double.parseDouble(value);
             } catch (NumberFormatException nfe2) {
-              //
+                //
             }
         }
         if (number != null) {
@@ -1207,7 +1209,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         return tree.createExternalNode(taxon);
     }
 
-    public static String[] metaCommentPairs(String meta) throws ImportException.BadFormatException {
+    private static String[] metaCommentPairs(String meta) throws ImportException.BadFormatException {
         String[] pairs = meta.split(",");
         String[] result = new String[pairs.length*2];
         int i = 0;
@@ -1240,6 +1242,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     // private stuff
 
     private NexusBlock nextBlock = null;
+    private String nextBlockName = null;
 
     private int taxonCount = 0, siteCount = 0;
     private SequenceType sequenceType = null;
@@ -1248,5 +1251,5 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     private String missingCharacters = "?";
     private boolean isInterleaved = false;
 
-    private final ImportHelper helper;
+    protected final ImportHelper helper;
 }

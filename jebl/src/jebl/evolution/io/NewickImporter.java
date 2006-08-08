@@ -24,9 +24,9 @@ public class NewickImporter implements TreeImporter {
     /**
      * Constructor
      */
-    public NewickImporter(Reader reader, boolean unquotedLables) {
+    public NewickImporter(Reader reader, boolean unquotedLabels) {
         helper = new ImportHelper(reader);
-        this.unquotedLables = unquotedLables;
+        this.unquotedLabels = unquotedLabels;
     }
 
     /**
@@ -185,12 +185,12 @@ public class NewickImporter implements TreeImporter {
     private Node readExternalNode(SimpleRootedTree tree) throws IOException
     {
         String label = helper.readToken(":(),;");
-        while( unquotedLables && helper.getLastDelimiter() == ' ' ) {
+        while( unquotedLabels && helper.getLastDelimiter() == ' ' ) {
             label = label + " " + helper.readToken(":(),;");
         }
         return tree.createExternalNode(Taxon.getTaxon(label));
     }
 
     private final ImportHelper helper;
-    private boolean unquotedLables;
+    private boolean unquotedLabels;
 }
