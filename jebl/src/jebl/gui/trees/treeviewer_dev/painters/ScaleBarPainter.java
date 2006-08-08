@@ -16,23 +16,12 @@ import java.util.prefs.Preferences;
  */
 public class ScaleBarPainter extends LabelPainter<TreePane> {
 
-	private static Preferences PREFS = Preferences.userNodeForPackage(ScaleBarPainter.class);
-
-	private static final String DEFAULT_SCALE_BAR_LINE_WIDTH_PREFS = "defaultScaleBarLineWidth";
-
-	// The defaults if there is nothing in the preferences
-	private static float DEFAULT_SCALE_BAR_LINE_WIDTH = 1.0f;
-
-
     public ScaleBarPainter() {
         this(0.0);
     }
 
     public ScaleBarPainter(double scaleRange) {
         this.scaleRange = scaleRange;
-
-	    float lineWidth = PREFS.getFloat(DEFAULT_SCALE_BAR_LINE_WIDTH_PREFS, DEFAULT_SCALE_BAR_LINE_WIDTH);
-	    setScaleBarStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
     }
 
 	public void setTreePane(TreePane treePane) {

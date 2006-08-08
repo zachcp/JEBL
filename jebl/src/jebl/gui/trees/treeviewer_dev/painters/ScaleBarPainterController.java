@@ -9,7 +9,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -17,8 +19,40 @@ import java.util.Map;
  */
 public class ScaleBarPainterController extends AbstractController {
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(ScaleBarPainterController.class);
+
+    private static final String FONT_NAME_KEY = "fontName";
+    private static final String FONT_SIZE_KEY = "fontSize";
+    private static final String FONT_STYLE_KEY = "fontStyle";
+
+    private static final String NUMBER_FORMATTING_KEY = "numberFormatting";
+
+    private static final String SCALE_RANGE_KEY = "scaleRange";
+    private static final String LINE_WIDTH_KEY = "lineWidth";
+
+    private static final String SIGNIFICANT_DIGITS_KEY = "significantDigits";
+
+    // The defaults if there is nothing in the preferences
+    private static String DEFAULT_FONT_NAME = "sansserif";
+    private static int DEFAULT_FONT_SIZE = 6;
+    private static int DEFAULT_FONT_STYLE = Font.PLAIN;
+
+    private static String DEFAULT_NUMBER_FORMATTING = "#.####";
+    private static float DEFAULT_LINE_WIDTH = 1.0f;
+
     public ScaleBarPainterController(final ScaleBarPainter scaleBarPainter) {
         this.scaleBarPainter = scaleBarPainter;
+
+        final String defaultFontName = PREFS.get(FONT_NAME_KEY, DEFAULT_FONT_NAME);
+        final int defaultFontStyle = PREFS.getInt(FONT_SIZE_KEY, DEFAULT_FONT_STYLE);
+        final int defaultFontSize = PREFS.getInt(FONT_STYLE_KEY, DEFAULT_FONT_SIZE);
+        final String defaultNumberFormatting = PREFS.get(NUMBER_FORMATTING_KEY, DEFAULT_NUMBER_FORMATTING);
+
+        float lineWidth = PREFS.getFloat(LINE_WIDTH_KEY, DEFAULT_LINE_WIDTH);
+
+        scaleBarPainter.setFont(new Font(defaultFontName, defaultFontStyle, defaultFontSize));
+        scaleBarPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
+        scaleBarPainter.setScaleBarStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         optionsPanel = new OptionsPanel();
 
@@ -118,10 +152,18 @@ public class ScaleBarPainterController extends AbstractController {
         return false;
     }
 
-    public void getSettings(Map<String, Object> settings) {
+    public void setSettings(Map<String,Object> settings) {
+        scaleRangeText.setValue((Double)settings.get(SCALE_RANGE_KEY));
+        fontSizeSpinner.setValue((Integer)settings.get(FONT_SIZE_KEY));
+        digitsSpinner.setValue((Integer)settings.get(SIGNIFICANT_DIGITS_KEY));
+        lineWeightSpinner.setValue((Integer)settings.get(LINE_WIDTH_KEY));
     }
 
-    public void setSettings(Map<String,Object> settings) {
+    public void getSettings(Map<String, Object> settings) {
+        settings.put(SCALE_RANGE_KEY, scaleRangeText.getValue());
+        settings.put(FONT_SIZE_KEY, fontSizeSpinner.getValue());
+        settings.put(SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
+        settings.put(LINE_WIDTH_KEY, lineWeightSpinner.getValue());
     }
 
     private final JCheckBox titleCheckBox;

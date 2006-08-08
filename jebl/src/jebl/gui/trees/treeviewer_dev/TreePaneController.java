@@ -28,6 +28,11 @@ public class TreePaneController extends AbstractController {
     private static final String BRANCH_LINE_WIDTH_KEY = "branchLineWidth";
 
     private static final String TRANSFORM_KEY = "transform";
+    private static final String TRANSFORM_TYPE_KEY = "transformType";
+    private static final String ORDER_KEY = "order";
+    private static final String ORDER_TYPE_KEY = "orderType";
+
+    private static final String SHOW_ROOT_KEY = "showRoot";
 
     // The defaults if there is nothing in the preferences
     private static Color DEFAULT_FOREGROUND_COLOUR = Color.BLACK;
@@ -142,11 +147,35 @@ public class TreePaneController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
-        transformCheck.setSelected((Boolean) settings.get("Transformed"));
+        // These settings don't have controls yet but they will!
+        treePane.setForeground((Color)settings.get(FOREGROUND_COLOUR_KEY));
+        treePane.setBackground((Color)settings.get(BACKGROUND_COLOUR_KEY));
+        treePane.setSelectionPaint((Color)settings.get(SELECTION_COLOUR_KEY));
+
+        transformCheck.setSelected((Boolean) settings.get(TRANSFORM_KEY));
+        transformCombo.setSelectedItem(TransformedRootedTree.Transform.valueOf((String)settings.get(TRANSFORM_TYPE_KEY)));
+        orderCheck.setSelected((Boolean) settings.get(ORDER_KEY));
+        orderCombo.setSelectedItem(SortedRootedTree.BranchOrdering.valueOf((String)settings.get(ORDER_TYPE_KEY)));
+
+        showRootCheck.setSelected((Boolean) settings.get(SHOW_ROOT_KEY));
+
+        branchLineWidthSpinner.setValue((Integer)settings.get(BRANCH_LINE_WIDTH_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
-        settings.put("Transformed", transformCheck.isSelected());
+        // These settings don't have controls yet but they will!
+        settings.put(FOREGROUND_COLOUR_KEY, treePane.getForeground());
+        settings.put(BACKGROUND_COLOUR_KEY, treePane.getBackground());
+        settings.put(SELECTION_COLOUR_KEY, treePane.getSelectionPaint());
+
+        settings.put(TRANSFORM_KEY, transformCheck.isSelected());
+        settings.put(TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
+        settings.put(ORDER_KEY, orderCheck.isSelected());
+        settings.put(ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
+
+        settings.put(SHOW_ROOT_KEY, showRootCheck.isSelected());
+
+        settings.put(BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
     }
 
 
