@@ -1,6 +1,5 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
@@ -9,6 +8,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Map;
 
 /**
  * @author Andrew Rambaut
@@ -139,10 +139,10 @@ public class NodeShapeController extends AbstractController {
         return false;
     }
 
-    public void getSettings(ControllerSettings settings) {
+    public void getSettings(Map<String, Object> settings) {
     }
 
-    public void setSettings(ControllerSettings settings) {
+    public void setSettings(Map<String,Object> settings) {
     }
 
     private final JCheckBox titleCheckBox;

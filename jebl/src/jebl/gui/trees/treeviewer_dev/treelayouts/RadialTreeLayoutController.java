@@ -1,12 +1,12 @@
 package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import org.virion.jam.controlpalettes.AbstractController;
-import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import java.util.Map;
 
 /**
  * @author Andrew Rambaut
@@ -57,11 +57,11 @@ public class RadialTreeLayoutController extends AbstractController {
 		return false;
 	}
 
-	public void setSettings(ControllerSettings settings) {
-	}
+    public void setSettings(Map<String,Object> settings) {
+    }
 
-	public void getSettings(ControllerSettings settings) {
-	}
+    public void getSettings(Map<String, Object> settings) {
+    }
 
 	private final JLabel titleLabel;
 	private final OptionsPanel optionsPanel;

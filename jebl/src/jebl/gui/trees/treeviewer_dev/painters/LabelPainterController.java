@@ -1,7 +1,5 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import org.virion.jam.controlpalettes.Controller;
-import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
 
@@ -12,12 +10,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.NumberFormat;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Arrays;
-
-import jebl.evolution.trees.Tree;
-import jebl.evolution.graphs.Node;
+import java.util.Map;
 
 /**
  * @author Andrew Rambaut
@@ -92,7 +85,7 @@ public class LabelPainterController extends AbstractController {
 
         labelPainter.addPainterListener(new PainterListener() {
             public void painterChanged() {
-                
+
             }
 
             public void painterSettingsChanged() {
@@ -118,10 +111,10 @@ public class LabelPainterController extends AbstractController {
         return false;
     }
 
-    public void getSettings(ControllerSettings settings) {
+    public void getSettings(Map<String, Object> settings) {
     }
 
-    public void setSettings(ControllerSettings settings) {
+    public void setSettings(Map<String,Object> settings) {
     }
 
     private final JCheckBox titleCheckBox;

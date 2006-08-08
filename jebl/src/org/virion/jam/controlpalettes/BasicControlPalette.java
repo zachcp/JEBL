@@ -9,6 +9,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Andrew Rambaut
@@ -114,13 +115,13 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         repaint();
     }
 
-    public void getSettings(ControllerSettings settings) {
+    public void getSettings(Map<String,Object> settings) {
         for (Controller controller : controllers) {
             controller.getSettings(settings);
         }
     }
 
-    public void setSettings(ControllerSettings settings) {
+    public void setSettings(Map<String,Object> settings) {
         for (Controller controller : controllers) {
             controller.setSettings(settings);
         }
