@@ -33,6 +33,10 @@ public abstract class DocumentFrame extends AbstractFrame {
         return documentFile;
     }
 
+	public final void clearFile() {
+		documentFile = null;
+	}
+
     public boolean requestClose() {
         if (isDirty()) {
             int option = JOptionPane.showConfirmDialog(this, "Do you wish to save?",
@@ -53,9 +57,9 @@ public abstract class DocumentFrame extends AbstractFrame {
     public boolean openFile(File file) {
 
         try {
+	        documentFile = file;
             if (readFromFile(file)) {
                 clearDirty();
-                documentFile = file;
 
                 return true;
             }

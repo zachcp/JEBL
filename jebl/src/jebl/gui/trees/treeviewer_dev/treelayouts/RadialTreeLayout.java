@@ -57,12 +57,12 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
             constructNode(root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0);
 
-            if( !tree.conceptuallyUnrooted() ) {
-                Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
-
-                // add the branchPath to the map of branch paths
-                branchPaths.put(root, branchPath);
-            }
+//            if( !tree.conceptuallyUnrooted() ) {
+//                Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
+//
+//                // add the branchPath to the map of branch paths
+//                branchPaths.put(root, branchPath);
+//            }
 
         } catch (Graph.NoEdgeException e) {
             e.printStackTrace();

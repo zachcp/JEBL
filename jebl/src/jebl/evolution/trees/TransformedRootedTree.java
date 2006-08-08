@@ -24,7 +24,7 @@ public class TransformedRootedTree extends FilteredRootedTree {
 	        this.name = name;
 	    }
 
-	    public String toString() { return name; }
+	    public String toString() { return name(); }
 
 	    private String name;
 	}

@@ -17,7 +17,6 @@ import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.*;
-import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -75,11 +74,15 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     public void setTree(Tree tree) {
-        if (tree != null && !(tree instanceof RootedTree)) {
-            treePane.setTree(Utils.rootTheTree(tree));
+        if (tree == null) {
+	        return;
         }
 
-        treePane.setTree((RootedTree)tree);
+	    if (tree instanceof RootedTree) {
+		    treePane.setTree((RootedTree)tree);
+	    } else {
+            treePane.setTree(Utils.rootTheTree(tree));
+        }
 
     }
 

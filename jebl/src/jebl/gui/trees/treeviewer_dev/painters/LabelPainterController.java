@@ -38,15 +38,16 @@ public class LabelPainterController extends AbstractController {
 
     private static String DEFAULT_NUMBER_FORMATTING = "#.####";
 
-    public LabelPainterController(String title, final LabelPainter labelPainter) {
+    public LabelPainterController(String title, String key, final LabelPainter labelPainter) {
 
         this.title = title;
+	    this.key = key;
         this.labelPainter = labelPainter;
 
-        final String defaultFontName = PREFS.get(title + FONT_NAME_KEY, DEFAULT_FONT_NAME);
-        final int defaultFontStyle = PREFS.getInt(title + FONT_SIZE_KEY, DEFAULT_FONT_STYLE);
-        final int defaultFontSize = PREFS.getInt(title + FONT_STYLE_KEY, DEFAULT_FONT_SIZE);
-        final String defaultNumberFormatting = PREFS.get(title + NUMBER_FORMATTING_KEY, DEFAULT_NUMBER_FORMATTING);
+        final String defaultFontName = PREFS.get(key + "." + FONT_NAME_KEY, DEFAULT_FONT_NAME);
+        final int defaultFontStyle = PREFS.getInt(key + "." + FONT_SIZE_KEY, DEFAULT_FONT_STYLE);
+        final int defaultFontSize = PREFS.getInt(key + "." + FONT_STYLE_KEY, DEFAULT_FONT_SIZE);
+        final String defaultNumberFormatting = PREFS.get(key + "." + NUMBER_FORMATTING_KEY, DEFAULT_NUMBER_FORMATTING);
 
         labelPainter.setFont(new Font(defaultFontName, defaultFontStyle, defaultFontSize));
         labelPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
@@ -132,15 +133,15 @@ public class LabelPainterController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
-        displayAttributeCombo.setSelectedItem(settings.get(DISPLAY_ATTRIBUTE_KEY));
-        fontSizeSpinner.setValue((Integer)settings.get(FONT_SIZE_KEY));
-        digitsSpinner.setValue((Integer)settings.get(SIGNIFICANT_DIGITS_KEY));
+        displayAttributeCombo.setSelectedItem(settings.get(key+"."+DISPLAY_ATTRIBUTE_KEY));
+        fontSizeSpinner.setValue((Double)settings.get(key+"."+FONT_SIZE_KEY));
+        digitsSpinner.setValue((Integer)settings.get(key+"."+SIGNIFICANT_DIGITS_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
-        settings.put(DISPLAY_ATTRIBUTE_KEY, displayAttributeCombo.getSelectedItem().toString());
-        settings.put(FONT_SIZE_KEY, fontSizeSpinner.getValue());
-        settings.put(SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
+        settings.put(key+"."+DISPLAY_ATTRIBUTE_KEY, displayAttributeCombo.getSelectedItem().toString());
+        settings.put(key+"."+FONT_SIZE_KEY, fontSizeSpinner.getValue());
+        settings.put(key+"."+SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
     }
 
     public String getTitle() {
@@ -155,6 +156,7 @@ public class LabelPainterController extends AbstractController {
     private final JSpinner digitsSpinner;
 
     private final String title;
+	private final String key;
 
     private final LabelPainter labelPainter;
 }

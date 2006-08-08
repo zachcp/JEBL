@@ -21,6 +21,8 @@ public class ScaleBarPainterController extends AbstractController {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(ScaleBarPainterController.class);
 
+	private static final String SCALE_BAR_KEY = "scaleBar";
+
     private static final String FONT_NAME_KEY = "fontName";
     private static final String FONT_SIZE_KEY = "fontSize";
     private static final String FONT_STYLE_KEY = "fontStyle";
@@ -153,17 +155,17 @@ public class ScaleBarPainterController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
-        scaleRangeText.setValue((Double)settings.get(SCALE_RANGE_KEY));
-        fontSizeSpinner.setValue((Integer)settings.get(FONT_SIZE_KEY));
-        digitsSpinner.setValue((Integer)settings.get(SIGNIFICANT_DIGITS_KEY));
-        lineWeightSpinner.setValue((Integer)settings.get(LINE_WIDTH_KEY));
+        scaleRangeText.setValue((Double)settings.get(SCALE_BAR_KEY + "." + SCALE_RANGE_KEY));
+        fontSizeSpinner.setValue((Double)settings.get(SCALE_BAR_KEY + "." + FONT_SIZE_KEY));
+        digitsSpinner.setValue((Integer)settings.get(SCALE_BAR_KEY + "." + SIGNIFICANT_DIGITS_KEY));
+        lineWeightSpinner.setValue((Double)settings.get(SCALE_BAR_KEY + "." + LINE_WIDTH_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
-        settings.put(SCALE_RANGE_KEY, scaleRangeText.getValue());
-        settings.put(FONT_SIZE_KEY, fontSizeSpinner.getValue());
-        settings.put(SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
-        settings.put(LINE_WIDTH_KEY, lineWeightSpinner.getValue());
+        settings.put(SCALE_BAR_KEY + "." + SCALE_RANGE_KEY, scaleRangeText.getValue());
+        settings.put(SCALE_BAR_KEY + "." + FONT_SIZE_KEY, fontSizeSpinner.getValue());
+        settings.put(SCALE_BAR_KEY + "." + SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
+        settings.put(SCALE_BAR_KEY + "." + LINE_WIDTH_KEY, lineWeightSpinner.getValue());
     }
 
     private final JCheckBox titleCheckBox;

@@ -37,6 +37,8 @@ public class TreeViewerController extends AbstractController {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewerController.class);
 
+	private static final String TREE_VIEWER_KEY = "treeViewer";
+
     private static final String LAYOUT_KEY = "layout";
     private static final String ZOOM_KEY = "zoom";
     private static final String EXPANSION_KEY = "expansion";
@@ -51,7 +53,8 @@ public class TreeViewerController extends AbstractController {
 
         this.treeViewer = treeViewer;
 
-        final TreeLayoutType defaultLayout = TreeLayoutType.valueOf(PREFS.get(LAYOUT_KEY, DEFAULT_LAYOUT));
+        final TreeLayoutType defaultLayout = TreeLayoutType.valueOf(PREFS.get(TREE_VIEWER_KEY + "." + LAYOUT_KEY, DEFAULT_LAYOUT));
+
 
         titleLabel = new JLabel("Layout");
         optionsPanel = new OptionsPanel();
@@ -176,7 +179,8 @@ public class TreeViewerController extends AbstractController {
         return true;
     }
     public void setSettings(Map<String,Object> settings) {
-        final TreeLayoutType layout = TreeLayoutType.valueOf((String)settings.get("Layout"));
+	    String treeLayoutName = (String)settings.get(TREE_VIEWER_KEY + "." + LAYOUT_KEY);
+        final TreeLayoutType layout = TreeLayoutType.valueOf(treeLayoutName);
         switch (layout) {
             case RECTILINEAR:
                 rectangularTreeToggle.setSelected(true);
@@ -188,20 +192,20 @@ public class TreeViewerController extends AbstractController {
                 radialTreeToggle.setSelected(true);
                 break;
         }
-        zoomSlider.setValue((Integer)settings.get(ZOOM_KEY));
-        verticalExpansionSlider.setValue((Integer)settings.get(EXPANSION_KEY));
+        zoomSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + ZOOM_KEY));
+        verticalExpansionSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + EXPANSION_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
         if (rectangularTreeToggle.isSelected()) {
-            settings.put(LAYOUT_KEY, TreeLayoutType.RECTILINEAR.toString());
+            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RECTILINEAR.name());
         } else if (polarTreeToggle.isSelected()) {
-            settings.put(LAYOUT_KEY, TreeLayoutType.POLAR.toString());
+            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.POLAR.name());
         } else if (radialTreeToggle.isSelected()) {
-            settings.put(LAYOUT_KEY, TreeLayoutType.RADIAL.toString());
+            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RADIAL.name());
         }
-        settings.put(ZOOM_KEY, zoomSlider.getValue());
-        settings.put(EXPANSION_KEY, verticalExpansionSlider.getValue());
+        settings.put(TREE_VIEWER_KEY + "." + ZOOM_KEY, zoomSlider.getValue());
+        settings.put(TREE_VIEWER_KEY + "." + EXPANSION_KEY, verticalExpansionSlider.getValue());
     }
 
     private void setTreeLayout(TreeLayoutType layoutType) {

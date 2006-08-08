@@ -22,6 +22,8 @@ public class TreePaneController extends AbstractController {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreePaneController.class);
 
+	private static final String TREE_PANE_KEY = "treePane";
+
     private static final String FOREGROUND_COLOUR_KEY = "foregroundColour";
     private static final String BACKGROUND_COLOUR_KEY = "backgroundColour";
     private static final String SELECTION_COLOUR_KEY = "selectionColour";
@@ -43,10 +45,10 @@ public class TreePaneController extends AbstractController {
     public TreePaneController(final TreePane treePane) {
         this.treePane = treePane;
 
-        int foregroundRGB = PREFS.getInt(FOREGROUND_COLOUR_KEY, DEFAULT_FOREGROUND_COLOUR.getRGB());
-        int backgroundRGB = PREFS.getInt(BACKGROUND_COLOUR_KEY, DEFAULT_BACKGROUND_COLOUR.getRGB());
-        int selectionRGB = PREFS.getInt(SELECTION_COLOUR_KEY, DEFAULT_SELECTION_COLOUR.getRGB());
-        float branchLineWidth = PREFS.getFloat(BRANCH_LINE_WIDTH_KEY, DEFAULT_BRANCH_LINE_WIDTH);
+        int foregroundRGB = PREFS.getInt(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY, DEFAULT_FOREGROUND_COLOUR.getRGB());
+        int backgroundRGB = PREFS.getInt(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY, DEFAULT_BACKGROUND_COLOUR.getRGB());
+        int selectionRGB = PREFS.getInt(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY, DEFAULT_SELECTION_COLOUR.getRGB());
+        float branchLineWidth = PREFS.getFloat(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY, DEFAULT_BRANCH_LINE_WIDTH);
 
         treePane.setForeground(new Color(foregroundRGB));
         treePane.setBackground(new Color(backgroundRGB));
@@ -148,34 +150,34 @@ public class TreePaneController extends AbstractController {
 
     public void setSettings(Map<String,Object> settings) {
         // These settings don't have controls yet but they will!
-        treePane.setForeground((Color)settings.get(FOREGROUND_COLOUR_KEY));
-        treePane.setBackground((Color)settings.get(BACKGROUND_COLOUR_KEY));
-        treePane.setSelectionPaint((Color)settings.get(SELECTION_COLOUR_KEY));
+        treePane.setForeground((Color)settings.get(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY));
+        treePane.setBackground((Color)settings.get(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY));
+        treePane.setSelectionPaint((Color)settings.get(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY));
 
-        transformCheck.setSelected((Boolean) settings.get(TRANSFORM_KEY));
-        transformCombo.setSelectedItem(TransformedRootedTree.Transform.valueOf((String)settings.get(TRANSFORM_TYPE_KEY)));
-        orderCheck.setSelected((Boolean) settings.get(ORDER_KEY));
-        orderCombo.setSelectedItem(SortedRootedTree.BranchOrdering.valueOf((String)settings.get(ORDER_TYPE_KEY)));
+        transformCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + TRANSFORM_KEY));
+        transformCombo.setSelectedItem(TransformedRootedTree.Transform.valueOf((String)settings.get(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY)));
+        orderCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + ORDER_KEY));
+        orderCombo.setSelectedItem(SortedRootedTree.BranchOrdering.valueOf((String)settings.get(TREE_PANE_KEY + "." + ORDER_TYPE_KEY)));
 
-        showRootCheck.setSelected((Boolean) settings.get(SHOW_ROOT_KEY));
+        showRootCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + SHOW_ROOT_KEY));
 
-        branchLineWidthSpinner.setValue((Integer)settings.get(BRANCH_LINE_WIDTH_KEY));
+        branchLineWidthSpinner.setValue((Double)settings.get(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
         // These settings don't have controls yet but they will!
-        settings.put(FOREGROUND_COLOUR_KEY, treePane.getForeground());
-        settings.put(BACKGROUND_COLOUR_KEY, treePane.getBackground());
-        settings.put(SELECTION_COLOUR_KEY, treePane.getSelectionPaint());
+        settings.put(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY, treePane.getForeground());
+        settings.put(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY, treePane.getBackground());
+        settings.put(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY, treePane.getSelectionPaint());
 
-        settings.put(TRANSFORM_KEY, transformCheck.isSelected());
-        settings.put(TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
-        settings.put(ORDER_KEY, orderCheck.isSelected());
-        settings.put(ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
+        settings.put(TREE_PANE_KEY + "." + TRANSFORM_KEY, transformCheck.isSelected());
+        settings.put(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
+        settings.put(TREE_PANE_KEY + "." + ORDER_KEY, orderCheck.isSelected());
+        settings.put(TREE_PANE_KEY + "." + ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
 
-        settings.put(SHOW_ROOT_KEY, showRootCheck.isSelected());
+        settings.put(TREE_PANE_KEY + "." + SHOW_ROOT_KEY, showRootCheck.isSelected());
 
-        settings.put(BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
+        settings.put(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
     }
 
 
