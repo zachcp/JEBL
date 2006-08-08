@@ -18,12 +18,12 @@ import java.util.ArrayList;
  * @version $Id$
  */
 public class AlignmentTreeBuilderFactory {
-    static public Tree build(Alignment alignment, TreeBuilderFactory.Method method, TreeBuilderFactory.DistanceModel model, ProgressListener progress) {
+    static public Result build(Alignment alignment, TreeBuilderFactory.Method method, TreeBuilderFactory.DistanceModel model, ProgressListener progress) {
 
         if( progress != null ) {
             progress.setMessage("Computing genetic distance for all pairs");
         }
-        DistanceMatrix d;
+        DistanceMatrix distMat;
 
         boolean timeit = false;
 
@@ -33,16 +33,16 @@ public class AlignmentTreeBuilderFactory {
         switch( model ) {
             case JukesCantor:
             default:
-                d = new JukesCantorDistanceMatrix(alignment, progress);
+                distMat = new JukesCantorDistanceMatrix(alignment, progress);
                 break;
             case F84:
-                d = new F84DistanceMatrix(alignment, progress);
+                distMat = new F84DistanceMatrix(alignment, progress);
                 break;
             case HKY:
-                d = new HKYDistanceMatrix(alignment, progress);
+                distMat = new HKYDistanceMatrix(alignment, progress);
                 break;
             case TamuraNei:
-                d = new TamuraNeiDistanceMatrix(alignment, progress);
+                distMat = new TamuraNeiDistanceMatrix(alignment, progress);
                 break;
         }
         if( timeit ) {
@@ -53,11 +53,11 @@ public class AlignmentTreeBuilderFactory {
             progress.setMessage("Building tree");
         }
 
-        TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, d);
+        TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, distMat);
         if( progress != null ) {
             treeBuilder.addProgressListener(progress);
         }
-        return treeBuilder.build();
+        return new Result(treeBuilder.build(), distMat);
     }
 
 
@@ -127,7 +127,7 @@ public class AlignmentTreeBuilderFactory {
 
         p.setSectionSize(treeWork);
         progress.setMessage("Building guide tree from alignment");
-        final Tree guideTree = build(alignment, method, distanceModel, minorProgress);
+        final Tree guideTree = build(alignment, method, distanceModel, minorProgress).tree;
         p.incrementSectionsCompleted(treeWork);
 
         DistanceMatrix distanceMatrix = null;
