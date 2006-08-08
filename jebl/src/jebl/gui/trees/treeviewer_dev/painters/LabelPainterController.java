@@ -18,6 +18,12 @@ import java.util.Map;
  */
 public class LabelPainterController extends AbstractController {
 
+    private static final String FONT_NAME_KEY = "defaultFontName";
+    private static final String FONT_SIZE_KEY = "defaultFontSize";
+    private static final String FONT_STYLE_KEY = "defaultFontStyle";
+
+    private static final String NUMBER_FORMATTING_KEY = "defaultNumberFormatting";
+
     public LabelPainterController(String title, final LabelPainter labelPainter) {
         this.title = title;
         this.labelPainter = labelPainter;

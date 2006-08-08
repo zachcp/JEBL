@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -19,8 +20,33 @@ import java.util.Map;
  */
 public class TreePaneController extends AbstractController {
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(TreePaneController.class);
+
+    private static final String FOREGROUND_COLOUR_KEY = "foregroundColour";
+    private static final String BACKGROUND_COLOUR_KEY = "backgroundColour";
+    private static final String SELECTION_COLOUR_KEY = "selectionColour";
+    private static final String BRANCH_LINE_WIDTH_KEY = "branchLineWidth";
+
+    private static final String TRANSFORM_KEY = "transform";
+
+    // The defaults if there is nothing in the preferences
+    private static Color DEFAULT_FOREGROUND_COLOUR = Color.BLACK;
+    private static Color DEFAULT_BACKGROUND_COLOUR = Color.WHITE;
+    private static Color DEFAULT_SELECTION_COLOUR = new Color(180, 213, 254);
+    private static float DEFAULT_BRANCH_LINE_WIDTH = 1.0f;
+
     public TreePaneController(final TreePane treePane) {
         this.treePane = treePane;
+
+        int foregroundRGB = PREFS.getInt(FOREGROUND_COLOUR_KEY, DEFAULT_FOREGROUND_COLOUR.getRGB());
+        int backgroundRGB = PREFS.getInt(BACKGROUND_COLOUR_KEY, DEFAULT_BACKGROUND_COLOUR.getRGB());
+        int selectionRGB = PREFS.getInt(SELECTION_COLOUR_KEY, DEFAULT_SELECTION_COLOUR.getRGB());
+        float branchLineWidth = PREFS.getFloat(BRANCH_LINE_WIDTH_KEY, DEFAULT_BRANCH_LINE_WIDTH);
+
+        treePane.setForeground(new Color(foregroundRGB));
+        treePane.setBackground(new Color(backgroundRGB));
+        treePane.setSelectionPaint(new Color(selectionRGB));
+        treePane.setBranchStroke(new BasicStroke(branchLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         titleLabel = new JLabel("Tree Formatting");
 

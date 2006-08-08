@@ -21,30 +21,7 @@ import java.util.prefs.Preferences;
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
 
-    private static Preferences PREFS = Preferences.userNodeForPackage(TreePaneController.class);
-
-    private static final String DEFAULT_FOREGROUND_COLOUR_PREFS = "defaultForegroundColour";
-    private static final String DEFAULT_BACKGROUND_COLOUR_PREFS = "defaultBackgroundColour";
-    private static final String DEFAULT_SELECTION_COLOUR_PREFS = "defaultSelectionColour";
-    private static final String DEFAULT_BRANCH_LINE_WIDTH_PREFS = "defaultBranchLineWidth";
-
-    // The defaults if there is nothing in the preferences
-    private static Color DEFAULT_FOREGROUND_COLOUR = Color.BLACK;
-    private static Color DEFAULT_BACKGROUND_COLOUR = Color.WHITE;
-    private static Color DEFAULT_SELECTION_COLOUR = new Color(180, 213, 254);
-    private static float DEFAULT_BRANCH_LINE_WIDTH = 1.0f;
-
     public TreePane() {
-        int foregroundRGB = PREFS.getInt(DEFAULT_FOREGROUND_COLOUR_PREFS, DEFAULT_FOREGROUND_COLOUR.getRGB());
-        int backgroundRGB = PREFS.getInt(DEFAULT_BACKGROUND_COLOUR_PREFS, DEFAULT_BACKGROUND_COLOUR.getRGB());
-        int selectionRGB = PREFS.getInt(DEFAULT_SELECTION_COLOUR_PREFS, DEFAULT_SELECTION_COLOUR.getRGB());
-        float branchLineWidth = PREFS.getFloat(DEFAULT_BRANCH_LINE_WIDTH_PREFS, DEFAULT_BRANCH_LINE_WIDTH);
-
-        setForeground(new Color(foregroundRGB));
-        setBackground(new Color(backgroundRGB));
-        setSelectionPaint(new Color(selectionRGB));
-        setBranchStroke(new BasicStroke(branchLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
     }
 
     public RootedTree getTree() {

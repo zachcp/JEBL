@@ -11,6 +11,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -34,12 +35,23 @@ public class TreeViewerController extends AbstractController {
         private final String name;
     }
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewerController.class);
+
+    private static final String LAYOUT_KEY = "layout";
+    private static final String ZOOM_KEY = "zoom";
+    private static final String EXPANSION_KEY = "expansion";
+
+    // The defaults if there is nothing in the preferences
+    private static String DEFAULT_LAYOUT = TreeLayoutType.RECTILINEAR.toString();
+
     private final static int MAX_ZOOM_SLIDER = 10000;
     private final static int DELTA_ZOOM_SLIDER = 200;
 
     public TreeViewerController(final TreeViewer treeViewer) {
 
         this.treeViewer = treeViewer;
+
+        final TreeLayoutType defaultLayout = TreeLayoutType.valueOf(PREFS.get(LAYOUT_KEY, DEFAULT_LAYOUT));
 
         titleLabel = new JLabel("Layout");
         optionsPanel = new OptionsPanel();
@@ -52,8 +64,6 @@ public class TreeViewerController extends AbstractController {
 
         radialTreeLayout = new RadialTreeLayout();
         radialTreeLayoutController = new RadialTreeLayoutController(radialTreeLayout);
-
-        treeViewer.setTreeLayout(rectilinearTreeLayout);
 
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
@@ -115,39 +125,23 @@ public class TreeViewerController extends AbstractController {
 
         optionsPanel.addSeparator();
 
-        final JPanel layoutPanel = new JPanel(new BorderLayout());
-        layoutPanel.add(rectilinearTreeLayoutController.getPanel(), BorderLayout.CENTER);
+        layoutPanel = new JPanel(new BorderLayout());
+        setTreeLayout(defaultLayout);
         optionsPanel.addSpanningComponent(layoutPanel);
 
         rectangularTreeToggle.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                if (rectangularTreeToggle.isSelected())
-                    treeViewer.setTreeLayout(rectilinearTreeLayout);
-                setExpansion();
-                layoutPanel.removeAll();
-                layoutPanel.add(rectilinearTreeLayoutController.getPanel(), BorderLayout.CENTER);
-                fireControllerChanged();
-
+                if (rectangularTreeToggle.isSelected()) setTreeLayout(TreeLayoutType.RECTILINEAR);
             }
         });
         polarTreeToggle.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                if (polarTreeToggle.isSelected())
-                    treeViewer.setTreeLayout(polarTreeLayout);
-                setExpansion();
-                layoutPanel.removeAll();
-                layoutPanel.add(polarTreeLayoutController.getPanel(), BorderLayout.CENTER);
-                fireControllerChanged();
+                if (polarTreeToggle.isSelected()) setTreeLayout(TreeLayoutType.POLAR);
             }
         });
         radialTreeToggle.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                if (radialTreeToggle.isSelected())
-                    treeViewer.setTreeLayout(radialTreeLayout);
-                setExpansion();
-                layoutPanel.removeAll();
-                layoutPanel.add(radialTreeLayoutController.getPanel(), BorderLayout.CENTER);
-                fireControllerChanged();
+                if (radialTreeToggle.isSelected()) setTreeLayout(TreeLayoutType.RADIAL);
             }
         });
 
@@ -181,7 +175,7 @@ public class TreeViewerController extends AbstractController {
         return true;
     }
     public void setSettings(Map<String,Object> settings) {
-        TreeLayoutType layout = (TreeLayoutType)settings.get("Layout");
+        final TreeLayoutType layout = TreeLayoutType.valueOf((String)settings.get("Layout"));
         switch (layout) {
             case RECTILINEAR:
                 rectangularTreeToggle.setSelected(true);
@@ -193,20 +187,49 @@ public class TreeViewerController extends AbstractController {
                 radialTreeToggle.setSelected(true);
                 break;
         }
-        zoomSlider.setValue((Integer) settings.get("Zoom"));
-        verticalExpansionSlider.setValue((Integer) settings.get("Expansion"));
+        zoomSlider.setValue((Integer)settings.get(ZOOM_KEY));
+        verticalExpansionSlider.setValue((Integer)settings.get(EXPANSION_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
         if (rectangularTreeToggle.isSelected()) {
-            settings.put("Layout", TreeLayoutType.RECTILINEAR);
+            settings.put(LAYOUT_KEY, TreeLayoutType.RECTILINEAR.toString());
         } else if (polarTreeToggle.isSelected()) {
-            settings.put("Layout", TreeLayoutType.POLAR);
+            settings.put(LAYOUT_KEY, TreeLayoutType.POLAR.toString());
         } else if (radialTreeToggle.isSelected()) {
-            settings.put("Layout", TreeLayoutType.RADIAL);
+            settings.put(LAYOUT_KEY, TreeLayoutType.RADIAL.toString());
         }
-        settings.put("Zoom", zoomSlider.getValue());
-        settings.put("Expansion", verticalExpansionSlider.getValue());
+        settings.put(ZOOM_KEY, zoomSlider.getValue());
+        settings.put(EXPANSION_KEY, verticalExpansionSlider.getValue());
+    }
+
+    private void setTreeLayout(TreeLayoutType layoutType) {
+        switch (layoutType) {
+            case RECTILINEAR:
+                treeViewer.setTreeLayout(rectilinearTreeLayout);
+                setExpansion();
+                layoutPanel.removeAll();
+                layoutPanel.add(rectilinearTreeLayoutController.getPanel(), BorderLayout.CENTER);
+                fireControllerChanged();
+                break;
+            case POLAR:
+                treeViewer.setTreeLayout(polarTreeLayout);
+                setExpansion();
+                layoutPanel.removeAll();
+                layoutPanel.add(polarTreeLayoutController.getPanel(), BorderLayout.CENTER);
+                fireControllerChanged();
+                break;
+            case RADIAL:
+                treeViewer.setTreeLayout(radialTreeLayout);
+                setExpansion();
+                layoutPanel.removeAll();
+                layoutPanel.add(radialTreeLayoutController.getPanel(), BorderLayout.CENTER);
+                fireControllerChanged();
+                break;
+            default:
+                new RuntimeException("Unknown TreeLayoutType: " + layoutType);
+        }
+
     }
 
     private void setExpansion() {
@@ -271,6 +294,8 @@ public class TreeViewerController extends AbstractController {
     private JSlider zoomSlider;
     private JSlider verticalExpansionSlider;
     private JLabel verticalExpansionLabel;
+
+    private final JPanel layoutPanel;
 
     private final JLabel titleLabel;
     private final OptionsPanel optionsPanel;
