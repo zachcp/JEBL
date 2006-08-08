@@ -597,7 +597,7 @@ public class ImportHelper {
     }
 
     static String safeName(String name) {
-        if( ! name.matches("[a-zA-Z0-9_]+") ) {
+        if( ! name.matches("[a-zA-Z0-9_.]+") ) {
             name = "\"" + name + "\"";
         }
         return name;

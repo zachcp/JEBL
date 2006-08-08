@@ -172,6 +172,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         return readTreesBlock(taxonList);
     }
 
+    public DistanceMatrix parseDistancesBlock(List<Taxon> taxonList) throws ImportException, IOException
+    {
+        return readDistancesBlock(taxonList);
+    }
+
     // **************************************************************
     // SequenceImporter IMPLEMENTATION
     // **************************************************************
@@ -791,7 +796,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         }
 
         Triangle triangle = Triangle.LOWER;
-        boolean diagonal = false;
+        boolean diagonal = true;
         boolean labels = false;
 
         boolean ttl = false, fmt = false;
@@ -830,8 +835,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         } else if (token3.equalsIgnoreCase("BOTH")) {
                             triangle = Triangle.BOTH;
                         }
-                    } else if (token2.equalsIgnoreCase("DIAGONAL")) {
-                        diagonal = true;
+                    } else
+                    // based on the example in the PAUP manual
+                    if (token2.equalsIgnoreCase("NODIAGONAL")) {
+                        // in a valid file, triangle != both
+                        diagonal = false;
                     } else if (token2.equalsIgnoreCase("LABELS")) {
                         labels = true;
                     }
@@ -840,6 +848,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
                 fmt = true;
             }
+            token = helper.readToken();
         }
 
         double[][] distances = new double[taxonList.size()][taxonList.size()];
@@ -872,7 +881,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                         }
                     }
                 }
-            } else if (triangle == Triangle.LOWER) {
+            } else if (triangle == Triangle.UPPER) {
                 for (int j = i; j < taxonList.size(); j++) {
                     if (i != j) {
                         distances[i][j] = helper.readDouble();
@@ -899,10 +908,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
         }
 
-        if (helper.getLastDelimiter() != ';') {
+        if (helper.nextCharacter() != ';') {
             throw new ImportException.BadFormatException("Expecting ';' after sequences data");
         }
-
 
         findEndBlock();
 

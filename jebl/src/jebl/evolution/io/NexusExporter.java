@@ -6,6 +6,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
+import jebl.evolution.distances.DistanceMatrix;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -80,19 +81,22 @@ public class NexusExporter implements SequenceExporter {
         setTaxa(t.toArray(new Taxon[]{}));
     }
 
+    private boolean establishTaxa(Collection<Taxon> ntaxa) {
+        if( taxa != null && taxa.size() == ntaxa.size()  && taxa.containsAll(ntaxa)) {
+            return false;
+        }
+
+        setTaxa(ntaxa.toArray(new Taxon[]{}));
+        return true;
+    }
+
     /**
      * Prepare for writing a tree. If a taxa block exists and is suitable for tree,
      * do nothing. If not, write a new taxa block.
      * @param tree
      */
     private boolean establishTaxa(Tree tree) {
-        Set<Taxon> treeTaxa = tree.getTaxa();
-        if( taxa != null && taxa.size() == treeTaxa.size()  && taxa.containsAll(treeTaxa)) {
-            return false;
-        }
-
-        setTaxa(treeTaxa.toArray(new Taxon[]{}));
-        return true;
+        return establishTaxa(tree.getTaxa());
     }
 
     /**
@@ -146,19 +150,37 @@ public class NexusExporter implements SequenceExporter {
                     if( builder.length() > 0 ) {
                         builder.append(",");
                     }
-                    builder.append(key);
-                    builder.append('=');
-                    builder.append(ImportHelper.safeName(value.toString()));
+                    builder.append(key).append('=').append(ImportHelper.safeName(value.toString()));
                 }
             }
-            String metacomment = null;
+            final String metacomment = builder.toString();
 
             ++nt;
             final String treeName = (name != null) ? name.toString() : "tree_" + nt;
             writer.println("\t" + (isRooted && !rtree.conceptuallyUnrooted() ? "" : "u") + "tree " + treeName
-                           + "=" + ((metacomment != null) ? ('[' + metacomment + ']') : "") +
+                           + "=" + ((metacomment.length() > 0) ? ('[' + metacomment + ']') : "") +
                            Utils.toNewick(rtree) + ";");
         }
+        writer.println("end;");
+    }
+
+    public void exportMatrix(final DistanceMatrix distanceMatrix) {
+        final List<Taxon> taxa = distanceMatrix.getTaxa();
+        establishTaxa(taxa);
+        writer.println("begin distances;");
+        // assume distance matrix is symetric, so save upper part. no method to guarantee this yet
+        final double[][] distances = distanceMatrix.getDistances();
+        writer.println(" format triangle = upper nodiagonal;");
+        writer.println(" matrix ");
+        for(int i = 0; i < taxa.size(); ++i) {
+            writer.print(safeTaxonName(taxa.get(i)));
+            for(int j = i+1; j < taxa.size(); ++j) {
+               writer.print(" ");
+               writer.print(distances[i][j]);
+            }
+            writer.println();
+        }
+        writer.println(";");
         writer.println("end;");
     }
 
