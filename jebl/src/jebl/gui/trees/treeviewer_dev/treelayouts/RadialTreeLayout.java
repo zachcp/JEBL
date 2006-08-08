@@ -93,7 +93,12 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 i++;
             }
 
-            final double span = (angleFinish - angleStart) * spread;
+            double span = (angleFinish - angleStart);
+
+	        if (!tree.isRoot(node)) {
+		        span *= spread;
+	        }
+
             double a2 = angleStart;
 
             i = 0;

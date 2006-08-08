@@ -21,15 +21,15 @@ package jebl.evolution.coalescent;
  */
 public class CataclysmicDemographic extends ExponentialGrowth {
 
-	//
-	// Public stuff
-	//
-
+	/**
+	 * Construct demographic model with default settings
+	 */
 	public CataclysmicDemographic() {
+	    // empty constructor
 	}
 
 	/**
-	 * Construct demographic model with default settings
+	 * Construct demographic model with given settings
 	 */
 	public CataclysmicDemographic(double N0, double r, double d, double t) {
 

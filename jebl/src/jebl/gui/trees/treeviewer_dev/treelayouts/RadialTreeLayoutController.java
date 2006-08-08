@@ -1,8 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.treelayouts;
 
-import org.virion.jam.controlpalettes.Controller;
-import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.controlpalettes.AbstractController;
+import org.virion.jam.controlpalettes.ControllerSettings;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -21,11 +20,9 @@ public class RadialTreeLayoutController extends AbstractController {
 		titleLabel = new JLabel("Radial Layout");
 		optionsPanel = new OptionsPanel();
 
-		final int sliderMax = 10000;
-		spreadSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
+		final int sliderMax = 100;
+		final JSlider spreadSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
 		spreadSlider.setValue((int)(treeLayout.getSpread() * sliderMax / 2.0));
-		spreadSlider.setMajorTickSpacing(spreadSlider.getMaximum() / 3);
-		spreadSlider.setPaintTicks(true);
 
 		spreadSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent changeEvent) {
@@ -34,6 +31,18 @@ public class RadialTreeLayoutController extends AbstractController {
 			}
 		});
 		optionsPanel.addComponentWithLabel("Spread:", spreadSlider, true);
+
+//		double spread = treeLayout.getSpread();
+//		final JSpinner spreadSpinner = new JSpinner(new SpinnerNumberModel(spread, 0, 2, 0.01));
+//
+//		optionsPanel.addComponentWithLabel("Spread:", spreadSpinner, true);
+//
+//		spreadSpinner.addChangeListener(new ChangeListener() {
+//		    public void stateChanged(ChangeEvent changeEvent) {
+//		        final double spread = (Double)spreadSpinner.getValue();
+//				treeLayout.setSpread(spread);
+//		    }
+//		});
 	}
 
 	public JComponent getTitleComponent() {
@@ -57,7 +66,7 @@ public class RadialTreeLayoutController extends AbstractController {
 	private final JLabel titleLabel;
 	private final OptionsPanel optionsPanel;
 
-	private final JSlider spreadSlider;
+	//private final JSlider spreadSlider;
 
 	private final RadialTreeLayout treeLayout;
 
