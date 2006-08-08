@@ -144,7 +144,10 @@ public class NexusExporter implements SequenceExporter {
             Object name = t.getAttribute("name");
             StringBuilder builder = new StringBuilder();
             for( String key : t.getAttributeMap().keySet() ) {
-                if( !key.equals("name") ) {
+                // we should replace the explicit chaeck for name by something more general.
+                // Like a reserved character at the start (here &). however we have to worry about backward
+                // compatibility so no change yet with name.
+                if( !key.equals("name") && key.charAt(0) != '&' ) {
                     Object value = t.getAttributeMap().get(key);
 
                     if( builder.length() > 0 ) {
