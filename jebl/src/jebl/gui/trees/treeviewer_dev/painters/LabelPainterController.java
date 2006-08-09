@@ -38,10 +38,13 @@ public class LabelPainterController extends AbstractController {
 
     private static String DEFAULT_NUMBER_FORMATTING = "#.####";
 
+    private static String DECIMAL_NUMBER_FORMATTING = "#.####";
+    private static String SCIENTIFIC_NUMBER_FORMATTING = "0.###E0";
+
     public LabelPainterController(String title, String key, final LabelPainter labelPainter) {
 
         this.title = title;
-	    this.key = key;
+        this.key = key;
         this.labelPainter = labelPainter;
 
         final String defaultFontName = PREFS.get(key + "." + FONT_NAME_KEY, DEFAULT_FONT_NAME);
@@ -91,9 +94,29 @@ public class LabelPainterController extends AbstractController {
 
         NumberFormat format = labelPainter.getNumberFormat();
         int digits = format.getMaximumFractionDigits();
+
+        numericalFormatCombo = new JComboBox(new String[] { "Decimal", "Scientific"});
+        numericalFormatCombo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                String formatType = (String)numericalFormatCombo.getSelectedItem();
+                final int digits = (Integer)digitsSpinner.getValue();
+                if (formatType.equals("Decimal")) {
+                    NumberFormat format = new DecimalFormat(DECIMAL_NUMBER_FORMATTING);
+                    format.setMaximumFractionDigits(digits);
+                    labelPainter.setNumberFormat(format);
+                } else if (formatType.equals("Scientific")) {
+                    NumberFormat format = new DecimalFormat(SCIENTIFIC_NUMBER_FORMATTING);
+                    format.setMaximumFractionDigits(digits);
+                    labelPainter.setNumberFormat(format);
+                }
+            }
+        });
+
+        optionsPanel.addComponentWithLabel("Format:", numericalFormatCombo);
+
         digitsSpinner = new JSpinner(new SpinnerNumberModel(digits, 2, 14, 1));
 
-        optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
+        optionsPanel.addComponentWithLabel("Sig. Digits:", digitsSpinner);
 
         digitsSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -153,10 +176,12 @@ public class LabelPainterController extends AbstractController {
 
     private final JComboBox displayAttributeCombo;
     private final JSpinner fontSizeSpinner;
+
+    private final JComboBox numericalFormatCombo;
     private final JSpinner digitsSpinner;
 
     private final String title;
-	private final String key;
+    private final String key;
 
     private final LabelPainter labelPainter;
 }

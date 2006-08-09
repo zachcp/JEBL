@@ -26,6 +26,14 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
         SCROLL
     };
 
+    public SelectionMode getSelectionMode() {
+        return selectionMode;
+    }
+
+    public DragMode getDragMode() {
+        return dragMode;
+    }
+
     public void setSelectionMode(SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
     }

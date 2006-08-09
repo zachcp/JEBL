@@ -2,8 +2,10 @@ package jebl.gui.trees.treeviewer_dev;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.taxa.MissingTaxonException;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.BranchDecorator;
+import jebl.gui.trees.treeviewer_dev.decorators.TaxonDecorator;
 import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayoutListener;
@@ -274,11 +276,51 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         }
     }
 
+    public void selectCladesFromSelectedNodes() {
+        for (Node node : selectedNodes) {
+            addSelectedClade(node);
+        }
+        fireSelectionChanged();
+        repaint();
+    }
+
+    public void selectTaxaFromSelectedNodes() {
+        for (Node node : selectedNodes) {
+            addSelectedChildTaxa(node);
+        }
+        selectedNodes.clear();
+        fireSelectionChanged();
+        repaint();
+    }
+
+    public void selectNodesFromSelectedTaxa() {
+        try {
+            Set<Node> tips = RootedTreeUtils.getTipsForTaxa(tree, selectedTaxa);
+
+            if (tips.size() > 0) {
+                Node node = RootedTreeUtils.getCommonAncestorNode(tree, tips);
+                addSelectedClade(node);
+            }
+
+        } catch (MissingTaxonException e) {
+            return;
+        }
+
+
+        selectedTaxa.clear();
+        fireSelectionChanged();
+        repaint();
+    }
+
     public void clearSelection() {
         selectedNodes.clear();
         selectedTaxa.clear();
         fireSelectionChanged();
         repaint();
+    }
+
+    public boolean hasSelection() {
+        return selectedNodes.size() > 0 || selectedTaxa.size() > 0;
     }
 
     public void annotateSelectedNodes(String name, Object value) {
@@ -396,6 +438,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
     public void setBranchDecorator(BranchDecorator branchDecorator) {
         this.branchDecorator = branchDecorator;
+        calibrated = false;
+        repaint();
+    }
+
+    public void setTaxonDecorator(TaxonDecorator taxonDecorator) {
+        this.taxonDecorator = taxonDecorator;
         calibrated = false;
         repaint();
     }
@@ -593,6 +641,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
                 Painter.Justification taxonLabelJustification = tipLabelJustifications.get(taxon);
                 g2.transform(taxonTransform);
 
+                if (taxonDecorator != null) {
+                    tipLabelPainter.setForeground(taxonDecorator.getTaxonPaint(taxon));
+                }
+
                 tipLabelPainter.paint(g2, node, taxonLabelJustification,
                         new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelPainter.getPreferredHeight()));
 
@@ -683,7 +735,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         // First of all get the bounds for the unscaled tree
         treeBounds = null;
         boolean showingRootBranch = treeLayout.isShowingRootBranch();
-    
+
         Node rootNode = tree.getRootNode();
 
         // There are two sets of bounds here. The treeBounds are the bounds of the elements
@@ -1077,6 +1129,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private Rectangle2D dragRectangle = null;
 
     private BranchDecorator branchDecorator = null;
+    private TaxonDecorator taxonDecorator = null;
 
     private float labelXOffset = 5.0F;
     private LabelPainter<Node> tipLabelPainter = null;

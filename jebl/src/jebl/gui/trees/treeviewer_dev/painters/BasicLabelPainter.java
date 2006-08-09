@@ -69,7 +69,11 @@ public class BasicLabelPainter extends LabelPainter<Node> {
             for (Node node : tree.getNodes()) {
                 nodeAttributes.addAll(node.getAttributeNames());
             }
-            attributeNames.addAll(nodeAttributes);
+            for (String attributeName : nodeAttributes) {
+                if (!attributeName.startsWith("!")) {
+                    attributeNames.add(attributeName);
+                }
+            }
         }
 
         this.attributes = new String[attributeNames.size()];

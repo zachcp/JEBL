@@ -232,6 +232,19 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     public void setSelectionMode(TreePaneSelector.SelectionMode selectionMode) {
+        TreePaneSelector.SelectionMode oldSelectionMode = treePaneSelector.getSelectionMode();
+
+        if (selectionMode == oldSelectionMode) {
+            return;
+        }
+        
+        if (oldSelectionMode == TreePaneSelector.SelectionMode.TAXA) {
+            treePane.selectNodesFromSelectedTaxa();
+        } else if (selectionMode == TreePaneSelector.SelectionMode.TAXA) {
+            treePane.selectTaxaFromSelectedNodes();
+        } else if (selectionMode == TreePaneSelector.SelectionMode.CLADE) {
+            treePane.selectCladesFromSelectedNodes();
+        }
         treePaneSelector.setSelectionMode(selectionMode);
     }
 

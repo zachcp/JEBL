@@ -84,11 +84,11 @@ public class TreeViewerController extends AbstractController {
         buttonGroup.add(polarTreeToggle);
         buttonGroup.add(radialTreeToggle);
         rectangularTreeToggle.setSelected(true);
-        panel1.add(Box.createHorizontalStrut(0));
+        panel1.add(Box.createHorizontalGlue());
         panel1.add(rectangularTreeToggle);
         panel1.add(polarTreeToggle);
         panel1.add(radialTreeToggle);
-        panel1.add(Box.createHorizontalStrut(0));
+        panel1.add(Box.createHorizontalGlue());
 
         optionsPanel.addSpanningComponent(panel1);
 

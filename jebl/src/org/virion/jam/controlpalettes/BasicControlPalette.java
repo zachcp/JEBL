@@ -132,11 +132,15 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         JPanel titlePanel = new JPanel(new BorderLayout(6, 0));
         titlePanel.add(controller.getTitleComponent(), BorderLayout.CENTER);
 
+        JPanel controllerPanel = controller.getPanel();
+
+//		// This tells Quaqua L&F to use a small components (ignored otherwise)
+        titlePanel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+        controllerPanel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+
 //		JCheckBox pinnedCheck = new JCheckBox();
 //		pinnedCheck.setFocusPainted(false);
 //
-//		// This tells Quaqua L&F to use a small check box (ignored otherwise)
-//		pinnedCheck.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 //		pinnedCheck.setSelected(controller.isInitiallyVisible());
 //		titlePanel.add(pinnedCheck, BorderLayout.EAST);
         PinnedButton pinnedButton = new PinnedButton();
@@ -146,7 +150,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         titlePanel.add(pinnedButton, BorderLayout.EAST);
 
         final DisclosurePanel panel = new DisclosurePanel(
-                titlePanel, controller.getPanel(), controller.isInitiallyVisible(), openingSpeed);
+                titlePanel, controllerPanel, controller.isInitiallyVisible(), openingSpeed);
 
         if (displayMode == DisplayMode.ONLY_ONE_OPEN) {
             panel.addDisclosureListener(new DisclosureListener() {

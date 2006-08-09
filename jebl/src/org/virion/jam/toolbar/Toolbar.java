@@ -25,11 +25,14 @@ public class Toolbar extends JToolBar {
 
         this.options = options;
 
+        putClientProperty("Quaqua.ToolBar.isDividerDrawn", Boolean.TRUE);
+        putClientProperty("JToolBar.isRollover", Boolean.TRUE);
+
         setLayout(new GridBagLayout());
 
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray),
-                BorderFactory.createEmptyBorder(0, 12, 0, 12)));
+//        setBorder(BorderFactory.createCompoundBorder(
+//                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray),
+//                BorderFactory.createEmptyBorder(0, 12, 0, 12)));
 
         if (options != null) {
             final JPopupMenu menu = new JPopupMenu();

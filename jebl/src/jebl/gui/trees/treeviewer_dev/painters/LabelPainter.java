@@ -77,7 +77,7 @@ public abstract class LabelPainter<T> extends AbstractPainter<T> {
 	    firePainterChanged();
 	}
 
-	protected void setNumberFormat(NumberFormat numberFormat) {
+	public void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
 	    firePainterChanged();
 	}
