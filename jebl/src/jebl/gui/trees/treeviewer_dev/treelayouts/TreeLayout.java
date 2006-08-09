@@ -59,6 +59,12 @@ public interface TreeLayout {
     AxisType getYAxisType();
 
     /**
+     * Return whether this layout displays a root branch
+     * @return showing root branch?
+     */
+    boolean isShowingRootBranch();
+
+    /**
      * Return whether the two axis scales should be maintained
      * relative to each other
      *

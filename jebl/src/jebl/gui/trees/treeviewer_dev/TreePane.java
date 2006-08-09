@@ -189,16 +189,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         return originalTree;
     }
 
-    public boolean isShowingRootBranch() {
-        return showingRootBranch;
-    }
-
-    public void setShowingRootBranch(boolean showingRootBranch) {
-        this.showingRootBranch = showingRootBranch;
-        calibrated = false;
-        repaint();
-    }
-
     public boolean isShowingTaxonCallouts() {
         return showingTaxonCallouts;
     }
@@ -579,6 +569,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         Stroke oldStroke = g2.getStroke();
         Font oldFont = g2.getFont();
 
+        boolean showingRootBranch = treeLayout.isShowingRootBranch();
+
         for (Node node : tree.getNodes() ) {
             if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
                 Shape nodeBar = nodeBars.get(node);
@@ -690,7 +682,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
         // First of all get the bounds for the unscaled tree
         treeBounds = null;
-
+        boolean showingRootBranch = treeLayout.isShowingRootBranch();
+    
         Node rootNode = tree.getRootNode();
 
         // There are two sets of bounds here. The treeBounds are the bounds of the elements
@@ -1104,7 +1097,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private boolean calibrated = false;
     private AffineTransform transform = null;
 
-    private boolean showingRootBranch = true;
     private boolean showingTaxonCallouts = true;
 
     private Map<Taxon, AffineTransform> tipLabelTransforms = new HashMap<Taxon, AffineTransform>();

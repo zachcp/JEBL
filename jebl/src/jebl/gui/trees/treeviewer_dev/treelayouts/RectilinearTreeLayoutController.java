@@ -14,6 +14,12 @@ import java.util.Map;
  */
 public class RectilinearTreeLayoutController extends AbstractController {
 
+    private static final String RECTILINEAR_LAYOUT_KEY = "rectilinearLayout";
+
+    private static final String ROOT_LENGTH_KEY = "rootLength";
+    private static final String CURVATURE_KEY = "curvature";
+    private static final String ALIGN_TIP_LABELS_KEY = "alignTipLabels";
+
     public RectilinearTreeLayoutController(final RectilinearTreeLayout treeLayout) {
         this.treeLayout = treeLayout;
 
@@ -23,7 +29,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
         final int sliderMax = 10000;
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
-        rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
+        //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
         rootLengthSlider.setPaintTicks(true);
 
         rootLengthSlider.addChangeListener(new ChangeListener() {
@@ -36,7 +42,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
 
         curvatureSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         curvatureSlider.setValue((int) (treeLayout.getCurvature() * sliderMax));
-        curvatureSlider.setMajorTickSpacing(curvatureSlider.getMaximum() / 5);
+        //curvatureSlider.setMajorTickSpacing(curvatureSlider.getMaximum() / 5);
         curvatureSlider.setPaintTicks(true);
 
         curvatureSlider.addChangeListener(new ChangeListener() {
@@ -73,9 +79,15 @@ public class RectilinearTreeLayoutController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
+        rootLengthSlider.setValue((Integer) settings.get(RECTILINEAR_LAYOUT_KEY + "." + ROOT_LENGTH_KEY));
+        curvatureSlider.setValue((Integer) settings.get(RECTILINEAR_LAYOUT_KEY + "." + CURVATURE_KEY));
+        alignTipLabelsCheck.setSelected((Boolean) settings.get(RECTILINEAR_LAYOUT_KEY + "." + ALIGN_TIP_LABELS_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
+        settings.put(RECTILINEAR_LAYOUT_KEY + "." + ROOT_LENGTH_KEY, rootLengthSlider.getValue());
+        settings.put(RECTILINEAR_LAYOUT_KEY + "." + CURVATURE_KEY, curvatureSlider.getValue());
+        settings.put(RECTILINEAR_LAYOUT_KEY + "." + ALIGN_TIP_LABELS_KEY, alignTipLabelsCheck.isSelected());
     }
 
     private final JLabel titleLabel;

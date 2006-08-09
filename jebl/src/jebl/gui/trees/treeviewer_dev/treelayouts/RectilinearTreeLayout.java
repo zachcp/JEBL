@@ -20,6 +20,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return AxisType.DISCRETE;
     }
 
+    public boolean isShowingRootBranch() {
+        return true;
+    }
+
     public boolean maintainAspectRatio() {
         return false;
     }
@@ -52,7 +56,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	}
 
 	public double getCurvature() {
-		return xProportion;
+		return 1.0 - xProportion;
 	}
 
 	public void setAlignTipLabels(boolean alignTipLabels) {
@@ -61,7 +65,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	}
 
 	public void setCurvature(double curvature) {
-	    setBranchCurveProportion(curvature, curvature);
+	    setBranchCurveProportion(1.0 - curvature, 1.0 - curvature);
 	}
 
     public void setBranchCurveProportion(double xProportion, double yProportion) {

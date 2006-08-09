@@ -194,6 +194,11 @@ public class TreeViewerController extends AbstractController {
         }
         zoomSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + ZOOM_KEY));
         verticalExpansionSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + EXPANSION_KEY));
+
+        // These controllers are internal to TreeViewerController so settings must be done here
+        rectilinearTreeLayoutController.setSettings(settings);
+        polarTreeLayoutController.setSettings(settings);
+        radialTreeLayoutController.setSettings(settings);
     }
 
     public void getSettings(Map<String, Object> settings) {
@@ -206,6 +211,11 @@ public class TreeViewerController extends AbstractController {
         }
         settings.put(TREE_VIEWER_KEY + "." + ZOOM_KEY, zoomSlider.getValue());
         settings.put(TREE_VIEWER_KEY + "." + EXPANSION_KEY, verticalExpansionSlider.getValue());
+
+        // These controllers are internal to TreeViewerController so settings must be done here
+        rectilinearTreeLayoutController.getSettings(settings);
+        polarTreeLayoutController.getSettings(settings);
+        radialTreeLayoutController.getSettings(settings);
     }
 
     private void setTreeLayout(TreeLayoutType layoutType) {

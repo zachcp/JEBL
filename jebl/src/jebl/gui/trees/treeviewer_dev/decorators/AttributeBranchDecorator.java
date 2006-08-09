@@ -12,9 +12,8 @@ import java.util.Map;
  * @version $Id$
  */
 public class AttributeBranchDecorator implements BranchDecorator {
-    public AttributeBranchDecorator(String attributeName, Map<Object, Paint> paintMap) {
+    public AttributeBranchDecorator(String attributeName) {
         this.attributeName = attributeName;
-        this.paintMap = paintMap;
     }
 
     public Paint getBranchPaint(Tree tree, Node node) {
@@ -25,12 +24,10 @@ public class AttributeBranchDecorator implements BranchDecorator {
 
     protected Paint getPaint(Object value) {
         if (value != null) {
-            return paintMap.get(value);
+            return Color.decode(value.toString());
         }
         return null;
     }
 
     protected final String attributeName;
-
-    protected Map<Object, Paint> paintMap = new HashMap<Object, Paint>();
 }

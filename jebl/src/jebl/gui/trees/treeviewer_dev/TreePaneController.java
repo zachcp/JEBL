@@ -34,7 +34,6 @@ public class TreePaneController extends AbstractController {
     private static final String ORDER_KEY = "order";
     private static final String ORDER_TYPE_KEY = "orderType";
 
-    private static final String SHOW_ROOT_KEY = "showRoot";
 
     // The defaults if there is nothing in the preferences
     private static Color DEFAULT_FOREGROUND_COLOUR = Color.BLACK;
@@ -114,16 +113,6 @@ public class TreePaneController extends AbstractController {
             }
         });
 
-        showRootCheck = new JCheckBox("Show Root Branch");
-        optionsPanel.addComponent(showRootCheck);
-
-        showRootCheck.setSelected(treePane.isShowingRootBranch());
-        showRootCheck.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                treePane.setShowingRootBranch(showRootCheck.isSelected());
-            }
-        });
-
         branchLineWidthSpinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
 
         branchLineWidthSpinner.addChangeListener(new ChangeListener() {
@@ -155,11 +144,20 @@ public class TreePaneController extends AbstractController {
         treePane.setSelectionPaint((Color)settings.get(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY));
 
         transformCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + TRANSFORM_KEY));
-        transformCombo.setSelectedItem(TransformedRootedTree.Transform.valueOf((String)settings.get(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY)));
-        orderCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + ORDER_KEY));
-        orderCombo.setSelectedItem(SortedRootedTree.BranchOrdering.valueOf((String)settings.get(TREE_PANE_KEY + "." + ORDER_TYPE_KEY)));
+        String transformName = (String)settings.get(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY);
+        for (TransformedRootedTree.Transform transform : TransformedRootedTree.Transform.values()) {
+            if (transform.toString().equalsIgnoreCase(transformName)) {
+                transformCombo.setSelectedItem(transform);
+            }
+        }
 
-        showRootCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + SHOW_ROOT_KEY));
+        orderCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + ORDER_KEY));
+        String orderName = (String)settings.get(TREE_PANE_KEY + "." + ORDER_TYPE_KEY);
+        for (SortedRootedTree.BranchOrdering order : SortedRootedTree.BranchOrdering.values()) {
+            if (order.toString().equalsIgnoreCase(orderName)) {
+                orderCombo.setSelectedItem(order);
+            }
+        }
 
         branchLineWidthSpinner.setValue((Double)settings.get(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY));
     }
@@ -175,8 +173,6 @@ public class TreePaneController extends AbstractController {
         settings.put(TREE_PANE_KEY + "." + ORDER_KEY, orderCheck.isSelected());
         settings.put(TREE_PANE_KEY + "." + ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
 
-        settings.put(TREE_PANE_KEY + "." + SHOW_ROOT_KEY, showRootCheck.isSelected());
-
         settings.put(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
     }
 
@@ -189,8 +185,6 @@ public class TreePaneController extends AbstractController {
 
     private final JCheckBox orderCheck;
     private final JComboBox orderCombo;
-
-    private final JCheckBox showRootCheck;
 
     private final JSpinner branchLineWidthSpinner;
 

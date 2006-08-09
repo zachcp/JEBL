@@ -22,6 +22,10 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return AxisType.CONTINUOUS;
     }
 
+    public boolean isShowingRootBranch() {
+        return false;
+    }
+
     public boolean maintainAspectRatio() {
         return true;
     }
@@ -38,14 +42,14 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightArea() is not supported in this TreeLayout");
     }
 
-	public double getSpread() {
-		return spread;
-	}
+    public double getSpread() {
+        return spread;
+    }
 
-	public void setSpread(double spread) {
-		this.spread = spread;
-		invalidate();
-	}
+    public void setSpread(double spread) {
+        this.spread = spread;
+        invalidate();
+    }
 
     protected void validate() {
         nodePoints.clear();
@@ -56,13 +60,6 @@ public class RadialTreeLayout extends AbstractTreeLayout {
             final Node root = tree.getRootNode();
 
             constructNode(root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0);
-
-//            if( !tree.conceptuallyUnrooted() ) {
-//                Line2D branchPath = new Line2D.Double(0.0, 0.0, 0.0, 0.0);
-//
-//                // add the branchPath to the map of branch paths
-//                branchPaths.put(root, branchPath);
-//            }
 
         } catch (Graph.NoEdgeException e) {
             e.printStackTrace();
@@ -95,9 +92,11 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
             double span = (angleFinish - angleStart);
 
-	        if (!tree.isRoot(node)) {
-		        span *= spread;
-	        }
+            if (!tree.isRoot(node)) {
+                span *= 1.0 + (spread / 10.0);
+                angleStart = branchAngle - (span / 2.0);
+                angleFinish = branchAngle + (span / 2.0);
+            }
 
             double a2 = angleStart;
 
@@ -126,13 +125,13 @@ public class RadialTreeLayout extends AbstractTreeLayout {
             Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
             nodeLabelPaths.put(node, nodeLabelPath);
 
-	        Point2D nodeBarPoint1 = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
-	                yPosition + ((length + 1.0) * directionY));
-	        Point2D nodeBarPoint2 = new Point2D.Double(xPosition + ((length - 1.0) * directionX),
-	                yPosition + ((length - 1.0) * directionY));
-	        Line2D nodeBarPath = new Line2D.Double(nodeBarPoint1, nodeBarPoint2);
+            Point2D nodeBarPoint1 = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
+                    yPosition + ((length + 1.0) * directionY));
+            Point2D nodeBarPoint2 = new Point2D.Double(xPosition + ((length - 1.0) * directionX),
+                    yPosition + ((length - 1.0) * directionY));
+            Line2D nodeBarPath = new Line2D.Double(nodeBarPoint1, nodeBarPoint2);
 
-	        nodeBarPaths.put(node, nodeBarPath);
+            nodeBarPaths.put(node, nodeBarPath);
         } else {
 
             Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
@@ -148,5 +147,5 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return nodePoint;
     }
 
-	private double spread = 1.0;
+    private double spread = 0.0;
 }

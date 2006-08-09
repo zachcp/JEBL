@@ -50,13 +50,17 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		return rootAngle;
 	}
 
-	public double getRootLength() {
-		return rootLength;
-	}
-
 	public double getAngularRange() {
 		return angularRange;
 	}
+
+    public boolean isShowingRootBranch() {
+        return showingRootBranch;
+    }
+
+    public double getRootLength() {
+        return rootLength;
+    }
 
 	public TipLabelPosition getTipLabelPosition() {
 		return tipLabelPosition;
@@ -67,13 +71,18 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         invalidate();
     }
 
-    public void setRootLength(double rootLength) {
-        this.rootLength = rootLength;
+    public void setAngularRange(double angularRange) {
+        this.angularRange = angularRange;
         invalidate();
     }
 
-    public void setAngularRange(double angularRange) {
-        this.angularRange = angularRange;
+    public void setShowingRootBranch(boolean showingRootBranch) {
+        this.showingRootBranch = showingRootBranch;
+        invalidate();
+    }
+
+    public void setRootLength(double rootLength) {
+        this.rootLength = rootLength;
         invalidate();
     }
 
@@ -275,6 +284,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
     private double rootAngle = 180.0;
     private double rootLength = 0.01;
     private double angularRange = 360.0;
+
+    private boolean showingRootBranch = true;
 
     private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
 }

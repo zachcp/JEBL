@@ -8,7 +8,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.*;
 import java.util.Map;
+
+import jebl.evolution.trees.TransformedRootedTree;
+import jebl.evolution.trees.SortedRootedTree;
 
 /**
  * @author Andrew Rambaut
@@ -16,15 +20,23 @@ import java.util.Map;
  */
 public class PolarTreeLayoutController extends AbstractController {
 
+    private static final String POLAR_LAYOUT_KEY = "polarLayout";
+
+    private static final String ROOT_ANGLE_KEY = "rootAngle";
+    private static final String ANGULAR_RANGE_KEY = "angularRange";
+    private static final String ROOT_LENGTH_KEY = "rootLength";
+    private static final String SHOW_ROOT_KEY = "showRoot";
+    private static final String ALIGN_TIP_LABELS_KEY = "alignTipLabels";
+
     public PolarTreeLayoutController(final PolarTreeLayout treeLayout) {
         this.treeLayout = treeLayout;
 
         titleLabel = new JLabel("Polar Layout");
-        optionsPanel = new OptionsPanel();
+        optionsPanel = new OptionsPanel(4, 6);
 
         rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
         rootAngleSlider.setValue((int) (180.0 - (treeLayout.getRootAngle() * 10)));
-        rootAngleSlider.setMajorTickSpacing(rootAngleSlider.getMaximum() / 5);
+        //rootAngleSlider.setMajorTickSpacing(rootAngleSlider.getMaximum() / 5);
         rootAngleSlider.setPaintTicks(true);
 
         rootAngleSlider.addChangeListener(new ChangeListener() {
@@ -35,23 +47,9 @@ public class PolarTreeLayoutController extends AbstractController {
         });
         optionsPanel.addComponentWithLabel("Root Angle:", rootAngleSlider, true);
 
-        final int sliderMax = 10000;
-        rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
-        rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
-        rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
-        rootLengthSlider.setPaintTicks(true);
-
-        rootLengthSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                double value = rootLengthSlider.getValue();
-                treeLayout.setRootLength(value / sliderMax);
-            }
-        });
-        optionsPanel.addComponentWithLabel("Root Length:", rootLengthSlider, true);
-
         angularRangeSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
         angularRangeSlider.setValue((int) (360.0 - (treeLayout.getAngularRange() * 10)));
-        angularRangeSlider.setMajorTickSpacing(angularRangeSlider.getMaximum() / 5);
+        //angularRangeSlider.setMajorTickSpacing(angularRangeSlider.getMaximum() / 5);
         angularRangeSlider.setPaintTicks(true);
 
         angularRangeSlider.addChangeListener(new ChangeListener() {
@@ -62,19 +60,54 @@ public class PolarTreeLayoutController extends AbstractController {
         });
         optionsPanel.addComponentWithLabel("Angle Range:", angularRangeSlider, true);
 
-        labelPositionCombo = new JComboBox();
-        for (PolarTreeLayout.TipLabelPosition position : PolarTreeLayout.TipLabelPosition.values()) {
-            if (position != PolarTreeLayout.TipLabelPosition.HORIZONTAL) // not implemented yet
-                labelPositionCombo.addItem(position);
-        }
-        labelPositionCombo.setSelectedItem(treeLayout.getTipLabelPosition());
-        labelPositionCombo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent itemEvent) {
-                treeLayout.setTipLabelPosition((PolarTreeLayout.TipLabelPosition) labelPositionCombo.getSelectedItem());
+        final int sliderMax = 10000;
+        rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
+        rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
+        //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
+        rootLengthSlider.setPaintTicks(true);
 
+        rootLengthSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                double value = rootLengthSlider.getValue();
+                treeLayout.setRootLength(value / sliderMax);
             }
         });
-        optionsPanel.addComponentWithLabel("Label Position:", labelPositionCombo);
+        optionsPanel.addComponentWithLabel("Root Length:", rootLengthSlider, true);
+
+        showRootCheck = new JCheckBox("Show Root");
+        optionsPanel.addComponent(showRootCheck);
+
+        showRootCheck.setSelected(treeLayout.isShowingRootBranch());
+        showRootCheck.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                treeLayout.setShowingRootBranch(showRootCheck.isSelected());
+            }
+        });
+
+
+//        labelPositionCombo = new JComboBox();
+//        for (PolarTreeLayout.TipLabelPosition position : PolarTreeLayout.TipLabelPosition.values()) {
+//            if (position != PolarTreeLayout.TipLabelPosition.HORIZONTAL) // not implemented yet
+//                labelPositionCombo.addItem(position);
+//        }
+//        labelPositionCombo.setSelectedItem(treeLayout.getTipLabelPosition());
+//        labelPositionCombo.addItemListener(new ItemListener() {
+//            public void itemStateChanged(ItemEvent itemEvent) {
+//                treeLayout.setTipLabelPosition((PolarTreeLayout.TipLabelPosition) labelPositionCombo.getSelectedItem());
+//
+//            }
+//        });
+//        optionsPanel.addComponentWithLabel("Label Position:", labelPositionCombo);
+
+        alignTipLabelsCheck = new JCheckBox("Align Tip Labels");
+
+        alignTipLabelsCheck.setSelected(treeLayout.getTipLabelPosition() == PolarTreeLayout.TipLabelPosition.RADIAL);
+        alignTipLabelsCheck.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                treeLayout.setTipLabelPosition(alignTipLabelsCheck.isSelected() ? PolarTreeLayout.TipLabelPosition.RADIAL : PolarTreeLayout.TipLabelPosition.FLUSH);
+            }
+        });
+        optionsPanel.addComponent(alignTipLabelsCheck);
     }
 
     public JComponent getTitleComponent() {
@@ -90,9 +123,19 @@ public class PolarTreeLayoutController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
+        rootAngleSlider.setValue((Integer) settings.get(POLAR_LAYOUT_KEY + "." + ROOT_ANGLE_KEY));
+        angularRangeSlider.setValue((Integer) settings.get(POLAR_LAYOUT_KEY + "." + ANGULAR_RANGE_KEY));
+        rootLengthSlider.setValue((Integer) settings.get(POLAR_LAYOUT_KEY + "." + ROOT_LENGTH_KEY));
+        showRootCheck.setSelected((Boolean) settings.get(POLAR_LAYOUT_KEY + "." + SHOW_ROOT_KEY));
+        alignTipLabelsCheck.setSelected((Boolean) settings.get(POLAR_LAYOUT_KEY + "." + ALIGN_TIP_LABELS_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
+        settings.put(POLAR_LAYOUT_KEY + "." + ROOT_ANGLE_KEY, rootAngleSlider.getValue());
+        settings.put(POLAR_LAYOUT_KEY + "." + ANGULAR_RANGE_KEY, angularRangeSlider.getValue());
+        settings.put(POLAR_LAYOUT_KEY + "." + ROOT_LENGTH_KEY, rootLengthSlider.getValue());
+        settings.put(POLAR_LAYOUT_KEY + "." + SHOW_ROOT_KEY, showRootCheck.isSelected());
+        settings.put(POLAR_LAYOUT_KEY + "." + ALIGN_TIP_LABELS_KEY, alignTipLabelsCheck.isSelected());
     }
 
     private final JLabel titleLabel;
@@ -101,7 +144,10 @@ public class PolarTreeLayoutController extends AbstractController {
     private final JSlider rootAngleSlider;
     private final JSlider rootLengthSlider;
     private final JSlider angularRangeSlider;
-    private final JComboBox labelPositionCombo;
+    //private final JComboBox labelPositionCombo;
+    private final JCheckBox alignTipLabelsCheck;
+
+    private final JCheckBox showRootCheck;
 
     private final PolarTreeLayout treeLayout;
 
