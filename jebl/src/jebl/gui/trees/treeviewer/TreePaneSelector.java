@@ -19,12 +19,16 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
         NODE,
         CLADE,
         TAXA
-    };
+    }
+
+    ;
 
     public enum DragMode {
         SELECT,
         SCROLL
-    };
+    }
+
+    ;
 
     public void setSelectionMode(SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
@@ -41,7 +45,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
     }
 
     public void mouseClicked(MouseEvent mouseEvent) {
-        Node selectedNode = treePane.getNodeAt((Graphics2D)treePane.getGraphics(), mouseEvent.getPoint());
+        Node selectedNode = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
         if (!mouseEvent.isShiftDown()) {
             treePane.clearSelection();
         }
@@ -78,7 +82,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
 
     public void mouseReleased(MouseEvent mouseEvent) {
         if (treePane.getDragRectangle() != null) {
-            Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D)treePane.getGraphics(), treePane.getDragRectangle().getBounds());
+            Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
 
             if (!mouseEvent.isShiftDown()) {
                 treePane.clearSelection();
@@ -129,11 +133,15 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
     }
 
     public void mouseDragged(MouseEvent mouseEvent) {
+        //this situation can happen on MacOS, though very rare
+        if (dragPoint == null) {
+            return;
+        }
         if (dragMode == DragMode.SCROLL || mouseEvent.isMetaDown()) {
             // Calculate how far the mouse has been dragged from the point clicked in
             // mousePressed, above.
-            int deltaX = (int)(mouseEvent.getX() - dragPoint.getX());
-            int deltaY = (int)(mouseEvent.getY() - dragPoint.getY());
+            int deltaX = (int) (mouseEvent.getX() - dragPoint.getX());
+            int deltaY = (int) (mouseEvent.getY() - dragPoint.getY());
 
             // Get the currently visible window
             Rectangle visRect = treePane.getVisibleRect();
