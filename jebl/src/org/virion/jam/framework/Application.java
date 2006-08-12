@@ -5,9 +5,9 @@
 package org.virion.jam.framework;
 
 import org.virion.jam.html.HTMLViewer;
-import org.virion.jam.util.BrowserLauncher;
 import org.virion.jam.preferences.PreferencesDialog;
 import org.virion.jam.preferences.PreferencesSection;
+import org.virion.jam.util.BrowserLauncher;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,6 @@ import java.io.*;
 /*
  * @todo Implement a list of open windows
  * @todo Implement the recent files menu (persistance)
- * @todo Implement a preferences system
  */
 
 public abstract class Application {
@@ -103,9 +102,13 @@ public abstract class Application {
 		getMenuBarFactory().registerMenuFactory(menuFactory);
 	}
 
+	private final static int MAX_RECENT_FILES = 20;
+
     public JMenu getRecentFileMenu() {
         if (recentFileMenu == null) {
             recentFileMenu = new JMenu("Recent Files");
+
+	        // LOAD from preferences here?
         }
 	    recentFileMenu.setEnabled(getOpenAction().isEnabled());
         return recentFileMenu;
@@ -114,14 +117,27 @@ public abstract class Application {
     public void addRecentFile(File file) {
 
         if (recentFileMenu != null) {
-            if (recentFileMenu.getItemCount() == 20) {
-                recentFileMenu.remove(19);
+            if (recentFileMenu.getItemCount() == MAX_RECENT_FILES) {
+                recentFileMenu.remove(MAX_RECENT_FILES - 1);
             }
-            recentFileMenu.insert(file.toString(), 0);
+	        recentFileMenu.insert(new RecentFileAction(file), 0);
 
-            //menuBar.validate();
+	        // WRITE to preferences here
         }
     }
+
+	private class RecentFileAction extends AbstractAction {
+		public RecentFileAction(File recentFile) {
+			super(recentFile.getName());
+			this.recentFile = recentFile;
+		}
+
+		public void actionPerformed(ActionEvent actionEvent) {
+			doOpenFile(recentFile);
+		}
+
+		private final File recentFile;
+	}
 
     protected abstract JFrame getDefaultFrame();
 

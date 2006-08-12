@@ -72,15 +72,12 @@ public class SingleDocApplication extends Application {
         if (documentFrame == null) {
             return;
         }
-        if (documentFrame.requestClose()) {           
+        if (documentFrame.requestClose()) {
 
             documentFrame.setVisible(false);
             documentFrame.dispose();
             System.exit(0);
         }
-    }
-
-    public void doPreferences() {
     }
 
     // Close the window when the close box is clicked

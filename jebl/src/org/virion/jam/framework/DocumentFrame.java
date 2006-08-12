@@ -60,6 +60,7 @@ public abstract class DocumentFrame extends AbstractFrame {
 	        documentFile = file;
             if (readFromFile(file)) {
                 clearDirty();
+	            setFrameTitle();
 
                 return true;
             }
@@ -83,6 +84,8 @@ public abstract class DocumentFrame extends AbstractFrame {
             try {
                 if (writeToFile(documentFile)) {
                     clearDirty();
+
+	                return true;
                 }
             } catch (IOException ioe) {
                 JOptionPane.showMessageDialog(this, "Unable to save file: " + ioe,
@@ -90,7 +93,8 @@ public abstract class DocumentFrame extends AbstractFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
-        return true;
+
+        return false;
     }
 
     public final boolean doSaveAs() {
@@ -111,6 +115,9 @@ public abstract class DocumentFrame extends AbstractFrame {
 
                 clearDirty();
                 documentFile = file;
+	            setFrameTitle();
+
+	            return true;
             }
         } catch (IOException ioe) {
             JOptionPane.showMessageDialog(this, "Unable to save file: " + ioe,
@@ -118,8 +125,16 @@ public abstract class DocumentFrame extends AbstractFrame {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        return true;
+        return false;
     }
+
+	protected final void setFrameTitle() {
+		String title = getTitle();
+		if (documentFile != null) {
+			setTitle(title + " - " + documentFile.getName());
+		}
+
+	}
 
     public Action getSaveAction() {
         return saveAction;

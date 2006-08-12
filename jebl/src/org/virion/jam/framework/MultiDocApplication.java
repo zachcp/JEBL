@@ -12,174 +12,191 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class MultiDocApplication extends Application {
-    private DocumentFrameFactory documentFrameFactory = null;
+	private DocumentFrameFactory documentFrameFactory = null;
 
-    private AbstractFrame invisibleFrame = null;
-    private DocumentFrame upperDocumentFrame = null;
+	private AbstractFrame invisibleFrame = null;
+	private DocumentFrame upperDocumentFrame = null;
 
-    private ArrayList<DocumentFrame> documents = new ArrayList<DocumentFrame>();
+	private ArrayList<DocumentFrame> documents = new ArrayList<DocumentFrame>();
 
-    public MultiDocApplication(String nameString, String aboutString, Icon icon) {
+	public MultiDocApplication(String nameString, String aboutString, Icon icon) {
 
-        super(new MultiDocMenuBarFactory(), nameString, aboutString, icon);
-    }
+		super(new MultiDocMenuBarFactory(), nameString, aboutString, icon);
+	}
 
-    public MultiDocApplication(String nameString, String aboutString, Icon icon,
-                               String websiteURLString, String helpURLString) {
+	public MultiDocApplication(String nameString, String aboutString, Icon icon,
+	                           String websiteURLString, String helpURLString) {
 
-        super(new MultiDocMenuBarFactory(), nameString, aboutString, icon, websiteURLString, helpURLString);
-    }
+		super(new MultiDocMenuBarFactory(), nameString, aboutString, icon, websiteURLString, helpURLString);
+	}
 
-    public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
+	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
 
-        super(menuBarFactory, nameString, aboutString, icon);
-    }
+		super(menuBarFactory, nameString, aboutString, icon);
+	}
 
-    public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
-                               String websiteURLString, String helpURLString) {
+	public MultiDocApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
+	                           String websiteURLString, String helpURLString) {
 
-        super(menuBarFactory, nameString, aboutString, icon, websiteURLString, helpURLString);
-    }
+		super(menuBarFactory, nameString, aboutString, icon, websiteURLString, helpURLString);
+	}
 
-    public final void initialize() {
-        setupFramelessMenuBar();
-    }
+	public final void initialize() {
+		setupFramelessMenuBar();
+	}
 
-    public void setDocumentFrameFactory(DocumentFrameFactory documentFrameFactory) {
-        this.documentFrameFactory = documentFrameFactory;
-    }
+	public void setDocumentFrameFactory(DocumentFrameFactory documentFrameFactory) {
+		this.documentFrameFactory = documentFrameFactory;
+	}
 
-    protected JFrame getDefaultFrame() {
-        JFrame frame = getUpperDocumentFrame();
-        if (frame == null) return invisibleFrame;
-        return frame;
-    }
+	protected JFrame getDefaultFrame() {
+		JFrame frame = getUpperDocumentFrame();
+		if (frame == null) return invisibleFrame;
+		return frame;
+	}
 
-    protected DocumentFrame createDocumentFrame() {
-        return documentFrameFactory.createDocumentFrame(this, getMenuBarFactory());
-    }
+	protected DocumentFrame createDocumentFrame() {
+		return documentFrameFactory.createDocumentFrame(this, getMenuBarFactory());
+	}
 
-    public void doNew() {
-        addDocumentFrame(createDocumentFrame());
-    }
+	public void doNew() {
+		addDocumentFrame(createDocumentFrame());
+	}
 
-    public void doOpenFile(File file) {
-        DocumentFrame documentFrame = createDocumentFrame();
-        if (documentFrame.openFile(file)) {
-            addDocumentFrame(documentFrame);
-        }
-    }
+	public void doOpenFile(File file) {
 
-    public void doQuit() {
+		DocumentFrame documentFrame = getDocumentFrame(file);
 
-        boolean ok = true;
+		if (documentFrame == null) {
+			documentFrame = createDocumentFrame();
+			if (documentFrame.openFile(file)) {
+				addDocumentFrame(documentFrame);
+			}
+		}
 
-        for (DocumentFrame documentFrame : documents) {
-            if (!documentFrame.requestClose()) {
-                ok = false;
-                break;
-            } else {
-                documentFrame.setVisible(false);
-                documentFrame.dispose();
-            }
-        }
+		documentFrame.toFront();
+	}
 
-        if (ok) {
-            System.exit(0);
-        }
-    }
+	public void doQuit() {
 
-    private void documentFrameActivated(DocumentFrame documentFrame) {
-        upperDocumentFrame = documentFrame;
-    }
+		boolean ok = true;
 
-    // Close the window when the close box is clicked
-    private void documentFrameClosing(DocumentFrame documentFrame) {
-        if (documentFrame.requestClose()) {
-            documentFrame.setVisible(false);
-            documentFrame.dispose();
-            documents.remove(documentFrame);
-        }
-    }
+		for (DocumentFrame documentFrame : documents) {
+			if (!documentFrame.requestClose()) {
+				ok = false;
+				break;
+			} else {
+				documentFrame.setVisible(false);
+				documentFrame.dispose();
+			}
+		}
 
-    private void addDocumentFrame(DocumentFrame documentFrame) {
-        documentFrame.initialize();
-        documentFrame.setVisible(true);
+		if (ok) {
+			System.exit(0);
+		}
+	}
 
-        // event handling
-        documentFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowActivated(java.awt.event.WindowEvent e) {
-                documentFrameActivated((DocumentFrame) e.getWindow());
-            }
+	private void documentFrameActivated(DocumentFrame documentFrame) {
+		upperDocumentFrame = documentFrame;
+	}
 
-            public void windowClosing(java.awt.event.WindowEvent e) {
-                documentFrameClosing((DocumentFrame) e.getWindow());
-            }
-        });
+	// Close the window when the close box is clicked
+	private void documentFrameClosing(DocumentFrame documentFrame) {
+		if (documentFrame.requestClose()) {
+			documentFrame.setVisible(false);
+			documentFrame.dispose();
+			documents.remove(documentFrame);
+		}
+	}
 
-        documents.add(documentFrame);
-        upperDocumentFrame = documentFrame;
-    }
+	private void addDocumentFrame(DocumentFrame documentFrame) {
+		documentFrame.initialize();
+		documentFrame.setVisible(true);
 
-    private DocumentFrame getUpperDocumentFrame() {
-        return upperDocumentFrame;
-    }
+		// event handling
+		documentFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+			public void windowActivated(java.awt.event.WindowEvent e) {
+				documentFrameActivated((DocumentFrame) e.getWindow());
+			}
 
-    private void setupFramelessMenuBar() {
-        if (Utils.isMacOSX() &&
-                System.getProperty("apple.laf.useScreenMenuBar").equalsIgnoreCase("true")) {
-            if (invisibleFrame == null) {
-                // We use reflection here because the setUndecorated() method
-                // only exists in Java 1.4 and up
-                invisibleFrame = new AbstractFrame() {
+			public void windowClosing(java.awt.event.WindowEvent e) {
+				documentFrameClosing((DocumentFrame) e.getWindow());
+			}
+		});
 
-                    protected void initializeComponents() {
-                        getSaveAction().setEnabled(false);
-                        getSaveAsAction().setEnabled(false);
-                        if (getImportAction() != null) getImportAction().setEnabled(false);
-                        if (getExportAction() != null) getExportAction().setEnabled(false);
-                        getPrintAction().setEnabled(false);
+		documents.add(documentFrame);
+		upperDocumentFrame = documentFrame;
+	}
 
-                        getCutAction().setEnabled(false);
-                        getCopyAction().setEnabled(false);
-                        getPasteAction().setEnabled(false);
-                        getDeleteAction().setEnabled(false);
-                        getSelectAllAction().setEnabled(false);
-                        getFindAction().setEnabled(false);
+	private DocumentFrame getUpperDocumentFrame() {
+		return upperDocumentFrame;
+	}
 
-                        getZoomWindowAction().setEnabled(false);
-                        getMinimizeWindowAction().setEnabled(false);
-                        getCloseWindowAction().setEnabled(false);
+	private DocumentFrame getDocumentFrame(File file) {
+		for (DocumentFrame doc : documents) {
+			if (doc.getFile() == file) {
+				return doc;
+			}
+		}
 
-                    }
+		return null;
+	}
 
-                    public boolean requestClose() {
-                        return false;
-                    }
+	private void setupFramelessMenuBar() {
+		if (Utils.isMacOSX() &&
+				System.getProperty("apple.laf.useScreenMenuBar").equalsIgnoreCase("true")) {
+			if (invisibleFrame == null) {
+				// We use reflection here because the setUndecorated() method
+				// only exists in Java 1.4 and up
+				invisibleFrame = new AbstractFrame() {
 
-                    public JComponent getExportableComponent() {
-                        return null;
-                    }
-                };
-                invisibleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                try {
-                    Method mthd = invisibleFrame.getClass().getMethod("setUndecorated",
-                            new Class[]{Boolean.TYPE});
-                    mthd.invoke(invisibleFrame, new Object[]{Boolean.TRUE});
-                } catch (Exception ex) {
-                    // Shouldn't happen
-                }
-                invisibleFrame.setSize(0, 0);
-                invisibleFrame.pack();
-            }
-            invisibleFrame.initialize();
+					protected void initializeComponents() {
+						getSaveAction().setEnabled(false);
+						getSaveAsAction().setEnabled(false);
+						if (getImportAction() != null) getImportAction().setEnabled(false);
+						if (getExportAction() != null) getExportAction().setEnabled(false);
+						getPrintAction().setEnabled(false);
 
-            if (!invisibleFrame.isVisible())
-                invisibleFrame.setVisible(true);
+						getCutAction().setEnabled(false);
+						getCopyAction().setEnabled(false);
+						getPasteAction().setEnabled(false);
+						getDeleteAction().setEnabled(false);
+						getSelectAllAction().setEnabled(false);
+						getFindAction().setEnabled(false);
 
-            invisibleFrame.pack();
-        }
+						getZoomWindowAction().setEnabled(false);
+						getMinimizeWindowAction().setEnabled(false);
+						getCloseWindowAction().setEnabled(false);
 
-    }
+					}
+
+					public boolean requestClose() {
+						return false;
+					}
+
+					public JComponent getExportableComponent() {
+						return null;
+					}
+				};
+				invisibleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+				try {
+					Method mthd = invisibleFrame.getClass().getMethod("setUndecorated",
+							new Class[]{Boolean.TYPE});
+					mthd.invoke(invisibleFrame, new Object[]{Boolean.TRUE});
+				} catch (Exception ex) {
+					// Shouldn't happen
+				}
+				invisibleFrame.setSize(0, 0);
+				invisibleFrame.pack();
+			}
+			invisibleFrame.initialize();
+
+			if (!invisibleFrame.isVisible())
+				invisibleFrame.setVisible(true);
+
+			invisibleFrame.pack();
+		}
+
+	}
 
 }
