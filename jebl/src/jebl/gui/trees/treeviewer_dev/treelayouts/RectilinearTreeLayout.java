@@ -12,40 +12,40 @@ import java.util.List;
  */
 public class RectilinearTreeLayout extends AbstractTreeLayout {
 
-    public AxisType getXAxisType() {
-        return AxisType.CONTINUOUS;
-    }
+	public AxisType getXAxisType() {
+		return AxisType.CONTINUOUS;
+	}
 
-    public AxisType getYAxisType() {
-        return AxisType.DISCRETE;
-    }
+	public AxisType getYAxisType() {
+		return AxisType.DISCRETE;
+	}
 
-    public boolean isShowingRootBranch() {
-        return true;
-    }
+	public boolean isShowingRootBranch() {
+		return true;
+	}
 
-    public boolean maintainAspectRatio() {
-        return false;
-    }
+	public boolean maintainAspectRatio() {
+		return false;
+	}
 
-    public double getHeightOfPoint(Point2D point) {
-        return point.getX();
-    }
+	public double getHeightOfPoint(Point2D point) {
+		return point.getX();
+	}
 
-    public Shape getHeightLine(double height) {
-        double x = height;
-        double y1 = 0.0;
-        double y2 = 1.0;
-        return new Line2D.Double(x, y1, x, y2);
-    }
+	public Shape getHeightLine(double height) {
+		double x = height;
+		double y1 = 0.0;
+		double y2 = 1.0;
+		return new Line2D.Double(x, y1, x, y2);
+	}
 
-    public Shape getHeightArea(double height1, double height2) {
-	    double x = height1;
-	    double y = 0.0;
-	    double w = height2 - height1;
-	    double h = 1.0;
+	public Shape getHeightArea(double height1, double height2) {
+		double x = height1;
+		double y = 0.0;
+		double w = height2 - height1;
+		double h = 1.0;
 		return new Rectangle2D.Double(x, y, w, h);
-    }
+	}
 
 	public boolean isAlignTipLabels() {
 		return alignTipLabels;
@@ -60,182 +60,220 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	}
 
 	public void setAlignTipLabels(boolean alignTipLabels) {
-	    this.alignTipLabels = alignTipLabels;
-	    invalidate();
+		this.alignTipLabels = alignTipLabels;
+		invalidate();
 	}
 
 	public void setCurvature(double curvature) {
-	    setBranchCurveProportion(1.0 - curvature, 1.0 - curvature);
+		setBranchCurveProportion(1.0 - curvature, 1.0 - curvature);
 	}
 
-    public void setBranchCurveProportion(double xProportion, double yProportion) {
-        this.xProportion = xProportion;
-        this.yProportion = yProportion;
-        invalidate();
-    }
+	public void setBranchCurveProportion(double xProportion, double yProportion) {
+		this.xProportion = xProportion;
+		this.yProportion = yProportion;
+		invalidate();
+	}
 
 	public void setRootLength(double rootLength) {
-        this.rootLength = rootLength;
-        invalidate();
-    }
+		this.rootLength = rootLength;
+		invalidate();
+	}
 
-    protected void validate() {
+	protected void validate() {
 
-        nodePoints.clear();
-        branchPaths.clear();
-        tipLabelPaths.clear();
-        calloutPaths.clear();
+		nodePoints.clear();
+		branchPaths.clear();
+		tipLabelPaths.clear();
+		calloutPaths.clear();
 
-        maxXPosition = 0.0;
+		maxXPosition = 0.0;
 
-        yPosition = 0.0;
-        yIncrement = 1.0 / (tree.getExternalNodes().size() + 1);
+		yPosition = 0.0;
+		yIncrement = 1.0 / (tree.getExternalNodes().size() + 1);
 
-        Node root = this.tree.getRootNode();
-        double rl = rootLength * this.tree.getHeight(root);
+		Node root = this.tree.getRootNode();
+		double rl = rootLength * this.tree.getHeight(root);
 
-        maxXPosition = 0.0;
-        getMaxXPosition(root, rl);
+		maxXPosition = 0.0;
+		getMaxXPosition(root, rl);
 
-        Point2D rootPoint = constructNode(root, rl);
+		Point2D rootPoint = constructNode(root, rl);
 
-        // construct a root branch line
-        Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
+		// construct a root branch line
+		Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
 
-        // add the line to the map of branch paths
-        branchPaths.put(root, line);
+		// add the line to the map of branch paths
+		branchPaths.put(root, line);
 
-    }
+	}
 
-    private Point2D constructNode(Node node, double xPosition) {
+	private Point2D constructNode(Node node, double xPosition) {
 
-        Point2D nodePoint;
+		Point2D nodePoint;
 
-        if (!tree.isExternal(node)) {
+		if (!tree.isExternal(node)) {
 
-            double yPos = 0.0;
+			double yPos = 0.0;
 
-            List<Node> children = tree.getChildren(node);
-            for (Node child : children) {
+			List<Node> children = tree.getChildren(node);
+			for (Node child : children) {
 
-                double length = tree.getLength(child);
-                Point2D childPoint = constructNode(child, xPosition + length);
-                yPos += childPoint.getY();
-            }
+				double length = tree.getLength(child);
+				Point2D childPoint = constructNode(child, xPosition + length);
+				yPos += childPoint.getY();
+			}
 
-            // the y-position of the node is the average of the child nodes
-            yPos /= children.size();
+			// the y-position of the node is the average of the child nodes
+			yPos /= children.size();
 
-            nodePoint = new Point2D.Double(xPosition, yPos);
+			nodePoint = new Point2D.Double(xPosition, yPos);
 
-            for (Node child : children) {
+			for (Node child : children) {
 
-                Point2D childPoint = nodePoints.get(child);
+				Point2D childPoint = nodePoints.get(child);
 
-                GeneralPath branchPath = new GeneralPath();
+				GeneralPath branchPath = new GeneralPath();
 
-                // start point
-                float x0 = (float) nodePoint.getX();
-                float y0 = (float) nodePoint.getY();
+				// start point
+				float x0 = (float) nodePoint.getX();
+				float y0 = (float) nodePoint.getY();
 
-                // end point
-                float x1 = (float) childPoint.getX();
-                float y1 = (float) childPoint.getY();
+				// end point
+				float x1 = (float) childPoint.getX();
+				float y1 = (float) childPoint.getY();
 
-                float x2 = x1 - ((x1 - x0) * (float) xProportion);
-                float y2 = y0 + ((y1 - y0) * (float) yProportion);
+				if (xProportion < 1.0 || yProportion < 1.0) {
+					// if the curvature is on then we simply don't
+					// do tree colouring - I just can't be bothered to
+					// implement it (and it would probably be confusing anyway).
+					float x2 = x1 - ((x1 - x0) * (float) xProportion);
+					float y2 = y0 + ((y1 - y0) * (float) yProportion);
 
-                branchPath.moveTo(x0, y0);
-                branchPath.lineTo(x0, y2);
-                branchPath.quadTo(x0, y1, x2, y1);
-                branchPath.lineTo(x1, y1);
+					branchPath.moveTo(x0, y0);
+					branchPath.lineTo(x0, y2);
+					branchPath.quadTo(x0, y1, x2, y1);
+					branchPath.lineTo(x1, y1);
+				} else {
 
-                // add the branchPath to the map of branch paths
-                branchPaths.put(child, branchPath);
+					Object[] colouring = null;
+					if (colouringAttributeName != null) {
+						colouring = (Object[])child.getAttribute(colouringAttributeName);
+					}
+					if (colouring != null) {
+						// If there is a colouring, then we break the path up into
+						// segments. This should allow use to iterate along the segments
+						// and colour them as we draw them.
 
-                double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
-                Line2D branchLabelPath = new Line2D.Double(
-                        x3 - 1.0, childPoint.getY(),
-                        x3 + 1.0, childPoint.getY());
 
-                branchLabelPaths.put(child, branchLabelPath);
-            }
+						float nodeHeight = (float) tree.getHeight(node);
+						float childHeight = (float) tree.getHeight(child);
 
-            Line2D nodeLabelPath = new Line2D.Double(
-                    nodePoint.getX(), nodePoint.getY(),
-                    nodePoint.getX() + 1.0, nodePoint.getY());
+						float dist = x1 - x0;
 
-            nodeLabelPaths.put(node, nodeLabelPath);
+						// to help this, we are going to draw the branch backwards
+						branchPath.moveTo(x1, y1);
+						for (int i = 0; i < colouring.length - 1; i+=2) {
+							float height = ((Number)colouring[i+1]).floatValue();
+							float p = (height - childHeight) / (nodeHeight - childHeight);
+							float x = x1 - (dist * p);
+							branchPath.lineTo(x, y1);
+						}
+						branchPath.lineTo(x0, y1);
+						branchPath.lineTo(x0, y0);
+					} else {
+						branchPath.moveTo(x0, y0);
+						branchPath.lineTo(x0, y1);
+						branchPath.lineTo(x1, y1);
+					}
+				}
 
-	        Line2D nodeBarPath = new Line2D.Double(
-	                nodePoint.getX() - 1.0, nodePoint.getY(),
-	                nodePoint.getX() + 1.0, nodePoint.getY());
+				// add the branchPath to the map of branch paths
+				branchPaths.put(child, branchPath);
 
-	        nodeBarPaths.put(node, nodeBarPath);
-        } else {
+				double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
+				Line2D branchLabelPath = new Line2D.Double(
+						x3 - 1.0, childPoint.getY(),
+						x3 + 1.0, childPoint.getY());
 
-            nodePoint = new Point2D.Double(xPosition, yPosition);
+				branchLabelPaths.put(child, branchLabelPath);
+			}
 
-            Line2D tipLabelPath;
+			Line2D nodeLabelPath = new Line2D.Double(
+					nodePoint.getX(), nodePoint.getY(),
+					nodePoint.getX() + 1.0, nodePoint.getY());
 
-            if (alignTipLabels) {
+			nodeLabelPaths.put(node, nodeLabelPath);
 
-                tipLabelPath = new Line2D.Double(
-                        maxXPosition, nodePoint.getY(),
-                        maxXPosition + 1.0, nodePoint.getY());
+			Line2D nodeBarPath = new Line2D.Double(
+					nodePoint.getX() - 1.0, nodePoint.getY(),
+					nodePoint.getX() + 1.0, nodePoint.getY());
 
-                Line2D calloutPath = new Line2D.Double(
-                        nodePoint.getX(), nodePoint.getY(),
-                        maxXPosition, nodePoint.getY());
+			nodeBarPaths.put(node, nodeBarPath);
+		} else {
 
-                calloutPaths.put(node, calloutPath);
+			nodePoint = new Point2D.Double(xPosition, yPosition);
 
-            } else {
-                tipLabelPath = new Line2D.Double(
-                        nodePoint.getX(), nodePoint.getY(),
-                        nodePoint.getX() + 1.0, nodePoint.getY());
+			Line2D tipLabelPath;
 
-            }
+			if (alignTipLabels) {
 
-            tipLabelPaths.put(node, tipLabelPath);
+				tipLabelPath = new Line2D.Double(
+						maxXPosition, nodePoint.getY(),
+						maxXPosition + 1.0, nodePoint.getY());
 
-            yPosition += yIncrement;
+				Line2D calloutPath = new Line2D.Double(
+						nodePoint.getX(), nodePoint.getY(),
+						maxXPosition, nodePoint.getY());
 
-        }
+				calloutPaths.put(node, calloutPath);
 
-        // add the node point to the map of node points
-        nodePoints.put(node, nodePoint);
+			} else {
+				tipLabelPath = new Line2D.Double(
+						nodePoint.getX(), nodePoint.getY(),
+						nodePoint.getX() + 1.0, nodePoint.getY());
 
-        return nodePoint;
-    }
+			}
 
-    private void getMaxXPosition(Node node, double xPosition) {
+			tipLabelPaths.put(node, tipLabelPath);
 
-        if (!tree.isExternal(node)) {
+			yPosition += yIncrement;
 
-            List<Node> children = tree.getChildren(node);
+		}
 
-            for (Node child : children) {
-                double length = tree.getLength(child);
-                getMaxXPosition(child, xPosition + length);
-            }
+		// add the node point to the map of node points
+		nodePoints.put(node, nodePoint);
 
-        } else {
-            if (xPosition > maxXPosition) {
-                maxXPosition = xPosition;
-            }
-        }
-    }
+		return nodePoint;
+	}
 
-    private double yPosition;
-    private double yIncrement;
+	private void getMaxXPosition(Node node, double xPosition) {
 
-    private double maxXPosition;
+		if (!tree.isExternal(node)) {
 
-    private double xProportion = 1.0;
-    private double yProportion = 1.0;
+			List<Node> children = tree.getChildren(node);
 
-    private double rootLength = 0.01;
+			for (Node child : children) {
+				double length = tree.getLength(child);
+				getMaxXPosition(child, xPosition + length);
+			}
 
-    private boolean alignTipLabels = false;
+		} else {
+			if (xPosition > maxXPosition) {
+				maxXPosition = xPosition;
+			}
+		}
+	}
+
+	private double yPosition;
+	private double yIncrement;
+
+	private double maxXPosition;
+
+	private double xProportion = 1.0;
+	private double yProportion = 1.0;
+
+	private double rootLength = 0.01;
+
+	private boolean alignTipLabels = false;
+
 }

@@ -12,11 +12,10 @@ import java.awt.geom.Point2D;
  * @version $Id$
  */
 public interface TreeLayout {
-
-    enum AxisType {
-        CONTINUOUS,
-        DISCRETE
-    }
+	enum AxisType {
+	    CONTINUOUS,
+	    DISCRETE
+	}
 
     /**
      * Set the tree for the layout0
@@ -116,6 +115,10 @@ public interface TreeLayout {
     Line2D getNodeLabelPath(Node node);
 
 	Line2D getNodeBarPath(Node node);
-	
+
     Shape getCalloutPath(Node node);
+
+	String getColouringAttributeName();
+
+	void setColouringAttributeName(String colouringAttributeName);
 }

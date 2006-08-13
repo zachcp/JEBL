@@ -178,6 +178,13 @@ public class TreeViewerController extends AbstractController {
     public boolean isInitiallyVisible() {
         return true;
     }
+
+	public void setColouringAttributeName(String attributeName) {
+		rectilinearTreeLayout.setColouringAttributeName(attributeName);
+		polarTreeLayout.setColouringAttributeName(attributeName);
+		radialTreeLayout.setColouringAttributeName(attributeName);
+	}
+
     public void setSettings(Map<String,Object> settings) {
 	    String treeLayoutName = (String)settings.get(TREE_VIEWER_KEY + "." + LAYOUT_KEY);
         final TreeLayoutType layout = TreeLayoutType.valueOf(treeLayoutName);

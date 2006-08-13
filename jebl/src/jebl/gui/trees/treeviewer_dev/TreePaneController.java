@@ -118,7 +118,7 @@ public class TreePaneController extends AbstractController {
         branchLineWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 float lineWidth = ((Double) branchLineWidthSpinner.getValue()).floatValue();
-                treePane.setBranchStroke(new BasicStroke(lineWidth));
+                treePane.setBranchStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
             }
         });
         optionsPanel.addComponentWithLabel("Line Weight:", branchLineWidthSpinner);

@@ -1246,7 +1246,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		if (value.startsWith("{")) {
 			// the value is a list so recursively parse the elements
 			// and return an array
-			String[] elements = value.substring(1, value.length() - 2).split(",");
+			String[] elements = value.substring(1, value.length() - 1).split(",");
 			Object[] values = new Object[elements.length];
 			for (int i = 0; i < elements.length; i++) {
 				values[i] = parseValue(elements[i]);

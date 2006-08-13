@@ -4,8 +4,7 @@ import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 
 import java.awt.*;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
+import java.awt.geom.*;
 import java.util.List;
 
 /**
@@ -109,13 +108,49 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
                 Point2D childPoint = constructNode(child, a1, a2, nodePoint.getX(), nodePoint.getY(), childLength);
 
-                Line2D branchPath =
-                        new Line2D.Double(nodePoint.getX(), nodePoint.getY(), childPoint.getX(), childPoint.getY());
+	            Line2D branchLine = new Line2D.Double(
+				            nodePoint.getX(), nodePoint.getY(),
+				            childPoint.getX(), childPoint.getY());
 
-                // add the branchPath to the map of branch paths
-                branchPaths.put(child, branchPath);
+	            Object[] colouring = null;
+	            if (colouringAttributeName != null) {
+		            colouring = (Object[])child.getAttribute(colouringAttributeName);
+	            }
+	            if (colouring != null) {
+		            // If there is a colouring, then we break the path up into
+		            // segments. This should allow use to iterate along the segments
+		            // and colour them as we draw them.
 
-                branchLabelPaths.put(child, (Line2D)branchPath.clone());
+		            float nodeHeight = (float) tree.getHeight(node);
+		            float childHeight = (float) tree.getHeight(child);
+
+		            float x1 = (float)childPoint.getX();
+		            float y1 = (float)childPoint.getY();
+		            float x0 = (float)nodePoint.getX();
+		            float y0 = (float)nodePoint.getY();
+
+		            GeneralPath branchPath = new GeneralPath();
+
+		            // to help this, we are going to draw the branch backwards
+		            branchPath.moveTo(x1, y1);
+		            for (int j = 0; j < colouring.length - 1; j+=2) {
+			            float height = ((Number)colouring[j+1]).floatValue();
+			            float p = (height - childHeight) / (nodeHeight - childHeight);
+			            float x = x1 + ((x0 - x1) * p);
+			            float y = y1 + ((y0 - y1) * p);
+			            branchPath.lineTo(x, y);
+		            }
+		            branchPath.lineTo(x0, y0);
+
+		            // add the branchPath to the map of branch paths
+		            branchPaths.put(child, branchPath);
+
+	            } else {
+		            // add the branchLine to the map of branch paths
+		            branchPaths.put(child, branchLine);
+	            }
+
+                branchLabelPaths.put(child, (Line2D)branchLine.clone());
                 i++;
             }
 

@@ -121,8 +121,6 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         Point2D nodePoint;
         Point2D transformedNodePoint;
 
-        Point2D transformedSecondaryNodePoint;
-
         if (!tree.isExternal(node)) {
 
             double yPos = 0.0;
@@ -146,32 +144,66 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             nodePoint = new Point2D.Double(xPosition, yPos);
             transformedNodePoint = transform(nodePoint);
 
-            transformedSecondaryNodePoint = transform(new Point2D.Double(xPosition + 1.0, yPos));
-
             final double start = getAngle(yPos);
 
             i = 0;
             for (Node child : children) {
 
                 GeneralPath branchPath = new GeneralPath();
+	            final Point2D transformedChildPoint = transform(childPoints[i]);
+	            final Point2D transformedShoulderPoint = transform(
+			            nodePoint.getX(), childPoints[i].getY());
 
-                final double childY = childPoints[i].getY();
+	            Object[] colouring = null;
+	            if (colouringAttributeName != null) {
+		            colouring = (Object[])child.getAttribute(colouringAttributeName);
+	            }
+	            if (colouring != null) {
+		            // If there is a colouring, then we break the path up into
+		            // segments. This should allow use to iterate along the segments
+		            // and colour them as we draw them.
 
-                final double finish = getAngle(childY);
+		            float nodeHeight = (float) tree.getHeight(node);
+		            float childHeight = (float) tree.getHeight(child);
+
+		            float x1 = (float)transformedChildPoint.getX();
+		            float y1 = (float)transformedChildPoint.getY();
+		            float x0 = (float)transformedShoulderPoint.getX();
+		            float y0 = (float)transformedShoulderPoint.getY();
+
+		            branchPath.moveTo(x1, y1);
+		            for (int j = 0; j < colouring.length - 1; j+=2) {
+			            float height = ((Number)colouring[j+1]).floatValue();
+			            float p = (height - childHeight) / (nodeHeight - childHeight);
+			            float x = x1 + ((x0 - x1) * p);
+			            float y = y1 + ((y0 - y1) * p);
+			            branchPath.lineTo(x, y);
+		            }
+		            branchPath.lineTo(x0, y0);
+	            } else {
+		            branchPath.moveTo(
+				            (float) transformedChildPoint.getX(),
+				            (float) transformedChildPoint.getY());
+
+		            branchPath.lineTo(
+				            (float) transformedShoulderPoint.getX(),
+				            (float) transformedShoulderPoint.getY());
+	            }
+
+                final double finish = getAngle(childPoints[i].getY());
 
                 Arc2D arc = new Arc2D.Double();
-                arc.setArcByCenter(0.0, 0.0, nodePoint.getX(), start, finish - start, Arc2D.OPEN);
+                arc.setArcByCenter(0.0, 0.0, nodePoint.getX(), finish, start - finish, Arc2D.OPEN);
                 branchPath.append(arc, true);
-
-                final Point2D p = transform(childPoints[i]);
-                branchPath.lineTo((float) p.getX(), (float) p.getY());
 
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
                 final double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
 
-                Line2D branchLabelPath = new Line2D.Double(transform(x3 - 1.0, childY), transform(x3 + 1.0, childY));
+                Line2D branchLabelPath = new Line2D.Double(
+		                transform(x3 - 1.0, childPoints[i].getY()),
+		                transform(x3 + 1.0, childPoints[i].getY()));
 
                 branchLabelPaths.put(child, branchLabelPath);
 
@@ -193,8 +225,6 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
             nodePoint = new Point2D.Double(xPosition, yPosition);
             transformedNodePoint = transform(nodePoint);
-
-            transformedSecondaryNodePoint = transform(new Point2D.Double(xPosition - 1.0, yPosition));
 
             Line2D tipLabelPath;
 

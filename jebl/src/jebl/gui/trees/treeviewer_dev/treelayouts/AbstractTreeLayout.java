@@ -85,7 +85,15 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 
     protected abstract void validate();
 
-    private boolean invalid = true;
+	public String getColouringAttributeName() {
+		return colouringAttributeName;
+	}
+
+	public void setColouringAttributeName(String colouringAttributeName) {
+		this.colouringAttributeName = colouringAttributeName;
+	}
+
+	private boolean invalid = true;
     protected RootedTree tree = null;
     protected Map<Node, Point2D> nodePoints = new HashMap<Node, Point2D>();
     protected Map<Node, Shape> branchPaths = new HashMap<Node, Shape>();
@@ -96,4 +104,5 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 	protected Map<Node, Shape> calloutPaths = new HashMap<Node, Shape>();
 
     private Set<TreeLayoutListener> listeners = new HashSet<TreeLayoutListener>();
+	protected String colouringAttributeName = null;
 }
