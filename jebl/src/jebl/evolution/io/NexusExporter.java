@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.List;
+import java.awt.*;
 
 /**
  * Export sequences and trees to Nexus format.
@@ -144,7 +146,7 @@ public class NexusExporter implements SequenceExporter {
             Object name = t.getAttribute("name");
             StringBuilder builder = new StringBuilder();
             for( String key : t.getAttributeMap().keySet() ) {
-                // we should replace the explicit chaeck for name by something more general.
+                // we should replace the explicit check for name by something more general.
                 // Like a reserved character at the start (here &). however we have to worry about backward
                 // compatibility so no change yet with name.
                 if( !key.equals("name") && key.charAt(0) != '&' ) {
@@ -153,19 +155,49 @@ public class NexusExporter implements SequenceExporter {
                     if( builder.length() > 0 ) {
                         builder.append(",");
                     }
-                    builder.append(key).append('=').append(ImportHelper.safeName(value.toString()));
+                    builder.append(key).append('=');
+	                appendAttributeValue(value, builder);
                 }
             }
             final String metacomment = builder.toString();
 
             ++nt;
             final String treeName = (name != null) ? name.toString() : "tree_" + nt;
-            writer.println("\t" + (isRooted && !rtree.conceptuallyUnrooted() ? "" : "u") + "tree " + treeName
-                           + "=" + ((metacomment.length() > 0) ? ('[' + metacomment + ']') : "") +
+
+	        // TREE & UTREE are depreciated in the NEXUS format in favour of a metacomment
+	        // [&U] or [&R] after the TREE command. Andrew.
+            writer.println("\ttree [&" + (isRooted && !rtree.conceptuallyUnrooted() ? "r]" : "u]") +
+		                    treeName + "=" + ((metacomment.length() > 0) ? ('[' + metacomment + ']') : "") +
                            Utils.toNewick(rtree) + ";");
         }
         writer.println("end;");
     }
+
+	private StringBuilder appendAttributeValue(Object value, StringBuilder builder) {
+		if (value instanceof Object[]) {
+			builder.append("{");
+			Object[] elements = ((Object[])value);
+
+			if (elements.length > 0) {
+				appendAttributeValue(elements[0], builder);
+				for (int i = 1; i < elements.length; i++) {
+					builder.append(",");
+					appendAttributeValue(elements[i], builder);
+				}
+			}
+			return builder.append("}");
+		}
+
+		if (value instanceof Color) {
+			return builder.append("#").append(((Color)value).getRGB());
+		}
+
+		if (value instanceof String) {
+			return builder.append("\"").append(value).append("\"");
+		}
+
+		return builder.append(value);
+	}
 
     public void exportMatrix(final DistanceMatrix distanceMatrix) {
         final List<Taxon> taxa = distanceMatrix.getTaxa();
