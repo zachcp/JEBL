@@ -35,7 +35,14 @@ public class AttributeTaxonDecorator implements TaxonDecorator {
 
     protected Paint getPaint(Object value) {
         if (value != null) {
-            return Color.decode(value.toString());
+            if (value instanceof Color) {
+                return (Color)value;
+            }
+            try {
+                return Color.decode(value.toString());
+            } catch (NumberFormatException nfe) {
+                //
+            }
         }
         return null;
     }

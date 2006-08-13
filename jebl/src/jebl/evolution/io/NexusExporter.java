@@ -7,6 +7,8 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.graphs.Node;
+import jebl.util.Attributable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,9 +35,92 @@ public class NexusExporter implements SequenceExporter {
         this.writer.println("#NEXUS");
     }
 
-    // name suitable for printing - quotes if necessary.
-    private static String safeTaxonName(Taxon tax) {
-        return ImportHelper.safeName(tax.getName());
+    /**
+     * export alignment.
+     */
+    public void exportSequences(List<Sequence> sequences) throws IOException, IllegalArgumentException {
+
+        establishTaxa(sequences);
+
+        final int seqLen = sequences.get(0).getLength();
+        final SequenceType seqType = sequences.get(0).getSequenceType();
+
+        writer.println("begin characters;");
+        writer.println("\tdimensions nchar=" + seqLen + ";");
+        writer.println("\tformat datatype=" + seqType.getNexusDataType() +
+                " missing=" + seqType.getUnknownState().getName() +
+                " gap=" + seqType.getGapState().getName() + ";");
+        writer.println("\tmatrix");
+        for (Sequence sequence : sequences) {
+            if( sequence.getSequenceType() != seqType || sequence.getLength() != seqLen ) {
+                throw new IllegalArgumentException();
+            }
+            StringBuilder builder = new StringBuilder("\t");
+            appendTaxonName(sequence.getTaxon(), builder);
+            builder.append("\t").append(sequence.getString());
+            writer.println(builder);
+        }
+        writer.println(";\nend;");
+    }
+
+    /**
+     * export trees
+     */
+    public void exportTrees(List<? extends Tree> trees) throws IOException, IllegalArgumentException {
+        // all trees in a set should have the same taxa
+        establishTaxa(trees.get(0));
+
+        writer.println("begin trees;");
+        int nt = 0;
+        for( Tree t : trees ) {
+            if( establishTaxa(t) ) {
+                throw new IllegalArgumentException();
+            }
+            boolean isRooted = t instanceof RootedTree;
+            RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
+
+            Object name = t.getAttribute("name");
+
+            ++nt;
+            final String treeName = (name != null) ? name.toString() : "tree_" + nt;
+
+            StringBuilder builder = new StringBuilder("\ttree [&");
+
+            // TREE & UTREE are depreciated in the NEXUS format in favour of a metacomment
+            // [&U] or [&R] after the TREE command. Andrew.
+            builder.append(isRooted && !rtree.conceptuallyUnrooted() ? "r] " : "u] ");
+            builder.append(treeName);
+            builder.append(" = ");
+
+            appendAttributes(rtree, "name", builder);
+
+            appendTree(rtree, rtree.getRootNode(), builder);
+            builder.append(";");
+
+            writer.println(builder);
+        }
+        writer.println("end;");
+    }
+
+    public void exportMatrix(final DistanceMatrix distanceMatrix) {
+        final List<Taxon> taxa = distanceMatrix.getTaxa();
+        establishTaxa(taxa);
+        writer.println("begin distances;");
+        // assume distance matrix is symetric, so save upper part. no method to guarantee this yet
+        final double[][] distances = distanceMatrix.getDistances();
+        writer.println(" format triangle = upper nodiagonal;");
+        writer.println(" matrix ");
+        for(int i = 0; i < taxa.size(); ++i) {
+            StringBuilder builder = new StringBuilder("\t");
+            appendTaxonName(taxa.get(i), builder);
+            for(int j = i+1; j < taxa.size(); ++j) {
+                builder.append(" ");
+                builder.append(distances[i][j]);
+            }
+            writer.println(builder);
+        }
+        writer.println(";");
+        writer.println("end;");
     }
 
     /**
@@ -49,12 +134,27 @@ public class NexusExporter implements SequenceExporter {
         writer.println("\tdimensions ntax=" + taxons.length + ";");
         writer.println("\ttaxlabels");
 
-        for (Taxon tax : taxons) {
-            taxa.add(tax);
+        for (Taxon taxon : taxons) {
+            taxa.add(taxon);
 
-            writer.print("\t" + safeTaxonName(tax));
+            StringBuilder builder = new StringBuilder("\t");
+            appendTaxonName(taxon, builder);
+            appendAttributes(taxon, null, builder);
+            writer.println(builder);
         }
         writer.println(";\nend;\n");
+    }
+
+    /**
+     * name suitable for printing - quotes if necessary
+     */
+    private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
+        String name = taxon.getName();
+        if (!name.matches("^\\w+$")) {
+            builder.append("\'").append(name).append("\'");
+            return builder;
+        }
+        return builder.append(name);
     }
 
     /**
@@ -101,122 +201,87 @@ public class NexusExporter implements SequenceExporter {
         return establishTaxa(tree.getTaxa());
     }
 
-    /**
-     * export alignment.
-     */
-    public void exportSequences(List<Sequence> sequences) throws IOException, IllegalArgumentException {
+    private void appendTree(RootedTree tree, Node node, StringBuilder builder) {
+        if (tree.isExternal(node)) {
+            appendTaxonName(tree.getTaxon(node), builder);
 
-        establishTaxa(sequences);
+            appendAttributes(node, null, builder);
 
-        final int seqLen = sequences.get(0).getLength();
-        final SequenceType seqType = sequences.get(0).getSequenceType();
-
-        writer.println("begin characters;");
-        writer.println("\tdimensions nchar=" + seqLen + ";");
-        writer.println("\tformat datatype=" + seqType.getNexusDataType() +
-                " missing=" + seqType.getUnknownState().getName() +
-                " gap=" + seqType.getGapState().getName() + ";");
-        writer.println("\tmatrix");
-        for (Sequence sequence : sequences) {
-            if( sequence.getSequenceType() != seqType || sequence.getLength() != seqLen ) {
-                throw new IllegalArgumentException();
+            if( tree.hasLengths() ) {
+                builder.append(':');
+                builder.append(tree.getLength(node));
             }
-            writer.print(safeTaxonName(sequence.getTaxon()) + "\t");
-            writer.println(sequence.getString());
+        } else {
+            builder.append('(');
+            List<Node> children = tree.getChildren(node);
+            final int last = children.size() - 1;
+            for (int i = 0; i < children.size(); i++) {
+                appendTree(tree, children.get(i), builder);
+                builder.append(i == last ? ')' : ',');
+            }
+
+            appendAttributes(node, null, builder);
+
+            Node parent = tree.getParent(node);
+            // Don't write root length. This is ignored elsewhere and the nexus importer fails
+            // whet it is present.
+            if (parent != null) {
+                builder.append(":").append(tree.getLength(node));
+            }
         }
-        writer.println(";\nend;");
     }
 
-    /**
-     * export trees
-     */
-    public void exportTrees(List<? extends Tree> trees) throws IOException, IllegalArgumentException {
-        // all trees in a set should have the same taxa
-        establishTaxa(trees.get(0));
+    private StringBuilder appendAttributes(Attributable item, String excludeKey, StringBuilder builder) {
+        boolean first = true;
+        for( String key : item.getAttributeNames() ) {
+            // we should replace the explicit check for name by something more general.
+            // Like a reserved character at the start (here &). however we have to worry about backward
+            // compatibility so no change yet with name.
+            if( excludeKey == null || !key.equals(excludeKey) ) {
+                if (first) {
+                    builder.append("[&");
+                    first = false;
+                } else {
+                    builder.append(",");
+                }
 
-        writer.println("begin trees;");
-        int nt = 0;
-        for( Tree t : trees ) {
-            if( establishTaxa(t) ) {
-                throw new IllegalArgumentException();
+                builder.append(key).append('=');
+
+                Object value = item.getAttribute(key);
+                appendAttributeValue(value, builder);
             }
-            boolean isRooted = t instanceof RootedTree;
-            RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
+        }
+        if (!first) {
+            builder.append("]");
+        }
 
-            Object name = t.getAttribute("name");
-            StringBuilder builder = new StringBuilder();
-            for( String key : t.getAttributeMap().keySet() ) {
-                // we should replace the explicit check for name by something more general.
-                // Like a reserved character at the start (here &). however we have to worry about backward
-                // compatibility so no change yet with name.
-                if( !key.equals("name") && key.charAt(0) != '&' ) {
-                    Object value = t.getAttributeMap().get(key);
+        return builder;
+    }
 
-                    if( builder.length() > 0 ) {
-                        builder.append(",");
-                    }
-                    builder.append(key).append('=');
-	                appendAttributeValue(value, builder);
+    private StringBuilder appendAttributeValue(Object value, StringBuilder builder) {
+        if (value instanceof Object[]) {
+            builder.append("{");
+            Object[] elements = ((Object[])value);
+
+            if (elements.length > 0) {
+                appendAttributeValue(elements[0], builder);
+                for (int i = 1; i < elements.length; i++) {
+                    builder.append(",");
+                    appendAttributeValue(elements[i], builder);
                 }
             }
-            final String metacomment = builder.toString();
-
-            ++nt;
-            final String treeName = (name != null) ? name.toString() : "tree_" + nt;
-
-	        // TREE & UTREE are depreciated in the NEXUS format in favour of a metacomment
-	        // [&U] or [&R] after the TREE command. Andrew.
-            writer.println("\ttree [&" + (isRooted && !rtree.conceptuallyUnrooted() ? "r]" : "u]") +
-		                    treeName + "=" + ((metacomment.length() > 0) ? ('[' + metacomment + ']') : "") +
-                           Utils.toNewick(rtree) + ";");
+            return builder.append("}");
         }
-        writer.println("end;");
-    }
 
-	private StringBuilder appendAttributeValue(Object value, StringBuilder builder) {
-		if (value instanceof Object[]) {
-			builder.append("{");
-			Object[] elements = ((Object[])value);
-
-			if (elements.length > 0) {
-				appendAttributeValue(elements[0], builder);
-				for (int i = 1; i < elements.length; i++) {
-					builder.append(",");
-					appendAttributeValue(elements[i], builder);
-				}
-			}
-			return builder.append("}");
-		}
-
-		if (value instanceof Color) {
-			return builder.append("#").append(((Color)value).getRGB());
-		}
-
-		if (value instanceof String) {
-			return builder.append("\"").append(value).append("\"");
-		}
-
-		return builder.append(value);
-	}
-
-    public void exportMatrix(final DistanceMatrix distanceMatrix) {
-        final List<Taxon> taxa = distanceMatrix.getTaxa();
-        establishTaxa(taxa);
-        writer.println("begin distances;");
-        // assume distance matrix is symetric, so save upper part. no method to guarantee this yet
-        final double[][] distances = distanceMatrix.getDistances();
-        writer.println(" format triangle = upper nodiagonal;");
-        writer.println(" matrix ");
-        for(int i = 0; i < taxa.size(); ++i) {
-            writer.print(safeTaxonName(taxa.get(i)));
-            for(int j = i+1; j < taxa.size(); ++j) {
-               writer.print(" ");
-               writer.print(distances[i][j]);
-            }
-            writer.println();
+        if (value instanceof Color) {
+            return builder.append("#").append(((Color)value).getRGB());
         }
-        writer.println(";");
-        writer.println("end;");
+
+        if (value instanceof String) {
+            return builder.append("\"").append(value).append("\"");
+        }
+
+        return builder.append(value);
     }
 
     private Set<Taxon> taxa = null;

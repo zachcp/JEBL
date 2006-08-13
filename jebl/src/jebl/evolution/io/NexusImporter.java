@@ -733,10 +733,18 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		List<Taxon> taxa = new ArrayList<Taxon>();
 
 		do {
-			String name = helper.readToken(";");
+            String name = helper.readToken(";");
 
-			Taxon taxon = Taxon.getTaxon(name);
+            Taxon taxon = Taxon.getTaxon(name);
 			taxa.add(taxon);
+
+            if (helper.getLastMetaComment() != null) {
+                // There was a meta-comment which should be in the form:
+                // \[&label[=value][,label[=value]>[,/..]]\]
+                parseMetaCommentPairs(helper.getLastMetaComment(), taxon);
+
+                helper.clearLastMetaComment();
+            }
 		} while (helper.getLastDelimiter() != ';');
 
 		if (taxa.size() != taxonCount) {
@@ -1201,7 +1209,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		// This regex should match key=value pairs, separated by commas
 		// This can match the following types of meta comment pairs:
 		// value=number, value="string", value={item1, item2, item3}
-		Pattern pattern = Pattern.compile("([^,=\\s]+)\\s*(=\\s*({[^=}]*}|\"[^\"]*\"+|[^,]+))?");
+		Pattern pattern = Pattern.compile("([^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
 		Matcher matcher = pattern.matcher(meta);
 
 		while (matcher.find()) {
@@ -1209,10 +1217,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			if (label == null || label.trim().length() == 0) {
 				throw new ImportException.BadFormatException("Badly formatted attribute: '"+matcher.group()+"'");
 			}
-			String value = matcher.group(1);
+			String value = matcher.group(2);
 			if (value != null && value.trim().length() > 0) {
 				// there is a specified value so try to parse it
-				item.setAttribute(label, parseValue(value));
+				item.setAttribute(label, parseValue(value.substring(1)));
 			} else {
 				item.setAttribute(label, Boolean.TRUE);
 			}

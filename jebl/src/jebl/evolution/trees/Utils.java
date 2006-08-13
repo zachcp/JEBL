@@ -32,27 +32,30 @@ public final class Utils {
         return buffer.toString();
     }
 
-    private static void addMetaComment(Node node, StringBuilder buffer) {
-        Map<String, Object> map = node.getAttributeMap();
-        if (map.size() == 0) {
-            return;
-        }
-        buffer.append(" [&");
-        boolean first = true;
-        for (Map.Entry<String, Object> o : map.entrySet()) {
-            if (! first) {
-                buffer.append(",");
-            }
-            first = false;
+//    private static void addMetaComment(Node node, StringBuilder buffer) {
+//        Map<String, Object> map = node.getAttributeMap();
+//        if (map.size() == 0) {
+//            return;
+//        }
+//        buffer.append(" [&");
+//        boolean first = true;
+//        for (Map.Entry<String, Object> o : map.entrySet()) {
+//            if (! first) {
+//                buffer.append(",");
+//            }
+//            first = false;
+//
+//            String val = o.getValue().toString();
+//            // we have no way to quote commas right now, throw them away if inside value.
+//            val = val.replace(',', ' ');
+//            buffer.append(o.getKey()).append("=").append(val);
+//        }
+//        buffer.append("] ");
+//    }
 
-            String val = o.getValue().toString();
-            // we have no way to quote commas right now, throw them away if inside value.
-            val = val.replace(',', ' ');
-            buffer.append(o.getKey()).append("=").append(val);
-        }
-        buffer.append("] ");
-    }
-
+//  Andrew - Comments are not part of the Newick format so should not be included except within
+//  a NEXUS file. I have copied the tree writing code (with metacomments) to NexusExport and
+//  simplified this on to produce the straight Newick format.
     private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
@@ -64,7 +67,6 @@ public final class Utils {
               buffer.append(':');
               buffer.append(tree.getLength(node));
             }
-            addMetaComment(node, buffer);
         } else {
             buffer.append('(');
             List<Node> children = tree.getChildren(node);
@@ -80,7 +82,6 @@ public final class Utils {
             if (parent != null) {
                 buffer.append(":").append(tree.getLength(node));
             }
-            addMetaComment(node, buffer);
         }
     }
 

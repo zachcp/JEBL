@@ -403,8 +403,13 @@ public class ImportHelper {
 						// otherwise it terminates the token
 
 						lastDelimiter = ' ';
-						unreadCharacter(ch2);
-						done = true;
+
+                        if (hasComments && (ch2 == startComment || ch2 == lineComment)) {
+                            skipComments(ch2);
+                        } else {
+                            unreadCharacter(ch2);
+                        }
+                        done = true;
 						quoted = false;
 					}
 				} else if (first && (ch == '\'' || ch == '"')) {
