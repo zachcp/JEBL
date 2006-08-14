@@ -168,14 +168,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 						float nodeHeight = (float) tree.getHeight(node);
 						float childHeight = (float) tree.getHeight(child);
 
-						float dist = x1 - x0;
-
 						// to help this, we are going to draw the branch backwards
 						branchPath.moveTo(x1, y1);
 						for (int i = 0; i < colouring.length - 1; i+=2) {
 							float height = ((Number)colouring[i+1]).floatValue();
 							float p = (height - childHeight) / (nodeHeight - childHeight);
-							float x = x1 - (dist * p);
+							float x = x1 - ((x1 - x0) * p);
 							branchPath.lineTo(x, y1);
 						}
 						branchPath.lineTo(x0, y1);

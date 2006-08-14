@@ -151,6 +151,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
                 GeneralPath branchPath = new GeneralPath();
 	            final Point2D transformedChildPoint = transform(childPoints[i]);
+
 	            final Point2D transformedShoulderPoint = transform(
 			            nodePoint.getX(), childPoints[i].getY());
 
@@ -166,20 +167,25 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		            float nodeHeight = (float) tree.getHeight(node);
 		            float childHeight = (float) tree.getHeight(child);
 
-		            float x1 = (float)transformedChildPoint.getX();
-		            float y1 = (float)transformedChildPoint.getY();
-		            float x0 = (float)transformedShoulderPoint.getX();
-		            float y0 = (float)transformedShoulderPoint.getY();
+		            double x1 = childPoints[i].getX();
+		            double x0 = nodePoint.getX();
 
-		            branchPath.moveTo(x1, y1);
+		            branchPath.moveTo(
+				            (float) transformedChildPoint.getX(),
+				            (float) transformedChildPoint.getY());
+
 		            for (int j = 0; j < colouring.length - 1; j+=2) {
-			            float height = ((Number)colouring[j+1]).floatValue();
-			            float p = (height - childHeight) / (nodeHeight - childHeight);
-			            float x = x1 + ((x0 - x1) * p);
-			            float y = y1 + ((y0 - y1) * p);
-			            branchPath.lineTo(x, y);
+			            double height = ((Number)colouring[j+1]).doubleValue();
+			            double p = (height - childHeight) / (nodeHeight - childHeight);
+			            double x = x1 - ((x1 - x0) * p);
+			            final Point2D transformedPoint = transform(x, childPoints[i].getY());
+			            branchPath.lineTo(
+					            (float) transformedPoint.getX(),
+					            (float) transformedPoint.getY());
 		            }
-		            branchPath.lineTo(x0, y0);
+		            branchPath.lineTo(
+				            (float) transformedShoulderPoint.getX(),
+				            (float) transformedShoulderPoint.getY());
 	            } else {
 		            branchPath.moveTo(
 				            (float) transformedChildPoint.getX(),
