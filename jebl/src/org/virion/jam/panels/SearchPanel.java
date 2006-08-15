@@ -3,14 +3,14 @@ package org.virion.jam.panels;
 import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
-import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,18 +36,18 @@ public class SearchPanel extends JPanel {
         Icon stopRolloverIcon = IconUtils.getIcon(SearchPanel.class, "images/search/stopRollover.png");
         Icon stopPressedIcon = IconUtils.getIcon(SearchPanel.class, "images/search/stopPressed.png");
 
-        setLayout(new BorderLayout(0,0));
+        setLayout(new BorderLayout(0, 0));
 
         if (popup != null) {
-	        popup.getSelectionModel().setSelectedIndex(0);
+            popup.getSelectionModel().setSelectedIndex(0);
             findButton = new JButton(findPopupIcon);
             findButton.add(popup);
             findButton.addMouseListener(new MouseAdapter() {
-	          public void mousePressed(MouseEvent mouseEvent) {
-		          Component comp = mouseEvent.getComponent();
-		          popup.show(comp, 0, comp.getHeight());
-	          }
-	        });
+                public void mousePressed(MouseEvent mouseEvent) {
+                    Component comp = mouseEvent.getComponent();
+                    popup.show(comp, 0, comp.getHeight());
+                }
+            });
         } else {
             findButton = new JButton(findIcon);
             findButton.addActionListener(new ActionListener() {
@@ -67,7 +67,7 @@ public class SearchPanel extends JPanel {
         findButton.setContentAreaFilled(false);
 
         JPanel findPanel = new JPanel();
-        findPanel.setBorder(BorderFactory.createEmptyBorder(0,2,0,2));
+        findPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
         findPanel.setOpaque(false);
         findPanel.add(findButton);
 
@@ -87,7 +87,7 @@ public class SearchPanel extends JPanel {
         cancelButton.setContentAreaFilled(false);
 
         JPanel cancelPanel = new JPanel();
-        cancelPanel.setBorder(BorderFactory.createEmptyBorder(0,2,0,2));
+        cancelPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
         cancelPanel.setOpaque(false);
         cancelPanel.add(cancelButton);
 
@@ -96,8 +96,8 @@ public class SearchPanel extends JPanel {
         add(cancelPanel, BorderLayout.EAST);
 
         setBackground(searchText.getBackground());
-        setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.gray));
-        setPreferredSize(new Dimension(120,24));
+        setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.gray));
+        setPreferredSize(new Dimension(120, 24));
 
         searchText.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
@@ -131,7 +131,7 @@ public class SearchPanel extends JPanel {
             }
         });
 
-		searchText.addKeyListener(new KeyAdapter() {
+        searchText.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (!searchTextEmpty) {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -144,9 +144,9 @@ public class SearchPanel extends JPanel {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     if (comboBox != null) {
-                        int index =comboBox.getSelectedIndex();
-                        if (index <comboBox.getItemCount()- 1)
-                            index ++;
+                        int index = comboBox.getSelectedIndex();
+                        if (index < comboBox.getItemCount() - 1)
+                            index++;
                         comboBox.setSelectedIndex(index);
                         e.consume();
                     }
@@ -154,8 +154,8 @@ public class SearchPanel extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                     if (comboBox != null) {
                         int index = comboBox.getSelectedIndex();
-                        if (index> 0)
-                            index --;
+                        if (index > 0)
+                            index--;
                         comboBox.setSelectedIndex(index);
                         e.consume();
                     }
@@ -193,6 +193,10 @@ public class SearchPanel extends JPanel {
         findButton.setToolTipText(text);
     }
 
+    public void setFindIcon(Icon icon) {
+        findButton.setIcon(icon);
+    }
+
     public void addSearchPanelListener(SearchPanelListener listener) {
         listeners.add(listener);
     }
@@ -200,8 +204,8 @@ public class SearchPanel extends JPanel {
     public void removeDataSourceListener(SearchPanelListener listener) {
         listeners.remove(listener);
     }
-    public boolean requestFocusInWindow()
-    {
+
+    public boolean requestFocusInWindow() {
         return searchText.requestFocusInWindow();
     }
 
@@ -218,18 +222,18 @@ public class SearchPanel extends JPanel {
     private void fireSearchStarted() {
         Iterator i = listeners.iterator();
         while (i.hasNext()) {
-            ((SearchPanelListener)i.next()).searchStarted(searchText.getText());
+            ((SearchPanelListener) i.next()).searchStarted(searchText.getText());
         }
     }
 
     private void fireSearchStopped() {
         Iterator i = listeners.iterator();
         while (i.hasNext()) {
-            ((SearchPanelListener)i.next()).searchStopped();
+            ((SearchPanelListener) i.next()).searchStopped();
         }
     }
 
-	private ArrayList listeners = new ArrayList();
+    private ArrayList listeners = new ArrayList();
     private boolean searchTextEmpty = true;
     private final String emptyLabel;
     private boolean continuousSearch;
@@ -256,10 +260,11 @@ public class SearchPanel extends JPanel {
     }
 
     private void searchTextChanged() {
-        if(searchText.isFocusOwner())
-            searchTextEmpty = searchText.getText().length()== 0;
+        if (searchText.isFocusOwner())
+            searchTextEmpty = searchText.getText().length() == 0;
         fireSearchTextChanged();
     }
+
     public void fireSearchTextChanged() {
         if (searchTextEmpty) {
             cancelButton.setVisible(false);
