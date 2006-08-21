@@ -130,6 +130,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         Object value = node.getAttribute(attribute);
         if (value != null) {
+            if (value instanceof Double) {
+                Double x = (Double) value;
+                return formatter.getFormattedValue(x);
+            }
             return value.toString();
         }
         return null;
