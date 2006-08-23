@@ -90,7 +90,7 @@ public class ProfileCharacter {
 
     public static float scoreSelf(ProfileCharacter character, Scores scores) {
         float score = 0;
-        int totalCharacters = character.totalCharacters * character.totalCharacters;
+        long totalCharacters = ((long)character.totalCharacters) * character.totalCharacters;
         if (totalCharacters == 1) {
             return scores.score[character.characters[0]][character.characters[0]];
         }
