@@ -36,21 +36,15 @@ public class NodeBarController extends AbstractController {
 
         String[] attributeNames = this.nodeBarPainter.getAttributeNames();
 
-        displayLowerAttributeCombo = new JComboBox(attributeNames);
-        displayLowerAttributeCombo.addItemListener(new ItemListener() {
+        displayAttributeCombo = new JComboBox(attributeNames);
+        displayAttributeCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                String attribute = (String)displayLowerAttributeCombo.getSelectedItem();
-                nodeBarPainter.setLowerAttributeName(attribute);
+                String attribute = (String)displayAttributeCombo.getSelectedItem();
+                nodeBarPainter.setDisplayAttribute(attribute);
             }
         });
 
-        displayUpperAttributeCombo = new JComboBox(attributeNames);
-        displayUpperAttributeCombo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent itemEvent) {
-                String attribute = (String)displayUpperAttributeCombo.getSelectedItem();
-                nodeBarPainter.setUpperAttributeName(attribute);
-            }
-        });
+	    optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
 
         this.nodeBarPainter.addPainterListener(new PainterListener() {
             public void painterChanged() {
@@ -58,47 +52,24 @@ public class NodeBarController extends AbstractController {
             }
 
             public void painterSettingsChanged() {
-                displayLowerAttributeCombo.removeAllItems();
-                displayUpperAttributeCombo.removeAllItems();
+                displayAttributeCombo.removeAllItems();
                 for (String name : nodeBarPainter.getAttributeNames()) {
-                    displayLowerAttributeCombo.addItem(name);
-                    displayUpperAttributeCombo.addItem(name);
+                    displayAttributeCombo.addItem(name);
                 }
 
                 optionsPanel.repaint();
             }
         });
 
-        if (nodeBarPainter.getLowerAttributeName() == null) {
-            for (String name : attributeNames) {
-                if (name.toUpperCase().contains("LOWER")) {
-                    displayLowerAttributeCombo.setSelectedItem(name);
-                    break;
-                }
-            }
-        }
+        barWidthSpinner = new JSpinner(new SpinnerNumberModel(4.0, 0.01, 48.0, 1.0));
 
-        if (nodeBarPainter.getUpperAttributeName() == null) {
-            for (String name : attributeNames) {
-                if (name.toUpperCase().contains("UPPER")) {
-                    displayUpperAttributeCombo.setSelectedItem(name);
-                    break;
-                }
-            }
-        }
-
-        optionsPanel.addComponentWithLabel("Lower:", displayLowerAttributeCombo);
-        optionsPanel.addComponentWithLabel("Upper:", displayUpperAttributeCombo);
-
-        branchLineWidthSpinner = new JSpinner(new SpinnerNumberModel(4.0, 0.01, 48.0, 1.0));
-
-        branchLineWidthSpinner.addChangeListener(new ChangeListener() {
+        barWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                float lineWidth = ((Double) branchLineWidthSpinner.getValue()).floatValue();
+                float lineWidth = ((Double) barWidthSpinner.getValue()).floatValue();
                 nodeBarPainter.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
             }
         });
-        optionsPanel.addComponentWithLabel("Line Weight:", branchLineWidthSpinner);
+        optionsPanel.addComponentWithLabel("Bar Width:", barWidthSpinner);
 
         nodeBarPainter.setStroke(new BasicStroke(4.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
@@ -125,8 +96,7 @@ public class NodeBarController extends AbstractController {
     private final JCheckBox titleCheckBox;
     private final OptionsPanel optionsPanel;
 
-    private JComboBox displayLowerAttributeCombo;
-    private JComboBox displayUpperAttributeCombo;
+    private JComboBox displayAttributeCombo;
 
     public String getTitle() {
         return title;
@@ -136,5 +106,5 @@ public class NodeBarController extends AbstractController {
 
     private final NodeBarPainter nodeBarPainter;
 
-    private final JSpinner branchLineWidthSpinner;
+    private final JSpinner barWidthSpinner;
 }

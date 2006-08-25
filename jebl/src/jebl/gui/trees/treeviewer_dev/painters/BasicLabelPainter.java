@@ -101,12 +101,32 @@ public class BasicLabelPainter extends LabelPainter<Node> {
             }
         }
 
-        Object value = node.getAttribute(displayAttribute);
-        if (value != null) {
-            return value.toString();
-        }
-        return null;
+        return formatValue(node.getAttribute(displayAttribute));
     }
+
+	private String formatValue(Object value) {
+		if (value != null) {
+			if (value instanceof Double) {
+				return getNumberFormat().format(value);
+			} else if (value instanceof Object[]) {
+				Object[] values = (Object[])value;
+
+				if (values.length == 0) return null;
+				if (values.length == 1) return formatValue(values[0]);
+
+		        StringBuilder builder = new StringBuilder("[");
+				builder.append(formatValue(values[0]));
+				for (int i = 1; i < values.length; i++) {
+					builder.append(",");
+					builder.append(formatValue(values[i]));
+				}
+				builder.append("]");
+				return builder.toString();
+			}
+		    return value.toString();
+		}
+		return null;
+	}
 
     public Rectangle2D calibrate(Graphics2D g2, Node item) {
         Tree tree = treePane.getTree();

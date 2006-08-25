@@ -26,7 +26,12 @@ public class NodeBarPainter extends NodePainter {
         if (tree != null) {
             Set<String> nodeAttributes = new TreeSet<String>();
             for (Node node : tree.getNodes()) {
-                nodeAttributes.addAll(node.getAttributeNames());
+	            for (String name : node.getAttributeNames()) {
+		            Object attr = node.getAttribute(name);
+		            if (attr instanceof Object[] && ((Object[])attr).length == 2) {
+			            nodeAttributes.add(name);
+		            }
+	            }
             }
             attributeNames.addAll(nodeAttributes);
         }
@@ -54,7 +59,8 @@ public class NodeBarPainter extends NodePainter {
 
         boolean hasBar = false;
 
-        Object value = node.getAttribute(lowerAttributeName);
+        Object[] values = (Object[])node.getAttribute(displayAttribute);
+	    Object value = values[0];
         if (value != null ) {
             if (value instanceof Number) {
                 lower = ((Number)value).doubleValue();
@@ -66,7 +72,7 @@ public class NodeBarPainter extends NodePainter {
             // todo - warn the user somehow?
         }
 
-        value = node.getAttribute(upperAttributeName);
+	    value = values[1];
         if (value != null ) {
             if (value instanceof Number) {
                 upper = ((Number)value).doubleValue();
@@ -147,29 +153,19 @@ public class NodeBarPainter extends NodePainter {
         return attributeNames;
     }
 
-    public String getLowerAttributeName() {
-        return lowerAttributeName;
+    public String getDisplayAttributeName() {
+        return displayAttribute;
     }
 
-    public String getUpperAttributeName() {
-        return upperAttributeName;
-    }
-
-    public void setLowerAttributeName(String attributeName) {
-        this.lowerAttributeName = attributeName;
-        firePainterChanged();
-    }
-
-    public void setUpperAttributeName(String attributeName) {
-        this.upperAttributeName = attributeName;
+    public void setDisplayAttribute(String displayAttribute) {
+        this.displayAttribute = displayAttribute;
         firePainterChanged();
     }
 
     private double preferredWidth;
     private double preferredHeight;
 
-    private String lowerAttributeName = null;
-    private String upperAttributeName = null;
+    private String displayAttribute = null;
     private String[] attributeNames;
 
     private TreePane treePane;
