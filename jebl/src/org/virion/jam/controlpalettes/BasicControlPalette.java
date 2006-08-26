@@ -40,6 +40,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         this.openingSpeed = openingSpeed;
         BoxLayout layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
+        setOpaque(true);
     }
 
 
@@ -129,12 +130,15 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
     private void setupController(Controller controller) {
 
         JPanel titlePanel = new JPanel(new BorderLayout(6, 0));
+        titlePanel.setOpaque(false);
         titlePanel.add(controller.getTitleComponent(), BorderLayout.CENTER);
 
         JPanel controllerPanel = controller.getPanel();
+        controllerPanel.setOpaque(false);
 
-//		// This tells Quaqua L&F to use a small components (ignored otherwise)
-        titlePanel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		// This tells Quaqua L&F to use a small components (ignored otherwise)
+        controller.getTitleComponent().setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+        controller.getTitleComponent().setOpaque(false);
         controllerPanel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 
 //		JCheckBox pinnedCheck = new JCheckBox();

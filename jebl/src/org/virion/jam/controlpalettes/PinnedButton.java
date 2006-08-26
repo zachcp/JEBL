@@ -16,7 +16,6 @@ public class PinnedButton extends JToggleButton {
 
 		putClientProperty("JButton.buttonType", "toolbar");
 		setBorderPainted(false);
-		setOpaque(false);
 		// this is required on Windows XP platform -- untested on Macintosh
 		setContentAreaFilled(false);
 

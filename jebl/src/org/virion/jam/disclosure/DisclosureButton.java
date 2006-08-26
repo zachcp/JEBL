@@ -26,7 +26,6 @@ public class DisclosureButton extends JToggleButton {
         this.animationSpeed = animationSpeed;
         putClientProperty("JButton.buttonType", "toolbar");
         setBorderPainted(false);
-        setOpaque(false);
         // this is required on Windows XP platform -- untested on Macintosh
         setContentAreaFilled(false);
 

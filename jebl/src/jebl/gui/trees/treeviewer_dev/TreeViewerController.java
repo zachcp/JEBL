@@ -69,6 +69,7 @@ public class TreeViewerController extends AbstractController {
         radialTreeLayoutController = new RadialTreeLayoutController(radialTreeLayout);
 
         JPanel panel1 = new JPanel();
+        panel1.setOpaque(false);
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
         Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer_dev/images/rectangularTree.png");
         Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer_dev/images/polarTree.png");
@@ -128,6 +129,7 @@ public class TreeViewerController extends AbstractController {
         optionsPanel.addSeparator();
 
         layoutPanel = new JPanel(new BorderLayout());
+        layoutPanel.setOpaque(false);
         setTreeLayout(defaultLayout);
         setExpansion();
 

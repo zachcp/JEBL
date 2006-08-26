@@ -33,23 +33,27 @@ public class DisclosurePanel extends JPanel {
     public DisclosurePanel(final JComponent titleComponent, final JPanel panel,
 	                       boolean isOpen, int openSpeed) {
 
+        setOpaque(false);
+
         this.panel = panel;
+        panel.setOpaque(false);
 
         setLayout(new BorderLayout());
 
 		button = new DisclosureButton(openSpeed);
 
         this.titleComponent = titleComponent;
+        titleComponent.setOpaque(false);
 
 		JPanel panel1 = new JPanel(new BorderLayout(6, 0)) {
-
 			public void paint(Graphics graphics) {
-				graphics.drawImage(background, 0, 0, getWidth(), getHeight(), null);
-				super.paint(graphics);
+				graphics.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+                super.paint(graphics);
 			}
 		};
+        panel1.setOpaque(false);
 
-		panel1.add(button, BorderLayout.WEST);
+        panel1.add(button, BorderLayout.WEST);
 		panel1.add(titleComponent, BorderLayout.CENTER);
         add(panel1, BorderLayout.NORTH);
 
@@ -137,11 +141,11 @@ public class DisclosurePanel extends JPanel {
     private final JPanel panel;
 	private final java.util.List listeners = new ArrayList();
 
-	private static BufferedImage background = null;
+	private static BufferedImage backgroundImage = null;
 
 	static {
 		try {
-			background = IconUtils.getBufferedImage(DisclosurePanel.class, "images/titleBackground.png");
+			backgroundImage = IconUtils.getBufferedImage(DisclosurePanel.class, "images/titleBackground.png");
 
 		} catch (Exception e) {
 			// no icons...

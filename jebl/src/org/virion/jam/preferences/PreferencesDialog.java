@@ -45,7 +45,8 @@ public class PreferencesDialog {
 
         JPanel panel = new JPanel(new BorderLayout());
         Toolbar toolbar = new Toolbar(null);
-
+        toolbar.setFloatable(false);
+        
         cardLayout = new CardLayout();
         sectionsPanel = new JPanel(cardLayout);
 
