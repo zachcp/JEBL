@@ -186,7 +186,7 @@ public abstract class Application {
         printJob.pageDialog(new PageFormat());
     }
 
-    public void doOpen() {
+    public DocumentFrame doOpen() {
         Frame frame = getDefaultFrame();
         if (frame == null) {
             frame = new JFrame();
@@ -198,22 +198,26 @@ public abstract class Application {
         dialog.setVisible(true);
         if (dialog.getFile() != null) {
             File file = new File(dialog.getDirectory(), dialog.getFile());
-            doOpenFile(file);
+            DocumentFrame doc = doOpenFile(file);
             addRecentFile(file);
+            return doc;
         }
+        return null;
     }
 
-	public void doOpen(String fileName) {
+	public DocumentFrame doOpen(String fileName) {
         if (fileName != null && fileName.length() > 0) {
             File file = new File(fileName);
-            doOpenFile(file);
+            DocumentFrame doc = doOpenFile(file);
             addRecentFile(file);
+            return doc;
         }
+        return null;
 	}
 
-    public abstract void doNew();
+    public abstract DocumentFrame doNew();
 
-    public abstract void doOpenFile(File file);
+    public abstract DocumentFrame doOpenFile(File file);
 
     public abstract void doQuit();
 

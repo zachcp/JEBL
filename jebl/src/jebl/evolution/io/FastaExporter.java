@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
+import java.util.Collection;
 
 /**
  * Class for exporting a fasta file format.
@@ -31,7 +32,7 @@ public class FastaExporter implements SequenceExporter {
     /**
      * export alignment or set of sequences.
      */
-    public void exportSequences(List<Sequence> sequences) throws IOException {
+    public void exportSequences(Collection<? extends Sequence> sequences) throws IOException {
         for (Sequence sequence : sequences) {
             final Taxon taxon = sequence.getTaxon();
             final String desc = (String) taxon.getAttribute(FastaImporter.descriptionPropertyName);

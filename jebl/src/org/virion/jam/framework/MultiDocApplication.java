@@ -59,11 +59,17 @@ public class MultiDocApplication extends Application {
 		return documentFrameFactory.createDocumentFrame(this, getMenuBarFactory());
 	}
 
-	public void doNew() {
-		addDocumentFrame(createDocumentFrame());
-	}
+    public void destroyDocumentFrame(DocumentFrame documentFrame) {
+        closeDocumentFrame(documentFrame);
+    }
 
-	public void doOpenFile(File file) {
+	public DocumentFrame doNew() {
+        DocumentFrame doc = createDocumentFrame();
+        addDocumentFrame(doc);
+        return doc;
+    }
+
+	public DocumentFrame doOpenFile(File file) {
 
 		DocumentFrame documentFrame = getDocumentFrame(file);
 
@@ -75,7 +81,9 @@ public class MultiDocApplication extends Application {
 		}
 
 		documentFrame.toFront();
-	}
+
+        return documentFrame;
+    }
 
 	public void doQuit() {
 
@@ -103,11 +111,17 @@ public class MultiDocApplication extends Application {
 	// Close the window when the close box is clicked
 	private void documentFrameClosing(DocumentFrame documentFrame) {
 		if (documentFrame.requestClose()) {
-			documentFrame.setVisible(false);
-			documentFrame.dispose();
-			documents.remove(documentFrame);
+            closeDocumentFrame(documentFrame);
 		}
 	}
+
+    // Close the documentFrame without further discussion
+    private void closeDocumentFrame(DocumentFrame documentFrame) {
+            documentFrame.setVisible(false);
+            documentFrame.dispose();
+            documentFrame.removeWindowListener(documentFrame.getWindowListeners()[0]);
+            documents.remove(documentFrame);
+    }
 
 	private void addDocumentFrame(DocumentFrame documentFrame) {
 		documentFrame.initialize();

@@ -56,12 +56,13 @@ public class SingleDocApplication extends Application {
 
 	protected String getDocumentExtension() { return ""; }
 
-    public void doNew() {
+    public DocumentFrame doNew() {
         throw new RuntimeException("A SingleDocApplication cannot do a New command");
     }
 
-    public void doOpenFile(File file) {
+    public DocumentFrame doOpenFile(File file) {
         documentFrame.openFile(file);
+        return documentFrame;
     }
 
     public void doCloseWindow() {

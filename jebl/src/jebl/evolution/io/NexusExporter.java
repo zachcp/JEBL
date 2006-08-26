@@ -8,6 +8,7 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.alignments.Alignment;
 import jebl.util.Attributable;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.awt.*;
  * @version $Id$
  */
 
-public class NexusExporter implements SequenceExporter {
+public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
     /**
      *
      * @param writer where export text goes
@@ -36,44 +37,77 @@ public class NexusExporter implements SequenceExporter {
     }
 
     /**
+     * exportAlignment.
+     */
+    public void exportAlignment(Alignment alignment) throws IOException {
+    }
+
+    /**
      * export alignment.
      */
-    public void exportSequences(List<Sequence> sequences) throws IOException, IllegalArgumentException {
+    public void exportSequences(Collection<? extends Sequence> sequences) throws IOException, IllegalArgumentException {
 
-        establishTaxa(sequences);
+        establishSequenceTaxa(sequences);
 
-        final int seqLen = sequences.get(0).getLength();
-        final SequenceType seqType = sequences.get(0).getSequenceType();
+        SequenceType seqType = null;
+
+        int maxLength = 0;
+        for (Sequence sequence : sequences) {
+            if (sequence.getLength() > maxLength) {
+                maxLength = sequence.getLength();
+            }
+            if (seqType == null) {
+                seqType = sequence.getSequenceType();
+            }
+        }
 
         writer.println("begin characters;");
-        writer.println("\tdimensions nchar=" + seqLen + ";");
+        writer.println("\tdimensions nchar=" + maxLength + ";");
         writer.println("\tformat datatype=" + seqType.getNexusDataType() +
                 " missing=" + seqType.getUnknownState().getName() +
-                " gap=" + seqType.getGapState().getName() + ";");
+                " gap=" + seqType.getGapState().getCode() + ";");
         writer.println("\tmatrix");
         for (Sequence sequence : sequences) {
-            if( sequence.getSequenceType() != seqType || sequence.getLength() != seqLen ) {
-                throw new IllegalArgumentException();
+            if( sequence.getSequenceType() != seqType ) {
+                throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
             }
             StringBuilder builder = new StringBuilder("\t");
             appendTaxonName(sequence.getTaxon(), builder);
             builder.append("\t").append(sequence.getString());
+            int shortBy = maxLength - sequence.getLength();
+            if (shortBy > 0) {
+                for (int i = 0; i < shortBy; i++) {
+                    builder.append(seqType.getGapState().getCode());
+                }
+            }
             writer.println(builder);
         }
         writer.println(";\nend;");
     }
 
     /**
+     * Export a single tree
+     *
+     * @param tree
+     * @throws java.io.IOException
+     */
+    public void exportTree(Tree tree) throws IOException {
+        List<Tree> trees = new ArrayList<Tree>();
+        trees.add(tree);
+        exportTrees(trees);
+    }
+
+    /**
      * export trees
      */
-    public void exportTrees(List<? extends Tree> trees) throws IOException, IllegalArgumentException {
+    public void exportTrees(Collection<? extends Tree> trees) throws IOException {
         // all trees in a set should have the same taxa
-        establishTaxa(trees.get(0));
+        establishTreeTaxa(trees.iterator().next());
 
         writer.println("begin trees;");
         int nt = 0;
         for( Tree t : trees ) {
-            if( establishTaxa(t) ) {
+            if( establishTreeTaxa(t) ) {
                 throw new IllegalArgumentException();
             }
             boolean isRooted = t instanceof RootedTree;
@@ -162,7 +196,7 @@ public class NexusExporter implements SequenceExporter {
      * do nothing. If not, write a new taxa block.
      * @param sequences
      */
-    private void establishTaxa(List<Sequence> sequences) {
+    private void establishSequenceTaxa(Collection<? extends Sequence> sequences) {
         if( taxa != null && taxa.size() == sequences.size() ) {
             boolean hasAll = true;
             for( Sequence s : sequences ) {
@@ -183,7 +217,11 @@ public class NexusExporter implements SequenceExporter {
         setTaxa(t.toArray(new Taxon[]{}));
     }
 
-    private boolean establishTaxa(Collection<Taxon> ntaxa) {
+    private boolean establishTreeTaxa(Tree tree) {
+        return establishTaxa(tree.getTaxa());
+    }
+
+    private boolean establishTaxa(Collection<? extends Taxon> ntaxa) {
         if( taxa != null && taxa.size() == ntaxa.size()  && taxa.containsAll(ntaxa)) {
             return false;
         }
@@ -197,10 +235,6 @@ public class NexusExporter implements SequenceExporter {
      * do nothing. If not, write a new taxa block.
      * @param tree
      */
-    private boolean establishTaxa(Tree tree) {
-        return establishTaxa(tree.getTaxa());
-    }
-
     private void appendTree(RootedTree tree, Node node, StringBuilder builder) {
         if (tree.isExternal(node)) {
             appendTaxonName(tree.getTaxon(node), builder);
@@ -286,4 +320,5 @@ public class NexusExporter implements SequenceExporter {
 
     private Set<Taxon> taxa = null;
     protected final PrintWriter writer;
+
 }

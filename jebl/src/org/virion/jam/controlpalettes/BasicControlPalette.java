@@ -112,7 +112,6 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
             panel.invalidate();
         }
         validate();
-        repaint();
     }
 
     public void getSettings(Map<String,Object> settings) {

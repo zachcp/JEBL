@@ -276,7 +276,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	}
 
 	public void selectCladesFromSelectedNodes() {
-		for (Node node : selectedNodes) {
+        Set<Node> nodes = new HashSet<Node>(selectedNodes);
+        selectedNodes.clear();
+        for (Node node : nodes) {
 			addSelectedClade(node);
 		}
 		fireSelectionChanged();
@@ -607,9 +609,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return PAGE_EXISTS;
 	}
 
-	protected void drawTree(Graphics2D g2, double width, double height) {
+    protected void drawTree(Graphics2D g2, double width, double height) {
 
-		if (!calibrated) calibrate(g2, width, height);
+        if (!calibrated) calibrate(g2, width, height);
 
 		AffineTransform oldTransform = g2.getTransform();
 		Paint oldPaint = g2.getPaint();
@@ -641,7 +643,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				g2.transform(taxonTransform);
 
 				if (taxonDecorator != null) {
-					tipLabelPainter.setForeground(taxonDecorator.getTaxonPaint(taxon));
+					//tipLabelPainter.setForeground(taxonDecorator.getTaxonPaint(taxon));
 				}
 
 				tipLabelPainter.paint(g2, node, taxonLabelJustification,

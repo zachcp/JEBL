@@ -4,6 +4,7 @@ import jebl.evolution.sequences.Sequence;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
@@ -13,8 +14,8 @@ import java.util.List;
  */
 public interface SequenceExporter {
 
-	/**
-	 * exportSequences.
-	 */
-	void exportSequences(List<Sequence> sequences) throws IOException;
+    /**
+     * exportSequences.
+     */
+    void exportSequences(Collection<? extends Sequence> sequences) throws IOException;
 }

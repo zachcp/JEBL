@@ -2,6 +2,7 @@ package org.virion.jam.console;
 
 import org.virion.jam.framework.Application;
 import org.virion.jam.framework.MenuBarFactory;
+import org.virion.jam.framework.DocumentFrame;
 
 import javax.swing.*;
 import java.io.File;
@@ -37,11 +38,11 @@ public class ConsoleApplication extends Application {
 
     protected JFrame getDefaultFrame() { return consoleFrame; }
 
-	public void doNew() {
+	public DocumentFrame doNew() {
 		throw new RuntimeException("A ConsoleApplication cannot do a New command");
 	}
 
-	public void doOpenFile(File file) {
+	public DocumentFrame doOpenFile(File file) {
 		throw new RuntimeException("A ConsoleApplication cannot do an Open command");
 	}
 
