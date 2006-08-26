@@ -10,6 +10,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.*;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -17,9 +18,19 @@ import java.util.Map;
  */
 public class NodeBarController extends AbstractController {
 
+    private static Preferences PREFS = Preferences.userNodeForPackage(NodeBarController.class);
+
+    private static final String NODE_BARS_KEY = "nodeBars";
+
+    private static final String BAR_WIDTH_KEY = "barWidth";
+
+    private static float DEFAULT_BAR_WIDTH = 4.0f;
+
     public NodeBarController(String title, final NodeBarPainter nodeBarPainter) {
         this.title = title;
         this.nodeBarPainter = nodeBarPainter;
+
+        final float defaultBarWidth = PREFS.getFloat(BAR_WIDTH_KEY, DEFAULT_BAR_WIDTH);
 
         optionsPanel = new OptionsPanel();
 
@@ -44,7 +55,7 @@ public class NodeBarController extends AbstractController {
             }
         });
 
-	    optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
+        optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
 
         this.nodeBarPainter.addPainterListener(new PainterListener() {
             public void painterChanged() {
@@ -61,7 +72,7 @@ public class NodeBarController extends AbstractController {
             }
         });
 
-        barWidthSpinner = new JSpinner(new SpinnerNumberModel(4.0, 0.01, 48.0, 1.0));
+        barWidthSpinner = new JSpinner(new SpinnerNumberModel(defaultBarWidth, 0.01, 48.0, 1.0));
 
         barWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -71,7 +82,7 @@ public class NodeBarController extends AbstractController {
         });
         optionsPanel.addComponentWithLabel("Bar Width:", barWidthSpinner);
 
-        nodeBarPainter.setStroke(new BasicStroke(4.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+        nodeBarPainter.setStroke(new BasicStroke(defaultBarWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
     }
 
@@ -87,11 +98,14 @@ public class NodeBarController extends AbstractController {
         return false;
     }
 
-    public void getSettings(Map<String, Object> settings) {
+    public void setSettings(Map<String,Object> settings) {
+        barWidthSpinner.setValue((Double)settings.get(NODE_BARS_KEY + "." + BAR_WIDTH_KEY));
     }
 
-    public void setSettings(Map<String,Object> settings) {
+    public void getSettings(Map<String, Object> settings) {
+        settings.put(NODE_BARS_KEY + "." + BAR_WIDTH_KEY, barWidthSpinner.getValue());
     }
+
 
     private final JCheckBox titleCheckBox;
     private final OptionsPanel optionsPanel;

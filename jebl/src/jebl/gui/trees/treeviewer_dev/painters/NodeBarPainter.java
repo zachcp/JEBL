@@ -8,6 +8,7 @@ import jebl.gui.trees.treeviewer_dev.TreePane;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.*;
 
 /**
@@ -26,12 +27,12 @@ public class NodeBarPainter extends NodePainter {
         if (tree != null) {
             Set<String> nodeAttributes = new TreeSet<String>();
             for (Node node : tree.getNodes()) {
-	            for (String name : node.getAttributeNames()) {
-		            Object attr = node.getAttribute(name);
-		            if (attr instanceof Object[] && ((Object[])attr).length == 2) {
-			            nodeAttributes.add(name);
-		            }
-	            }
+                for (String name : node.getAttributeNames()) {
+                    Object attr = node.getAttribute(name);
+                    if (attr instanceof Object[] && ((Object[])attr).length == 2) {
+                        nodeAttributes.add(name);
+                    }
+                }
             }
             attributeNames.addAll(nodeAttributes);
         }
@@ -60,45 +61,54 @@ public class NodeBarPainter extends NodePainter {
         boolean hasBar = false;
 
         Object[] values = (Object[])node.getAttribute(displayAttribute);
-	    Object value = values[0];
-        if (value != null ) {
-            if (value instanceof Number) {
-                lower = ((Number)value).doubleValue();
+        if (values != null) {
+            Object value = values[0];
+            if (value != null ) {
+                if (value instanceof Number) {
+                    lower = ((Number)value).doubleValue();
+                } else {
+                    lower = Double.parseDouble(value.toString());
+                }
+                hasBar = true;
             } else {
-                lower = Double.parseDouble(value.toString());
+                // todo - warn the user somehow?
             }
-            hasBar = true;
-        } else {
-            // todo - warn the user somehow?
-        }
 
-	    value = values[1];
-        if (value != null ) {
-            if (value instanceof Number) {
-                upper = ((Number)value).doubleValue();
+            value = values[1];
+            if (value != null ) {
+                if (value instanceof Number) {
+                    upper = ((Number)value).doubleValue();
+                } else {
+                    upper = Double.parseDouble(value.toString());
+                }
+                hasBar = true;
             } else {
-                upper = Double.parseDouble(value.toString());
+                // todo - warn the user somehow?
             }
-            hasBar = true;
-        } else {
-            // todo - warn the user somehow?
         }
 
         nodeBar = null;
 
         if (hasBar) {
             Line2D barPath = treePane.getTreeLayout().getNodeBarPath(node);
+
+            // x1,y1 is the node point
             double x1 = barPath.getX1();
             double y1 = barPath.getY1();
+            // x2,y2 is 1.0 units heigher than the node
             double x2 = barPath.getX2();
             double y2 = barPath.getY2();
 
+            // dx,dy is the change in x,y for one unit of height
             double dx = x2 - x1;
             double dy = y2 - y1;
 
+            double h1 = lower - height;
+            double h2 = upper - height;
+
             nodeBar = new Line2D.Double(
-                    x1 - (dx * (upper - height)), y1 - (dy * (upper - height)),
-                    x1 + (dx * (height - lower)), y1 + (dy * (height - lower)));
+                    x1 + (dx * h1), y1 + (dy * h1),
+                    x1 + (dx * h2), y1 + (dy * h2));
 
         }
 
@@ -130,10 +140,17 @@ public class NodeBarPainter extends NodePainter {
      */
     public void paint(Graphics2D g2, Node node, Justification justification, Shape barShape) {
         if (barShape != null) {
-            g2.setPaint(getForeground());
-            g2.setStroke(getStroke());
 
-            g2.draw(barShape);
+            Stroke stroke = getStroke();
+            Shape strokedOutline = stroke.createStrokedShape(barShape);
+
+            g2.setPaint(getForeground());
+            g2.fill(strokedOutline);
+
+            g2.setPaint(Color.black);
+            g2.setStroke(new BasicStroke(0.5F));
+
+            g2.draw(strokedOutline);
         }
 
     }

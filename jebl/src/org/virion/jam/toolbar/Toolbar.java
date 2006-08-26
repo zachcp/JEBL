@@ -25,6 +25,8 @@ public class Toolbar extends JToolBar {
 
         this.options = options;
 
+        // This property is only used if the Quaqua library is loaded on
+        // Mac OS X - it makes toolbars look more Mac-like
         putClientProperty("Quaqua.ToolBar.isDividerDrawn", Boolean.TRUE);
         putClientProperty("JToolBar.isRollover", Boolean.TRUE);
 
@@ -99,7 +101,7 @@ public class Toolbar extends JToolBar {
         }
     }
 
-    public void addComponent(Component component) {
+    public void addComponent(JComponent component) {
         if (component instanceof ToolbarItem) {
             ToolbarItem item = (ToolbarItem)component;
             toolbarItems.add(item);
@@ -116,12 +118,12 @@ public class Toolbar extends JToolBar {
         addItem(new Separator());
     }
 
-    private void addItem(Component component) {
+    private void addItem(JComponent item) {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.gridy = 0;
         c.weightx = 0;
-        add(component, c);
+        add(item, c);
     }
 
     public void addFlexibleSpace() {

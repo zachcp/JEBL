@@ -223,8 +223,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             nodeLabelPaths.put(node, nodeLabelPath);
 
 	        Line2D nodeBarPath = new Line2D.Double(
-			        transform(nodePoint.getX() - 1.0, yPos),
-			        transform(nodePoint.getX() + 1.0, yPos));
+			        transform(nodePoint.getX(), yPos),
+			        transform(nodePoint.getX() - 1.0, yPos));
 
 	        nodeBarPaths.put(node, nodeBarPath);
         } else {

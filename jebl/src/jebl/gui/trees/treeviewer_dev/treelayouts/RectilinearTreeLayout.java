@@ -203,8 +203,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 			nodeLabelPaths.put(node, nodeLabelPath);
 
 			Line2D nodeBarPath = new Line2D.Double(
-					nodePoint.getX() - 1.0, nodePoint.getY(),
-					nodePoint.getX() + 1.0, nodePoint.getY());
+					nodePoint.getX(), nodePoint.getY(),
+					nodePoint.getX() - 1.0, nodePoint.getY());
 
 			nodeBarPaths.put(node, nodeBarPath);
 		} else {
