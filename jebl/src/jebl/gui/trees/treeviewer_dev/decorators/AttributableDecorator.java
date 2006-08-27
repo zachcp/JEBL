@@ -18,6 +18,11 @@ public class AttributableDecorator implements Decorator {
         return this.paint;
     }
 
+    public Paint getFillPaint(Paint paint) {
+        if (this.fillPaint == null) return paint;
+        return this.fillPaint;
+    }
+
     public Stroke getStroke(Stroke stroke) {
         if (this.stroke == null) return stroke;
         return this.stroke;
@@ -62,7 +67,14 @@ public class AttributableDecorator implements Decorator {
     // Private methods
     private void setAttributableItem(Attributable item) {
         if (paintAttributeName != null) {
-            paint = getPaintAttribute(item.getAttribute(paintAttributeName));
+            Color color = getColorAttribute(item.getAttribute(paintAttributeName));
+            if (color != null) {
+                paint = color;
+                fillPaint = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 2);
+            } else {
+                paint = null;
+                fillPaint = null;
+            }
         }
         if (fontAttributeName != null) {
             font = getFontAttribute(item.getAttribute(fontAttributeName));
@@ -72,7 +84,7 @@ public class AttributableDecorator implements Decorator {
         }
     }
 
-    private Paint getPaintAttribute(Object value) {
+    private Color getColorAttribute(Object value) {
         if (value != null) {
             if (value instanceof Color) {
                 return (Color)value;
@@ -102,6 +114,7 @@ public class AttributableDecorator implements Decorator {
     private String strokeAttributeName = null;
 
     private Paint paint = null;
+    private Paint fillPaint = null;
     private Font font = null;
     private Stroke stroke = null;
 }

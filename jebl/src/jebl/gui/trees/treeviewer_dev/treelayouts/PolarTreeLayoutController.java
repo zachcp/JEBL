@@ -28,29 +28,29 @@ public class PolarTreeLayoutController extends AbstractController {
         titleLabel = new JLabel("Polar Layout");
         optionsPanel = new OptionsPanel(4, 6);
 
-        rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+        rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 360000, 0);
         rootAngleSlider.setOpaque(false);
-        rootAngleSlider.setValue((int) (180.0 - (treeLayout.getRootAngle() * 10)));
+        rootAngleSlider.setValue((int) ((180.0 - (treeLayout.getRootAngle()) * 1000)));
         //rootAngleSlider.setMajorTickSpacing(rootAngleSlider.getMaximum() / 5);
 //        rootAngleSlider.setPaintTicks(true);
 
         rootAngleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                double value = 180 + (rootAngleSlider.getValue() / 10.0);
+                double value = 180 + (rootAngleSlider.getValue() / 1000.0);
                 treeLayout.setRootAngle(value % 360);
             }
         });
         optionsPanel.addComponentWithLabel("Root Angle:", rootAngleSlider, true);
 
-        angularRangeSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+        angularRangeSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 360000, 0);
         angularRangeSlider.setOpaque(false);
-        angularRangeSlider.setValue((int) (360.0 - (treeLayout.getAngularRange() * 10)));
+        angularRangeSlider.setValue((int) ((360.0 - (treeLayout.getAngularRange()) * 1000.0)));
         //angularRangeSlider.setMajorTickSpacing(angularRangeSlider.getMaximum() / 5);
 //        angularRangeSlider.setPaintTicks(true);
 
         angularRangeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                double value = 360.0 - (angularRangeSlider.getValue() / 10.0);
+                double value = 360.0 - (angularRangeSlider.getValue() / 1000.0);
                 treeLayout.setAngularRange(value);
             }
         });

@@ -75,7 +75,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
                 treePane.addSelectedClade(selectedNode);
                 break;
             case TAXA:
-                treePane.addSelectedTaxa(selectedNode);
+                treePane.addSelectedTip(selectedNode);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
@@ -114,7 +114,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
                         treePane.addSelectedClade(selectedNode);
                         break;
                     case TAXA:
-                        treePane.addSelectedTaxa(selectedNode);
+                        treePane.addSelectedTip(selectedNode);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());

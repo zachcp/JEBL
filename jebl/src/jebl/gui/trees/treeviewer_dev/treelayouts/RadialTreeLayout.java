@@ -53,7 +53,11 @@ public class RadialTreeLayout extends AbstractTreeLayout {
     protected void validate() {
         nodePoints.clear();
         branchPaths.clear();
+        collapsedShapes.clear();
         tipLabelPaths.clear();
+        nodeLabelPaths.clear();
+        nodeBarPaths.clear();
+        calloutPaths.clear();
 
         try {
             final Node root = tree.getRootNode();

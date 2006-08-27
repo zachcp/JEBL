@@ -156,28 +156,28 @@ public class TreeViewer extends JPanel implements Printable {
 
         Tree tree = treePane.getTree();
 
-        for (Taxon taxon : tree.getTaxa()) {
-            String target = (caseSensitive ?
-                    taxon.getName() : taxon.getName().toUpperCase());
+        for (Node node : tree.getExternalNodes()) {
+            Taxon taxon = tree.getTaxon(node);
+            String target = (caseSensitive ? taxon.getName() : taxon.getName().toUpperCase());
             switch (searchType) {
                 case CONTAINS:
                     if (target.contains(query)) {
-                        treePane.addSelectedTaxon(taxon);
+                        treePane.addSelectedTip(node);
                     }
                     break;
                 case STARTS_WITH:
                     if (target.startsWith(query)) {
-                        treePane.addSelectedTaxon(taxon);
+                        treePane.addSelectedTip(node);
                     }
                     break;
                 case ENDS_WITH:
                     if (target.endsWith(query)) {
-                        treePane.addSelectedTaxon(taxon);
+                        treePane.addSelectedTip(node);
                     }
                     break;
                 case MATCHES:
                     if (target.matches(query)) {
-                        treePane.addSelectedTaxon(taxon);
+                        treePane.addSelectedTip(node);
                     }
                     break;
             }
@@ -227,6 +227,10 @@ public class TreeViewer extends JPanel implements Printable {
         }
     }
 
+    public void collapseSelected() {
+        treePane.collapseSelectedNodes();
+    }
+
     public void selectAll() {
         if (treePaneSelector.getSelectionMode() == TreePaneSelector.SelectionMode.TAXA) {
             treePane.selectAllTaxa();
@@ -247,9 +251,9 @@ public class TreeViewer extends JPanel implements Printable {
         }
         
         if (oldSelectionMode == TreePaneSelector.SelectionMode.TAXA) {
-            treePane.selectNodesFromSelectedTaxa();
+            treePane.selectNodesFromSelectedTips();
         } else if (selectionMode == TreePaneSelector.SelectionMode.TAXA) {
-            treePane.selectTaxaFromSelectedNodes();
+            treePane.selectTipsFromSelectedNodes();
         } else if (selectionMode == TreePaneSelector.SelectionMode.CLADE) {
             treePane.selectCladesFromSelectedNodes();
         }

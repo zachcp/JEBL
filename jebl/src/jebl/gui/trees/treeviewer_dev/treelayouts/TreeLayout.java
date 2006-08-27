@@ -6,16 +6,21 @@ import jebl.evolution.trees.Tree;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.Map;
+
+import com.sun.corba.se.impl.oa.poa.ActiveObjectMap;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
 public interface TreeLayout {
-	enum AxisType {
-	    CONTINUOUS,
-	    DISCRETE
-	}
+
+    enum AxisType {
+        CONTINUOUS,
+        DISCRETE
+    }
 
     /**
      * Set the tree for the layout0
@@ -63,11 +68,11 @@ public interface TreeLayout {
      */
     boolean isShowingRootBranch();
 
-	/**
-	 * Return whether this layout is showing a branch colouring
-	 * @return showing colouring?
-	 */
-	boolean isShowingColouring();
+    /**
+     * Return whether this layout is showing a branch colouring
+     * @return showing colouring?
+     */
+    boolean isShowingColouring();
 
     /**
      * Return whether the two axis scales should be maintained
@@ -114,17 +119,40 @@ public interface TreeLayout {
      */
     Shape getBranchPath(Node node);
 
+    Map<Node, Shape> getBranchPathMap();
+
+    /**
+     * Return the shape that represents this node when collapsed
+     * @param node
+     * @return the shape
+     */
+    Shape getCollapsedShape(Node node);
+
+    Map<Node, Shape> getCollapsedShapeMap();
+
     Line2D getTipLabelPath(Node node);
+
+    Map<Node, Line2D> getTipLabelPathMap();
 
     Line2D getBranchLabelPath(Node node);
 
+    Map<Node, Line2D> getBranchLabelPathMap();
+
     Line2D getNodeLabelPath(Node node);
 
-	Line2D getNodeBarPath(Node node);
+    Map<Node, Line2D> getNodeLabelPathMap();
+
+    Line2D getNodeBarPath(Node node);
+
+    Map<Node, Line2D> getNodeBarPathMap();
 
     Shape getCalloutPath(Node node);
 
-	String getColouringAttributeName();
+    Map<Node, Shape> getCalloutPathMap();
 
-	void setColouringAttributeName(String colouringAttributeName);
+    String getColouringAttributeName();
+
+    void setColouringAttributeName(String colouringAttributeName);
+
+    void setCollapseAttributeName(String collapseAttributeName);
 }

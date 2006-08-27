@@ -35,7 +35,39 @@ public class RootedTreeUtils {
 		return tipCount;
 	}
 
-	/**
+    public static double getMinTipHeight(RootedTree tree, Node node) {
+        if (tree.isExternal(node)) {
+            return tree.getHeight(node);
+        }
+
+        double minTipHeight = Double.MAX_VALUE;
+        for (Node child : tree.getChildren(node)) {
+           double h = getMinTipHeight(tree, child);
+            if (h < minTipHeight) {
+                minTipHeight = h;
+            }
+        }
+
+        return minTipHeight;
+    }
+
+    public static double getMaxTipHeight(RootedTree tree, Node node) {
+        if (tree.isExternal(node)) {
+            return tree.getHeight(node);
+        }
+
+        double maxTipHeight = -Double.MAX_VALUE;
+        for (Node child : tree.getChildren(node)) {
+           double h = getMaxTipHeight(tree, child);
+            if (h > maxTipHeight) {
+                maxTipHeight = h;
+            }
+        }
+
+        return maxTipHeight;
+    }
+
+    /**
 	 * @return true only if all tips have height 0.0
 	 */
 	public static boolean isUltrametric(RootedTree tree, double tolerance) {
@@ -270,7 +302,6 @@ public class RootedTreeUtils {
 
 		return uniqueNewick(tree1, tree1.getRootNode()).equals(uniqueNewick(tree2, tree2.getRootNode()));
 	}
-
 
 
 }

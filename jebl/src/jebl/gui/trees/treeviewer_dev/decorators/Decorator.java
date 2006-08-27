@@ -13,6 +13,7 @@ public interface Decorator {
     void setItem(Object item);
 
     Paint getPaint(Paint paint);
+    Paint getFillPaint(Paint paint);
     Stroke getStroke(Stroke stroke);
     Font getFont(Font font);
 }
