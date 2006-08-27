@@ -28,6 +28,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
 
         final int sliderMax = 10000;
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
+        rootLengthSlider.setOpaque(false);
         rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
         //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
 //        rootLengthSlider.setPaintTicks(true);
@@ -41,6 +42,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
         optionsPanel.addComponentWithLabel("Root Length:", rootLengthSlider, true);
 
         curvatureSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
+        curvatureSlider.setOpaque(false);
         curvatureSlider.setValue((int) (treeLayout.getCurvature() * sliderMax));
         //curvatureSlider.setMajorTickSpacing(curvatureSlider.getMaximum() / 5);
   //      curvatureSlider.setPaintTicks(true);
@@ -54,6 +56,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
         optionsPanel.addComponentWithLabel("Curvature:", curvatureSlider, true);
 
         alignTipLabelsCheck = new JCheckBox("Align Tip Labels");
+        alignTipLabelsCheck.setOpaque(false);
 
         alignTipLabelsCheck.setSelected(treeLayout.isAlignTipLabels());
         alignTipLabelsCheck.addChangeListener(new ChangeListener() {

@@ -94,6 +94,7 @@ public class TreeViewerController extends AbstractController {
         optionsPanel.addSpanningComponent(panel1);
 
         zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, MAX_ZOOM_SLIDER, 0);
+        zoomSlider.setOpaque(false);
         zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 //        zoomSlider.setPaintTicks(true);
@@ -111,6 +112,7 @@ public class TreeViewerController extends AbstractController {
         optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
         verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, MAX_ZOOM_SLIDER, 0);
+        verticalExpansionSlider.setOpaque(false);
 //        verticalExpansionSlider.setPaintTicks(true);
 //        verticalExpansionSlider.setPaintLabels(true);
 

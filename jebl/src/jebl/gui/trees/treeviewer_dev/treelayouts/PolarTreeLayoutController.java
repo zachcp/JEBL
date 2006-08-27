@@ -29,6 +29,7 @@ public class PolarTreeLayoutController extends AbstractController {
         optionsPanel = new OptionsPanel(4, 6);
 
         rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+        rootAngleSlider.setOpaque(false);
         rootAngleSlider.setValue((int) (180.0 - (treeLayout.getRootAngle() * 10)));
         //rootAngleSlider.setMajorTickSpacing(rootAngleSlider.getMaximum() / 5);
 //        rootAngleSlider.setPaintTicks(true);
@@ -42,6 +43,7 @@ public class PolarTreeLayoutController extends AbstractController {
         optionsPanel.addComponentWithLabel("Root Angle:", rootAngleSlider, true);
 
         angularRangeSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
+        angularRangeSlider.setOpaque(false);
         angularRangeSlider.setValue((int) (360.0 - (treeLayout.getAngularRange() * 10)));
         //angularRangeSlider.setMajorTickSpacing(angularRangeSlider.getMaximum() / 5);
 //        angularRangeSlider.setPaintTicks(true);
@@ -56,6 +58,7 @@ public class PolarTreeLayoutController extends AbstractController {
 
         final int sliderMax = 10000;
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
+        rootLengthSlider.setOpaque(false);
         rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
         //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
   //      rootLengthSlider.setPaintTicks(true);
@@ -69,6 +72,7 @@ public class PolarTreeLayoutController extends AbstractController {
         optionsPanel.addComponentWithLabel("Root Length:", rootLengthSlider, true);
 
         showRootCheck = new JCheckBox("Show Root");
+        showRootCheck.setOpaque(false);
         optionsPanel.addComponent(showRootCheck);
 
         showRootCheck.setSelected(treeLayout.isShowingRootBranch());
@@ -94,6 +98,7 @@ public class PolarTreeLayoutController extends AbstractController {
 //        optionsPanel.addComponentWithLabel("Label Position:", labelPositionCombo);
 
         alignTipLabelsCheck = new JCheckBox("Align Tip Labels");
+        alignTipLabelsCheck.setOpaque(false);
 
         alignTipLabelsCheck.setSelected(treeLayout.getTipLabelPosition() == PolarTreeLayout.TipLabelPosition.RADIAL);
         alignTipLabelsCheck.addChangeListener(new ChangeListener() {

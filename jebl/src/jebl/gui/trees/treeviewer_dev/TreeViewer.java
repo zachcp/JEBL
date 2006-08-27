@@ -227,6 +227,14 @@ public class TreeViewer extends JPanel implements Printable {
         }
     }
 
+    public void selectAll() {
+        if (treePaneSelector.getSelectionMode() == TreePaneSelector.SelectionMode.TAXA) {
+            treePane.selectAllTaxa();
+        } else {
+            treePane.selectAllNodes();
+        }
+    }
+
     public void clearSelectedTaxa() {
         treePane.clearSelection();
     }

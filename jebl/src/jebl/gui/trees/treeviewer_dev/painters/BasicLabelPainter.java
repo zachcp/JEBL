@@ -3,7 +3,9 @@ package jebl.gui.trees.treeviewer_dev.painters;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.taxa.Taxon;
 import jebl.gui.trees.treeviewer_dev.TreePane;
+import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -86,13 +88,37 @@ public class BasicLabelPainter extends LabelPainter<Node> {
         this.treePane = treePane;
     }
 
+    public Decorator getBorderDecorator() {
+        return borderDecorator;
+    }
+
+    public void setBorderDecorator(Decorator borderDecorator) {
+        this.borderDecorator = borderDecorator;
+    }
+
+    public Decorator getTextDecorator() {
+        return textDecorator;
+    }
+
+    public void setTextDecorator(Decorator textDecorator) {
+        this.textDecorator = textDecorator;
+    }
+
     protected String getLabel(Tree tree, Node node) {
         if (displayAttribute.equalsIgnoreCase(TAXON_NAMES)) {
-            return tree.getTaxon(node).getName();
+            Taxon taxon = tree.getTaxon(node);
+            if (textDecorator != null) {
+                textDecorator.setItem(taxon);
+            }
+            return taxon.getName();
         }
 
         if ( tree instanceof RootedTree) {
             final RootedTree rtree = (RootedTree) tree;
+
+            if (textDecorator != null) {
+                textDecorator.setItem(node);
+            }
 
             if (displayAttribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
                 return getNumberFormat().format(rtree.getHeight(node));
@@ -131,14 +157,19 @@ public class BasicLabelPainter extends LabelPainter<Node> {
     public Rectangle2D calibrate(Graphics2D g2, Node item) {
         Tree tree = treePane.getTree();
 
+        String label = getLabel(tree, item);
+
         final Font oldFont = g2.getFont();
-        g2.setFont(getFont());
+        if (textDecorator != null) {
+            g2.setFont(textDecorator.getFont(getFont()));
+        } else {
+            g2.setFont(getFont());
+        }
 
         FontMetrics fm = g2.getFontMetrics();
         preferredHeight = fm.getHeight();
         preferredWidth = 0;
 
-        String label = getLabel(tree, item);
         if (label != null) {
             Rectangle2D rect = fm.getStringBounds(label, g2);
             preferredWidth = rect.getWidth();
@@ -166,23 +197,39 @@ public class BasicLabelPainter extends LabelPainter<Node> {
     public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
         Tree tree = treePane.getTree();
 
+        String label = getLabel(tree, item);
+
         Font oldFont = g2.getFont();
 
-        if (getBackground() != null) {
-            g2.setPaint(getBackground());
+        Paint backgroundPaint = getBackground();
+        Paint borderPaint = getBorderPaint();
+        Stroke borderStroke = getBorderStroke();
+
+        if (borderDecorator != null) {
+            backgroundPaint = borderDecorator.getPaint(backgroundPaint);
+            borderPaint = borderDecorator.getPaint(borderPaint);
+            borderStroke = borderDecorator.getStroke(borderStroke);
+        }
+
+        if (backgroundPaint != null) {
+            g2.setPaint(backgroundPaint);
             g2.fill(bounds);
         }
 
-        if (getBorderPaint() != null && getBorderStroke() != null) {
-            g2.setPaint(getBorderPaint());
-            g2.setStroke(getBorderStroke());
+        if (borderPaint != null && borderStroke != null) {
+            g2.setPaint(borderPaint);
+            g2.setStroke(borderStroke);
             g2.draw(bounds);
         }
 
-        g2.setPaint(getForeground());
-        g2.setFont(getFont());
+        if (textDecorator != null) {
+            g2.setPaint(textDecorator.getPaint(getForeground()));
+            g2.setFont(textDecorator.getFont(getFont()));
+        } else {
+            g2.setPaint(getForeground());
+            g2.setFont(getFont());
+        }
 
-        String label = getLabel(tree, item);
         if (label != null) {
 
             Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
@@ -231,4 +278,8 @@ public class BasicLabelPainter extends LabelPainter<Node> {
     protected String[] attributes;
 
     protected TreePane treePane;
+
+    private Decorator textDecorator = null;
+    private Decorator borderDecorator = null;
+
 }

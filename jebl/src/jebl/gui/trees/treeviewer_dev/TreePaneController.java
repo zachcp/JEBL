@@ -59,11 +59,13 @@ public class TreePaneController extends AbstractController {
         optionsPanel = new OptionsPanel();
 
         transformCheck = new JCheckBox("Transform branches");
+        transformCheck.setOpaque(false);
         optionsPanel.addComponent(transformCheck);
 
         transformCheck.setSelected(treePane.isTransformBranchesOn());
 
         transformCombo = new JComboBox(TransformedRootedTree.Transform.values());
+        transformCombo.setOpaque(false);
         transformCombo.setSelectedItem(treePane.getBranchTransform());
         transformCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -87,11 +89,13 @@ public class TreePaneController extends AbstractController {
         });
 
         orderCheck = new JCheckBox("Order branches");
+        orderCheck.setOpaque(false);
         optionsPanel.addComponent(orderCheck);
 
         orderCheck.setSelected(treePane.isOrderBranchesOn());
 
         orderCombo = new JComboBox(SortedRootedTree.BranchOrdering.values());
+        orderCombo.setOpaque(false);
         orderCombo.setSelectedItem(treePane.getBranchOrdering());
         orderCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
