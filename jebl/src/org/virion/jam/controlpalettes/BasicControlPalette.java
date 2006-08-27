@@ -137,9 +137,8 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         controllerPanel.setOpaque(false);
 
 		// This tells Quaqua L&F to use a small components (ignored otherwise)
-        controller.getTitleComponent().setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+        controller.getTitleComponent().setFont(UIManager.getFont("SmallSystemFont"));
         controller.getTitleComponent().setOpaque(false);
-        controllerPanel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 
 //		JCheckBox pinnedCheck = new JCheckBox();
 //		pinnedCheck.setFocusPainted(false);

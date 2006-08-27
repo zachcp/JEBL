@@ -73,7 +73,6 @@ public class NodeBarController extends AbstractController {
         });
 
         barWidthSpinner = new JSpinner(new SpinnerNumberModel(defaultBarWidth, 0.01, 48.0, 1.0));
-
         barWidthSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 float lineWidth = ((Double) barWidthSpinner.getValue()).floatValue();

@@ -91,7 +91,6 @@ public class ScaleBarPainterController extends AbstractController {
         NumberFormat format = this.scaleBarPainter.getNumberFormat();
         int digits = format.getMaximumFractionDigits();
         digitsSpinner = new JSpinner(new SpinnerNumberModel(digits, 2, 14, 1));
-
         final JLabel label3 = optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
 
         digitsSpinner.addChangeListener(new ChangeListener() {

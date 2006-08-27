@@ -1,18 +1,12 @@
 package jebl.gui.trees.treeviewer_dev.treelayouts;
 
-import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.controlpalettes.AbstractController;
+import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.*;
 import java.util.Map;
-
-import jebl.evolution.trees.TransformedRootedTree;
-import jebl.evolution.trees.SortedRootedTree;
 
 /**
  * @author Andrew Rambaut
@@ -37,7 +31,7 @@ public class PolarTreeLayoutController extends AbstractController {
         rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
         rootAngleSlider.setValue((int) (180.0 - (treeLayout.getRootAngle() * 10)));
         //rootAngleSlider.setMajorTickSpacing(rootAngleSlider.getMaximum() / 5);
-        rootAngleSlider.setPaintTicks(true);
+//        rootAngleSlider.setPaintTicks(true);
 
         rootAngleSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -50,7 +44,7 @@ public class PolarTreeLayoutController extends AbstractController {
         angularRangeSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
         angularRangeSlider.setValue((int) (360.0 - (treeLayout.getAngularRange() * 10)));
         //angularRangeSlider.setMajorTickSpacing(angularRangeSlider.getMaximum() / 5);
-        angularRangeSlider.setPaintTicks(true);
+//        angularRangeSlider.setPaintTicks(true);
 
         angularRangeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -64,7 +58,7 @@ public class PolarTreeLayoutController extends AbstractController {
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
         //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
-        rootLengthSlider.setPaintTicks(true);
+  //      rootLengthSlider.setPaintTicks(true);
 
         rootLengthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {

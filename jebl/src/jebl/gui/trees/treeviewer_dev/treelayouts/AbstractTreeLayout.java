@@ -93,6 +93,10 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 		this.colouringAttributeName = colouringAttributeName;
 	}
 
+	public boolean isShowingColouring() {
+		return colouringAttributeName != null;
+	}
+
 	private boolean invalid = true;
     protected RootedTree tree = null;
     protected Map<Node, Point2D> nodePoints = new HashMap<Node, Point2D>();

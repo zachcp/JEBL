@@ -56,7 +56,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	}
 
 	public double getCurvature() {
-		return 1.0 - xProportion;
+		return curvature;
 	}
 
 	public void setAlignTipLabels(boolean alignTipLabels) {
@@ -65,12 +65,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	}
 
 	public void setCurvature(double curvature) {
-		setBranchCurveProportion(1.0 - curvature, 1.0 - curvature);
-	}
-
-	public void setBranchCurveProportion(double xProportion, double yProportion) {
-		this.xProportion = xProportion;
-		this.yProportion = yProportion;
+		this.curvature = curvature;
 		invalidate();
 	}
 
@@ -113,100 +108,108 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 		if (!tree.isExternal(node)) {
 
-			double yPos = 0.0;
+			if (node.getAttribute("!collapse") != null) {
+				nodePoint = constructTriangleNode(node, xPosition);
+			} else {
+				double yPos = 0.0;
 
-			List<Node> children = tree.getChildren(node);
-			for (Node child : children) {
+				List<Node> children = tree.getChildren(node);
+				for (Node child : children) {
 
-				double length = tree.getLength(child);
-				Point2D childPoint = constructNode(child, xPosition + length);
-				yPos += childPoint.getY();
-			}
-
-			// the y-position of the node is the average of the child nodes
-			yPos /= children.size();
-
-			nodePoint = new Point2D.Double(xPosition, yPos);
-
-			for (Node child : children) {
-
-				Point2D childPoint = nodePoints.get(child);
-
-				GeneralPath branchPath = new GeneralPath();
-
-				// start point
-				float x0 = (float) nodePoint.getX();
-				float y0 = (float) nodePoint.getY();
-
-				// end point
-				float x1 = (float) childPoint.getX();
-				float y1 = (float) childPoint.getY();
-
-				if (xProportion < 1.0 || yProportion < 1.0) {
-					// if the curvature is on then we simply don't
-					// do tree colouring - I just can't be bothered to
-					// implement it (and it would probably be confusing anyway).
-					float x2 = x1 - ((x1 - x0) * (float) xProportion);
-					float y2 = y0 + ((y1 - y0) * (float) yProportion);
-
-					branchPath.moveTo(x0, y0);
-					branchPath.lineTo(x0, y2);
-					branchPath.quadTo(x0, y1, x2, y1);
-					branchPath.lineTo(x1, y1);
-				} else {
-
-					Object[] colouring = null;
-					if (colouringAttributeName != null) {
-						colouring = (Object[])child.getAttribute(colouringAttributeName);
-					}
-					if (colouring != null) {
-						// If there is a colouring, then we break the path up into
-						// segments. This should allow use to iterate along the segments
-						// and colour them as we draw them.
-
-
-						float nodeHeight = (float) tree.getHeight(node);
-						float childHeight = (float) tree.getHeight(child);
-
-						// to help this, we are going to draw the branch backwards
-						branchPath.moveTo(x1, y1);
-						for (int i = 0; i < colouring.length - 1; i+=2) {
-							float height = ((Number)colouring[i+1]).floatValue();
-							float p = (height - childHeight) / (nodeHeight - childHeight);
-							float x = x1 - ((x1 - x0) * p);
-							branchPath.lineTo(x, y1);
-						}
-						branchPath.lineTo(x0, y1);
-						branchPath.lineTo(x0, y0);
-					} else {
-						branchPath.moveTo(x0, y0);
-						branchPath.lineTo(x0, y1);
-						branchPath.lineTo(x1, y1);
-					}
+					double length = tree.getLength(child);
+					Point2D childPoint = constructNode(child, xPosition + length);
+					yPos += childPoint.getY();
 				}
 
-				// add the branchPath to the map of branch paths
-				branchPaths.put(child, branchPath);
+				// the y-position of the node is the average of the child nodes
+				yPos /= children.size();
 
-				double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
-				Line2D branchLabelPath = new Line2D.Double(
-						x3 - 1.0, childPoint.getY(),
-						x3 + 1.0, childPoint.getY());
+				nodePoint = new Point2D.Double(xPosition, yPos);
 
-				branchLabelPaths.put(child, branchLabelPath);
+				for (Node child : children) {
+
+					Point2D childPoint = nodePoints.get(child);
+
+					GeneralPath branchPath = new GeneralPath();
+
+					// start point
+					float x0 = (float) nodePoint.getX();
+					float y0 = (float) nodePoint.getY();
+
+					// end point
+					float x1 = (float) childPoint.getX();
+					float y1 = (float) childPoint.getY();
+
+					if (curvature == 0.0) {
+						Object[] colouring = null;
+						if (colouringAttributeName != null) {
+							colouring = (Object[])child.getAttribute(colouringAttributeName);
+						}
+						if (colouring != null) {
+							// If there is a colouring, then we break the path up into
+							// segments. This should allow use to iterate along the segments
+							// and colour them as we draw them.
+
+
+							float nodeHeight = (float) tree.getHeight(node);
+							float childHeight = (float) tree.getHeight(child);
+
+							// to help this, we are going to draw the branch backwards
+							branchPath.moveTo(x1, y1);
+							for (int i = 0; i < colouring.length - 1; i+=2) {
+								float height = ((Number)colouring[i+1]).floatValue();
+								float p = (height - childHeight) / (nodeHeight - childHeight);
+								float x = x1 - ((x1 - x0) * p);
+								branchPath.lineTo(x, y1);
+							}
+							branchPath.lineTo(x0, y1);
+							branchPath.lineTo(x0, y0);
+						} else {
+							branchPath.moveTo(x0, y0);
+							branchPath.lineTo(x0, y1);
+							branchPath.lineTo(x1, y1);
+						}
+					} else if (curvature == 1.0) {
+						// The extreme is to use a triangular look
+						branchPath.moveTo(x0, y0);
+						branchPath.lineTo(x1, y1);
+					} else {
+						// if the curvature is on then we simply don't
+						// do tree colouring - I just can't be bothered to
+						// implement it (and it would probably be confusing anyway).
+						float x2 = x1 - ((x1 - x0) * (float) (1.0 - curvature));
+						float y2 = y0 + ((y1 - y0) * (float) (1.0 - curvature));
+
+						branchPath.moveTo(x0, y0);
+						branchPath.lineTo(x0, y2);
+						branchPath.quadTo(x0, y1, x2, y1);
+						branchPath.lineTo(x1, y1);
+					}
+
+
+					// add the branchPath to the map of branch paths
+					branchPaths.put(child, branchPath);
+
+					double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
+					Line2D branchLabelPath = new Line2D.Double(
+							x3 - 1.0, childPoint.getY(),
+							x3 + 1.0, childPoint.getY());
+
+					branchLabelPaths.put(child, branchLabelPath);
+				}
+
+				Line2D nodeLabelPath = new Line2D.Double(
+						nodePoint.getX(), nodePoint.getY(),
+						nodePoint.getX() + 1.0, nodePoint.getY());
+
+				nodeLabelPaths.put(node, nodeLabelPath);
+
+				Line2D nodeBarPath = new Line2D.Double(
+						nodePoint.getX(), nodePoint.getY(),
+						nodePoint.getX() - 1.0, nodePoint.getY());
+
+				nodeBarPaths.put(node, nodeBarPath);
 			}
-
-			Line2D nodeLabelPath = new Line2D.Double(
-					nodePoint.getX(), nodePoint.getY(),
-					nodePoint.getX() + 1.0, nodePoint.getY());
-
-			nodeLabelPaths.put(node, nodeLabelPath);
-
-			Line2D nodeBarPath = new Line2D.Double(
-					nodePoint.getX(), nodePoint.getY(),
-					nodePoint.getX() - 1.0, nodePoint.getY());
-
-			nodeBarPaths.put(node, nodeBarPath);
 		} else {
 
 			nodePoint = new Point2D.Double(xPosition, yPosition);
@@ -244,6 +247,61 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		return nodePoint;
 	}
 
+	private Point2D constructTriangleNode(Node node, double xPosition) {
+
+		Point2D nodePoint;
+
+		Object[] values = (Object[])node.getAttribute("!collapse");
+		int tipCount = (Integer)values[0];
+		double tipHeight = (Double)values[1];
+		double height = tree.getHeight(node);
+		double maxXPos = xPosition + height - tipHeight;
+
+		double minYPos = yPosition;
+		yPosition += yIncrement * (tipCount - 1);
+		double maxYPos = yPosition;
+		yPosition += yIncrement;
+
+		// the y-position of the node is the average of the child nodes
+		double yPos = (maxYPos + minYPos) / 2;
+
+		nodePoint = new Point2D.Double(xPosition, yPos);
+
+		GeneralPath branchPath = new GeneralPath();
+
+		// start point
+		float x0 = (float)nodePoint.getX();
+		float y0 = (float)nodePoint.getY();
+
+		// end point
+		float x1 = (float)maxXPos;
+		float y1 = (float)minYPos;
+
+		float y2 = (float)maxYPos;
+
+		branchPath.moveTo(x0, y0);
+		branchPath.lineTo(x1, y1);
+		branchPath.lineTo(x1, y2);
+		branchPath.closePath();
+
+		// add the branchPath to the map of branch paths
+		branchPaths.put(node, branchPath);
+
+		Line2D nodeLabelPath = new Line2D.Double(
+				nodePoint.getX(), nodePoint.getY(),
+				nodePoint.getX() + 1.0, nodePoint.getY());
+
+		nodeLabelPaths.put(node, nodeLabelPath);
+
+		Line2D nodeBarPath = new Line2D.Double(
+				nodePoint.getX(), nodePoint.getY(),
+				nodePoint.getX() - 1.0, nodePoint.getY());
+
+		nodeBarPaths.put(node, nodeBarPath);
+
+		return nodePoint;
+	}
+
 	private void getMaxXPosition(Node node, double xPosition) {
 
 		if (!tree.isExternal(node)) {
@@ -267,8 +325,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	private double maxXPosition;
 
-	private double xProportion = 1.0;
-	private double yProportion = 1.0;
+	private double curvature = 0.0;
 
 	private double rootLength = 0.01;
 

@@ -30,7 +30,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
         //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
-        rootLengthSlider.setPaintTicks(true);
+//        rootLengthSlider.setPaintTicks(true);
 
         rootLengthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -43,7 +43,7 @@ public class RectilinearTreeLayoutController extends AbstractController {
         curvatureSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         curvatureSlider.setValue((int) (treeLayout.getCurvature() * sliderMax));
         //curvatureSlider.setMajorTickSpacing(curvatureSlider.getMaximum() / 5);
-        curvatureSlider.setPaintTicks(true);
+  //      curvatureSlider.setPaintTicks(true);
 
         curvatureSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {

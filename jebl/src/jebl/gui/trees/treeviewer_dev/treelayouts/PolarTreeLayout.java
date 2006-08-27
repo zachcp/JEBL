@@ -12,38 +12,38 @@ import java.util.List;
  */
 public class PolarTreeLayout extends AbstractTreeLayout {
 
-    public enum TipLabelPosition {
-        FLUSH,
-        RADIAL,
-        HORIZONTAL
-    }
-
-	public AxisType getXAxisType() {
-	    return AxisType.CONTINUOUS;
+	public enum TipLabelPosition {
+		FLUSH,
+		RADIAL,
+		HORIZONTAL
 	}
 
-    public AxisType getYAxisType() {
-        return AxisType.CONTINUOUS;
-    }
+	public AxisType getXAxisType() {
+		return AxisType.CONTINUOUS;
+	}
 
-    public boolean maintainAspectRatio() {
-        return true;
-    }
+	public AxisType getYAxisType() {
+		return AxisType.CONTINUOUS;
+	}
 
-    public double getHeightOfPoint(Point2D point) {
-        throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
-    }
+	public boolean maintainAspectRatio() {
+		return true;
+	}
 
-    public Shape getHeightLine(double height) {
-        return new Ellipse2D.Double(0.0, 0.0, height * 2.0, height * 2.0);
-    }
+	public double getHeightOfPoint(Point2D point) {
+		throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+	}
 
-    public Shape getHeightArea(double height1, double height2) {
-        Area area1 = new Area(new Ellipse2D.Double(0.0, 0.0, height2 * 2.0, height2 * 2.0));
-        Area area2 = new Area(new Ellipse2D.Double(0.0, 0.0, height1 * 2.0, height1 * 2.0));
-        area1.subtract(area2);
-        return area1;
-    }
+	public Shape getHeightLine(double height) {
+		return new Ellipse2D.Double(0.0, 0.0, height * 2.0, height * 2.0);
+	}
+
+	public Shape getHeightArea(double height1, double height2) {
+		Area area1 = new Area(new Ellipse2D.Double(0.0, 0.0, height2 * 2.0, height2 * 2.0));
+		Area area2 = new Area(new Ellipse2D.Double(0.0, 0.0, height1 * 2.0, height1 * 2.0));
+		area1.subtract(area2);
+		return area1;
+	}
 
 
 	public double getRootAngle() {
@@ -54,274 +54,276 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 		return angularRange;
 	}
 
-    public boolean isShowingRootBranch() {
-        return showingRootBranch;
-    }
+	public boolean isShowingRootBranch() {
+		return showingRootBranch;
+	}
 
-    public double getRootLength() {
-        return rootLength;
-    }
+	public double getRootLength() {
+		return rootLength;
+	}
 
 	public TipLabelPosition getTipLabelPosition() {
 		return tipLabelPosition;
 	}
 
-    public void setRootAngle(double rootAngle) {
-        this.rootAngle = rootAngle;
-        invalidate();
-    }
+	public void setRootAngle(double rootAngle) {
+		this.rootAngle = rootAngle;
+		invalidate();
+	}
 
-    public void setAngularRange(double angularRange) {
-        this.angularRange = angularRange;
-        invalidate();
-    }
+	public void setAngularRange(double angularRange) {
+		this.angularRange = angularRange;
+		invalidate();
+	}
 
-    public void setShowingRootBranch(boolean showingRootBranch) {
-        this.showingRootBranch = showingRootBranch;
-        invalidate();
-    }
+	public void setShowingRootBranch(boolean showingRootBranch) {
+		this.showingRootBranch = showingRootBranch;
+		invalidate();
+	}
 
-    public void setRootLength(double rootLength) {
-        this.rootLength = rootLength;
-        invalidate();
-    }
+	public void setRootLength(double rootLength) {
+		this.rootLength = rootLength;
+		invalidate();
+	}
 
-    public void setTipLabelPosition(TipLabelPosition tipLabelPosition) {
-        this.tipLabelPosition = tipLabelPosition;
-        invalidate();
-    }
-
-    protected void validate() {
-        nodePoints.clear();
-        branchPaths.clear();
-        tipLabelPaths.clear();
-        calloutPaths.clear();
-
-        Node root = this.tree.getRootNode();
-        double rl = (rootLength * this.tree.getHeight(root)) * 10.0;
-
-        maxXPosition = 0.0;
-        getMaxXPosition(root, rl);
+	public void setTipLabelPosition(TipLabelPosition tipLabelPosition) {
+		this.tipLabelPosition = tipLabelPosition;
+		invalidate();
+	}
+
+	protected void validate() {
+		nodePoints.clear();
+		branchPaths.clear();
+		tipLabelPaths.clear();
+		calloutPaths.clear();
+
+		Node root = this.tree.getRootNode();
+		double rl = (rootLength * this.tree.getHeight(root)) * 10.0;
+
+		maxXPosition = 0.0;
+		getMaxXPosition(root, rl);
+
+		yPosition = 0.0;
+		yIncrement = 1.0 / tree.getExternalNodes().size();
+
+		final Point2D rootPoint = constructNode(root, rl);
+
+		if (showingRootBranch) {
+			// construct a root branch line
+			final double y = rootPoint.getY();
+			Line2D line = new Line2D.Double(transform(0.0, y), transform(rootPoint.getX(), y));
+
+			// add the line to the map of branch paths
+			branchPaths.put(root, line);
+		}
+	}
 
-        yPosition = 0.0;
-        yIncrement = 1.0 / tree.getExternalNodes().size();
+	private Point2D constructNode(Node node, double xPosition) {
 
-        final Point2D rootPoint = constructNode(root, rl);
+		Point2D nodePoint;
+		Point2D transformedNodePoint;
 
-        // construct a root branch line
-        final double y = rootPoint.getY();
-        Line2D line = new Line2D.Double(transform(0.0, y), transform(rootPoint.getX(), y));
+		if (!tree.isExternal(node)) {
 
-        // add the line to the map of branch paths
-        branchPaths.put(root, line);
-    }
+			double yPos = 0.0;
 
-    private Point2D constructNode(Node node, double xPosition) {
+			List<Node> children = tree.getChildren(node);
+			Point2D[] childPoints = new Point2D[children.size()];
 
-        Point2D nodePoint;
-        Point2D transformedNodePoint;
+			int i = 0;
+			for (Node child : children) {
 
-        if (!tree.isExternal(node)) {
+				final double length = tree.getLength(child);
+				childPoints[i] = constructNode(child, xPosition + length);
+				yPos += childPoints[i].getY();
 
-            double yPos = 0.0;
+				i++;
+			}
 
-            List<Node> children = tree.getChildren(node);
-            Point2D[] childPoints = new Point2D[children.size()];
+			// the y-position of the node is the average of the child nodes
+			yPos /= children.size();
 
-            int i = 0;
-            for (Node child : children) {
+			nodePoint = new Point2D.Double(xPosition, yPos);
+			transformedNodePoint = transform(nodePoint);
 
-                final double length = tree.getLength(child);
-                childPoints[i] = constructNode(child, xPosition + length);
-                yPos += childPoints[i].getY();
+			final double start = getAngle(yPos);
 
-                i++;
-            }
+			i = 0;
+			for (Node child : children) {
 
-            // the y-position of the node is the average of the child nodes
-            yPos /= children.size();
+				GeneralPath branchPath = new GeneralPath();
+				final Point2D transformedChildPoint = transform(childPoints[i]);
 
-            nodePoint = new Point2D.Double(xPosition, yPos);
-            transformedNodePoint = transform(nodePoint);
+				final Point2D transformedShoulderPoint = transform(
+						nodePoint.getX(), childPoints[i].getY());
 
-            final double start = getAngle(yPos);
+				Object[] colouring = null;
+				if (colouringAttributeName != null) {
+					colouring = (Object[])child.getAttribute(colouringAttributeName);
+				}
+				if (colouring != null) {
+					// If there is a colouring, then we break the path up into
+					// segments. This should allow use to iterate along the segments
+					// and colour them as we draw them.
 
-            i = 0;
-            for (Node child : children) {
+					float nodeHeight = (float) tree.getHeight(node);
+					float childHeight = (float) tree.getHeight(child);
 
-                GeneralPath branchPath = new GeneralPath();
-	            final Point2D transformedChildPoint = transform(childPoints[i]);
+					double x1 = childPoints[i].getX();
+					double x0 = nodePoint.getX();
 
-	            final Point2D transformedShoulderPoint = transform(
-			            nodePoint.getX(), childPoints[i].getY());
+					branchPath.moveTo(
+							(float) transformedChildPoint.getX(),
+							(float) transformedChildPoint.getY());
 
-	            Object[] colouring = null;
-	            if (colouringAttributeName != null) {
-		            colouring = (Object[])child.getAttribute(colouringAttributeName);
-	            }
-	            if (colouring != null) {
-		            // If there is a colouring, then we break the path up into
-		            // segments. This should allow use to iterate along the segments
-		            // and colour them as we draw them.
+					for (int j = 0; j < colouring.length - 1; j+=2) {
+						double height = ((Number)colouring[j+1]).doubleValue();
+						double p = (height - childHeight) / (nodeHeight - childHeight);
+						double x = x1 - ((x1 - x0) * p);
+						final Point2D transformedPoint = transform(x, childPoints[i].getY());
+						branchPath.lineTo(
+								(float) transformedPoint.getX(),
+								(float) transformedPoint.getY());
+					}
+					branchPath.lineTo(
+							(float) transformedShoulderPoint.getX(),
+							(float) transformedShoulderPoint.getY());
+				} else {
+					branchPath.moveTo(
+							(float) transformedChildPoint.getX(),
+							(float) transformedChildPoint.getY());
 
-		            float nodeHeight = (float) tree.getHeight(node);
-		            float childHeight = (float) tree.getHeight(child);
+					branchPath.lineTo(
+							(float) transformedShoulderPoint.getX(),
+							(float) transformedShoulderPoint.getY());
+				}
 
-		            double x1 = childPoints[i].getX();
-		            double x0 = nodePoint.getX();
+				final double finish = getAngle(childPoints[i].getY());
 
-		            branchPath.moveTo(
-				            (float) transformedChildPoint.getX(),
-				            (float) transformedChildPoint.getY());
+				Arc2D arc = new Arc2D.Double();
+				arc.setArcByCenter(0.0, 0.0, nodePoint.getX(), finish, start - finish, Arc2D.OPEN);
+				branchPath.append(arc, true);
 
-		            for (int j = 0; j < colouring.length - 1; j+=2) {
-			            double height = ((Number)colouring[j+1]).doubleValue();
-			            double p = (height - childHeight) / (nodeHeight - childHeight);
-			            double x = x1 - ((x1 - x0) * p);
-			            final Point2D transformedPoint = transform(x, childPoints[i].getY());
-			            branchPath.lineTo(
-					            (float) transformedPoint.getX(),
-					            (float) transformedPoint.getY());
-		            }
-		            branchPath.lineTo(
-				            (float) transformedShoulderPoint.getX(),
-				            (float) transformedShoulderPoint.getY());
-	            } else {
-		            branchPath.moveTo(
-				            (float) transformedChildPoint.getX(),
-				            (float) transformedChildPoint.getY());
+				// add the branchPath to the map of branch paths
+				branchPaths.put(child, branchPath);
 
-		            branchPath.lineTo(
-				            (float) transformedShoulderPoint.getX(),
-				            (float) transformedShoulderPoint.getY());
-	            }
+				final double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
+
+				Line2D branchLabelPath = new Line2D.Double(
+						transform(x3 - 1.0, childPoints[i].getY()),
+						transform(x3 + 1.0, childPoints[i].getY()));
+
+				branchLabelPaths.put(child, branchLabelPath);
 
-                final double finish = getAngle(childPoints[i].getY());
+				i++;
+			}
 
-                Arc2D arc = new Arc2D.Double();
-                arc.setArcByCenter(0.0, 0.0, nodePoint.getX(), finish, start - finish, Arc2D.OPEN);
-                branchPath.append(arc, true);
+			Line2D nodeLabelPath = new Line2D.Double(
+					transform(nodePoint.getX(), yPos),
+					transform(nodePoint.getX() + 1.0, yPos));
 
-                // add the branchPath to the map of branch paths
-                branchPaths.put(child, branchPath);
+			nodeLabelPaths.put(node, nodeLabelPath);
 
-                final double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
+			Line2D nodeBarPath = new Line2D.Double(
+					transform(nodePoint.getX(), yPos),
+					transform(nodePoint.getX() - 1.0, yPos));
 
-                Line2D branchLabelPath = new Line2D.Double(
-		                transform(x3 - 1.0, childPoints[i].getY()),
-		                transform(x3 + 1.0, childPoints[i].getY()));
+			nodeBarPaths.put(node, nodeBarPath);
+		} else {
 
-                branchLabelPaths.put(child, branchLabelPath);
+			nodePoint = new Point2D.Double(xPosition, yPosition);
+			transformedNodePoint = transform(nodePoint);
 
-                i++;
-            }
+			Line2D tipLabelPath;
 
-            Line2D nodeLabelPath = new Line2D.Double(
-		            transform(nodePoint.getX(), yPos),
-		            transform(nodePoint.getX() + 1.0, yPos));
+			if (tipLabelPosition == TipLabelPosition.FLUSH) {
 
-            nodeLabelPaths.put(node, nodeLabelPath);
+				tipLabelPath = new Line2D.Double(transformedNodePoint, transform(xPosition + 1.0, yPosition));
 
-	        Line2D nodeBarPath = new Line2D.Double(
-			        transform(nodePoint.getX(), yPos),
-			        transform(nodePoint.getX() - 1.0, yPos));
+			} else if (tipLabelPosition == TipLabelPosition.RADIAL) {
 
-	        nodeBarPaths.put(node, nodeBarPath);
-        } else {
+				tipLabelPath = new Line2D.Double(transform(maxXPosition, yPosition),
+						transform(maxXPosition + 1.0, yPosition));
 
-            nodePoint = new Point2D.Double(xPosition, yPosition);
-            transformedNodePoint = transform(nodePoint);
+				Line2D calloutPath = new Line2D.Double(transformedNodePoint, transform(maxXPosition, yPosition));
 
-            Line2D tipLabelPath;
+				calloutPaths.put(node, calloutPath);
 
-            if (tipLabelPosition == TipLabelPosition.FLUSH) {
+			} else if (tipLabelPosition == TipLabelPosition.HORIZONTAL) {
+				// this option disabled in getControls (JH)
+				throw new UnsupportedOperationException("Not implemented yet");
+			} else {
+				// this is a bug
+				throw new IllegalArgumentException("Unrecognized enum value");
+			}
 
-                tipLabelPath = new Line2D.Double(transformedNodePoint, transform(xPosition + 1.0, yPosition));
+			tipLabelPaths.put(node, tipLabelPath);
 
-            } else if (tipLabelPosition == TipLabelPosition.RADIAL) {
+			yPosition += yIncrement;
+		}
 
-                tipLabelPath = new Line2D.Double(transform(maxXPosition, yPosition),
-                                                   transform(maxXPosition + 1.0, yPosition));
+		// add the node point to the map of node points
+		nodePoints.put(node, transformedNodePoint);
 
-                Line2D calloutPath = new Line2D.Double(transformedNodePoint, transform(maxXPosition, yPosition));
+		return nodePoint;
+	}
 
-                calloutPaths.put(node, calloutPath);
+	private void getMaxXPosition(Node node, double xPosition) {
 
-            } else if (tipLabelPosition == TipLabelPosition.HORIZONTAL) {
-                // this option disabled in getControls (JH)
-                throw new UnsupportedOperationException("Not implemented yet");
-            } else {
-                // this is a bug
-                throw new IllegalArgumentException("Unrecognized enum value");
-            }
+		if (!tree.isExternal(node)) {
 
-            tipLabelPaths.put(node, tipLabelPath);
+			List<Node> children = tree.getChildren(node);
 
-            yPosition += yIncrement;
-        }
+			for (Node child : children) {
+				final double length = tree.getLength(child);
+				getMaxXPosition(child, xPosition + length);
+			}
 
-        // add the node point to the map of node points
-        nodePoints.put(node, transformedNodePoint);
+		} else {
+			if (xPosition > maxXPosition) {
+				maxXPosition = xPosition;
+			}
+		}
+	}
 
-        return nodePoint;
-    }
+	/**
+	 * Polar transform
+	 *
+	 * @param point
+	 * @return the point in polar space
+	 */
+	private Point2D transform(Point2D point) {
+		return transform(point.getX(), point.getY());
+	}
 
-    private void getMaxXPosition(Node node, double xPosition) {
+	/**
+	 * Polar transform
+	 *
+	 * @param x
+	 * @param y
+	 * @return the point in polar space
+	 */
+	private Point2D transform(double x, double y) {
+		double r = - Math.toRadians(getAngle(y));
+		double tx = x * Math.cos(r);
+		double ty = x * Math.sin(r);
+		return new Point2D.Double(tx, ty);
+	}
 
-        if (!tree.isExternal(node)) {
+	private double getAngle(double y) {
+		return rootAngle - ((360.0 - angularRange) * 0.5) - (y * angularRange);
+	}
 
-            List<Node> children = tree.getChildren(node);
+	private double yPosition;
+	private double yIncrement;
 
-            for (Node child : children) {
-                final double length = tree.getLength(child);
-                getMaxXPosition(child, xPosition + length);
-            }
+	private double maxXPosition;
 
-        } else {
-            if (xPosition > maxXPosition) {
-                maxXPosition = xPosition;
-            }
-        }
-    }
+	private double rootAngle = 180.0;
+	private double rootLength = 0.01;
+	private double angularRange = 360.0;
 
-    /**
-     * Polar transform
-     *
-     * @param point
-     * @return the point in polar space
-     */
-    private Point2D transform(Point2D point) {
-        return transform(point.getX(), point.getY());
-    }
+	private boolean showingRootBranch = true;
 
-    /**
-     * Polar transform
-     *
-     * @param x
-     * @param y
-     * @return the point in polar space
-     */
-    private Point2D transform(double x, double y) {
-        double r = - Math.toRadians(getAngle(y));
-        double tx = x * Math.cos(r);
-        double ty = x * Math.sin(r);
-        return new Point2D.Double(tx, ty);
-    }
-
-    private double getAngle(double y) {
-        return rootAngle - ((360.0 - angularRange) * 0.5) - (y * angularRange);
-    }
-
-    private double yPosition;
-    private double yIncrement;
-
-    private double maxXPosition;
-
-    private double rootAngle = 180.0;
-    private double rootLength = 0.01;
-    private double angularRange = 360.0;
-
-    private boolean showingRootBranch = true;
-
-    private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
+	private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
 }

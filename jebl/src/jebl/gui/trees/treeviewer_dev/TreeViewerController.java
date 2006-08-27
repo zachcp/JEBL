@@ -96,8 +96,8 @@ public class TreeViewerController extends AbstractController {
         zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, MAX_ZOOM_SLIDER, 0);
         zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        zoomSlider.setPaintTicks(true);
-        zoomSlider.setPaintLabels(true);
+//        zoomSlider.setPaintTicks(true);
+//        zoomSlider.setPaintLabels(true);
 
         zoomSlider.setValue(0);
 
@@ -111,8 +111,8 @@ public class TreeViewerController extends AbstractController {
         optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
         verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, MAX_ZOOM_SLIDER, 0);
-        verticalExpansionSlider.setPaintTicks(true);
-        verticalExpansionSlider.setPaintLabels(true);
+//        verticalExpansionSlider.setPaintTicks(true);
+//        verticalExpansionSlider.setPaintLabels(true);
 
         verticalExpansionSlider.setValue(0);
 

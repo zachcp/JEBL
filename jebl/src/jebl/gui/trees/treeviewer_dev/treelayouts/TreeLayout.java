@@ -63,6 +63,12 @@ public interface TreeLayout {
      */
     boolean isShowingRootBranch();
 
+	/**
+	 * Return whether this layout is showing a branch colouring
+	 * @return showing colouring?
+	 */
+	boolean isShowingColouring();
+
     /**
      * Return whether the two axis scales should be maintained
      * relative to each other

@@ -276,9 +276,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	}
 
 	public void selectCladesFromSelectedNodes() {
-        Set<Node> nodes = new HashSet<Node>(selectedNodes);
-        selectedNodes.clear();
-        for (Node node : nodes) {
+		Set<Node> nodes = new HashSet<Node>(selectedNodes);
+		selectedNodes.clear();
+		for (Node node : nodes) {
 			addSelectedClade(node);
 		}
 		fireSelectionChanged();
@@ -561,10 +561,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		Stroke oldStroke = g2.getStroke();
 
 		for (Node selectedNode : selectedNodes) {
-			Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(selectedNode));
-			g2.setPaint(selectionPaint);
-			g2.setStroke(selectionStroke);
-			g2.draw(branchPath);
+			Shape branchPath = treeLayout.getBranchPath(selectedNode);
+			if (branchPath != null) {
+				Shape transPath = transform.createTransformedShape(branchPath);
+				g2.setPaint(selectionPaint);
+				g2.setStroke(selectionStroke);
+				g2.draw(transPath);
+			}
 		}
 
 		for (Taxon selectedTaxon : selectedTaxa) {
@@ -609,9 +612,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return PAGE_EXISTS;
 	}
 
-    protected void drawTree(Graphics2D g2, double width, double height) {
+	protected void drawTree(Graphics2D g2, double width, double height) {
 
-        if (!calibrated) calibrate(g2, width, height);
+		if (!calibrated) calibrate(g2, width, height);
 
 		AffineTransform oldTransform = g2.getTransform();
 		Paint oldPaint = g2.getPaint();
@@ -639,26 +642,27 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			if (tipLabelPainter != null && tipLabelPainter.isVisible()) {
 
 				AffineTransform taxonTransform = tipLabelTransforms.get(taxon);
-				Painter.Justification taxonLabelJustification = tipLabelJustifications.get(taxon);
-				g2.transform(taxonTransform);
+				if (taxonTransform != null) {
+					Painter.Justification taxonLabelJustification = tipLabelJustifications.get(taxon);
+					g2.transform(taxonTransform);
 
-				if (taxonDecorator != null) {
-					//tipLabelPainter.setForeground(taxonDecorator.getTaxonPaint(taxon));
-				}
+					if (taxonDecorator != null) {
+						//tipLabelPainter.setForeground(taxonDecorator.getTaxonPaint(taxon));
+					}
 
-				tipLabelPainter.paint(g2, node, taxonLabelJustification,
-						new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelPainter.getPreferredHeight()));
+					tipLabelPainter.paint(g2, node, taxonLabelJustification,
+							new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelPainter.getPreferredHeight()));
 
-				g2.setTransform(oldTransform);
+					g2.setTransform(oldTransform);
 
-				if (showingTaxonCallouts) {
-					Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
-					if (calloutPath != null) {
-						g2.setStroke(calloutStroke);
-						g2.draw(calloutPath);
+					if (showingTaxonCallouts) {
+						Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
+						if (calloutPath != null) {
+							g2.setStroke(calloutStroke);
+							g2.draw(calloutPath);
+						}
 					}
 				}
-
 			}
 		}
 
@@ -666,15 +670,21 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		for (Node node : tree.getNodes() ) {
 			if ( showingRootBranch || node != rootNode ) {
 
-					g2.setStroke(branchLineStroke);
+				g2.setStroke(branchLineStroke);
 
-					Object[] colouring = null;
+				Object[] colouring = null;
+				if (treeLayout.isShowingColouring() && node.getAttribute("!collapse") == null) {
 					if (treeLayout.getColouringAttributeName() != null) {
 						colouring = (Object[])node.getAttribute(treeLayout.getColouringAttributeName());
 					}
+//				} else {
+//					System.out.println("collapse");
+				}
 
+				Shape branchPath = treeLayout.getBranchPath(node);
+				if (branchPath != null) {
 					if (colouring != null) {
-						PathIterator iter = treeLayout.getBranchPath(node).getPathIterator(transform);
+						PathIterator iter = branchPath.getPathIterator(transform);
 
 						float[] coords1 = new float[2];
 						iter.currentSegment(coords1);
@@ -706,50 +716,51 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 						g2.draw(path);
 
 					} else {
-						Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
+						Shape transPath = transform.createTransformedShape(branchPath);
 						if (branchDecorator != null) {
 							g2.setPaint(branchDecorator.getBranchPaint(tree, node));
 						} else {
 							g2.setPaint(Color.BLACK);
 						}
-						g2.draw(branchPath);
+						g2.draw(transPath);
 					}
-
-					if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
-
-						AffineTransform nodeTransform = nodeLabelTransforms.get(node);
-						if (nodeTransform != null) {
-							Painter.Justification nodeLabelJustification = nodeLabelJustifications.get(node);
-							g2.transform(nodeTransform);
-
-							nodeLabelPainter.paint(g2, node, nodeLabelJustification,
-									new Rectangle2D.Double(0.0, 0.0, nodeLabelPainter.getPreferredWidth(), nodeLabelPainter.getPreferredHeight()));
-
-							g2.setTransform(oldTransform);
-						}
-					}
-
 				}
 
-				if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
+				if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 
-					AffineTransform branchTransform = branchLabelTransforms.get(node);
-					if (branchTransform != null) {
-						g2.transform(branchTransform);
+					AffineTransform nodeTransform = nodeLabelTransforms.get(node);
+					if (nodeTransform != null) {
+						Painter.Justification nodeLabelJustification = nodeLabelJustifications.get(node);
+						g2.transform(nodeTransform);
 
-						branchLabelPainter.calibrate(g2, node);
-						final double preferredWidth = branchLabelPainter.getPreferredWidth();
-						final double preferredHeight = branchLabelPainter.getPreferredHeight();
-
-						//Line2D labelPath = treeLayout.getBranchLabelPath(node);
-
-						branchLabelPainter.paint(g2, node, Painter.Justification.CENTER,
-								//new Rectangle2D.Double(-preferredWidth/2, -preferredHeight, preferredWidth, preferredHeight));
-								new Rectangle2D.Double(0, 0, preferredWidth, preferredHeight));
+						nodeLabelPainter.paint(g2, node, nodeLabelJustification,
+								new Rectangle2D.Double(0.0, 0.0, nodeLabelPainter.getPreferredWidth(), nodeLabelPainter.getPreferredHeight()));
 
 						g2.setTransform(oldTransform);
 					}
 				}
+
+			}
+
+			if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
+
+				AffineTransform branchTransform = branchLabelTransforms.get(node);
+				if (branchTransform != null) {
+					g2.transform(branchTransform);
+
+					branchLabelPainter.calibrate(g2, node);
+					final double preferredWidth = branchLabelPainter.getPreferredWidth();
+					final double preferredHeight = branchLabelPainter.getPreferredHeight();
+
+					//Line2D labelPath = treeLayout.getBranchLabelPath(node);
+
+					branchLabelPainter.paint(g2, node, Painter.Justification.CENTER,
+							//new Rectangle2D.Double(-preferredWidth/2, -preferredHeight, preferredWidth, preferredHeight));
+							new Rectangle2D.Double(0, 0, preferredWidth, preferredHeight));
+
+					g2.setTransform(oldTransform);
+				}
+			}
 		}
 
 		if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
@@ -778,8 +789,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		// bounds on branches
 		for (Node node : tree.getNodes()) {
-			if (showingRootBranch || node != rootNode) {
-				final Shape branchPath = treeLayout.getBranchPath(node);
+			final Shape branchPath = treeLayout.getBranchPath(node);
+			if (branchPath != null) {
 				// Add the bounds of the branch path to the overall bounds
 				final Rectangle2D branchBounds = branchPath.getBounds2D();
 				if (treeBounds == null) {
@@ -829,11 +840,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				// Get the line that represents the path for the taxon label
 				Line2D taxonPath = treeLayout.getTipLabelPath(node);
 
-				// Work out how it is rotated and create a transform that matches that
-				AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, tipLabelHeight, true);
+				if (taxonPath != null) {
+					// Work out how it is rotated and create a transform that matches that
+					AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, tipLabelHeight, true);
 
-				// and add the translated bounds to the overall bounds
-				bounds.add(taxonTransform.createTransformedShape(labelBounds).getBounds2D());
+					// and add the translated bounds to the overall bounds
+					bounds.add(taxonTransform.createTransformedShape(labelBounds).getBounds2D());
+				}
 			}
 		}
 
@@ -959,11 +972,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		for (Node node : tree.getNodes()) {
 			if (showingRootBranch || node != rootNode) {
 				final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-				final Rectangle2D bounds2D = branchPath.getBounds2D();
-				if (treeBounds == null) {
-					treeBounds = bounds2D;
-				} else {
-					treeBounds.add(bounds2D);
+				if (branchPath != null) {
+					final Rectangle2D bounds2D = branchPath.getBounds2D();
+					if (treeBounds == null) {
+						treeBounds = bounds2D;
+					} else {
+						treeBounds.add(bounds2D);
+					}
 				}
 			}
 		}
@@ -984,19 +999,21 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				// Get the line that represents the path for the tip label
 				Line2D tipPath = treeLayout.getTipLabelPath(node);
 
-				// Work out how it is rotated and create a transform that matches that
-				AffineTransform taxonTransform = calculateTransform(transform, tipPath, tipLabelWidth, labelHeight, true);
+				if (tipPath != null) {
+					// Work out how it is rotated and create a transform that matches that
+					AffineTransform taxonTransform = calculateTransform(transform, tipPath, tipLabelWidth, labelHeight, true);
 
-				// Store the transformed bounds in the map for use when selecting
-				tipLabelBounds.put(taxon, taxonTransform.createTransformedShape(labelBounds));
+					// Store the transformed bounds in the map for use when selecting
+					tipLabelBounds.put(taxon, taxonTransform.createTransformedShape(labelBounds));
 
-				// Store the transform in the map for use when drawing
-				tipLabelTransforms.put(taxon, taxonTransform);
+					// Store the transform in the map for use when drawing
+					tipLabelTransforms.put(taxon, taxonTransform);
 
-				// Store the alignment in the map for use when drawing
-				final Painter.Justification just = (tipPath.getX1() < tipPath.getX2()) ?
-						Painter.Justification.LEFT : Painter.Justification.RIGHT;
-				tipLabelJustifications.put(taxon, just);
+					// Store the alignment in the map for use when drawing
+					final Painter.Justification just = (tipPath.getX1() < tipPath.getX2()) ?
+							Painter.Justification.LEFT : Painter.Justification.RIGHT;
+					tipLabelJustifications.put(taxon, just);
+				}
 			}
 		}
 

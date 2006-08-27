@@ -42,7 +42,6 @@ public class NodeShapeController extends AbstractController {
         optionsPanel = new OptionsPanel();
 
         titleCheckBox = new JCheckBox(getTitle());
-
         titleCheckBox.setSelected(this.nodeShapePainter.isVisible());
 
         titleCheckBox.addChangeListener(new ChangeListener() {
