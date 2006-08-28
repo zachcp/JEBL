@@ -611,6 +611,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             }
         }
 
+	    g2.setPaint(oldPaint);
+	    g2.setStroke(oldStroke);
+
         drawTree(g2, getWidth(), getHeight());
 
         if (dragRectangle != null) {
@@ -690,6 +693,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             }
         }
 
+	    g2.setStroke(branchLineStroke);
+	    
         // Paint collapsed nodes
         for (Node node : treeLayout.getCollapsedShapeMap().keySet() ) {
             Shape collapsedShape = treeLayout.getCollapsedShape(node);
@@ -714,8 +719,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
         // Paint branches
         for (Node node : treeLayout.getBranchPathMap().keySet() ) {
-
-            g2.setStroke(branchLineStroke);
 
             Object[] colouring = null;
             if (treeLayout.isShowingColouring() && treeLayout.getColouringAttributeName() != null) {

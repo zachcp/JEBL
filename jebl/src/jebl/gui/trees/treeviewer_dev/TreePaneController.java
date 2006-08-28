@@ -34,7 +34,6 @@ public class TreePaneController extends AbstractController {
     private static final String ORDER_KEY = "order";
     private static final String ORDER_TYPE_KEY = "orderType";
 
-
     // The defaults if there is nothing in the preferences
     private static Color DEFAULT_FOREGROUND_COLOUR = Color.BLACK;
     private static Color DEFAULT_BACKGROUND_COLOUR = Color.WHITE;

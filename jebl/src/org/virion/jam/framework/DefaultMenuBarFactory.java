@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2005 Biomatters LTD. All Rights Reserved.
- */
 package org.virion.jam.framework;
 
 import javax.swing.*;
@@ -13,8 +10,8 @@ import java.util.*;
  */
 public class DefaultMenuBarFactory implements MenuBarFactory {
 
-    private final List menuFactories = new ArrayList();
-    private final List permanentMenuFactories = new ArrayList();
+    private final List<MenuFactory> menuFactories = new ArrayList<MenuFactory>();
+    private final List<MenuFactory> permanentMenuFactories = new ArrayList<MenuFactory>();
     private boolean populatedMenu = false;
     private JMenuBar menuBar = null;
     AbstractFrame frame = null;
@@ -22,19 +19,18 @@ public class DefaultMenuBarFactory implements MenuBarFactory {
     public final void populateMenuBar(JMenuBar menuBar, AbstractFrame frame) {
         this.menuBar = menuBar;
         this.frame = frame;
-        Map menus = new HashMap();
-        Map order = new TreeMap();
-        List l = new ArrayList();
-        l.addAll(menuFactories);
-        l.addAll(permanentMenuFactories);
-        Iterator iter = l.iterator();
+        Map<String, JMenu> menus = new HashMap<String, JMenu>();
+        Map<Integer, String> order = new TreeMap<Integer, String>();
 
         int leftOrder = 0;
         int centerOrder = 1000;
         int rightOrder = 10000;
 
-        while (iter.hasNext()) {
-            MenuFactory menuFactory = (MenuFactory)iter.next();
+	    List<MenuFactory> l = new ArrayList<MenuFactory>();
+	    l.addAll(menuFactories);
+	    l.addAll(permanentMenuFactories);
+
+        for (MenuFactory menuFactory : l) {
             String name = menuFactory.getMenuName();
             JMenu menu = (JMenu)menus.get(name);
             if (menu == null) {
@@ -52,7 +48,7 @@ public class DefaultMenuBarFactory implements MenuBarFactory {
                     break;
                     case MenuFactory.RIGHT:
                         order.put(new Integer(rightOrder), name);
-                        rightOrder--;
+                        rightOrder++;
                     break;
                 }
             }
@@ -60,41 +56,9 @@ public class DefaultMenuBarFactory implements MenuBarFactory {
             menuFactory.populateMenu(menu, frame);
         }
 
-//        Iterator iter3 = menuFactories.iterator();
-//
-//        while (iter3.hasNext()) {
-//            MenuFactory menuFactory = (MenuFactory)iter3.next();
-//            String name = menuFactory.getMenuName();
-//            JMenu menu = (JMenu)menus.get(name);
-//            if (menu == null) {
-//                int alignment = menuFactory.getPreferredAlignment();
-//                menu = new JMenu(name);
-//                menus.put(name, menu);
-//                switch (alignment) {
-//                    case MenuFactory.LEFT:
-//                        order.put(new Integer(leftOrder), name);
-//                        leftOrder++;
-//                    break;
-//                    case MenuFactory.CENTER:
-//                        order.put(new Integer(centerOrder), name);
-//                        centerOrder++;
-//                    break;
-//                    case MenuFactory.RIGHT:
-//                        order.put(new Integer(rightOrder), name);
-//                        rightOrder--;
-//                    break;
-//                }
-//            }
-//
-//            menuFactory.populateMenu(menu, frame);
-//        }
-
-        Iterator iter2 = order.keySet().iterator();
-        while (iter2.hasNext()) {
-            Integer i = (Integer)iter2.next();
+	    for (int i : order.keySet()) {
             String name = (String)order.get(i);
             JMenu menu = (JMenu)menus.get(name);
-
             menuBar.add(menu);
         }
         populatedMenu = true;
