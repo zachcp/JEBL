@@ -657,44 +657,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         Stroke oldStroke = g2.getStroke();
         Font oldFont = g2.getFont();
 
-        boolean showingRootBranch = treeLayout.isShowingRootBranch();
-
-        // Paint node bars
-        if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
-            for (Node node : nodeBars.keySet() ) {
-                Shape nodeBar = nodeBars.get(node);
-                nodeBar = transform.createTransformedShape(nodeBar);
-                nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, nodeBar);
-            }
-        }
-
-        // Paint tip labels
-        if (tipLabelPainter != null && tipLabelPainter.isVisible()) {
-
-            for (Node node : tipLabelTransforms.keySet()) {
-
-                AffineTransform tipLabelTransform = tipLabelTransforms.get(node);
-
-                Painter.Justification tipLabelJustification = tipLabelJustifications.get(node);
-                g2.transform(tipLabelTransform);
-
-                tipLabelPainter.paint(g2, node, tipLabelJustification,
-                        new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelPainter.getPreferredHeight()));
-
-                g2.setTransform(oldTransform);
-
-                if (showingTipCallouts) {
-                    Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
-                    if (calloutPath != null) {
-                        g2.setStroke(calloutStroke);
-                        g2.draw(calloutPath);
-                    }
-                }
-            }
-        }
-
 	    g2.setStroke(branchLineStroke);
-	    
+
         // Paint collapsed nodes
         for (Node node : treeLayout.getCollapsedShapeMap().keySet() ) {
             Shape collapsedShape = treeLayout.getCollapsedShape(node);
@@ -770,6 +734,40 @@ public class TreePane extends JComponent implements PainterListener, Printable {
                 g2.draw(transPath);
             }
         }
+
+	    // Paint node bars
+	    if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
+	        for (Node node : nodeBars.keySet() ) {
+	            Shape nodeBar = nodeBars.get(node);
+	            nodeBar = transform.createTransformedShape(nodeBar);
+	            nodeBarPainter.paint(g2, node, NodePainter.Justification.CENTER, nodeBar);
+	        }
+	    }
+
+	    // Paint tip labels
+	    if (tipLabelPainter != null && tipLabelPainter.isVisible()) {
+
+	        for (Node node : tipLabelTransforms.keySet()) {
+
+	            AffineTransform tipLabelTransform = tipLabelTransforms.get(node);
+
+	            Painter.Justification tipLabelJustification = tipLabelJustifications.get(node);
+	            g2.transform(tipLabelTransform);
+
+	            tipLabelPainter.paint(g2, node, tipLabelJustification,
+	                    new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelPainter.getPreferredHeight()));
+
+	            g2.setTransform(oldTransform);
+
+	            if (showingTipCallouts) {
+	                Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
+	                if (calloutPath != null) {
+	                    g2.setStroke(calloutStroke);
+	                    g2.draw(calloutPath);
+	                }
+	            }
+	        }
+	    }
 
         // Paint node labels
         if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
