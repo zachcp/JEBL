@@ -1,19 +1,19 @@
 package jebl.gui.trees.treeviewer_dev;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.*;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.*;
+import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayoutListener;
-import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
-import jebl.gui.trees.treeviewer_dev.decorators.AttributableDecorator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.print.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -43,6 +43,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             invalidate();
             repaint();
         }
+	    fireTreePaneSettingsChanged();
     }
 
     private void setupTree() {
@@ -101,9 +102,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         calibrated = false;
         invalidate();
         repaint();
+
+	    fireTreePaneSettingsChanged();
     }
 
-    public void setBranchDecorator(AttributableDecorator branchDecorator) {
+    public void setBranchDecorator(Decorator branchDecorator) {
         this.branchDecorator = branchDecorator;
         repaint();
     }
@@ -351,6 +354,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             treeLayout.invalidate();
             repaint();
         }
+	    fireTreePaneSettingsChanged();
     }
 
     public void annotateSelectedNodes(String name, Object value) {
@@ -358,6 +362,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             selectedNode.setAttribute(name, value);
         }
         repaint();
+	    fireTreePaneSettingsChanged();
     }
 
     public void annotateSelectedTips(String name, Object value) {
@@ -366,6 +371,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             selectedTaxon.setAttribute(name, value);
         }
         repaint();
+	    fireTreePaneSettingsChanged();
     }
 
     /**
@@ -1177,6 +1183,22 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
         return lineTransform;
     }
+
+	public void addTreePaneListener(TreePaneListener listener) {
+	    listeners.add(listener);
+	}
+
+	public void removeTreePaneListener(TreePaneListener listener) {
+	    listeners.remove(listener);
+	}
+
+	public void fireTreePaneSettingsChanged() {
+	    for (TreePaneListener listener : listeners) {
+	        listener.treePaneSettingsChanged();
+	    }
+	}
+
+	private final List<TreePaneListener> listeners = new ArrayList<TreePaneListener>();
 
     // Overridden methods to recalibrate tree when bounds change
     public void setBounds(int x, int y, int width, int height) {

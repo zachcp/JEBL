@@ -20,9 +20,11 @@ import java.util.prefs.Preferences;
  */
 public class TreePaneController extends AbstractController {
 
+	private static final String CONTROLLER_TITLE = "Tree";
+
     private static Preferences PREFS = Preferences.userNodeForPackage(TreePaneController.class);
 
-	private static final String TREE_PANE_KEY = "treePane";
+	private static final String CONTROLLER_KEY = "tree";
 
     private static final String FOREGROUND_COLOUR_KEY = "foregroundColour";
     private static final String BACKGROUND_COLOUR_KEY = "backgroundColour";
@@ -43,17 +45,17 @@ public class TreePaneController extends AbstractController {
     public TreePaneController(final TreePane treePane) {
         this.treePane = treePane;
 
-        int foregroundRGB = PREFS.getInt(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY, DEFAULT_FOREGROUND_COLOUR.getRGB());
-        int backgroundRGB = PREFS.getInt(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY, DEFAULT_BACKGROUND_COLOUR.getRGB());
-        int selectionRGB = PREFS.getInt(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY, DEFAULT_SELECTION_COLOUR.getRGB());
-        float branchLineWidth = PREFS.getFloat(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY, DEFAULT_BRANCH_LINE_WIDTH);
+        int foregroundRGB = PREFS.getInt(CONTROLLER_KEY + "." + FOREGROUND_COLOUR_KEY, DEFAULT_FOREGROUND_COLOUR.getRGB());
+        int backgroundRGB = PREFS.getInt(CONTROLLER_KEY + "." + BACKGROUND_COLOUR_KEY, DEFAULT_BACKGROUND_COLOUR.getRGB());
+        int selectionRGB = PREFS.getInt(CONTROLLER_KEY + "." + SELECTION_COLOUR_KEY, DEFAULT_SELECTION_COLOUR.getRGB());
+        float branchLineWidth = PREFS.getFloat(CONTROLLER_KEY + "." + BRANCH_LINE_WIDTH_KEY, DEFAULT_BRANCH_LINE_WIDTH);
 
         treePane.setForeground(new Color(foregroundRGB));
         treePane.setBackground(new Color(backgroundRGB));
         treePane.setSelectionPaint(new Color(selectionRGB));
         treePane.setBranchStroke(new BasicStroke(branchLineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        titleLabel = new JLabel("Tree Formatting");
+        titleLabel = new JLabel(CONTROLLER_TITLE);
 
         optionsPanel = new OptionsPanel();
 
@@ -142,41 +144,41 @@ public class TreePaneController extends AbstractController {
 
     public void setSettings(Map<String,Object> settings) {
         // These settings don't have controls yet but they will!
-        treePane.setForeground((Color)settings.get(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY));
-        treePane.setBackground((Color)settings.get(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY));
-        treePane.setSelectionPaint((Color)settings.get(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY));
+        treePane.setForeground((Color)settings.get(CONTROLLER_KEY + "." + FOREGROUND_COLOUR_KEY));
+        treePane.setBackground((Color)settings.get(CONTROLLER_KEY + "." + BACKGROUND_COLOUR_KEY));
+        treePane.setSelectionPaint((Color)settings.get(CONTROLLER_KEY + "." + SELECTION_COLOUR_KEY));
 
-        transformCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + TRANSFORM_KEY));
-        String transformName = (String)settings.get(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY);
+        transformCheck.setSelected((Boolean) settings.get(CONTROLLER_KEY + "." + TRANSFORM_KEY));
+        String transformName = (String)settings.get(CONTROLLER_KEY + "." + TRANSFORM_TYPE_KEY);
         for (TransformedRootedTree.Transform transform : TransformedRootedTree.Transform.values()) {
             if (transform.toString().equalsIgnoreCase(transformName)) {
                 transformCombo.setSelectedItem(transform);
             }
         }
 
-        orderCheck.setSelected((Boolean) settings.get(TREE_PANE_KEY + "." + ORDER_KEY));
-        String orderName = (String)settings.get(TREE_PANE_KEY + "." + ORDER_TYPE_KEY);
+        orderCheck.setSelected((Boolean) settings.get(CONTROLLER_KEY + "." + ORDER_KEY));
+        String orderName = (String)settings.get(CONTROLLER_KEY + "." + ORDER_TYPE_KEY);
         for (SortedRootedTree.BranchOrdering order : SortedRootedTree.BranchOrdering.values()) {
             if (order.toString().equalsIgnoreCase(orderName)) {
                 orderCombo.setSelectedItem(order);
             }
         }
 
-        branchLineWidthSpinner.setValue((Double)settings.get(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY));
+        branchLineWidthSpinner.setValue((Double)settings.get(CONTROLLER_KEY + "." + BRANCH_LINE_WIDTH_KEY));
     }
 
     public void getSettings(Map<String, Object> settings) {
         // These settings don't have controls yet but they will!
-        settings.put(TREE_PANE_KEY + "." + FOREGROUND_COLOUR_KEY, treePane.getForeground());
-        settings.put(TREE_PANE_KEY + "." + BACKGROUND_COLOUR_KEY, treePane.getBackground());
-        settings.put(TREE_PANE_KEY + "." + SELECTION_COLOUR_KEY, treePane.getSelectionPaint());
+        settings.put(CONTROLLER_KEY + "." + FOREGROUND_COLOUR_KEY, treePane.getForeground());
+        settings.put(CONTROLLER_KEY + "." + BACKGROUND_COLOUR_KEY, treePane.getBackground());
+        settings.put(CONTROLLER_KEY + "." + SELECTION_COLOUR_KEY, treePane.getSelectionPaint());
 
-        settings.put(TREE_PANE_KEY + "." + TRANSFORM_KEY, transformCheck.isSelected());
-        settings.put(TREE_PANE_KEY + "." + TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
-        settings.put(TREE_PANE_KEY + "." + ORDER_KEY, orderCheck.isSelected());
-        settings.put(TREE_PANE_KEY + "." + ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
+        settings.put(CONTROLLER_KEY + "." + TRANSFORM_KEY, transformCheck.isSelected());
+        settings.put(CONTROLLER_KEY + "." + TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
+        settings.put(CONTROLLER_KEY + "." + ORDER_KEY, orderCheck.isSelected());
+        settings.put(CONTROLLER_KEY + "." + ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
 
-        settings.put(TREE_PANE_KEY + "." + BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
+        settings.put(CONTROLLER_KEY + "." + BRANCH_LINE_WIDTH_KEY, branchLineWidthSpinner.getValue());
     }
 
 

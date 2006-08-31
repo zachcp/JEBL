@@ -34,6 +34,8 @@ public class TreeViewerPanel extends JPanel {
 
         controlPalette.addController(new TreeViewerController(treeViewer));
 
+		controlPalette.addController(new TreeAppearanceController(treePane));
+
 		controlPalette.addController(new TreePaneController(treePane));
 
 		// Create a tip label painter and its controller

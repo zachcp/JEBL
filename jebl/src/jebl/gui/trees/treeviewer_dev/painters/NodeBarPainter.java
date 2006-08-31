@@ -22,20 +22,21 @@ public class NodeBarPainter extends NodePainter {
 	}
 
 	public void setupAttributes(Tree tree) {
-		java.util.List<String> attributeNames = new ArrayList<String>();
+		java.util.Set<String> attributeNames = new TreeSet<String>();
 		if (tree != null) {
-			Set<String> nodeAttributes = new TreeSet<String>();
 			for (Node node : tree.getNodes()) {
 				for (String name : node.getAttributeNames()) {
-					Object attr = node.getAttribute(name);
-					if (attr instanceof Object[] &&
-							((Object[])attr).length == 2 &&
-							!name.startsWith("!")) {
-						nodeAttributes.add(name);
+					if (!name.startsWith("!")) {
+						Object attr = node.getAttribute(name);
+						if (!(attr instanceof Object[])) {
+							attributeNames.add(name);
+						}
 					}
 				}
 			}
-			attributeNames.addAll(nodeAttributes);
+		}
+		if (attributeNames.size() == 0) {
+			attributeNames.add("no attributes");
 		}
 
 		this.attributeNames = new String[attributeNames.size()];

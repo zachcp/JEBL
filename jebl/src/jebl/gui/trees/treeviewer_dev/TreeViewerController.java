@@ -19,6 +19,8 @@ import java.util.prefs.Preferences;
  */
 public class TreeViewerController extends AbstractController {
 
+	private static final String CONTROLLER_TITLE = "Layout";
+
     public enum TreeLayoutType {
         RECTILINEAR("Rectangle"),
         POLAR("Polar"),
@@ -37,9 +39,9 @@ public class TreeViewerController extends AbstractController {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewerController.class);
 
-	private static final String TREE_VIEWER_KEY = "treeViewer";
+	private static final String CONTROLLER_KEY = "layout";
 
-    private static final String LAYOUT_KEY = "layout";
+    private static final String LAYOUT_KEY = "layoutType";
     private static final String ZOOM_KEY = "zoom";
     private static final String EXPANSION_KEY = "expansion";
 
@@ -53,10 +55,10 @@ public class TreeViewerController extends AbstractController {
 
         this.treeViewer = treeViewer;
 
-        final TreeLayoutType defaultLayout = TreeLayoutType.valueOf(PREFS.get(TREE_VIEWER_KEY + "." + LAYOUT_KEY, DEFAULT_LAYOUT));
+        final TreeLayoutType defaultLayout = TreeLayoutType.valueOf(PREFS.get(CONTROLLER_KEY + "." + LAYOUT_KEY, DEFAULT_LAYOUT));
 
 
-        titleLabel = new JLabel("Layout");
+        titleLabel = new JLabel(CONTROLLER_TITLE);
         optionsPanel = new OptionsPanel();
 
         rectilinearTreeLayout = new RectilinearTreeLayout();
@@ -190,7 +192,7 @@ public class TreeViewerController extends AbstractController {
 	}
 
     public void setSettings(Map<String,Object> settings) {
-	    String treeLayoutName = (String)settings.get(TREE_VIEWER_KEY + "." + LAYOUT_KEY);
+	    String treeLayoutName = (String)settings.get(CONTROLLER_KEY + "." + LAYOUT_KEY);
         final TreeLayoutType layout = TreeLayoutType.valueOf(treeLayoutName);
         switch (layout) {
             case RECTILINEAR:
@@ -203,8 +205,8 @@ public class TreeViewerController extends AbstractController {
                 radialTreeToggle.setSelected(true);
                 break;
         }
-        zoomSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + ZOOM_KEY));
-        verticalExpansionSlider.setValue((Integer)settings.get(TREE_VIEWER_KEY + "." + EXPANSION_KEY));
+        zoomSlider.setValue((Integer)settings.get(CONTROLLER_KEY + "." + ZOOM_KEY));
+        verticalExpansionSlider.setValue((Integer)settings.get(CONTROLLER_KEY + "." + EXPANSION_KEY));
 
         // These controllers are internal to TreeViewerController so settings must be done here
         rectilinearTreeLayoutController.setSettings(settings);
@@ -214,14 +216,14 @@ public class TreeViewerController extends AbstractController {
 
     public void getSettings(Map<String, Object> settings) {
         if (rectangularTreeToggle.isSelected()) {
-            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RECTILINEAR.name());
+            settings.put(CONTROLLER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RECTILINEAR.name());
         } else if (polarTreeToggle.isSelected()) {
-            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.POLAR.name());
+            settings.put(CONTROLLER_KEY + "." + LAYOUT_KEY, TreeLayoutType.POLAR.name());
         } else if (radialTreeToggle.isSelected()) {
-            settings.put(TREE_VIEWER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RADIAL.name());
+            settings.put(CONTROLLER_KEY + "." + LAYOUT_KEY, TreeLayoutType.RADIAL.name());
         }
-        settings.put(TREE_VIEWER_KEY + "." + ZOOM_KEY, zoomSlider.getValue());
-        settings.put(TREE_VIEWER_KEY + "." + EXPANSION_KEY, verticalExpansionSlider.getValue());
+        settings.put(CONTROLLER_KEY + "." + ZOOM_KEY, zoomSlider.getValue());
+        settings.put(CONTROLLER_KEY + "." + EXPANSION_KEY, verticalExpansionSlider.getValue());
 
         // These controllers are internal to TreeViewerController so settings must be done here
         rectilinearTreeLayoutController.getSettings(settings);
