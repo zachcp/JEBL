@@ -204,7 +204,6 @@ public class Utils {
             } else if (nucState == Nucleotides.GAP_STATE) {
                 --sequenceLength;
             }
-
         }
 
         final double threshold = 0.7;
