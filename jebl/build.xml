@@ -124,4 +124,29 @@
             <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
         </jar>
     </target>
+   
+   
+   <property name="api" location="doc/api"/>
+   
+   <target name="document" depends="clean-api,prepare-api">
+      <javadoc destdir="${api}"
+               version="false"
+               use="true"
+               author="true"
+               windowtitle="Java Evolutionary Biology Library"
+               doctitle="Java Evolutionary Biology Library">
+         <fileset dir="src"/>
+         <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+      </javadoc>
+   </target>
+
+
+   <target name="prepare-api">
+      <mkdir dir="${api}"/>
+   </target>
+
+
+   <target name="clean-api">
+      <delete dir="${api}"/>
+   </target>
 </project>
