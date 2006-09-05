@@ -88,7 +88,11 @@ public class FastaImporter implements SequenceImporter {
                 if( type == null ) {
                     throw new ImportException("Sequence contains illegal characters (near line " + helper.getLineNumber() + ")");
                 }
-                  sequences.add(new BasicSequence(type, taxon, sequenceString));
+                BasicSequence sequence = new BasicSequence(type, taxon, sequenceString);
+                if (description != null && description.length() > 0) {
+                    sequence.setAttribute(descriptionPropertyName, description);
+                }
+                sequences.add(sequence);
             } while (helper.getLastDelimiter() == fastaFirstChar);
 
         } catch (EOFException e) {
