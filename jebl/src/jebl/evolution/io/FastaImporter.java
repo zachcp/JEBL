@@ -29,8 +29,11 @@ import java.util.StringTokenizer;
 public class FastaImporter implements SequenceImporter {
 
     /**
-     * Name of Jebl taxon property which stores sequence description (i.e. anything after sequence name in fasta
+     * Name of Jebl sequence property which stores sequence description (i.e. anything after sequence name in fasta
      * file), so this data is available and an export to fasta can preserves the original data.
+     * This is stored some attribute of the sequence  and of the taxon for backwards compatibility.
+     * Generally, attributes on taxon should not be used, as they are unsafe
+     * when dealing with objects that share the same taxon.
      */
     public static final String descriptionPropertyName = "description";
 
@@ -88,7 +91,11 @@ public class FastaImporter implements SequenceImporter {
                 if( type == null ) {
                     throw new ImportException("Sequence contains illegal characters (near line " + helper.getLineNumber() + ")");
                 }
-                  sequences.add(new BasicSequence(type, taxon, sequenceString));
+                BasicSequence sequence = new BasicSequence(type, taxon, sequenceString);
+                if (description != null && description.length() > 0) {
+                    sequence.setAttribute(descriptionPropertyName, description);
+                }
+                sequences.add(sequence);
             } while (helper.getLastDelimiter() == fastaFirstChar);
 
         } catch (EOFException e) {
