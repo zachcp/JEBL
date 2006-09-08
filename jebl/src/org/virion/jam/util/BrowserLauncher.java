@@ -2,6 +2,8 @@ package org.virion.jam.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -460,14 +462,43 @@ public class BrowserLauncher {
 			default:
                 browser = Utils.getEnv("BROWSER");
                 if( browser == null ) {
-                  browser = "netscape";
+                  browser = getLinuxBrowser();
                 }
                 break;
 		}
 		return browser;
 	}
 
-	/**
+    /**
+     * Call this if "Linux".equals(System.getProperty("os.name"));
+     *
+     * @return a fully qualified browser executable, or null if none is found.
+     */
+    private static String getLinuxBrowser() {
+
+        final String[] browsers = { "opera", "firefox", "mozilla", "galeon", "konqueror", "netscape" };
+        final String[] cmd = { "which", null };
+        String result = null;
+
+        try {
+            for (int i = 0; i < browsers.length; i++) {
+                cmd[1] = browsers[i];
+                Process process = Runtime.getRuntime().exec(cmd);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                result = reader.readLine();
+                reader.close();
+                if (result != null) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            // This means we get someting back even if the OS isn't Linux
+            result = "netscape";
+        }
+        return result;
+    }
+
+    /**
 	 * Attempts to open the default web browser to the given URL.
 	 * @param url The URL to open
 	 * @throws IOException If the web browser could not be located or does not run
