@@ -8,19 +8,14 @@
  */
 package org.virion.jam.preferences;
 
-import org.virion.jam.toolbar.Toolbar;
-import org.virion.jam.toolbar.ToolbarButton;
-import org.virion.jam.toolbar.ToolbarAction;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import org.virion.jam.toolbar.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 /**
  * DemographicDialog.java
@@ -46,13 +41,13 @@ public class PreferencesDialog {
         JPanel panel = new JPanel(new BorderLayout());
         Toolbar toolbar = new Toolbar(null);
         toolbar.setFloatable(false);
-        
+
         cardLayout = new CardLayout();
         sectionsPanel = new JPanel(cardLayout);
+	    sectionsPanel.setBorder(new EmptyBorder(12,12,12,12));
 
         panel.add(toolbar, BorderLayout.NORTH);
         panel.add(sectionsPanel, BorderLayout.CENTER);
-
 
         JOptionPane optionPane = new JOptionPane(panel,
                 JOptionPane.PLAIN_MESSAGE,
@@ -60,7 +55,7 @@ public class PreferencesDialog {
                 null,
                 new String[] { "Done" },
                 null);
-        optionPane.setBorder(new EmptyBorder(0,0,0,0));
+        optionPane.setBorder(new EmptyBorder(0,0,12,0));
 
         final JDialog dialog = optionPane.createDialog(frame, currentSection);
 

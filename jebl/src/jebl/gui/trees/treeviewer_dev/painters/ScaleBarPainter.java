@@ -1,13 +1,12 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import jebl.gui.trees.treeviewer_dev.TreePane;
 import jebl.evolution.trees.Tree;
+import jebl.gui.trees.treeviewer_dev.TreePane;
 import org.virion.jam.controlpalettes.ControlPalette;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -34,29 +33,6 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 
         FontMetrics fm = g2.getFontMetrics();
         double labelHeight = fm.getHeight();
-
-        if( userScaleRange != 0.0 ) {
-            scaleRange = userScaleRange;
-        } else {
-            final double treeScale = treePane.getTreeScale();
-            if( treeScale == 0.0 ) {
-                scaleRange = 0.0;
-            } else {
-                int w10 = treePane.getWidth() / 10;
-
-                double low = w10 /treeScale;
-                double b = -(Math.ceil(Math.log10(low)) - 1);
-                for(int n = 0; n < 3; ++n) {
-                    double factor = Math.pow(10, b);
-                    double x = ((int)(low * factor) + 1)/factor;
-                    if( n == 2 || x < w10 * 2 ) {
-                        scaleRange = x;
-                        break;
-                    }
-                    ++b;
-                }
-            }
-        }
 
         preferredWidth = treePane.getTreeScale() * scaleRange;
         preferredHeight = labelHeight + 4 + scaleBarStroke.getLineWidth();
@@ -148,18 +124,49 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 	}
 
 	public double getScaleRange() {
-		return userScaleRange;
+		return scaleRange;
 	}
 
     public void setScaleRange(double scaleRange) {
         this.userScaleRange = scaleRange;
+	    calculateScaleRange();
         firePainterChanged();
     }
+
+	public void setAutomaticScale(boolean automaticScale) {
+		this.automaticScale = automaticScale;
+		firePainterChanged();
+	}
 
     public void setControlPalette(ControlPalette controlPalette) {
         // nothing to do
     }
 
+	public void calculateScaleRange() {
+		if( !automaticScale && userScaleRange != 0.0 ) {
+		    scaleRange = userScaleRange;
+		} else {
+			final double treeScale = treePane.getTreeScale();
+			if( treeScale == 0.0 ) {
+			    scaleRange = 0.0;
+			} else {
+			    int w10 = treePane.getWidth() / 10;
+
+			    double low = w10 /treeScale;
+			    double b = -(Math.ceil(Math.log10(low)) - 1);
+			    for(int n = 0; n < 3; ++n) {
+			        double factor = Math.pow(10, b);
+			        double x = ((int)(low * factor) + 1)/factor;
+			        if( n == 2 || x < w10 * 2 ) {
+			            scaleRange = x;
+			            break;
+			        }
+			        ++b;
+			    }
+			}
+		}
+
+	}
 
 	public String[] getAttributes() {
 		return new String[0];
@@ -176,6 +183,7 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 
 	private double scaleRange;
 	private double userScaleRange = 0.0;
+	private boolean automaticScale = true;
 
     private double preferredHeight;
     private double preferredWidth;

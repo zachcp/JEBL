@@ -100,6 +100,8 @@ public class TreeAppearanceController extends AbstractController {
 	}
 
 	private void setupAttributes(Tree tree) {
+		Object selected = branchColorAttributeCombo.getSelectedItem();
+
 		branchColorAttributeCombo.removeAllItems();
 		branchColorAttributeCombo.addItem("User Selection");
 		if (tree == null) {
@@ -108,6 +110,8 @@ public class TreeAppearanceController extends AbstractController {
 		for (String name : getAttributeNames(tree.getNodes())) {
 			branchColorAttributeCombo.addItem(name);
 		}
+
+		branchColorAttributeCombo.setSelectedItem(selected);
 	}
 
 	private String[] getAttributeNames(Collection<? extends Attributable> items) {
