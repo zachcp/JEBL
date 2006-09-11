@@ -52,7 +52,7 @@
         <condition property="isMac">
             <os family="mac"/>
         </condition>
-        <javac source="1.4" srcdir="${src}" destdir="${build-mac-only}">
+        <javac source="1.5" srcdir="${src}" destdir="${build-mac-only}">
             <include name="org/**/maconly/*"/>
         </javac>
     </target>

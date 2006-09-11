@@ -81,13 +81,12 @@ public class OSXAdapter extends ApplicationAdapter {
         theApplication.setEnabledPreferencesMenu(enabled);
     }
 
-
     public void handleOpenFile(ApplicationEvent ae) {
         if (application != null) {
             application.doOpenFile(new File(ae.getFilename()));
             ae.setHandled(true);
         } else {
-            throw new IllegalStateException("handleReOpenApplication: MyApp instance detached from listener");
+            throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
         }
     }
 }
