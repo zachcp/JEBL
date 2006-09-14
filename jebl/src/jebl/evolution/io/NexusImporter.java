@@ -45,7 +45,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		TREES
 	}
 
-	// NEXUS specific ImportException classes
+    private boolean compactTrees = false;
+
+    // NEXUS specific ImportException classes
 	public static class MissingBlockException extends ImportException {
 		public MissingBlockException() { super(); }
 		public MissingBlockException(String message) { super(message); }
@@ -62,7 +64,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		helper.setCommentDelimiters('[', ']', '\0', '!', '&');
 	}
 
-	/**
+    public NexusImporter(Reader reader, boolean compactTrees) {
+        this(reader);
+        this.compactTrees = compactTrees;
+    }
+
+    /**
 	 * This function returns an integer to specify what the
 	 * next block in the file is. The internal variable nextBlock is also set to this
 	 * value. This should be overridden to provide support for other blocks. Once
@@ -1006,8 +1013,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			SimpleRootedTree tree = null;
 			String token = lastToken[0];
 
-			if ( token.equalsIgnoreCase("UTREE") || token.equalsIgnoreCase("TREE")) {
-				boolean isUnrooted = token.equalsIgnoreCase("UTREE");
+            boolean isUnrooted = token.equalsIgnoreCase("UTREE");
+            if ( isUnrooted || token.equalsIgnoreCase("TREE")) {
 
 				if (helper.nextCharacter() == '*') {
 					// Star is used to specify a default tree - ignore it
@@ -1087,7 +1094,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			//added this to escape readNextTree loop correctly -- AJD
 			lastToken[0] = token;
 
-			return tree;
+			return compactTrees ? new CompactRootedTree(tree) : tree;
 
 		} catch (EOFException e) {
 			return null;
@@ -1101,7 +1108,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
 	{
-
 		Node branch;
 
 		helper.clearLastMetaComment();
