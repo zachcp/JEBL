@@ -235,6 +235,10 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
                 }
                 noSons[k] = ns;
 
+                final Map<String, Object> map = n.getAttributeMap();
+                if( map.size() > 0 ) {
+                   nodes[k].getMap().putAll(map);
+                }
                 for( Node s : t.getChildren(n) ) {
                     nlevel.add(s);
                 }
@@ -243,6 +247,12 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
             }
             level.clear();
             level.addAll(nlevel);
+        }
+
+        // add tree attributes
+        final Map<String, Object> map = t.getAttributeMap();
+        if( map.size() > 0 ) {
+           getMap().putAll(map);
         }
     }
 
@@ -467,7 +477,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return null;
     }
 
-    Map<String, Object>  getMap() {
+    Map<String, Object> getMap() {
         final short index = (short) nodes.length;
         return aMap(index);
     }
