@@ -66,7 +66,9 @@ public class PHYLIPExporter implements AlignmentExporter {
     private List<String> phylipNames(List<Sequence> seqs) {
        List<String> names = new ArrayList<String>();
         for( Sequence s : seqs ) {
-           names.add(s.getTaxon().getName());
+            // PHYML plugin does not like spaces in names. I guess this may mean Phylip does not allows them,
+            // but not sure (JH)
+           names.add(s.getTaxon().getName().replace(' ', '_') );
         }
 
         List<String> pnames = tryNames(names, 9, 0);
