@@ -1,7 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.Attributable;
 
@@ -10,13 +10,17 @@ import java.util.*;
 /**
  * A memory efficient rooted tree.
  *
- *   - Uses A compact representation for the tree structure based primarily on indices instead of pointers
+ *   - Uses a compact representation for the tree structure based primarily on indices instead of pointers
  *     and objects
  *   - Minimize penalty for unused features. Trees not using attributes or edges do not require additional
  *     per node/edge memory.
  *
- * Limitations: Maximun of 2^16 nodes and 2^15 external nodes. This should not be a problem with the current
- * sizes of phlogenetic trees we currently handle.
+ * Limitations:
+ *    - Maximun of 2^16 nodes and 2^15 external nodes. This should not be a problem with the current
+ *      sizes of phlogenetic trees we currently handle.
+ *
+ *    - Some of the accessors are slower, typically the ones getting all nodes, all edges, all internal
+ *      nodes etc. Traversing the tree and handling attributes speed should be fine (compared to SimpkeRootedTree)
  *
  * @author Joseph Heled
  * @version $Id$
@@ -56,20 +60,23 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      * Actually the above is true only for internal nodes. External nodes contain an index into
      * the taxa array indicating where the taxon for this node is stored. A 1 bit is added at the most
      * significant place to separate internal from external nodes. So in fact the array would look like
-     * that (2 0x8000|0 2 2 0x8000|1 0x8000|2 0x8000|3), where taxa[0] holds a taxon etc.
+     * that (2 0x8000|0 2 2 0x8000|1 0x8000|2 0x8000|3), where taxa[0] holds a's taxon etc.
      */
     short[] noSons;
+
+    /** Tree has node heights information */
+    boolean hasHeights;
+
+    /** Tree has branch length information */
+    boolean hasLengths;
 
     /**
      * Height of node x is heights[x]
      *
      * Keep only heights since it is easy to compute length given easy access to
-     * parent height.
+     * parent height. (If tree has only lengths, those are stored insted).
      */
     double[] heights;
-
-    boolean hasHeights;
-    boolean hasLengths;
 
     /**
      * Taxon for all external nodes.
@@ -106,7 +113,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     /**
-     * Attribute map for index.
+     * Attribute map for index (node, tree or edge).
      *
      * @param index
      * @return attribute map
@@ -139,14 +146,14 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
             return nSons(index) + 1;
         }
 
-        Map<String, Object>  getExistingMap() {
+        Map<String, Object> getExistingMap() {
             if( hasAttributeMap(index) ) {
                 return aMap(index);
             }
             return null;
         }
 
-        Map<String, Object>  getMap() {
+        Map<String, Object> getMap() {
             return aMap(index);
         }
     }
@@ -161,15 +168,19 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return 0;
     }
 
+    /** Minimal edge object */
     private class SimpleRootedEdge extends AttributableImp implements Edge {
-       // edge is between node 'index' and it's parent
+       /** edge is between node 'index' and it's parent
+        *
+        * As a consequence, index > 0 always.
+        */
        private short index;
 
         SimpleRootedEdge(short index) {
             this.index = index;
         }
 
-        Map<String, Object>  getExistingMap() {
+        Map<String, Object> getExistingMap() {
             final short i = (short)(nodes.length + index);
             if( hasAttributeMap(i) ) {
                 return aMap(i);
@@ -177,7 +188,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
             return null;
         }
 
-        Map<String, Object>  getMap() {
+        Map<String, Object> getMap() {
             return aMap((short)(nodes.length + index));
         }
 
@@ -186,6 +197,11 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         }
     }
 
+    /**
+     *  Do all the hard work.
+     *
+     * @param t
+     */
     public CompactRootedTree(RootedTree t) {
         conceptuallyUnrooted = t.conceptuallyUnrooted();
 
@@ -201,11 +217,19 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         edges = null;
 
         final Node rootNode = t.getRootNode();
+        // nodes to be inserted to the tree, all the same distance from root.
         List<Node> level = new ArrayList<Node>();
+
+        // nodes to be inserted in next iteration (decendents of nodes in 'level')
         List<Node> nlevel = new ArrayList<Node>();
+
+        // start with roo node
         level.add(rootNode);
-        int k = 0;
-        int nextLevelStart = 1;
+        // where next inserted node goes
+        int iNode = 0;
+        // where decendents (if any) of next node goes
+        int decendentslStart = 1;
+        // where taxa (if external) of next node goes
         int nTax = 0;
 
         while( level.size() > 0 ) {
@@ -214,37 +238,42 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
                 short ns = (short) (n.getDegree() - 1);
 
                 if( hasHeights ) {
-                    heights[k] = t.getHeight(n);
+                    heights[iNode] = t.getHeight(n);
                 } else if( hasLengths ) {
-                    heights[k] = ((k == 0) ? 0.0 : t.getLength(n));
+                    heights[iNode] = ((iNode == 0) ? 0.0 : t.getLength(n));
                 }
 
-                nodes[k] = new SimpleRootedNode((short)k);
-                sons[k] = ns  > 0 ? (short)nextLevelStart : 0;
+                nodes[iNode] = new SimpleRootedNode((short)iNode);
+                sons[iNode] = ns > 0 ? (short)decendentslStart : 0;
                 for(int l = 0; l < ns; ++l) {
-                    parent[nextLevelStart + l] = (short)k;
+                    parent[decendentslStart + l] = (short)iNode;
                 }
 
-                nextLevelStart += ns;
+                decendentslStart += ns;
 
                 if( ns == 0 ) {
+                    // external, set taxon and mark it.
                     assert t.isExternal(n);
                     taxa[nTax] = t.getTaxon(n);
                     ns = (short)(0x8000 | nTax);
                     ++nTax;
                 }
-                noSons[k] = ns;
+                noSons[iNode] = ns;
 
+                // set node attributes
                 final Map<String, Object> map = n.getAttributeMap();
                 if( map.size() > 0 ) {
-                   nodes[k].getMap().putAll(map);
+                   nodes[iNode].getMap().putAll(map);
                 }
+
+                // add decendents for next round
                 for( Node s : t.getChildren(n) ) {
                     nlevel.add(s);
                 }
 
-                ++k;
+                ++iNode;
             }
+            // setup for next level
             level.clear();
             level.addAll(nlevel);
         }
@@ -483,10 +512,24 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 }
 
-
+/**
+ * Helper in attribute handling for tree, nodes and edges.
+ *
+ * The object provides the map via the abstract methods.
+ */
 abstract class AttributableImp implements Attributable {
-    abstract Map<String, Object>  getExistingMap();
+    /**
+     * Get attribute map for object.
+     */
     abstract Map<String, Object>  getMap();
+
+    /**
+     * Used to avoid creating an attribute object when only querying for map elements.
+     *
+     * @return Attribute map for object if a none-empty one exists for object, null otherwise
+     */
+    abstract Map<String, Object> getExistingMap();
+
 
     public void setAttribute(String name, Object value) {
         getMap().put(name, value);
@@ -516,84 +559,3 @@ abstract class AttributableImp implements Attributable {
         return Collections.emptyMap();
     }
 }
-
-
-    /*
-    public void setAttribute(String name, Object value) {
-        aMap((short)-1).put(name, value);
-    }
-
-    public Object getAttribute(String name) {
-        return aMap((short)-1).get(name);
-    }
-
-    public void removeAttribute(String name) {
-       aMap((short)-1).remove(name);
-    }
-
-    public Set<String> getAttributeNames() {
-        if( hasAttributeMap((short)-1) ) {
-            return aMap((short)-1).keySet();
-        }
-        return Collections.emptySet();
-    }
-
-    public Map<String, Object> getAttributeMap() {
-        if( hasAttributeMap((short)-1) ) {
-            return aMap((short)-1);
-        }
-        return Collections.emptyMap();
-    }
-    */
-
-
-/*
-    private abstract class AttributableImp implements Attributable {
-         abstract short getIndex();
-
-         public void setAttribute(String name, Object value) {
-            aMap(getIndex()).put(name, value);
-        }
-
-        public Object getAttribute(String name) {
-            return aMap(getIndex()).get(name);
-        }
-
-        public void removeAttribute(String name) {
-            aMap(getIndex()).remove(name);
-        }
-
-        public Set<String> getAttributeNames() {
-            final short index = getIndex();
-            if( hasAttributeMap(index) ) {
-              return aMap(index).keySet();
-            }
-            return Collections.emptySet();
-        }
-
-        public Map<String, Object> getAttributeMap() {
-            final short index = getIndex();
-            if( hasAttributeMap(index) ) {
-               return aMap(index);
-            }
-            return Collections.emptyMap();
-        }
-    }
-      */
-/*
-    public Node createExternalNode(Taxon taxon) {
-        nodes.
-        return null;
-    }
-
-    public void setConceptuallyUnrooted(boolean unrooted) {
-    }
-
-    public void setLength(Node branch, double length) {
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
-    public Node createInternalNode(List<Node> children) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
-    }
-    */
