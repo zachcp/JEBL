@@ -1,22 +1,22 @@
 package jebl.evolution.io;
 
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
-import jebl.evolution.distances.DistanceMatrix;
-import jebl.evolution.graphs.Node;
-import jebl.evolution.alignments.Alignment;
 import jebl.util.Attributable;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 import java.util.List;
-import java.awt.*;
 
 /**
  * Export sequences and trees to Nexus format.
@@ -97,20 +97,14 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         exportTrees(trees);
     }
 
-    /**
-     * export trees
-     */
-    public void exportTrees(Collection<? extends Tree> trees) throws IOException {
-        // all trees in a set should have the same taxa
-        establishTreeTaxa(trees.iterator().next());
+    private void writeTrees(Collection<? extends Tree> trees, boolean checkTaxa) throws IOException {
 
-        writer.println("begin trees;");
         int nt = 0;
         for( Tree t : trees ) {
-            if( establishTreeTaxa(t) ) {
+            if( checkTaxa && establishTreeTaxa(t) ) {
                 throw new IllegalArgumentException();
             }
-            boolean isRooted = t instanceof RootedTree;
+            final boolean isRooted = t instanceof RootedTree;
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
 
             Object name = t.getAttribute("name");
@@ -133,6 +127,29 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             writer.println(builder);
         }
+    }
+    /**
+     * export trees
+     */
+    public void exportTrees(Collection<? extends Tree> trees) throws IOException {
+        // all trees in a set should have the same taxa
+        establishTreeTaxa(trees.iterator().next());
+        writer.println("begin trees;");
+        writeTrees(trees, true);
+        writer.println("end;");
+    }
+
+    public void exportTreesWithTranslation(Collection<? extends Tree> trees, Map<String, String> t) throws IOException {
+        writer.println("begin trees;");
+        writer.println("\ttranslate");
+        boolean first = true;
+        for( Map.Entry<String, String> e : t.entrySet() ) {
+            writer.print((first ? "" : ",\n") + "\t\t" + safeName(e.getKey()) + " " + safeName(e.getValue()));
+            first = false;
+        }
+        writer.println("\n\t;");
+
+        writeTrees(trees, false);
         writer.println("end;");
     }
 
@@ -177,6 +194,16 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             writer.println(builder);
         }
         writer.println(";\nend;\n");
+    }
+
+    /**
+     * name suitable as token - quotes if necessary
+     */
+    private String safeName(String name) {
+        if (!name.matches("^\\w+$")) {
+            return "\'" + name + "\'";
+        }
+        return name;
     }
 
     /**
