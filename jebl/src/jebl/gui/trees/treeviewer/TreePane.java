@@ -634,6 +634,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     protected void drawTree(Graphics2D g2, double width, double height) {
         RenderingHints rhints = g2.getRenderingHints();
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0,  (int)width, (int)height);
         boolean antialiasOn = rhints.containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
         if( ! antialiasOn ) {
           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
