@@ -124,14 +124,10 @@ public class NexusExporter implements SequenceExporter {
     /**
      * export trees
      */
-    public void exportTrees(List<? extends Tree> trees) throws IOException, IllegalArgumentException {
-        // all trees in a set should have the same taxa
-        establishTaxa(trees.get(0));
-
-        writer.println("begin trees;");
+    public void writeTrees(Collection<? extends Tree> trees, boolean checkTaxa) throws IOException, IllegalArgumentException {
         int nt = 0;
         for( Tree t : trees ) {
-            if( establishTaxa(t) ) {
+            if( checkTaxa && establishTaxa(t) ) {
                 throw new IllegalArgumentException();
             }
             boolean isRooted = t instanceof RootedTree;
@@ -157,8 +153,33 @@ public class NexusExporter implements SequenceExporter {
                            + "=" + ((metacomment != null) ? ('[' + metacomment + ']') : "") +
                            Utils.toNewick(rtree) + ";");
         }
+    }
+
+    /**
+     * export trees
+     */
+    public void exportTrees(Collection<? extends Tree> trees) throws IOException {
+        // all trees in a set should have the same taxa
+        establishTaxa(trees.iterator().next());
+        writer.println("begin trees;");
+        writeTrees(trees, true);
         writer.println("end;");
     }
+
+    public void exportTreesWithTranslation(Collection<? extends Tree> trees, Map<String, String> t) throws IOException {
+        writer.println("begin trees;");
+        writer.println("\ttranslate");
+        boolean first = true;
+        for( Map.Entry<String, String> e : t.entrySet() ) {
+            writer.print((first ? "" : ",\n") + "\t\t" + ImportHelper.safeName(e.getKey()) + " " + ImportHelper.safeName(e.getValue()));
+            first = false;
+        }
+        writer.println("\n\t;");
+
+        writeTrees(trees, false);
+        writer.println("end;");
+    }
+
 
     private Set<Taxon> taxa = null;
     private final PrintWriter writer;
