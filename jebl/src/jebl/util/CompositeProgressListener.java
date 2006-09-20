@@ -84,6 +84,13 @@ public final class CompositeProgressListener implements ProgressListener {
     }
 
     /**
+     * clear all progress, including that of previous operations
+     */
+    public void clearAllProgress () {
+        listener.setProgress(0);
+    }
+
+    /**
      * Convenience method to start the next operation AND set a new message.
      * @param message message to set (will be passed to setMessage()
      */
