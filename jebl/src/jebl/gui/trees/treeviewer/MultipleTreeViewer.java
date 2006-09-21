@@ -42,17 +42,20 @@ public class MultipleTreeViewer extends TreeViewer {
         setCurrentTree(tree);
     }
 
+    private int labelSize = 6;
+
     public void setTrees(Collection<? extends Tree> trees) {
-        setTrees(trees, 6);
+        setTrees(trees, labelSize);
     }
 
     public void setTrees(Collection<? extends Tree> trees, int defaultLabelSize) {
         this.trees = new ArrayList<Tree>(trees);
+        labelSize = defaultLabelSize;
         super.setTree(this.trees.get(0), defaultLabelSize);
     }
 
     private void setCurrentTree(Tree tree) {
-        super.setTree(tree);
+        super.setTree(tree, labelSize);
     }
 
     private ControlsProvider multipleTreeControlsProvider = new ControlsProvider() {
