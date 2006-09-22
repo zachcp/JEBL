@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
  * @author Joseph Heled
  * @version $Id$
  */
-public class FastaImporter implements SequenceImporter {
+public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporter {
 
     /**
      * Name of Jebl sequence property which stores sequence description (i.e. anything after sequence name in fasta
@@ -56,9 +56,9 @@ public class FastaImporter implements SequenceImporter {
      * @throws IOException
      * @throws ImportException
      */
-    public final List<Sequence> importSequences() throws IOException, ImportException {
+    private List<Sequence> read(ImmidiateSequenceImporter.Callback callback) throws IOException, ImportException {
 
-        List<Sequence> sequences = new ArrayList<Sequence>();
+        List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
         final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
@@ -95,7 +95,11 @@ public class FastaImporter implements SequenceImporter {
                 if (description != null && description.length() > 0) {
                     sequence.setAttribute(descriptionPropertyName, description);
                 }
-                sequences.add(sequence);
+                if( callback != null ) {
+                    callback.add(sequence);
+                } else {
+                    sequences.add(sequence);
+                }
             } while (helper.getLastDelimiter() == fastaFirstChar);
 
         } catch (EOFException e) {
@@ -105,5 +109,19 @@ public class FastaImporter implements SequenceImporter {
         }
 
         return sequences;
+    }
+
+
+    /**
+     * @return sequences from file.
+     * @throws IOException
+     * @throws ImportException
+     */
+    public final List<Sequence> importSequences() throws IOException, ImportException {
+        return read(null);
+    }
+
+    public void importSequences(Callback callback) throws IOException, ImportException {
+        read(callback);
     }
 }
