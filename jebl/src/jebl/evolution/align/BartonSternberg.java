@@ -35,25 +35,25 @@ import java.util.List;
  * the profile a fixed number of times(currently two).
  */
 public class BartonSternberg implements MultipleAligner {
-    private float gapOpen,gapExtend;
+   // private float gapOpen,gapExtend;
     Scores scores;
     NeedlemanWunschLinearSpaceAffine aligner;
     private int refinementIterations;
-    private boolean freeGapsAtEnds;
+   // private boolean freeGapsAtEnds;
     private boolean fastGuide;
 
     public BartonSternberg(Scores scores, float gapOpen, float gapExtend, int refinementIterations,
                            boolean freeGapsAtEnds, boolean fastGuide) {
 //        if (true) throw new RuntimeException("testing");
-        this.gapOpen = gapOpen;
-        this.gapExtend = gapExtend;
+       // this.gapOpen = gapOpen;
+       // this.gapExtend = gapExtend;
         this.fastGuide = fastGuide;
 
         this.scores = Scores.includeGaps(scores, -gapExtend, 0);
 //        this.scores = Scores.includeGaps(scores, 0,0);
 //        this.scores = Scores.includeGaps(scores);
         this.refinementIterations= refinementIterations;
-        this.freeGapsAtEnds=freeGapsAtEnds;
+      //  this.freeGapsAtEnds = freeGapsAtEnds;
         aligner = new NeedlemanWunschLinearSpaceAffine(this.scores, gapOpen, gapExtend, freeGapsAtEnds);
 
     }
