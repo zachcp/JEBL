@@ -180,6 +180,7 @@ public class Utils {
     public static SequenceType guessSequenceType(final String seq) {
 
         int canonicalNucStates = 0;
+        int undeterminedStates = 0;
         // true length, excluding any gaps
         int sequenceLength = seq.length();
 
@@ -201,13 +202,23 @@ public class Utils {
 
             if (nucState.getIndex() < canonicalStateCount) {
                 ++canonicalNucStates;
-            } else if (nucState == Nucleotides.GAP_STATE) {
-                --sequenceLength;
+            } else {
+                if (nucState == Nucleotides.GAP_STATE) {
+                  --sequenceLength;
+                } else if( nucState == Nucleotides.N_STATE ) {
+                    ++undeterminedStates;
+                }
             }
         }
 
+        // All sites are nucleotides (actual or ambigoues). If longer than 100 sites, declare it a nuc
+        if( sequenceLength >= 100 ) return SequenceType.NUCLEOTIDE;
+
+        // if short, ask for 70% of ACGT or N
+
         final double threshold = 0.7;
 
-        return canonicalNucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
+        final int nucStates = canonicalNucStates + undeterminedStates;
+        return nucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
     }
 }
