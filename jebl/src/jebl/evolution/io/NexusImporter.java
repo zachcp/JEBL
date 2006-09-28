@@ -13,13 +13,20 @@ import jebl.evolution.alignments.BasicAlignment;
 import jebl.evolution.distances.BasicDistanceMatrix;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.sequences.*;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.*;
+import jebl.evolution.trees.CompactRootedTree;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
 
 import java.awt.*;
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -1055,7 +1062,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					int last = helper.getLastDelimiter();
 					if( last == ':' ) {
 						// root length - discard for now
-						double rootLength = helper.readDouble(";");
+						/*double rootLength = */ helper.readDouble(";");
 						last = helper.getLastDelimiter();
 					}
 
@@ -1121,7 +1128,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		}
 
 		if (helper.getLastDelimiter() == ':') {
-			double length = helper.readDouble(",():;");
+			final double length = helper.readDouble(",():;");
 			tree.setLength(branch, length);
 		}
 
@@ -1215,22 +1222,26 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		// This regex should match key=value pairs, separated by commas
 		// This can match the following types of meta comment pairs:
 		// value=number, value="string", value={item1, item2, item3}
-		Pattern pattern = Pattern.compile("([^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
+        // (label must be quoted if it contains spaces (i.e. "my label"=label)
+
+        Pattern pattern = Pattern.compile("(\"[^\"]*\"+|[^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
 		Matcher matcher = pattern.matcher(meta);
 
 		while (matcher.find()) {
 			String label = matcher.group(1);
-			if (label == null || label.trim().length() == 0) {
-				throw new ImportException.BadFormatException("Badly formatted attribute: '"+matcher.group()+"'");
+            if( label.charAt(0) == '\"' ) {
+                label = label.substring(1, label.length() - 1);
+            }
+            if (label == null || label.trim().length() == 0) {
+				throw new ImportException.BadFormatException("Badly formatted attribute: '"+ matcher.group()+"'");
 			}
-			String value = matcher.group(2);
+			final String value = matcher.group(2);
 			if (value != null && value.trim().length() > 0) {
 				// there is a specified value so try to parse it
 				item.setAttribute(label, parseValue(value.substring(1)));
 			} else {
 				item.setAttribute(label, Boolean.TRUE);
 			}
-
 		}
 	}
 
