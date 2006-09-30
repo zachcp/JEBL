@@ -1,17 +1,17 @@
 package jebl.evolution.align;
 
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.TreeBuilderFactory;
-import jebl.evolution.trees.TreeBuilder;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.distances.*;
 import jebl.evolution.alignments.Alignment;
-import jebl.evolution.sequences.Sequence;
+import jebl.evolution.distances.*;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.TreeBuilder;
+import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.util.ProgressListener;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Joseph Heled
@@ -83,7 +83,9 @@ public class AlignmentTreeBuilderFactory {
     }
 
     static public Result build(List<Sequence> seqs, TreeBuilderFactory.Method method, MultipleAligner aligner,
-                                boolean needDistances, ProgressListener progress) {
+                                /*boolean needDistances, */ProgressListener progress) {
+       // needDistances = false;
+
         SimpleRootedTree gtree = new SimpleRootedTree();
         List<Node> nodes = new ArrayList<Node>();
         for(Sequence s : seqs) {
@@ -106,7 +108,7 @@ public class AlignmentTreeBuilderFactory {
 
         final int alignWork = seqs.size()-1;
         final int treeWork = 1;
-        final int matrixWork = needDistances ? 1 : 0;
+        final int matrixWork = 0; // needDistances ? 1 : 0;
 
         CompoundAlignmentProgressListener p = new CompoundAlignmentProgressListener(progress,
                                                                                     alignWork + treeWork + matrixWork);
@@ -127,9 +129,11 @@ public class AlignmentTreeBuilderFactory {
 
         p.setSectionSize(treeWork);
         progress.setMessage("Building guide tree from alignment");
-        final Tree guideTree = build(alignment, method, distanceModel, minorProgress).tree;
+        final Result result = build(alignment, method, distanceModel, minorProgress);
+        //final Tree guideTree = result.tree;
         p.incrementSectionsCompleted(treeWork);
-
+        return result;
+        /*
         DistanceMatrix distanceMatrix = null;
         if( needDistances ) {
             p.setSectionSize(matrixWork);
@@ -143,5 +147,6 @@ public class AlignmentTreeBuilderFactory {
             p.incrementSectionsCompleted(matrixWork);
         }
         return new Result(guideTree, distanceMatrix);
+        */
     }
 }

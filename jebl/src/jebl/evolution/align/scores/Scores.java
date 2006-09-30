@@ -12,7 +12,7 @@ package jebl.evolution.align.scores;
 public abstract class Scores implements ScoreMatrix {
 
     public float[][] score;
-    private String extraResidues= "";
+    private String extraResidues = "";
 
     protected void buildScores(float[][] scores) {
 
@@ -63,13 +63,10 @@ public abstract class Scores implements ScoreMatrix {
             result = new AminoAcidScores();
         else
             result = new NucleotideScores((NucleotideScores) scores);
-        result.extraResidues= scores.getExtraResidues();
+        result.extraResidues = scores.getExtraResidues();
         result.score = new float[127][127];
         for (int i = 0; i < 127; i++) {
-            for (int j = 0; j < 127; j++) {
-                result.score[i][j]= scores.score[i][j];
-            }
-
+            System.arraycopy(scores.score[i], 0, result.score[i], 0, 127);
         }
         return result;
     }
@@ -82,7 +79,7 @@ public abstract class Scores implements ScoreMatrix {
      */
     public static Scores includeGaps(Scores scores, float gapVersusResidueCost, float gapVersusGapCost) {
 //        System.out.println("cost =" + gapVersusResidueCost+ "," + gapVersusGapCost);
-        Scores result =duplicate(scores);
+        Scores result = duplicate(scores);
         String states = scores.getAlphabet();
         for (int i = 0; i < states.length(); i++) {
             char res1 = states.charAt(i);
@@ -113,12 +110,12 @@ public abstract class Scores implements ScoreMatrix {
     public static Scores includeAdditionalCharacters(Scores scores, String characters) {
         Scores result = duplicate(scores);
         String states = scores.getAlphabet();
-        char[] unique =new char[characters.length ()];
+        char[] unique = new char[characters.length ()];
         int index = 0;
         for (char character : characters.toCharArray()) {
             if(states.indexOf(character)< 0) unique[index++ ]= character;
         }
-        result.extraResidues = new String(unique, 0,index);
+        result.extraResidues = new String(unique, 0, index);
         // don't need to modify any of the "scores" values, since they all default to zero anyway.
         return result;
     }

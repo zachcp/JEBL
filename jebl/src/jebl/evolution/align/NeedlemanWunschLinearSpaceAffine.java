@@ -1,8 +1,8 @@
 package jebl.evolution.align;
 
+import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
-import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.alignments.BasicAlignment;
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.Sequence;
@@ -18,7 +18,7 @@ import java.util.List;
 public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine implements PairwiseAligner {
     private float resultScore;
     static final int RECURSION_THRESHOLD = 6;
-    private boolean debug= false;
+    private boolean debug = false;
     private boolean freeGapsAtEnds;
 
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float openGapPenalty, float extendGapPenalty) {

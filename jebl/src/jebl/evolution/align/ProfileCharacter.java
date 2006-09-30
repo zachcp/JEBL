@@ -21,8 +21,8 @@ public class ProfileCharacter {
     public int totalCharacters;
 
     public ProfileCharacter(int alphabetSize) {
-        characters =new char[alphabetSize +1];
-        count =new int[alphabetSize +1];
+        characters = new char[alphabetSize +1];
+        count = new int[alphabetSize +1];
     }
 
     public void addCharacter(char character, int increment) {

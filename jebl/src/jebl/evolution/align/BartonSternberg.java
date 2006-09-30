@@ -1,9 +1,11 @@
 package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Blosum60;
+import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
+import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.FastaImporter;
 import jebl.evolution.io.ImportException;
@@ -35,27 +37,37 @@ import java.util.List;
  * the profile a fixed number of times(currently two).
  */
 public class BartonSternberg implements MultipleAligner {
-   // private float gapOpen,gapExtend;
+
     Scores scores;
     NeedlemanWunschLinearSpaceAffine aligner;
     private int refinementIterations;
-   // private boolean freeGapsAtEnds;
+    private float gapOpen,gapExtend;
+    private boolean freeGapsAtEnds;
     private boolean fastGuide;
+    // if not null, scores are from estimate
+    private Scores origScores = null;
+
+    private void establishScores(Scores scores) {
+        this.scores = scores;
+        this.scores = Scores.includeGaps(scores, -gapExtend, 0);
+        aligner = new NeedlemanWunschLinearSpaceAffine(this.scores, gapOpen, gapExtend, freeGapsAtEnds);
+    }
+
+    public Scores getEstimatedScores() {
+        return origScores != null ? scores : null;
+    }
 
     public BartonSternberg(Scores scores, float gapOpen, float gapExtend, int refinementIterations,
                            boolean freeGapsAtEnds, boolean fastGuide) {
 //        if (true) throw new RuntimeException("testing");
-       // this.gapOpen = gapOpen;
-       // this.gapExtend = gapExtend;
+       this.gapOpen = gapOpen;
+       this.gapExtend = gapExtend;
+       this.freeGapsAtEnds = freeGapsAtEnds;
+
         this.fastGuide = fastGuide;
 
-        this.scores = Scores.includeGaps(scores, -gapExtend, 0);
-//        this.scores = Scores.includeGaps(scores, 0,0);
-//        this.scores = Scores.includeGaps(scores);
-        this.refinementIterations= refinementIterations;
-      //  this.freeGapsAtEnds = freeGapsAtEnds;
-        aligner = new NeedlemanWunschLinearSpaceAffine(this.scores, gapOpen, gapExtend, freeGapsAtEnds);
-
+        this.refinementIterations = refinementIterations;
+        establishScores(scores);
     }
 
     CompoundAlignmentProgressListener compoundProgress;
@@ -106,18 +118,19 @@ public class BartonSternberg implements MultipleAligner {
      * @param refineOnly if specified, then the input sequences are assumed to be aligned already,
      * and this function will only refine the alignment.
      */
-    public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly) {
+    public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly,
+                          boolean estimateMatchMIsmatchCosts) {
+        if( origScores != null ) {
+            establishScores(origScores);
+        }
+
         final int count = sourceSequences.size();
 
-//        String[] sequences = new String[count];
-
-//        Profile[] sequenceProfiles= new Profile[count];
         Profile[] sequenceProfilesWithoutGaps = new Profile[count];
         String[] sequencesWithoutGaps = new String[count];
         for (int i = 0; i < count; i++) {
             sequencesWithoutGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), false);
             sequenceProfilesWithoutGaps[i] = new Profile(i, sequencesWithoutGaps[i]);
-
         }
 
         int treeWork = refineOnly ? 0 : (fastGuide ? count : count*(count - 1)/2);
@@ -127,7 +140,7 @@ public class BartonSternberg implements MultipleAligner {
         compoundProgress = new CompoundAlignmentProgressListener(progress,treeWork + refinementWork + alignmentWork);
 
         Profile profile = null;
-        if(refineOnly) {
+        if( refineOnly ) {
             String[] sequencesWithGaps = new String[count];
             for (int i = 0; i < count; i++) {
                 sequencesWithGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), true);
@@ -141,28 +154,47 @@ public class BartonSternberg implements MultipleAligner {
         } else {
             List<Sequence> sequencesForGuideTree = new ArrayList<Sequence>(sourceSequences.size());
             for (int i = 0; i < count; i++) {
-
                 Sequence s = sourceSequences.get(i);
                 sequencesForGuideTree.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequencesWithoutGaps[i]));
             }
             compoundProgress.setSectionSize(treeWork);
             // We want a binary rooted tree
 
-            long start = System.currentTimeMillis();
+            //long start = System.currentTimeMillis();
+            final boolean estimateMatchCost = estimateMatchMIsmatchCosts && scores instanceof NucleotideScores;
 
             final AlignmentTreeBuilderFactory.Result unrootedGuideTree =
                     fastGuide ?
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
-                                    this, false, compoundProgress.getMinorProgress()) :
+                                    this, compoundProgress.getMinorProgress()) :
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     aligner, compoundProgress.getMinorProgress());
             if (compoundProgress.isCancelled()) return null;
-            long duration = System.currentTimeMillis() - start;
+            //long duration = System.currentTimeMillis() - start;
             //System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
 
             RootedTree guideTree = Utils.rootTreeAtCenter(unrootedGuideTree.tree);
             compoundProgress.incrementSectionsCompleted(treeWork);
 
+            if( estimateMatchCost ) {
+                final DistanceMatrix distanceMat = unrootedGuideTree.distance;
+                final double[][] distances = distanceMat.getDistances();
+                double sum = 0.0;
+                final int n = distances.length;
+                for(int k = 0; k < n; ++k) {
+                    for(int j = k+1; j < n; ++j) {
+                        // ignore infinity and high values
+                        sum += Math.min(5.0, distances[k][j]);
+                    }
+                }
+                final double avg = sum / ((n * (n - 1)/2));
+
+                final double percentmatches = 1 - (3.0/4.0) * (1 - Math.exp(-4.0 * avg / 3.0));
+
+                origScores = scores;
+                final NucleotideScores nucleotideScores = new NucleotideScores(scores, percentmatches);
+                establishScores(nucleotideScores);
+            }
             progress.setMessage("Building alignment");
             profile = align(guideTree, guideTree.getRootNode(), sequencesForGuideTree, compoundProgress);
             if (compoundProgress.isCancelled()) return null;
@@ -208,7 +240,6 @@ public class BartonSternberg implements MultipleAligner {
             }
         }
 
-
         String[] results = new String[count];
         for (int i = 0; i < count; i++) {
             results[i]= profile.paddedSequences.get(i);
@@ -244,7 +275,7 @@ public class BartonSternberg implements MultipleAligner {
         BartonSternberg alignment = new BartonSternberg( new Blosum60(), 20, 1, 2, true, false);
         String[] sequences = sequenceStrings.toArray(new String[0]);
         System.out.println("aligning " + sequences.length);
-        String results[] = alignment.align(xsequences, null, false);
+        String results[] = alignment.align(xsequences, null, false, false);
         for (String result : results) {
             System.out.println(result);
         }
