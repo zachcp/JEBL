@@ -1,5 +1,6 @@
 package jebl.gui.trees.treeviewer;
 
+import jebl.evolution.io.NexusExporter;
 import jebl.evolution.trees.Tree;
 import org.virion.jam.controlpanels.*;
 import org.virion.jam.panels.OptionsPanel;
@@ -71,14 +72,41 @@ public class MultipleTreeViewer extends TreeViewer {
             if (controls == null) {
                 OptionsPanel optionsPanel = new OptionsPanel();
 
-                final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(1, 1, trees.size(), 1));
-
-                spinner1.addChangeListener(new ChangeListener() {
-                    public void stateChanged(ChangeEvent changeEvent) {
-                        setCurrentTree(trees.get((Integer) spinner1.getValue() - 1));
+                boolean useNames = false;
+                for( Tree t : trees ) {
+                    Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
+                    if( !NexusExporter.isGeneratedTreeName(name.toString()) ) {
+                        useNames = true;
+                        break;
                     }
-                });
-                optionsPanel.addComponentWithLabel("Tree:", spinner1);
+                }
+                if( useNames ) {
+                    final List<String> names = new ArrayList<String>();
+                    for( Tree t : trees ) {
+                        Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
+                        if( name == null ) {
+                            name = trees.indexOf(t);
+                        }
+                        names.add(name.toString());
+                    }
+                    final JSpinner spinner1 = new JSpinner(new SpinnerListModel(names));
+
+                    spinner1.addChangeListener(new ChangeListener() {
+                        public void stateChanged(ChangeEvent changeEvent) {
+                            setCurrentTree(trees.get( names.indexOf( spinner1.getValue()) ) );
+                        }
+                    });
+                    optionsPanel.addComponentWithLabel("Tree:", spinner1);
+                }  else {
+                    final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(1, 1, trees.size(), 1));
+
+                    spinner1.addChangeListener(new ChangeListener() {
+                        public void stateChanged(ChangeEvent changeEvent) {
+                            setCurrentTree(trees.get((Integer) spinner1.getValue() - 1));
+                        }
+                    });
+                    optionsPanel.addComponentWithLabel("Tree:", spinner1);
+                }
 
                 controls = new Controls("Current Tree", optionsPanel, true);
             }

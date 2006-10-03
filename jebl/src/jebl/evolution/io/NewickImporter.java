@@ -10,8 +10,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -169,14 +169,30 @@ public class NewickImporter implements TreeImporter {
             throw new ImportException.BadFormatException("Missing closing ')' in tree");
         }
 
+        final Node node = tree.createInternalNode(children);
+
         try {
           // find the next delimiter
-          helper.readToken(":(),;");
+          String token = helper.readToken(":(),;");
+
+            if (token.length() > 0) {
+                node.setAttribute("label", NexusImporter.parseValue(token));
+            }
+
+            // If there is a metacomment before the branch length indicator (:), then it is a node attribute
+            if (helper.getLastMetaComment() != null) {
+                // There was a meta-comment which should be in the form:
+                // \[&label[=value][,label[=value]>[,/..]]\]
+                NexusImporter.parseMetaCommentPairs(helper.getLastMetaComment(), node);
+
+                helper.clearLastMetaComment();
+            }
+
         } catch( EOFException e) {
             // Ok if we just finished
         }
 
-        return tree.createInternalNode(children);
+        return node;
     }
 
     /**

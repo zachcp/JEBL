@@ -107,7 +107,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             final boolean isRooted = t instanceof RootedTree;
             final RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
 
-            final Object name = t.getAttribute("name");
+            final Object name = t.getAttribute(treeNameAttributeKey);
 
             ++nt;
             final String treeName = (name != null) ? name.toString() : "tree_" + nt;
@@ -120,7 +120,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             builder.append(treeName);
             builder.append(" = ");
 
-            appendAttributes(rtree, "name", builder);
+            appendAttributes(rtree, treeNameAttributeKey, builder);
 
             appendTree(rtree, rtree.getRootNode(), builder);
             builder.append(";");
@@ -349,6 +349,12 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         }
 
         return builder.append(value);
+    }
+
+    static public String treeNameAttributeKey = "name";
+
+    static public boolean isGeneratedTreeName(String name) {
+        return name != null && name.matches("tree_[0-9]+");
     }
 
     private Set<Taxon> taxa = null;

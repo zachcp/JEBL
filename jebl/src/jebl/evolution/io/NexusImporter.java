@@ -1057,9 +1057,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					readInternalNode(tree);
 
 					// save name as attribute
-					tree.setAttribute("name", treeName);
+                    if( ! NexusExporter.isGeneratedTreeName(treeName) )  {
+                        tree.setAttribute(NexusExporter.treeNameAttributeKey, treeName);
+                    }
 
-					int last = helper.getLastDelimiter();
+                    int last = helper.getLastDelimiter();
 					if( last == ':' ) {
 						// root length - discard for now
 						/*double rootLength = */ helper.readDouble(";");
@@ -1218,7 +1220,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return tree.createExternalNode(taxon);
 	}
 
-	private void parseMetaCommentPairs(String meta, Attributable item) throws ImportException.BadFormatException {
+	static void parseMetaCommentPairs(String meta, Attributable item) throws ImportException.BadFormatException {
 		// This regex should match key=value pairs, separated by commas
 		// This can match the following types of meta comment pairs:
 		// value=number, value="string", value={item1, item2, item3}
@@ -1256,7 +1258,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 * @param value the string
 	 * @return the object
 	 */
-	private Object parseValue(String value) {
+	static Object parseValue(String value) {
 
 		value = value.trim();
 
