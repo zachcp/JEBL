@@ -21,6 +21,8 @@ import java.util.*;
  */
 
 public class NexusExporter implements SequenceExporter {
+    public static String treeNameAttributeKey = "name";
+
     /**
      *
      * @param writer where export text goes
@@ -133,10 +135,10 @@ public class NexusExporter implements SequenceExporter {
             boolean isRooted = t instanceof RootedTree;
             RootedTree rtree = isRooted ? (RootedTree)t : Utils.rootTheTree(t);
 
-            Object name = t.getAttribute("name");
+            Object name = t.getAttribute(treeNameAttributeKey);
             String metacomment = null;
             for( Map.Entry<String, Object> e : t.getAttributeMap().entrySet() ) {
-                if( !e.getKey().equals("name") ) {
+                if( !e.getKey().equals(treeNameAttributeKey) ) {
                     if( metacomment == null ) {
                         metacomment = "";
                     } else {

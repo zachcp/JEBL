@@ -5,6 +5,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.util.Attributable;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.awt.*;
 
 /**
  * @author Andrew Rambaut
@@ -169,16 +173,116 @@ public class NewickImporter implements TreeImporter {
             throw new ImportException.BadFormatException("Missing closing ')' in tree");
         }
 
+
+        final Node node = tree.createInternalNode(children);
+
         try {
           // find the next delimiter
-          helper.readToken(":(),;");
+          String token = helper.readToken(":(),;");
+
+            if (token.length() > 0) {
+                node.setAttribute("label", parseValue(token));
+            }
+
+            // If there is a metacomment before the branch length indicator (:), then it is a node attribute
+            if (helper.getLastMetaComment() != null) {
+                // There was a meta-comment which should be in the form:
+                // \[&label[=value][,label[=value]>[,/..]]\]
+                parseMetaCommentPairs(helper.getLastMetaComment(), node);
+
+                helper.clearLastMetaComment();
+            }
+
         } catch( EOFException e) {
             // Ok if we just finished
         }
 
-        return tree.createInternalNode(children);
+        return node;
     }
 
+    static void parseMetaCommentPairs(String meta, Attributable item) throws ImportException.BadFormatException {
+		// This regex should match key=value pairs, separated by commas
+		// This can match the following types of meta comment pairs:
+		// value=number, value="string", value={item1, item2, item3}
+        // (label must be quoted if it contains spaces (i.e. "my label"=label)
+
+        Pattern pattern = Pattern.compile("(\"[^\"]*\"+|[^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
+		Matcher matcher = pattern.matcher(meta);
+
+		while (matcher.find()) {
+			String label = matcher.group(1);
+            if( label.charAt(0) == '\"' ) {
+                label = label.substring(1, label.length() - 1);
+            }
+            if (label == null || label.trim().length() == 0) {
+				throw new ImportException.BadFormatException("Badly formatted attribute: '"+ matcher.group()+"'");
+			}
+			final String value = matcher.group(2);
+			if (value != null && value.trim().length() > 0) {
+				// there is a specified value so try to parse it
+				item.setAttribute(label, parseValue(value.substring(1)));
+			} else {
+				item.setAttribute(label, Boolean.TRUE);
+			}
+		}
+	}
+    /**
+	 * This method takes a string and tries to decode it returning the object
+	 * that best fits the data. It will recognize command delimited lists enclosed
+	 * in {..} and call parseValue() on each element. It will also recognize Boolean,
+	 * Integer and Double. If the value starts with a # then it will attempt to decode
+	 * the following integer as an RGB colour - see Color.decode(). If nothing else fits
+	 * then the value will be returned as a string but trimmed of leading and trailing
+	 * white space.
+	 * @param value the string
+	 * @return the object
+	 */
+	static Object parseValue(String value) {
+
+		value = value.trim();
+
+		if (value.startsWith("{")) {
+			// the value is a list so recursively parse the elements
+			// and return an array
+			String[] elements = value.substring(1, value.length() - 1).split(",");
+			Object[] values = new Object[elements.length];
+			for (int i = 0; i < elements.length; i++) {
+				values[i] = parseValue(elements[i]);
+			}
+			return values;
+		}
+
+		if (value.startsWith("#")) {
+			// I am not sure whether this is a good idea but
+			// I am going to assume that a # denotes an RGB colour
+			try {
+				return Color.decode(value.substring(1));
+			} catch (NumberFormatException nfe1) {
+				// not a colour
+			}
+		}
+
+		if (value.equalsIgnoreCase("TRUE") || value.equalsIgnoreCase("FALSE")) {
+			return new Boolean(value);
+		}
+
+		// Attempt to format the value as an integer
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException nfe1) {
+			// not an integer
+		}
+
+		// Attempt to format the value as a double
+		try {
+			return Double.parseDouble(value);
+		} catch (NumberFormatException nfe2) {
+			// not a double
+		}
+
+		// return the trimmed string
+		return value;
+	}
     /**
      * Reads an external node in.
      */
