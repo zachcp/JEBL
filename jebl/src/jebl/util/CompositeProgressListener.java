@@ -7,9 +7,10 @@ package jebl.util;
  *          created on 17/03/2006 11:15:00
  *          <p/>
  *          This is a progress listener that is suitable for a task that consists of several subtasks.
- *          You specfiy the relative duration of each subtask, and then the subtasks' setProgress()
+ *          You specify the relative duration of each subtask, and then the subtasks' setProgress()
  *          calls with values between 0 and 1 are translated to reflect the overall progress on the whole
- *          (combined) task.
+ *          (combined) task. In other words, each reports progress as if it were the whole task, and the
+ *          CompositeProgressListener translates this into overall progress.
  *          <p/>
  *          As the combined progress listener cannot know which subtask it is currently being called from,
  *          you have to explicitely let it know when a new subtask (not the first) starts, by calling
@@ -32,15 +33,7 @@ public final class CompositeProgressListener implements ProgressListener {
             throw new IllegalArgumentException();
         }
         if (listener == null) {
-            this.listener = new ProgressListener() {
-                public boolean setProgress(double fractionCompleted) {
-                    return false; // do nothing
-                }
-
-                public boolean setMessage(String message) {
-                    return false;  // do nothing
-                }
-            };
+            this.listener = new ProgressListener.EmptyProgressListener();
         } else {
             this.listener = listener;
         }
@@ -48,8 +41,12 @@ public final class CompositeProgressListener implements ProgressListener {
 
         // scale times to a sum of 1
         double totalTime = 0.0;
-        for (double d : operationDuration)
+        for (double d : operationDuration) {
+            if (d < 0.0) {
+                throw new IllegalArgumentException("Operation cannot take negative time: " + d);
+            }
             totalTime += d;
+        }
         for (int i = 0; i < numOperations; i++)
             this.time[i] = (operationDuration[i] / totalTime);
     }
