@@ -86,12 +86,6 @@ public class ImportHelper {
         reader.close();
     }
 
-    private void encounteredEndOfFile() throws IOException {
-        if (closeReaderUponEndOfFile) {
-            reader.close();
-        }
-    }
-
     public void setCommentDelimiters(char line) {
 		hasComments = true;
 		this.lineComment = line;
@@ -177,7 +171,6 @@ public class ImportHelper {
             if (ch != -1) {
                 totalCharactersRead++;
             } else {
-                encounteredEndOfFile();
                 throw new EOFException();
 			}
 		} else {
@@ -218,7 +211,7 @@ public class ImportHelper {
 
 		} catch (EOFException e) {
             // We catch an EOF and return the line we have so far
-            encounteredEndOfFile();
+//            encounteredEndOfFile();
 		}
 
 		return line.toString();
@@ -291,7 +284,6 @@ public class ImportHelper {
 
 		} catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
-            encounteredEndOfFile();
 		}
 	}
 
@@ -368,7 +360,6 @@ public class ImportHelper {
 
 		} catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
-            encounteredEndOfFile();
 		}
 	}
 
@@ -508,7 +499,6 @@ public class ImportHelper {
 				}
 			} catch (EOFException e) {
                 // We catch an EOF and return the token we have so far
-                encounteredEndOfFile();
 				done = true;
 			}
 		}

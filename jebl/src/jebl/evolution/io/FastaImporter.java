@@ -128,7 +128,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
         } finally {
             if (closeReaderAtEnd) {
                 // closing more than once doesn't hurt (see API doc of Reader)
-                helper.closeReader();
+//                helper.closeReader();
             }
         }
         return sequences;
