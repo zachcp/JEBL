@@ -22,44 +22,29 @@ import java.io.*;
  * @version $Id$
  */
 public class ImportHelper {
-    private final boolean closeReaderUponEndOfFile;
-
     private long totalCharactersRead = 0;
 
     // Expected length of input in bytes, or 0 if unknown
     private long expectedInputLength = 0;
 
     /**
-     *
+     * ATTENTION: The ImportHelper never closes the reader passed to the constructor.
+     * If the reader holds resources (e.g. a FileReader, which holds an open file),
+     * then it is the client class' responsibility to close the reader when it has
+     * finished using it.
      * @param reader
-     * @param closeReaderUponEndOfFile if this is true, every attempt will be made to
-     *        close the reader on end of file. It is still recommended that you
-     *        call closeReader() explicitely when finished.
      */
-    public ImportHelper(Reader reader, boolean closeReaderUponEndOfFile) {
+    public ImportHelper(Reader reader) {
         this.reader = new LineNumberReader(reader);
-        this.closeReaderUponEndOfFile = closeReaderUponEndOfFile;
         this.commentWriter = null;
     }
 
-    /**
-     * Every attempt will be made to close the file on end of file. It is still
-     * recommended that you call closeReader() explicitely when finished.
-     * @param file
-     * @throws FileNotFoundException
-     */
-    public ImportHelper(File file) throws FileNotFoundException {
-        this(new BufferedReader(new FileReader(file)), true);
-        this.expectedInputLength = file.length();
+    public void setExpectedInputLength(long l) {
+        this.expectedInputLength = l;
     }
-
-    public ImportHelper(Reader reader) {
-        this(reader, false);
-	}
 
     public ImportHelper(Reader reader, Writer commentWriter) {
 		this.reader = new LineNumberReader(reader);
-        this.closeReaderUponEndOfFile = false;
         this.commentWriter = new BufferedWriter(commentWriter);
 	}
 

@@ -40,6 +40,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     private final SequenceType sequenceType;
     private final boolean closeReaderAtEnd;
 
+    private final Reader reader;
+
     /**
      * Use this constructor if you are reading from a file. The advantage over the
      * other constructor is that a) the input size is known, so read() can report
@@ -49,10 +51,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
      * @throws FileNotFoundException
      */
     public FastaImporter(File file, SequenceType sequenceType) throws FileNotFoundException {
-        helper = new ImportHelper(file);
-        helper.setCommentDelimiters(';');
-        this.sequenceType = sequenceType;
-        this.closeReaderAtEnd = true;
+        this(new BufferedReader(new FileReader(file)), sequenceType, true);
+        helper.setExpectedInputLength(file.length());
     }
 
     /**
@@ -64,10 +64,15 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
      */
     @Deprecated
     public FastaImporter(Reader reader, SequenceType sequenceType) {
+        this(reader, sequenceType, false);
+    }
+
+    private FastaImporter(final Reader reader, final SequenceType sequenceType, final boolean closeReaderAtEnd) {
+        this.reader = reader;
+        this.sequenceType = sequenceType;
+        this.closeReaderAtEnd = closeReaderAtEnd;
         helper = new ImportHelper(reader);
         helper.setCommentDelimiters(';');
-        this.sequenceType = sequenceType;
-        this.closeReaderAtEnd = false;
     }
 
     /**
@@ -125,11 +130,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
             // catch end of file the ugly way.
         } catch (NoSuchElementException e) {
             throw new ImportException("Incorrectly formatted fasta file (near line " + helper.getLineNumber() + ")");
-        } finally {
-            if (closeReaderAtEnd) {
-                // closing more than once doesn't hurt (see API doc of Reader)
-//                helper.closeReader();
-            }
+        }
+        if (closeReaderAtEnd) {
+            reader.close();
         }
         return sequences;
     }

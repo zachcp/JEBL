@@ -71,16 +71,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         this.compactTrees = compactTrees;
     }
 
-    public NexusImporter(File file) throws FileNotFoundException{
-        helper = new ImportHelper(file);
-        initHelper();
-    }
-
-    public NexusImporter(File file, boolean compactTrees) throws FileNotFoundException {
-        this(file);
-        this.compactTrees = compactTrees;
-    }
-
     private void initHelper() {
         // ! defines a comment to be written out to a log file
         // & defines a meta comment
@@ -267,44 +257,30 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		while (!done) {
 			try {
-
 				NexusBlock block = findNextBlock();
-
 				if (block == NexusBlock.TAXA) {
-
 					taxonList = readTaxaBlock();
-
 				} else if (block == NexusBlock.CHARACTERS) {
-
 					if (taxonList == null) {
 						throw new MissingBlockException("TAXA block is missing");
 					}
-
 					sequences = readCharactersBlock(taxonList);
-
 					done = true;
-
 				} else if (block == NexusBlock.DATA) {
-
 					// A data block doesn't need a taxon block before it
 					// but if one exists then it will use it.
 					sequences = readDataBlock(taxonList);
-
 					done = true;
-
 				} else {
 					// Ignore the block..
 				}
-
 			} catch (EOFException ex) {
 				done = true;
 			}
 		}
-
 		if (sequences == null) {
 			throw new MissingBlockException("DATA or CHARACTERS block is missing");
 		}
-
 		return sequences;
 	}
 
