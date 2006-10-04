@@ -1,6 +1,7 @@
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.Sequence;
+import jebl.util.ProgressListener;
 
 import java.io.IOException;
 
@@ -13,10 +14,10 @@ import java.io.IOException;
  * @version $Id$
  *
  */
-public interface ImmidiateSequenceImporter {
+public interface ImmediateSequenceImporter {
     public interface Callback {
         void add(Sequence seq);
     }
 
-    void importSequences(Callback callback) throws IOException, ImportException;
+    void importSequences(Callback callback, ProgressListener progressListener) throws IOException, ImportException;
 }

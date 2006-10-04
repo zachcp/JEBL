@@ -21,6 +21,7 @@ import jebl.util.ProgressListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -248,10 +249,10 @@ public class BartonSternberg implements MultipleAligner {
     }
 
     public static void main(String[] arguments) throws IOException, ImportException {
-        BufferedReader reader = new BufferedReader(new FileReader(arguments[0]));
+        File file = new File(arguments[0]);
         SequenceType sequenceType = SequenceType.AMINO_ACID;
 
-        FastaImporter importer = new FastaImporter(reader,sequenceType);
+        FastaImporter importer = new FastaImporter(file, sequenceType);
         List<Sequence> xsequences = importer.importSequences();
         List<String> sequenceStrings = new ArrayList<String>();
         int count = 0;

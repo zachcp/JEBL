@@ -9,10 +9,9 @@ import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.Utils;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,7 +25,7 @@ import java.util.StringTokenizer;
  * @author Joseph Heled
  * @version $Id$
  */
-public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporter {
+public class FastaImporter implements SequenceImporter, ImmediateSequenceImporter {
 
     /**
      * Name of Jebl sequence property which stores sequence description (i.e. anything after sequence name in fasta
@@ -37,18 +36,38 @@ public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporte
      */
     public static final String descriptionPropertyName = "description";
 
-
     private final ImportHelper helper;
     private final SequenceType sequenceType;
+    private final boolean closeReaderAtEnd;
 
     /**
-     * @param reader       holds sequences data
-     * @param sequenceType pre specified sequences type. We should try and guess hem some day.
+     * Use this constructor if you are reading from a file. The advantage over the
+     * other constructor is that a) the input size is known, so read() can report
+     * meaningful progress, and b) the file is closed at the end.
+     * @param file
+     * @param sequenceType
+     * @throws FileNotFoundException
      */
+    public FastaImporter(File file, SequenceType sequenceType) throws FileNotFoundException {
+        helper = new ImportHelper(file);
+        helper.setCommentDelimiters(';');
+        this.sequenceType = sequenceType;
+        this.closeReaderAtEnd = true;
+    }
+
+    /**
+     * This constructor should normally never be needed because usually we
+     * want to import from a file. Then, the constructor expecting a file
+     * should be used. Therefore, this constructor is deprecated for now.
+     * @param reader       holds sequences data
+     * @param sequenceType pre specified sequences type. We should try and guess them some day.
+     */
+    @Deprecated
     public FastaImporter(Reader reader, SequenceType sequenceType) {
         helper = new ImportHelper(reader);
         helper.setCommentDelimiters(';');
         this.sequenceType = sequenceType;
+        this.closeReaderAtEnd = false;
     }
 
     /**
@@ -56,8 +75,9 @@ public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporte
      * @throws IOException
      * @throws ImportException
      */
-    private List<Sequence> read(ImmidiateSequenceImporter.Callback callback) throws IOException, ImportException {
-
+    private List<Sequence> read(ImmediateSequenceImporter.Callback callback, ProgressListener progressListener)
+            throws IOException, ImportException
+    {
         List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
@@ -68,16 +88,13 @@ public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporte
             while (helper.read() != fastaFirstChar) {
             }
 
+            boolean importAborted;
             do {
                 final String line = helper.readLine();
-
                 final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
                 final String name = tokenizer.nextToken().replace('_', ' ');
-
                 final String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
-
                 final StringBuffer seq = new StringBuffer();
-
                 helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
 
                 final Taxon taxon = Taxon.getTaxon(name);
@@ -100,14 +117,20 @@ public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporte
                 } else {
                     sequences.add(sequence);
                 }
-            } while (helper.getLastDelimiter() == fastaFirstChar);
-
+                // helper.getProgress currently assumes each character to be
+                // one byte long, but this should be ok for fasta files.
+                importAborted = progressListener.setProgress(helper.getProgress());
+            } while (!importAborted && (helper.getLastDelimiter() == fastaFirstChar));
         } catch (EOFException e) {
             // catch end of file the ugly way.
         } catch (NoSuchElementException e) {
             throw new ImportException("Incorrectly formatted fasta file (near line " + helper.getLineNumber() + ")");
+        } finally {
+            if (closeReaderAtEnd) {
+                // closing more than once doesn't hurt (see API doc of Reader)
+                helper.closeReader();
+            }
         }
-
         return sequences;
     }
 
@@ -118,10 +141,10 @@ public class FastaImporter implements SequenceImporter, ImmidiateSequenceImporte
      * @throws ImportException
      */
     public final List<Sequence> importSequences() throws IOException, ImportException {
-        return read(null);
+        return read(null, new ProgressListener.EmptyProgressListener());
     }
 
-    public void importSequences(Callback callback) throws IOException, ImportException {
-        read(callback);
+    public void importSequences(Callback callback, ProgressListener progressListener) throws IOException, ImportException {
+        read(callback, progressListener);
     }
 }

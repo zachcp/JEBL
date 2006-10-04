@@ -22,21 +22,77 @@ import java.io.*;
  * @version $Id$
  */
 public class ImportHelper {
+    private final boolean closeReaderUponEndOfFile;
 
-	/**
-	 * Constructor
-	 */
-	public ImportHelper(Reader reader) {
-		this.reader = new LineNumberReader(reader);
-		this.commentWriter = null;
+    private long totalCharactersRead = 0;
+
+    // Expected length of input in bytes, or 0 if unknown
+    private long expectedInputLength = 0;
+
+    /**
+     *
+     * @param reader
+     * @param closeReaderUponEndOfFile if this is true, every attempt will be made to
+     *        close the reader on end of file. It is still recommended that you
+     *        call closeReader() explicitely when finished.
+     */
+    public ImportHelper(Reader reader, boolean closeReaderUponEndOfFile) {
+        this.reader = new LineNumberReader(reader);
+        this.closeReaderUponEndOfFile = closeReaderUponEndOfFile;
+        this.commentWriter = null;
+    }
+
+    /**
+     * Every attempt will be made to close the file on end of file. It is still
+     * recommended that you call closeReader() explicitely when finished.
+     * @param file
+     * @throws FileNotFoundException
+     */
+    public ImportHelper(File file) throws FileNotFoundException {
+        this(new BufferedReader(new FileReader(file)), true);
+        this.expectedInputLength = file.length();
+    }
+
+    public ImportHelper(Reader reader) {
+        this(reader, false);
 	}
 
-	public ImportHelper(Reader reader, Writer commentWriter) {
+    public ImportHelper(Reader reader, Writer commentWriter) {
 		this.reader = new LineNumberReader(reader);
-		this.commentWriter = new BufferedWriter(commentWriter);
+        this.closeReaderUponEndOfFile = false;
+        this.commentWriter = new BufferedWriter(commentWriter);
 	}
 
-	public void setCommentDelimiters(char line) {
+    /**
+     * @return  If the length of the input is known (because a file was
+     * passed to the constructor), this reports a value between 0.0 and 1.0
+     * indicating the relative read position in the file. Otherwise, this
+     * always returns 0.0.
+     *
+     * This method assumes that all characters in the input are one byte
+     * long (to get its estimate, it divides the number of *characters* read
+     * by the number of *bytes* in the file). If there is an efficient way
+     * to fix this, we should do so :)
+     */
+    public double getProgress() {
+        if (expectedInputLength == 0) {
+            return 0.0;
+        } else {
+            return (double) totalCharactersRead / expectedInputLength;
+        }
+    }
+
+    public void closeReader() throws IOException {
+        reader.close();
+    }
+
+    private void encounteredEndOfFile() throws IOException {
+        if (closeReaderUponEndOfFile) {
+            reader.close();
+        }
+    }
+
+    public void setCommentDelimiters(char line) {
 		hasComments = true;
 		this.lineComment = line;
 	}
@@ -108,19 +164,26 @@ public class ImportHelper {
 		return (char)lastChar;
 	}
 
-	public char read() throws IOException {
+    /**
+     * All read attempts pass through this function.
+     * @return
+     * @throws IOException
+     */
+    public char read() throws IOException {
 		int ch;
-
 		if (lastChar == '\0') {
-			ch = reader.read();
-			if (ch == -1) {
-				throw new EOFException();
+            // this is the only point where anything is read from the reader
+            ch = reader.read();
+            if (ch != -1) {
+                totalCharactersRead++;
+            } else {
+                encounteredEndOfFile();
+                throw new EOFException();
 			}
 		} else {
 			ch = lastChar;
 			lastChar = '\0';
 		}
-
 		return (char)ch;
 	}
 
@@ -130,13 +193,9 @@ public class ImportHelper {
 	public String readLine() throws IOException {
 
 		StringBuffer line = new StringBuffer();
-
 		char ch = read();
-
 		try {
-
 			while (ch != '\n' && ch != '\r') {
-
 				if (hasComments) {
 					if (ch == lineComment) {
 						skipComments(ch);
@@ -147,7 +206,6 @@ public class ImportHelper {
 						ch = read();
 					}
 				}
-
 				line.append(ch);
 				ch = read();
 			}
@@ -156,11 +214,11 @@ public class ImportHelper {
 			if (ch == '\r') {
 				if (next() == '\n') read();
 			}
-
 			lastDelimiter = ch;
 
 		} catch (EOFException e) {
-			// We catch an EOF and return the line we have so far
+            // We catch an EOF and return the line we have so far
+            encounteredEndOfFile();
 		}
 
 		return line.toString();
@@ -232,7 +290,8 @@ public class ImportHelper {
 			}
 
 		} catch (EOFException e) {
-			// We catch an EOF and return the sequences we have so far
+            // We catch an EOF and return the sequences we have so far
+            encounteredEndOfFile();
 		}
 	}
 
@@ -288,7 +347,6 @@ public class ImportHelper {
 					} else {
 						sequence.append(ch);
 					}
-
 					n++;
 				}
 
@@ -309,7 +367,8 @@ public class ImportHelper {
 			}
 
 		} catch (EOFException e) {
-			// We catch an EOF and return the sequences we have so far
+            // We catch an EOF and return the sequences we have so far
+            encounteredEndOfFile();
 		}
 	}
 
@@ -321,7 +380,7 @@ public class ImportHelper {
 		try {
 			return Integer.parseInt(token);
 		} catch (NumberFormatException nfe) {
-			throw new ImportException("Number format error: " + nfe.getMessage());
+            throw new ImportException("Number format error: " + nfe.getMessage());
 		}
 	}
 
@@ -448,7 +507,8 @@ public class ImportHelper {
 					}
 				}
 			} catch (EOFException e) {
-				// We catch an EOF and return the token we have so far
+                // We catch an EOF and return the token we have so far
+                encounteredEndOfFile();
 				done = true;
 			}
 		}
@@ -624,5 +684,4 @@ public class ImportHelper {
 	private char metaComment = (char)-1;
 
 	private String lastMetaComment = null;
-
 }

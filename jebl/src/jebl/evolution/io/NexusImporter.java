@@ -24,9 +24,7 @@ import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
 
 import java.awt.*;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -65,15 +63,28 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	public NexusImporter(Reader reader) {
 		helper = new ImportHelper(reader);
-
-		// ! defines a comment to be written out to a log file
-		// & defines a meta comment
-		helper.setCommentDelimiters('[', ']', '\0', '!', '&');
+        initHelper();
 	}
 
     public NexusImporter(Reader reader, boolean compactTrees) {
         this(reader);
         this.compactTrees = compactTrees;
+    }
+
+    public NexusImporter(File file) throws FileNotFoundException{
+        helper = new ImportHelper(file);
+        initHelper();
+    }
+
+    public NexusImporter(File file, boolean compactTrees) throws FileNotFoundException {
+        this(file);
+        this.compactTrees = compactTrees;
+    }
+
+    private void initHelper() {
+        // ! defines a comment to be written out to a log file
+        // & defines a meta comment
+        helper.setCommentDelimiters('[', ']', '\0', '!', '&');
     }
 
     /**
@@ -1284,7 +1295,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		}
 
 		if (value.equalsIgnoreCase("TRUE") || value.equalsIgnoreCase("FALSE")) {
-			return new Boolean(value);
+			return Boolean.valueOf(value);
 		}
 
 		// Attempt to format the value as an integer

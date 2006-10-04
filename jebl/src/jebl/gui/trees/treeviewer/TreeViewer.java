@@ -595,7 +595,7 @@ public class TreeViewer extends JPanel implements Printable {
             }
 
 //        TreeImporter importer = new NewickImporter(new FileReader(inputFile));
-            TreeImporter importer = new NexusImporter(new FileReader(inputFile));
+            TreeImporter importer = new NexusImporter(inputFile);
             Tree tree = importer.importNextTree();
 
             treeViewer.setTree(tree);
