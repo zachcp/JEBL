@@ -1,5 +1,8 @@
 package jebl.util;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * @author Tobias Thierer
  * @version $Id$
@@ -50,6 +53,17 @@ public final class CompositeProgressListener implements ProgressListener {
         for (int i = 0; i < numOperations; i++)
             this.time[i] = (operationDuration[i] / totalTime);
     }
+
+    public static CompositeProgressListener forFiles(ProgressListener listener, List<File> files) {
+        int n = files.size();
+        double[] lengths = new double[n];
+        int i =0;
+        for (File file : files) {
+            lengths[i++] = (double) file.length();
+        }
+        return new CompositeProgressListener(listener, lengths);
+    }
+
 
     public boolean isAborted() {
         return setProgress(currentOperationProgress);
