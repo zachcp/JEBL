@@ -472,13 +472,13 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
             float score2=doAlignment(profile1, profile2, offset1 + u, offset2 + v, n - u, m - v, vtype, endType, result1, result2, false, propagateFreeStartGap, freeEndGap);
             if (cancelled) return 0;
             float combinedScore = score1+ score2;
-            if (Math.abs(combinedScore - finalScore) > 0.01f) {
+            if ( finalScore != 0 && Math.abs((combinedScore - finalScore)/finalScore) > 1e-5 ) {
                 // multiple alignment scoring is not necessarily valid.
                 if (profile1.sequenceCount==1 && profile2.sequenceCount==1) {
                     //todo: work out why this happens sometimes, possibly just cumulative floating point error.
                     System.out.println("free =" + freeStartGap+ "," + freeEndGap);
                     System.out.println("offset1="+ offset1+" offset2="+ offset2+" u="+u+" v="+v);
-                    System.out.println(""+ score1+ "," + score2+"!="+ finalScore);
+                    System.out.println(""+ score1+ "+" + score2+"!="+ finalScore);
                 }
             }
         }
