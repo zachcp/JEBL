@@ -201,6 +201,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      */
     private String safeName(String name) {
         if (!name.matches("^\\w+$")) {
+            name = name.replace("\'", "\'\'");
             return "\'" + name + "\'";
         }
         return name;
@@ -212,6 +213,8 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
         String name = taxon.getName();
         if (!name.matches("^\\w+$")) {
+            // JEBL way of quoting the quote character
+            name = name.replace("\'", "\'\'");
             builder.append("\'").append(name).append("\'");
             return builder;
         }
