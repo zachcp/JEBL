@@ -28,7 +28,6 @@ public final class CompositeProgressListener implements ProgressListener {
     protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
     protected boolean aborted = false;
     protected double currentOperationProgress = 0.0;
-    protected double currentTotalProgress = 0.0;
 
     public CompositeProgressListener(ProgressListener listener, double[] operationDuration) {
         numOperations = operationDuration.length;
@@ -98,7 +97,10 @@ public final class CompositeProgressListener implements ProgressListener {
      * clear all progress, including that of previous operations
      */
     public void clearAllProgress () {
-        listener.setProgress(0);
+        currentOperationNum = 0;
+        baseTime = 0.0;
+        setProgress(0.0);
+        //listener.setProgress(0);
     }
 
     /**
