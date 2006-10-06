@@ -36,7 +36,7 @@ public final class CompositeProgressListener extends ProgressListener {
             throw new IllegalArgumentException();
         }
         if (listener == null) {
-            this.listener = new ProgressListener.EmptyProgressListener();
+            this.listener = ProgressListener.empty();
         } else {
             this.listener = listener;
         }

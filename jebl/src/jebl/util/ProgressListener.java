@@ -21,16 +21,28 @@ public abstract class ProgressListener {
      */
     public abstract boolean setMessage(String message);
 
-    // we may consider using a public final ProgressListener like this and
-    // deprecate the class EmptyProgressListener below
     private static final ProgressListener EMPTY = new ProgressListener() {
         public boolean setMessage(String message) { return false; }
         public boolean setProgress(double fractionCompleted) { return false; }
     };
 
     /**
+     * @return A ProgressListener that never gets aborted. Although ProgressListener
+     *         is immutable, it is not guaranteed whether this static factory method
+     *         will return the same object on each invocation.   
+     */
+    public static ProgressListener empty() {
+        return EMPTY;
+    }
+
+    /**
+     * This class is deprecated. Use static factory method empty() instead.
+     *
+     * Old API documenation follows:
+     *
      * a useful class to use when you don't care about the progress results or cancelling the operation.
      */
+    @Deprecated
     public static class EmptyProgressListener extends ProgressListener {
         public boolean setProgress(double fractionCompleted) {
             return false;
