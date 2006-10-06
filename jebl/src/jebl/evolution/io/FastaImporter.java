@@ -144,7 +144,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
      * @throws ImportException
      */
     public final List<Sequence> importSequences() throws IOException, ImportException {
-        return read(null, ProgressListener.empty());
+        return read(null, new ProgressListener.EmptyProgressListener());
     }
 
     public void importSequences(Callback callback, ProgressListener progressListener) throws IOException, ImportException {

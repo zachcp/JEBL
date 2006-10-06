@@ -5,7 +5,7 @@ package jebl.util;
  *
  * @version $Id$
  */
-public abstract class ProgressListener {
+public interface ProgressListener {
     /**
      * @param fractionCompleted a number between 0 and 1 inclusive
      * representing the fraction of the operation completed.
@@ -21,29 +21,11 @@ public abstract class ProgressListener {
      */
     public abstract boolean setMessage(String message);
 
-    private static final ProgressListener EMPTY = new ProgressListener() {
-        public boolean setMessage(String message) { return false; }
-        public boolean setProgress(double fractionCompleted) { return false; }
-    };
 
     /**
-     * @return A ProgressListener that never gets aborted. Although ProgressListener
-     *         is immutable, it is not guaranteed whether this static factory method
-     *         will return the same object on each invocation.   
-     */
-    public static ProgressListener empty() {
-        return EMPTY;
-    }
-
-    /**
-     * This class is deprecated. Use static factory method empty() instead.
-     *
-     * Old API documenation follows:
-     *
      * a useful class to use when you don't care about the progress results or cancelling the operation.
      */
-    @Deprecated
-    public static class EmptyProgressListener extends ProgressListener {
+    public static class EmptyProgressListener implements ProgressListener {
         public boolean setProgress(double fractionCompleted) {
             return false;
         }

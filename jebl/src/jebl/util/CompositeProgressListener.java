@@ -20,7 +20,7 @@ import java.util.List;
  *          startNextOperation(). Thus when the constructor is passed an array of N doubles as its second
  *          argument, startNextOperation() should be called precisely N-1 times.
  */
-public final class CompositeProgressListener extends ProgressListener {
+public final class CompositeProgressListener implements ProgressListener {
     protected int numOperations;
     protected ProgressListener listener;
     protected int currentOperationNum = 0;
@@ -36,7 +36,7 @@ public final class CompositeProgressListener extends ProgressListener {
             throw new IllegalArgumentException();
         }
         if (listener == null) {
-            this.listener = ProgressListener.empty();
+            this.listener = new ProgressListener.EmptyProgressListener();
         } else {
             this.listener = listener;
         }
