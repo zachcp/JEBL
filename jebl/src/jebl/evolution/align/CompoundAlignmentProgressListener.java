@@ -47,7 +47,8 @@ public class CompoundAlignmentProgressListener  {
         }
 
         public boolean setMessage(String message) {
-            return progress.setMessage(message);
+            if (progress.setMessage(message)) cancelled = true;
+            return cancelled;
         }
     };
 }
