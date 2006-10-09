@@ -24,7 +24,9 @@ import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
 
 import java.awt.*;
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -1204,8 +1206,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			}
 		}
 
-		return tree.createExternalNode(taxon);
-	}
+        try {
+            final Node node = tree.createExternalNode(taxon);
+            return node;
+        } catch (IllegalArgumentException e) {
+           throw new ImportException.DuplicateTaxaException(e.getMessage());
+        }
+    }
 
 	static void parseMetaCommentPairs(String meta, Attributable item) throws ImportException.BadFormatException {
 		// This regex should match key=value pairs, separated by commas

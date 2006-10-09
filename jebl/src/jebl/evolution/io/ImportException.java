@@ -42,7 +42,12 @@ public class ImportException extends Exception {
 		public TooFewTaxaException(String message) { super(message); }
 	}
 
-	public static class UnknownTaxonException extends ImportException {
+    public static class DuplicateTaxaException extends ImportException {
+		public DuplicateTaxaException() { super(); }
+		public DuplicateTaxaException(String message) { super(message); }
+	}
+
+    public static class UnknownTaxonException extends ImportException {
 		public UnknownTaxonException() { super(); }
 		public UnknownTaxonException(String message) { super(message); }
 	}

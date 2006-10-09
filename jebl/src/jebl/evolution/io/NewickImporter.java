@@ -198,13 +198,17 @@ public class NewickImporter implements TreeImporter {
     /**
      * Reads an external node in.
      */
-    private Node readExternalNode(SimpleRootedTree tree) throws IOException
+    private Node readExternalNode(SimpleRootedTree tree) throws IOException, ImportException
     {
         String label = helper.readToken(":(),;");
         while( unquotedLabels && helper.getLastDelimiter() == ' ' ) {
             label = label + " " + helper.readToken(":(),;");
         }
-        return tree.createExternalNode(Taxon.getTaxon(label));
+          try {
+              return tree.createExternalNode(Taxon.getTaxon(label));
+        } catch (IllegalArgumentException e) {
+           throw new ImportException.DuplicateTaxaException(e.getMessage());
+        }
     }
 
     private final ImportHelper helper;
