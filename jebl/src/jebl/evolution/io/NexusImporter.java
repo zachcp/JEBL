@@ -1195,9 +1195,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	private Node readExternalNode(SimpleRootedTree tree) throws ImportException, IOException
 	{
 		String label = helper.readToken(":(),;");
-		Taxon taxon = Taxon.getTaxon(label);
 
-		if (translationList.size() > 0) {
+        Taxon taxon;
+        try {
+            taxon = Taxon.getTaxon(label);
+        } catch (IllegalArgumentException e) {
+            throw new ImportException.UnknownTaxonException(e.getMessage());
+        }
+
+        if (translationList.size() > 0) {
 			taxon = translationList.get(label);
 
 			if (taxon == null) {
