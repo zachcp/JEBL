@@ -75,7 +75,7 @@ public class MultipleTreeViewer extends TreeViewer {
                 boolean useNames = false;
                 for( Tree t : trees ) {
                     Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
-                    if( !NexusExporter.isGeneratedTreeName(name.toString()) ) {
+                    if( name != null && !NexusExporter.isGeneratedTreeName(name.toString()) ) {
                         useNames = true;
                         break;
                     }
