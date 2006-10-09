@@ -67,7 +67,8 @@ public class ScoresFactory {
 			Constructor con[] = c.getConstructors();
 			sub = (Scores)(con[0].newInstance(new Object[] {new Float(val)}));
 		}
-		catch(Exception e) {
+        
+        catch(Exception e) {
 			System.out.println("no such substitution matrix!\n" + e);
 		}
 
@@ -86,8 +87,17 @@ public class ScoresFactory {
         return new NucleotideScores[] {
                 new NucleotideScores("51% similarity", 5.0f, -3.0f),
                 new NucleotideScores("65% similarity", 5.0f, -4.0f),
-                new NucleotideScores("70% similarity (IUB)", 1.0f, -0.9f),
-                new NucleotideScores("93% similarity, Transition/Transversion", 1, -1,-5, 0),
+               // new NucleotideScores("70% similarity (IUB)", 1.0f, -0.9f),
+
+                // This seems like a bad choice as it implies a very high kappa
+               //  new NucleotideScores("93% similarity, Transition/Transversion", 1, -1,-5, 0),
+
+                new NucleotideScores("70% similarity (IUB)", 5 * 1.0f, 5 * -0.9f),
+
+               // new NucleotideScores("93% similarity, Transition/Transversion", 5*1, 5*-1, 5*-5, 0),
+
+              //  new NucleotideScores("88% similarity", 5.0f, -7.2810419984342278f),
+                new NucleotideScores("93% similarity", 5.0f, -9.0261674571825044f), 
 /*                new NucleotideScores("Identity",1,0, 0, 0),*/
 
                 /*,new Hamming()*/};
