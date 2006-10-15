@@ -97,8 +97,10 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
             do {
                 final String line = helper.readLine();
                 final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
-                final String name = tokenizer.nextToken().replace('_', ' ');
-                final String description = tokenizer.hasMoreElements() ? tokenizer.nextToken("") : null;
+                String name = ImportHelper.convertControlsChars(tokenizer.nextToken()).replace('_', ' ');
+
+                final String description = tokenizer.hasMoreElements() ?
+                        ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
                 final StringBuffer seq = new StringBuffer();
                 helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
 

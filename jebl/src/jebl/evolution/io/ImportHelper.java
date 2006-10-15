@@ -643,6 +643,26 @@ public class ImportHelper {
         return name;
     }
 
+    /**
+     * Convert control (unprintable) characters to something printable
+     * @param token
+     * @return token printable version
+     */
+    static String convertControlsChars(String token) {
+        if( ! token.matches("[^\\p{Cntrl}]+") ) {
+            StringBuilder b = new StringBuilder();
+            for( char c : token.toCharArray() ) {
+                if( c < 0x20 || c >= 0xfe ) {
+                    b.append("#").append(Integer.toHexString(c));
+                } else {
+                    b.append(c);
+                }
+            }
+            return b.toString();
+        }
+        return token;
+    }
+
     // Private stuff
 
 	private LineNumberReader reader;
