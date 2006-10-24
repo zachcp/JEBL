@@ -11,14 +11,17 @@ import java.io.IOException;
 public class ConsoleApplication extends Application {
 
 	private ConsoleFrame consoleFrame = null;
+    private boolean dontAskSave;
 
-    public ConsoleApplication(String nameString, String aboutString, Icon icon) throws IOException {
-        this(new ConsoleMenuBarFactory(), nameString, aboutString, icon);
+    public ConsoleApplication(String nameString, String aboutString, Icon icon, boolean dontAskSave) throws IOException {
+        this(new ConsoleMenuBarFactory(), nameString, aboutString, icon, dontAskSave);
     }
 
-    public ConsoleApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) throws IOException {
+    public ConsoleApplication(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon, boolean dontAskSave) throws IOException {
 
 		super(menuBarFactory, nameString, aboutString, icon);
+
+        this.dontAskSave = dontAskSave;
 
 		consoleFrame = new ConsoleFrame();
 		consoleFrame.initialize();
@@ -51,7 +54,7 @@ public class ConsoleApplication extends Application {
 	}
 
 	public void doQuit() {
-		if (consoleFrame.requestClose()) {
+		if (dontAskSave || consoleFrame.requestClose()) {
 
 			consoleFrame.setVisible(false);
 			consoleFrame.dispose();
