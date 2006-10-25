@@ -65,8 +65,6 @@ public class RectilinearTreeLayoutController extends AbstractController {
             }
         });
         optionsPanel.addComponent(alignTipLabelsCheck);
-
-
     }
 
     public JComponent getTitleComponent() {

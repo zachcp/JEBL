@@ -498,8 +498,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
                 optionsPanel.addComponent(checkBox3);
 
-                boolean showRootBranch = PREFS.getBoolean(showRootPREFSkey, isShowingRootBranch());
-                checkBox3.setSelected(showRootBranch);
+                showingRootBranch = PREFS.getBoolean(showRootPREFSkey, isShowingRootBranch());
+                checkBox3.setSelected(showingRootBranch);
                 checkBox3.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         setShowingRootBranch(checkBox3.isSelected());
@@ -756,7 +756,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         // bounds on branches
         for (Node node : tree.getNodes()) {
-            if (showingRootBranch || node != rootNode) {
+            //if (showingRootBranch || node != rootNode) {
                 final Shape branchPath = treeLayout.getBranchPath(node);
                 // Add the bounds of the branch path to the overall bounds
                 final Rectangle2D branchBounds = branchPath.getBounds2D();
@@ -765,7 +765,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 } else {
                     treeBounds.add(branchBounds);
                 }
-            }
+            //}
         }
 
         // add the tree bounds
