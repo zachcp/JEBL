@@ -672,7 +672,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return PAGE_EXISTS;
 	}
 
-	protected void drawTree(Graphics2D g2, double width, double height) {
+	public void drawTree(Graphics2D g2, double width, double height) {
 
 		if (!calibrated) calibrate(g2, width, height);
 
