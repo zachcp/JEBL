@@ -3,8 +3,6 @@ package jebl.evolution.alignments;
 import jebl.math.Random;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
  * Date: 15/01/2006
  * Time: 10:13:50
  *

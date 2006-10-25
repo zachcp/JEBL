@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
  * Date: 20/03/2006
  * Time: 10:23:21
  *

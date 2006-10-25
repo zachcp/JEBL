@@ -1,7 +1,7 @@
 package org.virion.jam.util;
 
 /**
- * @author Richard
+ * @author Richard Moir
  * @version $Id$
  */
 public interface SimpleListener {

@@ -7,8 +7,6 @@ import jebl.evolution.sequences.State;
 import jebl.util.ProgressListener;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
  * Date: 22/01/2006
  * Time: 17:28:59
  *

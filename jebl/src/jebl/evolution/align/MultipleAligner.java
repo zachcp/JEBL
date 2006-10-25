@@ -10,8 +10,7 @@ import java.util.List;
 /**
  * @author Joseph Heled
  * @version $Id$
- *          Created by IntelliJ IDEA.
- *          User: joseph Date: 6/05/2006 Time: 08:08:22
+ *          Date: 6/05/2006 Time: 08:08:22
  */
 public interface MultipleAligner {
     Alignment doAlign(List<Sequence> seqs, RootedTree guideTree, ProgressListener progress);

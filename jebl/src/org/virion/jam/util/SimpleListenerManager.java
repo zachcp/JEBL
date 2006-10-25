@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Richard
+ * @author Richard Moir
  * @version $Id$
  */
 public class SimpleListenerManager {

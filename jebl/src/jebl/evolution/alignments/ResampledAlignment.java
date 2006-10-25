@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joseph
  * Date: 17/01/2006
  * Time: 08:08:44
  *

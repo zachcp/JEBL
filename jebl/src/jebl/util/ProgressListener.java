@@ -1,7 +1,7 @@
 package jebl.util;
 
 /**
- * @author Matt
+ * @author Matt Kearse
  *
  * @version $Id$
  */

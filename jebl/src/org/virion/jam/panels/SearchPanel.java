@@ -13,11 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: rambaut
+ * @author Andrew Rambaut
  * Date: Jul 26, 2004
  * Time: 5:11:59 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SearchPanel extends JPanel {
 
