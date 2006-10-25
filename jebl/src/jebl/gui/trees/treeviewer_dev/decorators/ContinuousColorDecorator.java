@@ -88,7 +88,8 @@ public class ContinuousColorDecorator implements Decorator {
 	}
 
 	public Paint getFillPaint(Paint paint) {
-		return paint;
+        if (this.fillPaint == null) return paint;
+		return fillPaint;
 	}
 
 	public Stroke getStroke(Stroke stroke) {
@@ -126,6 +127,7 @@ public class ContinuousColorDecorator implements Decorator {
 					color1[1] * p + color2[1] * q,
 					color1[2] * p + color2[2] * q,
 					color1[3] * p + color2[3] * q);
+            fillPaint = new Color(paint.getRed(), paint.getGreen(), paint.getBlue(), paint.getAlpha() / 2);
 		}
 	}
 
@@ -137,5 +139,6 @@ public class ContinuousColorDecorator implements Decorator {
 	private double minValue = Double.MAX_VALUE;
 	private double maxValue = Double.MIN_VALUE;
 
-	private Paint paint = null;
+	private Color paint = null;
+    private Color fillPaint = null;
 }

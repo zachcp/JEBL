@@ -145,8 +145,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
                     if (curvature == 0.0) {
                         Object[] colouring = null;
-                        if (colouringAttributeName != null) {
-                            colouring = (Object[])child.getAttribute(colouringAttributeName);
+                        if (branchColouringAttribute != null) {
+                            colouring = (Object[])child.getAttribute(branchColouringAttribute);
                         }
                         if (colouring != null) {
                             // If there is a colouring, then we break the path up into

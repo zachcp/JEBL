@@ -97,6 +97,10 @@ public class NodeBarController extends AbstractController {
         return false;
     }
 
+    public void initialize() {
+        // nothing to do
+    }
+
     public void setSettings(Map<String,Object> settings) {
         barWidthSpinner.setValue((Double)settings.get(NODE_BARS_KEY + "." + BAR_WIDTH_KEY));
     }

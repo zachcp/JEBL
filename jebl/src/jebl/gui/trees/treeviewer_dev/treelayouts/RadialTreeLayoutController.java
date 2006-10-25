@@ -61,6 +61,10 @@ public class RadialTreeLayoutController extends AbstractController {
 		return false;
 	}
 
+    public void initialize() {
+        // nothing to do
+    }
+
     public void setSettings(Map<String,Object> settings) {
         spreadSpinner.setValue((Double) settings.get(RADIAL_LAYOUT_KEY + "." + SPREAD_KEY));
     }

@@ -121,6 +121,10 @@ public class PolarTreeLayoutController extends AbstractController {
         return false;
     }
 
+    public void initialize() {
+        // nothing to do
+    }
+
     public void setSettings(Map<String,Object> settings) {
         rootAngleSlider.setValue((Integer) settings.get(POLAR_LAYOUT_KEY + "." + ROOT_ANGLE_KEY));
         angularRangeSlider.setValue((Integer) settings.get(POLAR_LAYOUT_KEY + "." + ANGULAR_RANGE_KEY));

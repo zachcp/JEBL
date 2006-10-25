@@ -117,8 +117,8 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 				            childPoint.getX(), childPoint.getY());
 
 	            Object[] colouring = null;
-	            if (colouringAttributeName != null) {
-		            colouring = (Object[])child.getAttribute(colouringAttributeName);
+	            if (branchColouringAttribute != null) {
+		            colouring = (Object[])child.getAttribute(branchColouringAttribute);
 	            }
 	            if (colouring != null) {
 		            // If there is a colouring, then we break the path up into

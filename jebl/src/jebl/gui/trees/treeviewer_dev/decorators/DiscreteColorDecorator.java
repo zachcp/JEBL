@@ -40,7 +40,19 @@ public class DiscreteColorDecorator implements Decorator {
 			Color.DARK_GRAY
 	};
 
-	public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items, Color[] paints) {
+    public DiscreteColorDecorator() {
+        this(DEFAULT_PAINTS);
+    }
+
+    public DiscreteColorDecorator(Color[] paints) {
+        this.paints = paints;
+    }
+
+    public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items) {
+		this(attributeName, items, DEFAULT_PAINTS);
+	}
+
+    public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items, Color[] paints) {
 		this.attributeName = attributeName;
 
 		// First collect the set of all attribute values
@@ -52,14 +64,22 @@ public class DiscreteColorDecorator implements Decorator {
 			}
 		}
 
-		// now create a paint map for these values
-		int i = 0;
-		for (Object value : values) {
-			colourMap.put(value, paints[i]);
-			i = (i + 1) % paints.length;
-		}
+		setValues(values, paints);
 
 	}
+
+    public void setValues(Set<? extends Object> values, Color[] paints) {
+        colourMap = new HashMap<Object, Paint>();
+        this.paints = paints;
+
+        // now create a paint map for these values
+        int i = 0;
+        for (Object value : values) {
+            colourMap.put(value, paints[i]);
+            i = (i + 1) % paints.length;
+        }
+
+    }
 
 	// Decorator INTERFACE
 	public Paint getPaint(Paint paint) {
@@ -67,7 +87,11 @@ public class DiscreteColorDecorator implements Decorator {
 		return this.paint;
 	}
 
-	public Paint getFillPaint(Paint paint) {
+    public String getAttributeName() {
+        return attributeName;
+    }
+
+    public Paint getFillPaint(Paint paint) {
 		return paint;
 	}
 
@@ -82,7 +106,9 @@ public class DiscreteColorDecorator implements Decorator {
 	public void setItem(Object item) {
 		if (item instanceof Attributable) {
 			setAttributableItem((Attributable)item);
-		}
+		} else {
+            setValue(item);
+        }
 	}
 
 	// Private methods
@@ -90,13 +116,25 @@ public class DiscreteColorDecorator implements Decorator {
 		paint = null;
 		Object value = item.getAttribute(attributeName);
 		if (value != null) {
-			paint = colourMap.get(value);
+			setValue(value);
 		}
 	}
 
+    private void setValue(Object value) {
+        if (colourMap != null) {
+            paint = colourMap.get(value);
+        } else if (value instanceof Number) {
+            int index = ((Number)value).intValue() % paints.length;
+            if (index > 1) {
+                System.out.println("eek");
+            }
+            paint = paints[index];
+        }
+    }
+
 	private String attributeName = null;
 
-	Map<Object, Paint> colourMap = new HashMap<Object, Paint>();
-
+	private Map<Object, Paint> colourMap = null;
+    private Paint[] paints = null;
 	private Paint paint = null;
 }

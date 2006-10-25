@@ -111,6 +111,13 @@ public class TreePaneController extends AbstractController {
         return false;
     }
 
+    public void initialize() {
+        treePane.setTransformBranchesOn(transformCheck.isSelected());
+        treePane.setBranchTransform((TransformedRootedTree.Transform) transformCombo.getSelectedItem());
+        treePane.setOrderBranchesOn(orderCheck.isSelected());
+        treePane.setBranchOrdering((SortedRootedTree.BranchOrdering) orderCombo.getSelectedItem());
+    }
+
     public void setSettings(Map<String,Object> settings) {
         transformCheck.setSelected((Boolean) settings.get(CONTROLLER_KEY + "." + TRANSFORM_KEY));
         String transformName = (String)settings.get(CONTROLLER_KEY + "." + TRANSFORM_TYPE_KEY);

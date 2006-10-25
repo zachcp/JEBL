@@ -186,10 +186,14 @@ public class TreeViewerController extends AbstractController {
     }
 
 	public void setColouringAttributeName(String attributeName) {
-		rectilinearTreeLayout.setColouringAttributeName(attributeName);
-		polarTreeLayout.setColouringAttributeName(attributeName);
-		radialTreeLayout.setColouringAttributeName(attributeName);
+		rectilinearTreeLayout.setBranchColouringAttribute(attributeName);
+		polarTreeLayout.setBranchColouringAttribute(attributeName);
+		radialTreeLayout.setBranchColouringAttribute(attributeName);
 	}
+
+    public void initialize() {
+        // nothing to do
+    }
 
     public void setSettings(Map<String,Object> settings) {
 	    String treeLayoutName = (String)settings.get(CONTROLLER_KEY + "." + LAYOUT_KEY);

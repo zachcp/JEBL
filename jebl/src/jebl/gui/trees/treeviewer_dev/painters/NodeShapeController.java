@@ -138,6 +138,10 @@ public class NodeShapeController extends AbstractController {
         return false;
     }
 
+    public void initialize() {
+        // nothing to do
+    }
+
     public void getSettings(Map<String, Object> settings) {
     }
 

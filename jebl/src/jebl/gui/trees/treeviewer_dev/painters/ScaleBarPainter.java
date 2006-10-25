@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer_dev.TreePane;
 import org.virion.jam.controlpalettes.ControlPalette;
 
@@ -135,6 +136,7 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 
 	public void setAutomaticScale(boolean automaticScale) {
 		this.automaticScale = automaticScale;
+        calculateScaleRange();
 		firePainterChanged();
 	}
 
@@ -146,18 +148,19 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 		if( !automaticScale && userScaleRange != 0.0 ) {
 		    scaleRange = userScaleRange;
 		} else {
-			final double treeScale = treePane.getTreeScale();
-			if( treeScale == 0.0 ) {
+            RootedTree tree = treePane.getTree();
+            final double treeHeight = tree.getHeight(tree.getRootNode());
+            
+            if( treeHeight == 0.0 ) {
 			    scaleRange = 0.0;
 			} else {
-			    int w10 = treePane.getWidth() / 10;
 
-			    double low = w10 /treeScale;
+			    double low = treeHeight / 10.0;
 			    double b = -(Math.ceil(Math.log10(low)) - 1);
 			    for(int n = 0; n < 3; ++n) {
 			        double factor = Math.pow(10, b);
 			        double x = ((int)(low * factor) + 1)/factor;
-			        if( n == 2 || x < w10 * 2 ) {
+			        if( n == 2 || x < treeHeight / 5.0 ) {
 			            scaleRange = x;
 			            break;
 			        }

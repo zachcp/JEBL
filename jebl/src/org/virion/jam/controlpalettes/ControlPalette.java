@@ -42,6 +42,12 @@ public interface ControlPalette {
     void removeControlPaletteListener(ControlPaletteListener listener);
 
     /**
+     * Initialize all controllers when a new document is created. At this
+     * point, settings can be adjusted to match the contents of the document.
+     */
+    void initialize();
+
+    /**
      * Gather up all the settings from all the controls in the palette.
      * This would usually called before saving them with the document
      * that the palette controls.

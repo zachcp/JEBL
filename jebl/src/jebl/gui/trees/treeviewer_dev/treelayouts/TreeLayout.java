@@ -150,9 +150,9 @@ public interface TreeLayout {
 
     Map<Node, Shape> getCalloutPathMap();
 
-    String getColouringAttributeName();
+    String getBranchColouringAttribute();
 
-    void setColouringAttributeName(String colouringAttributeName);
+    void setBranchColouringAttribute(String colouringAttributeName);
 
     void setCollapseAttributeName(String collapseAttributeName);
 }

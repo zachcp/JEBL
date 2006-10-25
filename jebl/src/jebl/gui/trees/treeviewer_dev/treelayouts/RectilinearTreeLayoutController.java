@@ -79,6 +79,10 @@ public class RectilinearTreeLayoutController extends AbstractController {
         return false;
     }
 
+    public void initialize() {
+        // nothing to do
+    }
+
     public void setSettings(Map<String,Object> settings) {
         rootLengthSlider.setValue((Integer) settings.get(RECTILINEAR_LAYOUT_KEY + "." + ROOT_LENGTH_KEY));
         curvatureSlider.setValue((Integer) settings.get(RECTILINEAR_LAYOUT_KEY + "." + CURVATURE_KEY));

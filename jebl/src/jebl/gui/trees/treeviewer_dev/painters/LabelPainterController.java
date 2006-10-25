@@ -14,6 +14,9 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
+import jebl.evolution.trees.TransformedRootedTree;
+import jebl.evolution.trees.SortedRootedTree;
+
 /**
  * @author Andrew Rambaut
  * @version $Id$
@@ -153,6 +156,10 @@ public class LabelPainterController extends AbstractController {
 
     public boolean isInitiallyVisible() {
         return false;
+    }
+
+    public void initialize() {
+        // nothing to do
     }
 
     public void setSettings(Map<String,Object> settings) {

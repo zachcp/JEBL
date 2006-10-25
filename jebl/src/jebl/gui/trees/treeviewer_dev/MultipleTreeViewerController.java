@@ -51,6 +51,11 @@ public class MultipleTreeViewerController extends AbstractController {
     public boolean isInitiallyVisible() {
         return true;
     }
+    
+    public void initialize() {
+        // nothing to do
+    }
+
     public void setSettings(Map<String,Object> settings) {
     }
 

@@ -122,16 +122,17 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 
     protected abstract void validate();
 
-    public String getColouringAttributeName() {
-        return colouringAttributeName;
+    public String getBranchColouringAttribute() {
+        return branchColouringAttribute;
     }
 
-    public void setColouringAttributeName(String colouringAttributeName) {
-        this.colouringAttributeName = colouringAttributeName;
+    public void setBranchColouringAttribute(String branchColouringAttribute) {
+        this.branchColouringAttribute = branchColouringAttribute;
+        invalidate();
     }
 
     public boolean isShowingColouring() {
-        return colouringAttributeName != null;
+        return branchColouringAttribute != null;
     }
 
     public String getCollapseAttributeName() {
@@ -140,6 +141,7 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 
     public void setCollapseAttributeName(String collapseAttributeName) {
         this.collapseAttributeName = collapseAttributeName;
+        invalidate();
     }
 
     public boolean isShowingCollapsedTipLabels() {
@@ -148,6 +150,7 @@ public abstract class AbstractTreeLayout implements TreeLayout {
 
     public void setShowingCollapsedTipLabels(boolean showingCollapsedTipLabels) {
         this.showingCollapsedTipLabels = showingCollapsedTipLabels;
+        invalidate();
     }
 
     private boolean invalid = true;
@@ -162,7 +165,7 @@ public abstract class AbstractTreeLayout implements TreeLayout {
     protected Map<Node, Shape> calloutPaths = new HashMap<Node, Shape>();
 
     private Set<TreeLayoutListener> listeners = new HashSet<TreeLayoutListener>();
-    protected String colouringAttributeName = null;
+    protected String branchColouringAttribute = null;
     protected String collapseAttributeName = null;
     protected boolean showingCollapsedTipLabels = true;
 }

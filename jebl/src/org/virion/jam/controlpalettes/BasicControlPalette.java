@@ -115,6 +115,12 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         validate();
     }
 
+    public void initialize() {
+        for (Controller controller : controllers) {
+            controller.initialize();
+        }
+    }
+
     public void getSettings(Map<String,Object> settings) {
         for (Controller controller : controllers) {
             controller.getSettings(settings);

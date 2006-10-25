@@ -29,10 +29,16 @@ public interface Controller {
     boolean isInitiallyVisible();
 
     /**
+     * Initialize this controller when a new document is created. At this
+     * point, settings can be adjusted to match the contents of the document.
+     */
+    void initialize();
+
+    /**
      * Collect the settings for this controller. These should be stored
      * in the given settings map using string keys.
      *
-     * @param settings
+     * @param settings the settings map
      */
     void getSettings(Map<String, Object> settings);
 
@@ -40,7 +46,7 @@ public interface Controller {
      * Set the settings for this controller. These will have been stored
      * as a map by the getSettings function.
      *
-     * @param settings
+     * @param settings the settings map
      */
     void setSettings(Map<String,Object> settings);
 
@@ -48,13 +54,13 @@ public interface Controller {
      * Add a ControllerListener to this controllers list of listeners
      * The main listener will be the ControlPalette itself which will use
      * this to resize the panels if the components changed
-     * @param listener
+     * @param listener the controller listener
      */
     void addControllerListener(ControllerListener listener);
 
     /**
      * Remove a listener
-     * @param listener
+     * @param listener the controller listener
      */
     void removeControllerListener(ControllerListener listener);
 }
