@@ -32,7 +32,7 @@ public class MultipleTreeViewerController extends AbstractController {
         currentTreeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 treeViewer.getTrees();
-                treeViewer.setCurrentTree(treeViewer.getTrees().get((Integer)currentTreeSpinner.getValue() - 1));
+                treeViewer.setCurrentTree((Integer)currentTreeSpinner.getValue() - 1);
             }
         });
         optionsPanel.addComponentWithLabel("Tree:", currentTreeSpinner);
@@ -70,3 +70,4 @@ public class MultipleTreeViewerController extends AbstractController {
     private final MultipleTreeViewer treeViewer;
 
 }
+ 
