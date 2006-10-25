@@ -3,9 +3,9 @@ package jebl.evolution.align;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Sequence;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matt Kearse
@@ -179,7 +179,7 @@ class Profile {
 
     public static int calculateAlphabetSize(String[] sequences) {
         int total = 0;
-        boolean found[] =new boolean[127];
+        boolean found[] = new boolean[127];
         for (String sequence : sequences) {
             for (char character : sequence.toCharArray()) {
                 if(! found [ character ]) total ++;
