@@ -543,6 +543,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             controlsList.addAll(getScaleBarPainter().getControls(detachPrimaryCheckbox));
         }
 
+        setupTree();
         return controlsList;
     }
 
