@@ -17,6 +17,7 @@ import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.*;
+import java.util.ArrayList;
 
 /**
  * @author Andrew Rambaut
@@ -249,7 +250,7 @@ public class TreeViewer extends JPanel implements Printable {
         if (selectionMode == oldSelectionMode) {
             return;
         }
-        
+
         if (oldSelectionMode == TreePaneSelector.SelectionMode.TAXA) {
             treePane.selectNodesFromSelectedTips();
         } else if (selectionMode == TreePaneSelector.SelectionMode.TAXA) {
@@ -279,6 +280,22 @@ public class TreeViewer extends JPanel implements Printable {
     public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
         return treePane.print(g, pageFormat, pageIndex);
     }
+
+	public void addTreeViewerListener(TreeViewerListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeTreeViewerListener(TreeViewerListener listener) {
+		listeners.remove(listener);
+	}
+
+	public void fireTreeChanged() {
+		for (TreeViewerListener listener : listeners) {
+			listener.treeChanged();
+		}
+	}
+
+	private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
 
     protected TreePane treePane;
     protected TreePaneSelector treePaneSelector;

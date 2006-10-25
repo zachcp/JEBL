@@ -146,9 +146,9 @@ public class Toolbar extends JToolBar {
     private void setToolbarOptions(ToolbarOptions toolbarOptions) {
         this.options = toolbarOptions;
 
-        Iterator iter = toolbarItems.iterator();
+        Iterator<ToolbarItem> iter = toolbarItems.iterator();
         while (iter.hasNext()) {
-            ToolbarItem item = (ToolbarItem)iter.next();
+            ToolbarItem item = iter.next();
             item.setToolbarOptions(options);
         }
 
@@ -163,5 +163,5 @@ public class Toolbar extends JToolBar {
     private final JRadioButtonMenuItem textOnlyMenuItem;
     private final JCheckBoxMenuItem smallSizeMenuItem;
 
-    private List toolbarItems = new ArrayList();
+    private List<ToolbarItem> toolbarItems = new ArrayList<ToolbarItem>();
 }

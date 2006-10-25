@@ -16,27 +16,16 @@ import java.util.*;
  */
 public class DiscreteColorDecorator implements Decorator {
 
+
 	public static Color[] DEFAULT_PAINTS = new Color[] {
-			new Color(204, 255, 255),
-			new Color(0, 255, 255),
-			new Color(255, 204, 153),
-			new Color(255, 204, 0),
-			new Color(0, 204, 255),
-			new Color(0, 255, 0),
-			new Color(255, 255, 153),
-			new Color(0, 0, 128),
-			new Color(198, 66, 0),
-			new Color(51, 102, 255),
-			new Color(153, 204, 255),
-			new Color(255, 153, 0),
-			new Color(255, 255, 0),
-			new Color(255, 102, 0),
-			new Color(230, 6, 6),
-			new Color(204, 255, 153),
-			new Color(0, 255, 153),
-			new Color(0, 0, 255),
-			new Color(204, 153, 255),
-			new Color(204, 255, 204),
+			new Color(64,35,225),
+			new Color(229,35,60),
+			new Color(255,174,34),
+			new Color(86,255,34),
+			new Color(35,141,148),
+			new Color(146,35,142),
+			new Color(255,90,34),
+			new Color(239,255,34),
 			Color.DARK_GRAY
 	};
 
@@ -68,7 +57,7 @@ public class DiscreteColorDecorator implements Decorator {
 
 	}
 
-    public void setValues(Set<? extends Object> values, Color[] paints) {
+    public void setValues(Collection<? extends Object> values, Color[] paints) {
         colourMap = new HashMap<Object, Paint>();
         this.paints = paints;
 
@@ -125,9 +114,6 @@ public class DiscreteColorDecorator implements Decorator {
             paint = colourMap.get(value);
         } else if (value instanceof Number) {
             int index = ((Number)value).intValue() % paints.length;
-            if (index > 1) {
-                System.out.println("eek");
-            }
             paint = paints[index];
         }
     }

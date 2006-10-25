@@ -33,9 +33,18 @@ public class MultipleTreeViewer extends TreeViewer {
 		return trees;
 	}
 
+	public int getCurrentTreeIndex() {
+		return currentTreeIndex;
+	}
+
+	public int getTreeCount() {
+		return trees.size();
+	}
+
     public void setCurrentTree(int index) {
         super.setTree(trees.get(index));
 	    currentTreeIndex = index;
+	    fireTreeChanged();
     }
 
 	public void showNextTree() {
@@ -51,6 +60,6 @@ public class MultipleTreeViewer extends TreeViewer {
 	}
 
 
-    private List<Tree> trees = null;
+	private List<Tree> trees = null;
 	private int currentTreeIndex = 0;
 }
