@@ -38,6 +38,7 @@ public class MultipleTreeViewer extends TreeViewer {
 	}
 
 	public int getTreeCount() {
+		if (trees == null) return 0;
 		return trees.size();
 	}
 
