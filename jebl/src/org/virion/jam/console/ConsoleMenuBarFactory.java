@@ -12,8 +12,10 @@ import org.virion.jam.mac.MacWindowMenuFactory;
 public class ConsoleMenuBarFactory extends DefaultMenuBarFactory {
 
 	public ConsoleMenuBarFactory() {
-		if (org.virion.jam.mac.Utils.isMacOSX()) {
-			registerMenuFactory(new MacFileMenuFactory(false));
+        // org.virion stuff shouldn't be called from here - it's a separate project!
+        //if (org.virion.jam.mac.Utils.isMacOSX()) {
+        if (System.getProperty("mrj.version") != null) {
+            registerMenuFactory(new MacFileMenuFactory(false));
 			registerMenuFactory(new DefaultEditMenuFactory());
 			registerMenuFactory(new MacWindowMenuFactory());
 			registerMenuFactory(new MacHelpMenuFactory());
