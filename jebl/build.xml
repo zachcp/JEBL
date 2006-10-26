@@ -34,6 +34,11 @@
             <exclude name="org/**/maconly/*"/>
             <!--<exclude name="org/**/maconly/*" unless = "isMac"/>-->
         </javac>
+
+        <!-- Utils.class was getting included in jebl.jar    -->
+        <!-- twice and Pack200 was having issues.            -->
+        <delete file="${build}/org/virion/jam/mac/Utils.class"/>
+
         <copy todir="${build}">
             <fileset dir="${src}" includes="org/**/*.png"/>
         </copy>
