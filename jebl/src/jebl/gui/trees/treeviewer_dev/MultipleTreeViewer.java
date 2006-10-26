@@ -21,13 +21,20 @@ public class MultipleTreeViewer extends TreeViewer {
     public void setTree(Tree tree) {
         this.trees = new ArrayList<Tree>();
         trees.add(tree);
-        setCurrentTree(0);
+        showTree(0);
     }
 
     public void setTrees(Collection<? extends Tree> trees) {
         this.trees = new ArrayList<Tree>(trees);
-	    setCurrentTree(0);
+	    showTree(0);
     }
+
+	public void addTrees(Collection<? extends Tree> trees) {
+		int count = getTreeCount();
+		this.trees.addAll(trees);
+		showTree(count);
+	}
+
 
 	public List<Tree> getTrees() {
 		return trees;
@@ -42,7 +49,7 @@ public class MultipleTreeViewer extends TreeViewer {
 		return trees.size();
 	}
 
-    public void setCurrentTree(int index) {
+    public void showTree(int index) {
         super.setTree(trees.get(index));
 	    currentTreeIndex = index;
 	    fireTreeChanged();
@@ -50,13 +57,13 @@ public class MultipleTreeViewer extends TreeViewer {
 
 	public void showNextTree() {
 		if (currentTreeIndex < trees.size() - 1) {
-			setCurrentTree(currentTreeIndex + 1);
+			showTree(currentTreeIndex + 1);
 		}
 	}
 
 	public void showPreviousTree() {
 		if (currentTreeIndex > 0) {
-			setCurrentTree(currentTreeIndex - 1);
+			showTree(currentTreeIndex - 1);
 		}
 	}
 

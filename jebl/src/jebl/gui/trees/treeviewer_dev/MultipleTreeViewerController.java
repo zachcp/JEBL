@@ -32,7 +32,7 @@ public class MultipleTreeViewerController extends AbstractController {
         currentTreeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 treeViewer.getTrees();
-                treeViewer.setCurrentTree((Integer)currentTreeSpinner.getValue() - 1);
+                treeViewer.showTree((Integer)currentTreeSpinner.getValue() - 1);
             }
         });
         optionsPanel.addComponentWithLabel("Tree:", currentTreeSpinner);
@@ -51,7 +51,7 @@ public class MultipleTreeViewerController extends AbstractController {
     public boolean isInitiallyVisible() {
         return true;
     }
-    
+
     public void initialize() {
         // nothing to do
     }
@@ -70,4 +70,3 @@ public class MultipleTreeViewerController extends AbstractController {
     private final MultipleTreeViewer treeViewer;
 
 }
- 
