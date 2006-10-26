@@ -43,6 +43,8 @@ public class StatusPanel extends JPanel implements StatusListener {
 
             statusLabel = new JLabel(statusText);
             add(statusLabel, BorderLayout.CENTER);
+            statusLabel.setFont(UIManager.getFont("SmallSystemFont"));
+
         }
 
         statusButton = new JButton(normalStatusIcon);

@@ -17,7 +17,7 @@ public class StatusBar extends StatusPanel {
 		    BorderFactory.createEmptyBorder(2, 12, 2, 12)));
   //      panel.setBackground(new Color(0.0F, 0.0F, 0.0F, 0.05F));
 
-	}
+    }
 
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
