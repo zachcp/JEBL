@@ -28,7 +28,7 @@ public class OSXAdapter extends ApplicationAdapter {
             ae.setHandled(true);
             application.doAbout();
         } else {
-            throw new IllegalStateException("handleAbout: MyApp instance detached from listener");
+            throw new IllegalStateException("handleAbout: Application instance detached from listener");
         }
     }
 
@@ -37,7 +37,7 @@ public class OSXAdapter extends ApplicationAdapter {
             application.doPreferences();
             ae.setHandled(true);
         } else {
-            throw new IllegalStateException("handlePreferences: MyApp instance detached from listener");
+            throw new IllegalStateException("handlePreferences: Application instance detached from listener");
         }
     }
 
@@ -53,7 +53,7 @@ public class OSXAdapter extends ApplicationAdapter {
             ae.setHandled(false);
             application.doQuit();
         } else {
-            throw new IllegalStateException("handleQuit: MyApp instance detached from listener");
+            throw new IllegalStateException("handleQuit: Application instance detached from listener");
         }
     }
 
@@ -81,34 +81,13 @@ public class OSXAdapter extends ApplicationAdapter {
         theApplication.setEnabledPreferencesMenu(enabled);
     }
 
-	public void handleOpenApplication(ApplicationEvent ae) {
-		if (application != null) {
-			System.err.println("handleOpenApplication: " + ae.getFilename());
-		    application.doOpenFile(new File(ae.getFilename()));
-		    ae.setHandled(true);
-		} else {
-		    throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
-		}
-	}
-
-	public void handleReOpenApplication(ApplicationEvent ae) {
-		if (application != null) {
-			System.err.println("handleReOpenApplication: " + ae.getFilename());
-		    application.doOpenFile(new File(ae.getFilename()));
-		    ae.setHandled(true);
-		} else {
-		    throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
-		}
-	}
-
 	public void handleOpenFile(ApplicationEvent ae) {
         if (application != null) {
-	        System.err.println("handleOpenFile: " + ae.getFilename());
-
             application.doOpenFile(new File(ae.getFilename()));
             ae.setHandled(true);
         } else {
-            throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
+            throw new IllegalStateException("handleOpenFile: Application instance detached from listener");
         }
+        throw new RuntimeException("handleOpenFile: " + ae.getFilename());
     }
 }

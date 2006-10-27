@@ -22,7 +22,7 @@ import java.io.*;
  */
 
 public abstract class Application {
-
+ 
     private static MenuBarFactory menuBarFactory;
     private static Icon icon;
     private static String nameString;

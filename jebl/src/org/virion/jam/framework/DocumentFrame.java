@@ -21,7 +21,7 @@ public abstract class DocumentFrame extends AbstractFrame {
 
     protected abstract void initializeComponents();
 
-    protected abstract boolean readFromFile(File file) throws FileNotFoundException, IOException;
+    protected abstract boolean readFromFile(File file) throws IOException;
 
     protected abstract boolean writeToFile(File file) throws IOException;
 
