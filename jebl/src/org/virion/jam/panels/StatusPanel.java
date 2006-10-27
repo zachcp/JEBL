@@ -43,6 +43,8 @@ public class StatusPanel extends JPanel implements StatusListener {
 
             statusLabel = new JLabel(statusText);
             add(statusLabel, BorderLayout.CENTER);
+
+            // Added this to reduce size of status bar (this looks nice on a Mac - not tested on Windows).
             statusLabel.setFont(UIManager.getFont("SmallSystemFont"));
 
         }
@@ -55,6 +57,7 @@ public class StatusPanel extends JPanel implements StatusListener {
         statusButton.setOpaque(false);
         statusButton.setRolloverEnabled(true);
         // this is required on Windows XP platform -- untested on Macintosh
+        // ... seems to be fine on a Macintosh (AR).
         statusButton.setContentAreaFilled(false);
 
         statusButton.addActionListener(new ActionListener() {
