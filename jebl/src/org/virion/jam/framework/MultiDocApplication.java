@@ -9,7 +9,6 @@ import org.virion.jam.mac.Utils;
 import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Vector;
 
 public class MultiDocApplication extends Application {
@@ -155,7 +154,7 @@ public class MultiDocApplication extends Application {
 
     private DocumentFrame getDocumentFrame(File file) {
         for (DocumentFrame doc : documents) {
-            if (doc.getFile() == file) {
+            if (doc != null && doc.getFile() == file) {
                 return doc;
             }
         }

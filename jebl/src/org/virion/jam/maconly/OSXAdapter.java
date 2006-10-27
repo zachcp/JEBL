@@ -81,8 +81,30 @@ public class OSXAdapter extends ApplicationAdapter {
         theApplication.setEnabledPreferencesMenu(enabled);
     }
 
-    public void handleOpenFile(ApplicationEvent ae) {
+	public void handleOpenApplication(ApplicationEvent ae) {
+		if (application != null) {
+			System.err.println("handleOpenApplication: " + ae.getFilename());
+		    application.doOpenFile(new File(ae.getFilename()));
+		    ae.setHandled(true);
+		} else {
+		    throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
+		}
+	}
+
+	public void handleReOpenApplication(ApplicationEvent ae) {
+		if (application != null) {
+			System.err.println("handleReOpenApplication: " + ae.getFilename());
+		    application.doOpenFile(new File(ae.getFilename()));
+		    ae.setHandled(true);
+		} else {
+		    throw new IllegalStateException("handleOpenFile: MyApp instance detached from listener");
+		}
+	}
+
+	public void handleOpenFile(ApplicationEvent ae) {
         if (application != null) {
+	        System.err.println("handleOpenFile: " + ae.getFilename());
+
             application.doOpenFile(new File(ae.getFilename()));
             ae.setHandled(true);
         } else {

@@ -1,4 +1,4 @@
-/** 
+/**
 * ConsoleMenuBarFactory.java
 */
 
@@ -13,8 +13,10 @@ public class ConsoleMenuBarFactory extends DefaultMenuBarFactory {
 
 	public ConsoleMenuBarFactory() {
         // org.virion stuff shouldn't be called from here - it's a separate project!
-        //if (org.virion.jam.mac.Utils.isMacOSX()) {
-        if (System.getProperty("mrj.version") != null) {
+
+		// no its not. This class is part of JAM.
+        if (org.virion.jam.mac.Utils.isMacOSX()) {
+        //if (System.getProperty("mrj.version") != null) {
             registerMenuFactory(new MacFileMenuFactory(false));
 			registerMenuFactory(new DefaultEditMenuFactory());
 			registerMenuFactory(new MacWindowMenuFactory());

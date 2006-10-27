@@ -71,6 +71,8 @@ public abstract class Application {
     public Application(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
     					String websiteURLString, String helpURLString) {
 
+	    System.err.println("Initializing Application");
+	    
         Application.menuBarFactory = menuBarFactory;
         Application.nameString = nameString;
         Application.aboutString = aboutString;
