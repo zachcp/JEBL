@@ -60,7 +60,7 @@ public final class Utils {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^\\w+$")) {
-                name = "\"" + name + "\"";
+                name = "\'" + name + "\'";
             }
             buffer.append(name);
             if( tree.hasLengths() ) {
@@ -263,91 +263,167 @@ public final class Utils {
         return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
     }
 
+    private static String nodeName(Tree tree, Node n) {
+        if( tree.isExternal(n) ) {
+            return tree.getTaxon(n).getName();
+        }
+        String s = n.toString();
+        return s.substring(s.lastIndexOf('@'));
+    }
+
+    private static void showTree(Tree tree) {
+       for (Node e : tree.getNodes())  {
+           String name = nodeName(tree, e);
+           System.out.print(name + ":");
+           for( Node n : tree.getAdjacencies(e) ) {
+               try {
+                   System.out.print(" {" + nodeName(tree, n) + " : " + tree.getEdgeLength(e, n) + "}");
+               } catch (Graph.NoEdgeException e1) {
+                   e1.printStackTrace();
+               }
+           }
+           System.out.println();
+       }
+    }
+
     public static RootedTree rootTreeAtCenter(Tree tree) {
+        HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
         try {
-            HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
+           // showTree(tree);
 
-            double minOfMaxes = Double.MAX_VALUE;
-            HashPair<Node> best = null;
-            for (Node i : tree.getInternalNodes()) {
-                double maxDist = -Double.MAX_VALUE;
-                HashPair<Node> maxDirection = null;
-                for (Node n : tree.getAdjacencies(i)) {
-                    HashPair<Node> p = new HashPair<Node>(i, n);
-                    double d = dist(tree, p.first, p.second, dists);
-                    if (maxDist < d) {
-                        maxDist = d;
-                        maxDirection = p;
-                    }
-                }
+            double maxDistance =  -Double.MAX_VALUE;
+            // node on maximal path
+            Node current = null;
+            // next node on maximal path
+            Node direction = null;
 
-                if (maxDist < minOfMaxes) {
-                    minOfMaxes = maxDist;
-                    best = maxDirection;
-                }
-            }
-
-            if (best == null) {
-                minOfMaxes = Double.MAX_VALUE;
-                best = null;
-                for (Node i : tree.getInternalNodes()) {
-                    double maxDist = -Double.MAX_VALUE;
-                    HashPair<Node> maxDirection = null;
-                    for (Node n : tree.getAdjacencies(i)) {
-                        HashPair<Node> p = new HashPair<Node>(i, n);
-                        double d = dist(tree, p.first, p.second, dists);
-                        if (maxDist < d) {
-                            maxDist = d;
-                            maxDirection = p;
-                        }
-                    }
-
-                    if (maxDist < minOfMaxes) {
-                        minOfMaxes = maxDist;
-                        best = maxDirection;
-                    }
-
-                    if (best == null) {
-                        maxDist = -Double.MAX_VALUE;
-                        maxDirection = null;
-                        for (Node n : tree.getAdjacencies(i)) {
-                            HashPair<Node> p = new HashPair<Node>(i, n);
-                            double d = dist(tree, p.first, p.second, dists);
-                            if (maxDist < d) {
-                                maxDist = d;
-                                maxDirection = p;
-                            }
-                        }
-
-                        if (maxDist < minOfMaxes) {
-                            minOfMaxes = maxDist;
-                            best = maxDirection;
-                        }
+            // locate one terminal node of longest path
+            for (Node e : tree.getExternalNodes() ) {
+                for (Node n : tree.getAdjacencies(e)) {
+                    final double d = dist(tree, e, n, dists);
+                    if( d > maxDistance ) {
+                        maxDistance = d;
+                        current = e;
+                        direction = n;
                     }
                 }
             }
 
-            double distToSecond = -Double.MAX_VALUE;
-            for (Node n : tree.getAdjacencies(best.first)) {
-                if (n != best.second) {
-                    double d1 = dists.get(new HashPair<Node>(best.first, n));
-                    if (d1 > distToSecond) {
-                        distToSecond = d1;
+            // traverse along maximal path to it's middle
+            double distanceLeft = maxDistance / 2.0;
+
+            while( true ) {
+                final double len = tree.getEdgeLength(current, direction);
+                if( distanceLeft <= len ) {
+                    RootedFromUnrooted rtree = new RootedFromUnrooted(tree, current, direction, distanceLeft);
+                    //System.out.println(toNewick(rtree));
+                    return rtree;
+                }
+                distanceLeft -= len;
+
+                maxDistance = -Double.MAX_VALUE;
+                Node next = null;
+                for (Node n : tree.getAdjacencies(direction)) {
+                    if( n == current ) continue;
+                    final double d = dist(tree, direction, n, dists);
+                    if( d > maxDistance ) {
+                       maxDistance = d;
+                       next = n;
                     }
                 }
+                current = direction;
+                direction = next;
             }
-
-            double d = (minOfMaxes - distToSecond) / 2;
-            if (d > tree.getEdgeLength(best.first, best.second) ||
-                    Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2) {
-                return new RootedFromUnrooted(tree, best.first, true);
-            }
-
-            return new RootedFromUnrooted(tree, best.first, best.second, d);
-        } catch (Graph.NoEdgeException e1) {
-            return null; // bug
+        } catch( Graph.NoEdgeException e1)  {
+            return null; // serious bug, should not happen
         }
     }
+
+//    public static RootedTree rootTreeAtCenter1(Tree tree) {
+//        try {
+//            HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
+//
+//            double minOfMaxes = Double.MAX_VALUE;
+//            HashPair<Node> best = null;
+//            for (Node i : tree.getInternalNodes()) {
+//                double maxDist = -Double.MAX_VALUE;
+//                HashPair<Node> maxDirection = null;
+//                for (Node n : tree.getAdjacencies(i)) {
+//                    HashPair<Node> p = new HashPair<Node>(i, n);
+//                    double d = dist(tree, p.first, p.second, dists);
+//                    if (maxDist < d) {
+//                        maxDist = d;
+//                        maxDirection = p;
+//                    }
+//                }
+//
+//                if (maxDist < minOfMaxes) {
+//                    minOfMaxes = maxDist;
+//                    best = maxDirection;
+//                }
+//            }
+//
+//            if (best == null) {
+//                minOfMaxes = Double.MAX_VALUE;
+//                best = null;
+//                for (Node i : tree.getInternalNodes()) {
+//                    double maxDist = -Double.MAX_VALUE;
+//                    HashPair<Node> maxDirection = null;
+//                    for (Node n : tree.getAdjacencies(i)) {
+//                        HashPair<Node> p = new HashPair<Node>(i, n);
+//                        double d = dist(tree, p.first, p.second, dists);
+//                        if (maxDist < d) {
+//                            maxDist = d;
+//                            maxDirection = p;
+//                        }
+//                    }
+//
+//                    if (maxDist < minOfMaxes) {
+//                        minOfMaxes = maxDist;
+//                        best = maxDirection;
+//                    }
+//
+//                    if (best == null) {
+//                        maxDist = -Double.MAX_VALUE;
+//                        maxDirection = null;
+//                        for (Node n : tree.getAdjacencies(i)) {
+//                            HashPair<Node> p = new HashPair<Node>(i, n);
+//                            double d = dist(tree, p.first, p.second, dists);
+//                            if (maxDist < d) {
+//                                maxDist = d;
+//                                maxDirection = p;
+//                            }
+//                        }
+//
+//                        if (maxDist < minOfMaxes) {
+//                            minOfMaxes = maxDist;
+//                            best = maxDirection;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            double distToSecond = -Double.MAX_VALUE;
+//            for (Node n : tree.getAdjacencies(best.first)) {
+//                if (n != best.second) {
+//                    double d1 = dists.get(new HashPair<Node>(best.first, n));
+//                    if (d1 > distToSecond) {
+//                        distToSecond = d1;
+//                    }
+//                }
+//            }
+//
+//            double d = (minOfMaxes - distToSecond) / 2;
+//            if (d > tree.getEdgeLength(best.first, best.second) ||
+//                    Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2) {
+//                return new RootedFromUnrooted(tree, best.first, true);
+//            }
+//
+//            return new RootedFromUnrooted(tree, best.first, best.second, d);
+//        } catch (Graph.NoEdgeException e1) {
+//            return null; // bug
+//        }
+//    }
 
     /**
      * @param tree  the tree
