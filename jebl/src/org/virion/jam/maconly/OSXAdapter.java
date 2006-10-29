@@ -5,8 +5,6 @@ package org.virion.jam.maconly;
 import com.apple.eawt.ApplicationAdapter;
 import com.apple.eawt.ApplicationEvent;
 
-import java.io.File;
-
 public class OSXAdapter extends ApplicationAdapter {
 
     // pseudo-singleton model; no point in making multiple instances
@@ -83,7 +81,7 @@ public class OSXAdapter extends ApplicationAdapter {
 
 	public void handleOpenFile(ApplicationEvent ae) {
         if (application != null) {
-            application.doOpenFile(new File(ae.getFilename()));
+            application.doOpen(ae.getFilename());
             ae.setHandled(true);
         } else {
             throw new IllegalStateException("handleOpenFile: Application instance detached from listener");

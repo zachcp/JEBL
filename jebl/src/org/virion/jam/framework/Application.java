@@ -22,7 +22,7 @@ import java.io.*;
  */
 
 public abstract class Application {
- 
+
     private static MenuBarFactory menuBarFactory;
     private static Icon icon;
     private static String nameString;
@@ -72,7 +72,7 @@ public abstract class Application {
     					String websiteURLString, String helpURLString) {
 
 	    System.err.println("Initializing Application");
-	    
+
         Application.menuBarFactory = menuBarFactory;
         Application.nameString = nameString;
         Application.aboutString = aboutString;
@@ -90,10 +90,6 @@ public abstract class Application {
             throw new RuntimeException("Only on instance of Application is allowed");
         }
         application = this;
-
-        if (org.virion.jam.mac.Utils.isMacOSX()) {
-            org.virion.jam.mac.Utils.macOSXRegistration(application);
-        }
 
         preferencesDialog = new PreferencesDialog(getDefaultFrame());
     }
