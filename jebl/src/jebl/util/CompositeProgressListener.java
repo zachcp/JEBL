@@ -19,6 +19,9 @@ import java.util.List;
  *          you have to explicitely let it know when a new subtask (not the first) starts, by calling
  *          startNextOperation(). Thus when the constructor is passed an array of N doubles as its second
  *          argument, startNextOperation() should be called precisely N-1 times.
+ *          <p/>
+ *          Alternatively, instead of calling startNextOperation() after each subtask (except the last),
+ *          you can instead call beganSubtask() before each subtask (including the first)
  */
 public final class CompositeProgressListener implements ProgressListener {
     protected int numOperations;
@@ -28,6 +31,7 @@ public final class CompositeProgressListener implements ProgressListener {
     protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
     protected boolean aborted = false;
     protected double currentOperationProgress = 0.0;
+    private boolean beganFirstSubTask=false;
 
     public CompositeProgressListener(ProgressListener listener, double[] operationDuration) {
         numOperations = operationDuration.length;
@@ -61,6 +65,32 @@ public final class CompositeProgressListener implements ProgressListener {
             lengths[i++] = (double) file.length();
         }
         return new CompositeProgressListener(listener, lengths);
+    }
+
+    /**
+     * Used as an alternative to {@link #startNextOperation()}.
+     * Instead of calling {@link #startNextOperation()} once after each subtask
+     * (except the last), you can instead call beginSubTask at the beginning
+     * of every subtask including the first.
+     */
+    public void beginSubTask() {
+        if (!beganFirstSubTask) {
+            beganFirstSubTask = true;
+        } else {
+            startNextOperation();
+        }
+    }
+
+    /**
+     * Used as an alternative to {@link #startNextOperation()}.
+     * Instead of calling {@link #startNextOperation()} once after each subtask
+     * (except the last), you can instead call beginSubTask at the beginning
+     * of every subtask including the first.
+     * @param message a message to be displayed to the user as part of the progress
+     */
+    public void beginSubTask(String message) {
+        setMessage(message);
+        beginSubTask();
     }
 
 
