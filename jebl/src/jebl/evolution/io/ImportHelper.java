@@ -10,6 +10,7 @@
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.SequenceType;
+import jebl.util.ProgressListener;
 
 import java.io.*;
 
@@ -202,22 +203,32 @@ public class ImportHelper {
         return line.toString();
     }
 
-    /**
-     *
-     * Reads sequence, skipping over any comments and filtering using sequenceType.
-     * @param sequence a StringBuffer into which the sequence is put
-     * @param sequenceType the sequenceType of the sequence
-     * @param delimiters list of characters that will stop the reading
-     * @param gapCharacters list of characters that will be read as gaps
-     * @param missingCharacters list of characters that will be read as missing
-     * @param matchCharacters list of characters that will be read as matching the matchSequence
-     * @param matchSequence the sequence string to match match characters to
-     * @param maxSites maximum number of sites to read
-     */
     public void readSequence(StringBuffer sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
+        readSequence(sequence, sequenceType, delimiters, maxSites,gapCharacters, missingCharacters,
+                matchCharacters, matchSequence, null);
+    }
+
+    /**
+        *
+        * Reads sequence, skipping over any comments and filtering using sequenceType.
+        * @param sequence a StringBuffer into which the sequence is put
+        * @param sequenceType the sequenceType of the sequence
+        * @param delimiters list of characters that will stop the reading
+        * @param gapCharacters list of characters that will be read as gaps
+        * @param missingCharacters list of characters that will be read as missing
+        * @param matchCharacters list of characters that will be read as matching the matchSequence
+        * @param matchSequence the sequence string to match match characters to
+        * @param maxSites maximum number of sites to read
+        * @param progress optional ProgressListener. May be null if not interested in progress
+        */
+    public void readSequence(StringBuffer sequence, SequenceType sequenceType,
+                             String delimiters, int maxSites,
+                             String gapCharacters, String missingCharacters,
+                             String matchCharacters, String matchSequence,
+                             ProgressListener progress) throws IOException, ImportException {
 
         char ch = read();
 
@@ -228,6 +239,7 @@ public class ImportHelper {
             int n = 0;
 
             while (n < maxSites && delimiters.indexOf(ch) == -1) {
+                if(progress!= null && n%1000==0 && progress.setProgress(getProgress())) return;
 
                 if (hasComments && (ch == startComment || ch == lineComment)) {
                     skipComments(ch);

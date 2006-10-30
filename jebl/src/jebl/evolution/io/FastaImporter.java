@@ -80,7 +80,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
      * @throws IOException
      * @throws ImportException
      */
-    private List<Sequence> read(ImmediateSequenceImporter.Callback callback, ProgressListener progressListener)
+    private List<Sequence> read(ImmediateSequenceImporter.Callback callback,
+                                ProgressListener progressListener)
             throws IOException, ImportException
     {
         List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
@@ -102,7 +103,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 final String description = tokenizer.hasMoreElements() ?
                         ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
                 final StringBuffer seq = new StringBuffer();
-                helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null);
+                helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
+                importAborted = progressListener.setProgress(helper.getProgress());
+                if(importAborted) break;
 
                 final Taxon taxon = Taxon.getTaxon(name);
                 if (description != null && description.length() > 0) {
