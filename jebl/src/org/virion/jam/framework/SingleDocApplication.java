@@ -34,7 +34,12 @@ public class SingleDocApplication extends Application {
     }
 
 	public final void initialize() {
-		// nothing to do...
+        if (org.virion.jam.mac.Utils.isMacOSX()) {
+            // If this is a Mac application then register it at this point.
+            // This will result in any events such as open file being executed
+            // due to files being double-clicked or dragged on to the application.
+            org.virion.jam.mac.Utils.macOSXRegistration(this);
+        }
 	}
 
     public void setDocumentFrame(DocumentFrame documentFrame) {

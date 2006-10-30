@@ -43,6 +43,13 @@ public class MultiDocApplication extends Application {
 
 	public final void initialize() {
 		setupFramelessMenuBar();
+
+        if (org.virion.jam.mac.Utils.isMacOSX()) {
+            // If this is a Mac application then register it at this point.
+            // This will result in any events such as open file being executed
+            // due to files being double-clicked or dragged on to the application.
+            org.virion.jam.mac.Utils.macOSXRegistration(this);
+        }
 	}
 
 	public void setDocumentFrameFactory(DocumentFrameFactory documentFrameFactory) {
@@ -108,6 +115,22 @@ public class MultiDocApplication extends Application {
 		}
 	}
 
+    public DocumentFrame getUpperDocumentFrame() {
+        return upperDocumentFrame;
+    }
+
+    public DocumentFrame getDocumentFrame(File file) {
+        if (documents != null && documents.size() > 0) {
+            for (DocumentFrame doc : documents) {
+                if (doc != null && doc.getFile() == file) {
+                    return doc;
+                }
+            }
+        }
+
+        return null;
+    }
+
 	private void documentFrameActivated(DocumentFrame documentFrame) {
 		upperDocumentFrame = documentFrame;
 	}
@@ -146,22 +169,6 @@ public class MultiDocApplication extends Application {
 
 		documents.add(documentFrame);
 		upperDocumentFrame = documentFrame;
-	}
-
-	private DocumentFrame getUpperDocumentFrame() {
-		return upperDocumentFrame;
-	}
-
-	private DocumentFrame getDocumentFrame(File file) {
-		if (documents != null && documents.size() > 0) {
-			for (DocumentFrame doc : documents) {
-				if (doc != null && doc.getFile() == file) {
-					return doc;
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private void setupFramelessMenuBar() {

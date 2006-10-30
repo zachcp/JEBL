@@ -6,6 +6,7 @@ import org.virion.jam.preferences.PreferencesSection;
 
 import javax.swing.*;
 import java.util.prefs.Preferences;
+import java.awt.*;
 
 public class DemoApplication extends MultiDocApplication {
 
@@ -89,7 +90,8 @@ public class DemoApplication extends MultiDocApplication {
             //System.setProperty("Quaqua.Debug.showVisualBounds","true");
             UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
             // set UI manager properties here that affect Quaqua
-
+            UIManager.put("SystemFont", new Font("Lucida Grande", Font.PLAIN, 13));
+            UIManager.put("SmallSystemFont", new Font("Lucida Grande", Font.PLAIN, 11));
         } catch (Exception e) {
             try {
 
@@ -99,7 +101,7 @@ public class DemoApplication extends MultiDocApplication {
             }
         }
 
-        java.net.URL url = DemoApplication.class.getResource("/images/treedraw.png");
+        java.net.URL url = DemoApplication.class.getResource("/images/demo.png");
         Icon icon = null;
 
         if (url != null) {
@@ -107,7 +109,7 @@ public class DemoApplication extends MultiDocApplication {
         }
 
         String nameString = "JAM Demo";
-        String aboutString = "JAM Demo\nVersion 1.0\n \nCopyright 2006 Andrew Rambaut\nUniversity of Oxford\nAll Rights Reserved.";
+        String aboutString = "JAM Demo\nVersion 1.0\n \nCopyright 2006 Andrew Rambaut\nUniversity of Edinburgh\nAll Rights Reserved.";
 
         DemoApplication app = new DemoApplication(new DemoMenuBarFactory(), nameString, aboutString, icon);
 
@@ -119,13 +121,17 @@ public class DemoApplication extends MultiDocApplication {
 
         app.initialize();
 
-        if (args.length == 0) {
-            app.doNew();
-        } else {
+        if (args.length > 0) {
             for (String arg : args) {
                 app.doOpen(arg);
             }
         }
+
+        if (app.getUpperDocumentFrame() == null) {
+            // If we haven't opened any files by now, prompt for one...
+            app.doOpen();
+        }
     }
+
 
 }
