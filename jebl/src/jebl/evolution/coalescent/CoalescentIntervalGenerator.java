@@ -12,6 +12,7 @@ import jebl.evolution.trees.IntervalGenerator;
  * Much of this class was derived from C++ code provided by Oliver Pybus.
  *
  * @author Andrew Rambaut
+ * @author Oliver Pybus
  * @version $Id$
  */
 public class CoalescentIntervalGenerator implements IntervalGenerator {
@@ -60,7 +61,7 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
         double highBracket = 0.0;
         double factor=1.6;
 
-        for (double gEst=1.0; gEst < CoalescentIntervalGenerator.LARGE_POSITIVE_NUMBER; gEst=gEst*factor) {
+        for (double gEst=1.0; gEst < LARGE_POSITIVE_NUMBER; gEst=gEst*factor) {
 
             if (getIntegral(gEst, inT) > constant) {	// solution must be smaller than gEst
                 highBracket = gEst;
@@ -134,19 +135,19 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
      */
     private double getNumericalIntegral(double inLowBound, double inHighBound)
     {
-        double lastST = CoalescentIntervalGenerator.LARGE_NEGATIVE_NUMBER;
-        double lastS = CoalescentIntervalGenerator.LARGE_NEGATIVE_NUMBER;
+        double lastST = LARGE_NEGATIVE_NUMBER;
+        double lastS = LARGE_NEGATIVE_NUMBER;
 
         assert(inHighBound > inLowBound);
 
-        for (int j = 1; j <= CoalescentIntervalGenerator.INTEGRATION_MAX_ITERATIONS; j++) {
+        for (int j = 1; j <= INTEGRATION_MAX_ITERATIONS; j++) {
             // iterate doTrapezoid() until answer obtained
 
             double st = doTrapezoid(j, inLowBound, inHighBound, lastST);
             double s = (4.0 * st - lastST) / 3.0;
 
             // If answer is within desired accuracy then return
-            if (Math.abs(s - lastS) < CoalescentIntervalGenerator.INTEGRATION_PRECISION * Math.abs(lastS)) {
+            if (Math.abs(s - lastS) < INTEGRATION_PRECISION * Math.abs(lastS)) {
                 return s;
             }
             lastS = s;
