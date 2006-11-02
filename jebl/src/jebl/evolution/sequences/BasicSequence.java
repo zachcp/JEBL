@@ -25,12 +25,15 @@ import java.util.Set;
 public class BasicSequence implements Sequence {
 
     /**
-     * Creates a sequence with a name corresponding to the taxon name
+     * Creates a sequence with a name corresponding to the taxon name.
+     *
+     * Use CharSequence so both a String and a StringBuilder are fine
      *
      * @param taxon
      * @param sequenceString
      */
-    public BasicSequence(SequenceType sequenceType, Taxon taxon, String sequenceString) {
+
+    public BasicSequence(SequenceType sequenceType, Taxon taxon, CharSequence sequenceString) {
 
         if (sequenceType == null) {
             throw new IllegalArgumentException("sequenceType is not allowed to be null");
@@ -38,19 +41,20 @@ public class BasicSequence implements Sequence {
         if (taxon == null) {
             throw new IllegalArgumentException("taxon is not allowed to be null");
         }
+
         this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequence = new byte[sequenceString.length()];
-        int k = 0;
-        for (int i = 0; i < sequenceString.length(); i++) {
-            State state = sequenceType.getState(sequenceString.substring(i, i + 1));
+        final int len = sequenceString.length();
+        this.sequence = new byte[len];
+
+        for (int i = 0; i < len; i++) {
+            State state = sequenceType.getState(sequenceString.charAt(i));
 
             if (state == null) {
                 // Something is wrong. Keep original length by inserting an unknown state
                 state = sequenceType.getUnknownState();
             }
-            sequence[k] = (byte)state.getIndex();
-            k++;
+            sequence[i] = (byte)state.getIndex();
         }
     }
 
@@ -82,7 +86,7 @@ public class BasicSequence implements Sequence {
      * @return a string representing the sequence of symbols.
      */
     public String getString() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(sequence.length);
         for (int i : sequence) {
             buffer.append(sequenceType.getState(i).getCode());
         }
@@ -90,7 +94,7 @@ public class BasicSequence implements Sequence {
     }
 
     public String getCleanString() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(sequence.length);
         for (int i : sequence) {
             State state = sequenceType.getState(i);
             if (state.isAmbiguous() || state.isGap()) continue;
@@ -187,5 +191,5 @@ public class BasicSequence implements Sequence {
     private final SequenceType sequenceType;
     private final byte[] sequence;
 
-    private Map<String, Object> attributeMap = null;
+   // private Map<String, Object> attributeMap = null;
 }

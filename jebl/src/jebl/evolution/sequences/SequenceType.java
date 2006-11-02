@@ -56,6 +56,8 @@ public interface SequenceType {
      */
     State getState(String code);
 
+    State getState(char code);
+
     /**
      * @return the length, in characters, of a state, when encoded as a string.
      *         i.e. 1 for Nucleotides and AminoAcids and 3 for Codons.
@@ -143,6 +145,10 @@ public interface SequenceType {
             return Nucleotides.getState(code);
         }
 
+        public State getState(char code) {
+            return Nucleotides.getState(code);
+        }
+
         public int getCodeLength() {
             return 1;
         }
@@ -202,6 +208,10 @@ public interface SequenceType {
         }
 
         public State getState(String code) {
+            return AminoAcids.getState(code);
+        }
+
+        public State getState(char code) {
             return AminoAcids.getState(code);
         }
 
@@ -265,6 +275,11 @@ public interface SequenceType {
 
         public State getState(String code) {
             return Codons.getState(code);
+        }
+
+        public State getState(char code) {
+            // if anybody searches for a string of length one he should get a null from getState(String) anyway
+            return null;
         }
 
         public int getCodeLength() {

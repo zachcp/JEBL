@@ -177,16 +177,20 @@ public class Utils {
      * @param seq the sequence
      * @return type of sequence, null if sequence contains illegal characters.
      */
-    public static SequenceType guessSequenceType(final String seq) {
+    public static SequenceType guessSequenceType(final CharSequence seq) {
 
         int canonicalNucStates = 0;
         int undeterminedStates = 0;
         // true length, excluding any gaps
         int sequenceLength = seq.length();
+        final int seqLen = sequenceLength;
 
         final int canonicalStateCount = Nucleotides.getCanonicalStateCount();
 
-        for( char c : seq.toCharArray() ) {
+        // do not use toCharArray: it allocates an array size of sequence
+        for(int k = 0; k < seqLen; ++k) {
+            final char c = seq.charAt(k);
+
             final NucleotideState nucState = Nucleotides.getState(c);
             final boolean isNucState = nucState != null;
             final boolean isAminoState = AminoAcids.getState(c) != null;

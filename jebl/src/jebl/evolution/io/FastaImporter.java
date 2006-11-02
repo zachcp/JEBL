@@ -102,8 +102,17 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 
                 final String description = tokenizer.hasMoreElements() ?
                         ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
-                final StringBuffer seq = new StringBuffer();
+                final StringBuilder seq = new StringBuilder();
+
+//                Runtime s_runtime = Runtime.getRuntime();
+//                s_runtime.gc();
+//                System.out.println("before read " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+
                 helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
+
+//                s_runtime.gc();
+//                System.out.println("after readSeeuqnece " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+
                 importAborted = progressListener.setProgress(helper.getProgress());
                 if(importAborted) break;
 
@@ -112,17 +121,29 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                     taxon.setAttribute(descriptionPropertyName, description);
                 }
 
-                final String sequenceString = seq.toString();
-                SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(sequenceString);
+                // fixed guessSequenceType so it does not allocate anything
+                final SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(seq);
 
                 if( type == null ) {
                     throw new ImportException("Sequence contains illegal characters (near line " + helper.getLineNumber() + ")");
                 }
-                BasicSequence sequence = new BasicSequence(type, taxon, sequenceString);
+                // now we need more again
+                BasicSequence sequence = new BasicSequence(type, taxon, seq);
+
+//                s_runtime.gc();
+//                System.out.println("after create jebl sequence " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+
+                // get rid of memeory used by the builder
+                seq.setLength(0); seq.trimToSize(); System.gc();
+
+//                s_runtime.gc();
+//                System.out.println("after reduceing of builder " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+
                 if (description != null && description.length() > 0) {
                     sequence.setAttribute(descriptionPropertyName, description);
                 }
                 if( callback != null ) {
+                    // this may use more memeory by getting the string from the jebl seq yet again
                     callback.add(sequence);
                 } else {
                     sequences.add(sequence);
@@ -136,6 +157,11 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
         } catch (NoSuchElementException e) {
             throw new ImportException("Incorrectly formatted fasta file (near line " + helper.getLineNumber() + ")");
         }
+
+//        Runtime s_runtime = Runtime.getRuntime();
+//        s_runtime.gc();
+//        System.out.println("at end " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+
         if (closeReaderAtEnd) {
             reader.close();
         }

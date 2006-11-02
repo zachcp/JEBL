@@ -203,7 +203,7 @@ public class ImportHelper {
         return line.toString();
     }
 
-    public void readSequence(StringBuffer sequence, SequenceType sequenceType,
+    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
@@ -224,7 +224,7 @@ public class ImportHelper {
         * @param maxSites maximum number of sites to read
         * @param progress optional ProgressListener. May be null if not interested in progress
         */
-    public void readSequence(StringBuffer sequence, SequenceType sequenceType,
+    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence,
@@ -232,8 +232,10 @@ public class ImportHelper {
 
         char ch = read();
 
-        final String gapCode = sequenceType.getGapState().getCode();
-        final String unknownCode = sequenceType.getUnknownState().getCode();
+        final char gapCode = sequenceType.getGapState().getCode().charAt(0);
+        final char unknownCode = sequenceType.getUnknownState().getCode().charAt(0);
+
+        ByteBuilder bb = new ByteBuilder((int)expectedInputLength);
 
         try {
             int n = 0;
@@ -249,9 +251,9 @@ public class ImportHelper {
                 if (!Character.isWhitespace(ch)) {
 
                     if (gapCharacters.indexOf(ch) != -1) {
-                        sequence.append(gapCode);
+                        bb.append(gapCode);
                     } else if (missingCharacters.indexOf(ch) != -1) {
-                        sequence.append(unknownCode);
+                        bb.append(unknownCode);
                     } else if (matchCharacters.indexOf(ch) != -1) {
                         if (matchSequence == null) {
                             throw new ImportException("Match character in first sequences");
@@ -260,9 +262,11 @@ public class ImportHelper {
                             throw new ImportException("Match sequences too short");
                         }
 
-                        sequence.append(matchSequence.charAt(n));
+                        bb.append(matchSequence.charAt(n));
+                        //sequence.append(matchSequence.charAt(n));
                     } else {
-                        sequence.append(ch);
+                        //sequence.append(ch);
+                        bb.append(ch);
                     }
                     n++;
                 }
@@ -282,6 +286,9 @@ public class ImportHelper {
         } catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
         }
+
+        sequence.ensureCapacity(bb.length());
+        sequence.append(bb);
     }
 
     /**

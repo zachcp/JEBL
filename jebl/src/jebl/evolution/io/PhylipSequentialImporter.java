@@ -59,7 +59,7 @@ public class PhylipSequentialImporter implements SequenceImporter {
                     n++;
                 }
 
-                StringBuffer seq = new StringBuffer(siteCount);
+                StringBuilder seq = new StringBuilder(siteCount);
                 helper.readSequence(seq, sequenceType, "", siteCount, "-", "?", ".", firstSeq);
 
                 if (firstSeq == null) {

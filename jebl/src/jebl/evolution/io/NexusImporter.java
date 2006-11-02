@@ -688,7 +688,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					throw new ImportException.UnknownTaxonException(token);
 				}
 
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder() ;
 				helper.readSequence(buffer, sequenceType, ";", siteCount, gapCharacters,
 						missingCharacters, matchCharacters, firstSequence);
 				String seqString = buffer.toString();
