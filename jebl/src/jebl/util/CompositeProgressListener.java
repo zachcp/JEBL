@@ -2,9 +2,6 @@ package jebl.util;
 
 import java.io.File;
 import java.util.List;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Tobias Thierer
@@ -20,11 +17,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *          <p/>
  *          As the combined progress listener cannot know which subtask it is currently being called from,
  *          you have to explicitely let it know when a new subtask (not the first) starts, by calling
- *          startNextOperation(). Thus when the constructor is passed an array of N doubles as its second
- *          argument, startNextOperation() should be called precisely N-1 times.
+ *          {@link #beginNextSubtask()}. Thus when the constructor is passed an array of N doubles as its second
+ *          argument, {@link #beginNextSubtask()} should be called precisely N-1 times.
  *          <p/>
- *          Alternatively, instead of calling startNextOperation() after each subtask (except the last),
- *          you can instead call beganSubtask() before each subtask (including the first)
+ *          Alternatively, instead of calling {@link #beginNextSubtask()}after each subtask (except the last),
+ *          you can instead call {@link #beginSubtask()} before each subtask (including the first)
  */
 public final class CompositeProgressListener extends ProgressListener {
     protected int numOperations;
@@ -71,29 +68,29 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     /**
-     * Used as an alternative to {@link #startNextOperation()}.
-     * Instead of calling {@link #startNextOperation()} once after each subtask
+     * Used as an alternative to {@link #beginNextSubtask()}.
+     * Instead of calling {@link #beginNextSubtask()} once after each subtask
      * (except the last), you can instead call beginSubTask at the beginning
      * of every subtask including the first.
      */
-    public void beginSubTask() {
+    public void beginSubtask() {
         if (!beganFirstSubTask) {
             beganFirstSubTask = true;
         } else {
-            startNextOperation();
+            beginNextSubtask();
         }
     }
 
     /**
-     * Used as an alternative to {@link #startNextOperation()}.
-     * Instead of calling {@link #startNextOperation()} once after each subtask
+     * Used as an alternative to {@link #beginNextSubtask()}.
+     * Instead of calling {@link #beginNextSubtask()} once after each subtask
      * (except the last), you can instead call beginSubTask at the beginning
      * of every subtask including the first.
      * @param message a message to be displayed to the user as part of the progress
      */
-    public void beginSubTask(String message) {
+    public void beginSubtask(String message) {
         setMessage(message);
-        beginSubTask();
+        beginSubtask();
     }
 
 
@@ -126,7 +123,11 @@ public final class CompositeProgressListener extends ProgressListener {
         return setProgress(1.0);
     }
 
-    public boolean hasNextOperation() {
+    /**
+     *
+     * @return true if there is another subtask available after the current one
+     */
+    public boolean hasNextSubtask() {
         return (currentOperationNum < (numOperations - 1));
     }
 
@@ -144,14 +145,19 @@ public final class CompositeProgressListener extends ProgressListener {
      * Convenience method to start the next operation AND set a new message.
      * @param message message to set (will be passed to setMessage()
      */
-    public void startNextOperation(String message) {
-        startNextOperation();
+    public void beginNextSubtask(String message) {
+        beginNextSubtask();
         setMessage(message);
     }
 
-    public void startNextOperation() {
+    /**
+     * begins the next subtask. Should not be called on the first subtask, but should only be called
+     * to start tasks after the first one. If you wish to call a begin subtask method
+     * for each task including the first, use {@link #beginSubtask()} instead.
+     */
+    public void beginNextSubtask() {
         setComplete();
-        if (!hasNextOperation()) {
+        if (!hasNextSubtask()) {
             throw new IllegalStateException(currentOperationNum + " " + numOperations);
         }
         baseTime += time[currentOperationNum];
@@ -159,34 +165,34 @@ public final class CompositeProgressListener extends ProgressListener {
         currentOperationProgress = 0.0;
     }
 
-    public Iterator<ProgressListener> iterator() {
-        final AtomicBoolean isFirst = new AtomicBoolean(true);
-        return new Iterator<ProgressListener>() {
-            public boolean hasNext() {
-                return hasNextOperation();
-            }
-
-            public ProgressListener next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                if (isFirst.get()) {
-                    isFirst.set(false);
-                } else {
-                    startNextOperation();
-                }
-                return CompositeProgressListener.this;
-            }
-
-            /**
-             * Currently not implemented, but may be implemented in the future.
-             *
-             * @throws UnsupportedOperationException
-             */
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
+//    public Iterator<ProgressListener> iterator() {
+//        final AtomicBoolean isFirst = new AtomicBoolean(true);
+//        return new Iterator<ProgressListener>() {
+//            public boolean hasNext() {
+//                return hasNextOperation();
+//            }
+//
+//            public ProgressListener next() {
+//                if (!hasNext()) {
+//                    throw new NoSuchElementException();
+//                }
+//                if (isFirst.get()) {
+//                    isFirst.set(false);
+//                } else {
+//                    startNextOperation();
+//                }
+//                return CompositeProgressListener.this;
+//            }
+//
+//            /**
+//             * Currently not implemented, but may be implemented in the future.
+//             *
+//             * @throws UnsupportedOperationException
+//             */
+//            public void remove() {
+//                throw new UnsupportedOperationException();
+//            }
+//        };
+//    }
 
 }
