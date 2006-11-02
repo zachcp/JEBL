@@ -50,5 +50,13 @@ public class CompoundAlignmentProgressListener  {
             if (progress.setMessage(message)) cancelled = true;
             return cancelled;
         }
+
+        public boolean isCancelled() {
+            return cancelled;
+        }
+
+        public boolean setIndefiniteProgress() {
+            return cancelled;
+        }
     };
 }

@@ -2,6 +2,9 @@ package jebl.util;
 
 import java.io.File;
 import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Tobias Thierer
@@ -23,7 +26,7 @@ import java.util.List;
  *          Alternatively, instead of calling startNextOperation() after each subtask (except the last),
  *          you can instead call beganSubtask() before each subtask (including the first)
  */
-public final class CompositeProgressListener implements ProgressListener {
+public final class CompositeProgressListener extends ProgressListener {
     protected int numOperations;
     protected ProgressListener listener;
     protected int currentOperationNum = 0;
@@ -39,7 +42,7 @@ public final class CompositeProgressListener implements ProgressListener {
             throw new IllegalArgumentException();
         }
         if (listener == null) {
-            this.listener = new ProgressListener.EmptyProgressListener();
+            this.listener = ProgressListener.EMPTY_PROGRESS_LISTENER;
         } else {
             this.listener = listener;
         }
@@ -94,8 +97,12 @@ public final class CompositeProgressListener implements ProgressListener {
     }
 
 
-    public boolean isAborted() {
+    public boolean isCancelled() {
         return setProgress(currentOperationProgress);
+    }
+
+    public boolean setIndefiniteProgress() {
+        return isCancelled();
     }
 
     public boolean setMessage(String message) {
@@ -151,4 +158,35 @@ public final class CompositeProgressListener implements ProgressListener {
         currentOperationNum++;
         currentOperationProgress = 0.0;
     }
+
+    public Iterator<ProgressListener> iterator() {
+        final AtomicBoolean isFirst = new AtomicBoolean(true);
+        return new Iterator<ProgressListener>() {
+            public boolean hasNext() {
+                return hasNextOperation();
+            }
+
+            public ProgressListener next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                if (isFirst.get()) {
+                    isFirst.set(false);
+                } else {
+                    startNextOperation();
+                }
+                return CompositeProgressListener.this;
+            }
+
+            /**
+             * Currently not implemented, but may be implemented in the future.
+             *
+             * @throws UnsupportedOperationException
+             */
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
 }
