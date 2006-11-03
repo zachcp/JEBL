@@ -207,23 +207,23 @@ public class ImportHelper {
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
-        readSequence(sequence, sequenceType, delimiters, maxSites,gapCharacters, missingCharacters,
+        readSequence(sequence, sequenceType, delimiters, maxSites, gapCharacters, missingCharacters,
                 matchCharacters, matchSequence, null);
     }
 
     /**
-        *
-        * Reads sequence, skipping over any comments and filtering using sequenceType.
-        * @param sequence a StringBuffer into which the sequence is put
-        * @param sequenceType the sequenceType of the sequence
-        * @param delimiters list of characters that will stop the reading
-        * @param gapCharacters list of characters that will be read as gaps
-        * @param missingCharacters list of characters that will be read as missing
-        * @param matchCharacters list of characters that will be read as matching the matchSequence
-        * @param matchSequence the sequence string to match match characters to
-        * @param maxSites maximum number of sites to read
-        * @param progress optional ProgressListener. May be null if not interested in progress
-        */
+     *
+     * Reads sequence, skipping over any comments and filtering using sequenceType.
+     * @param sequence a StringBuffer into which the sequence is put
+     * @param sequenceType the sequenceType of the sequence
+     * @param delimiters list of characters that will stop the reading
+     * @param gapCharacters list of characters that will be read as gaps
+     * @param missingCharacters list of characters that will be read as missing
+     * @param matchCharacters list of characters that will be read as matching the matchSequence
+     * @param matchSequence the sequence string to match match characters to
+     * @param maxSites maximum number of sites to read
+     * @param progress optional ProgressListener. May be null if not interested in progress
+     */
     public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
@@ -238,10 +238,10 @@ public class ImportHelper {
         ByteBuilder bb = new ByteBuilder((int)expectedInputLength);
 
         try {
-            int n = 0;
+            int nSites = 0;
 
-            while (n < maxSites && delimiters.indexOf(ch) == -1) {
-                if(progress!= null && n%1000==0 && progress.setProgress(getProgress())) return;
+            while (nSites < maxSites && delimiters.indexOf(ch) == -1) {
+                if(progress!= null && (nSites%1024) == 0 && progress.setProgress(getProgress())) return;
 
                 if (hasComments && (ch == startComment || ch == lineComment)) {
                     skipComments(ch);
@@ -252,23 +252,25 @@ public class ImportHelper {
 
                     if (gapCharacters.indexOf(ch) != -1) {
                         bb.append(gapCode);
+                        //sequence.append(gapCode);
                     } else if (missingCharacters.indexOf(ch) != -1) {
                         bb.append(unknownCode);
+                        //sequence.append(unknownCode);
                     } else if (matchCharacters.indexOf(ch) != -1) {
                         if (matchSequence == null) {
                             throw new ImportException("Match character in first sequences");
                         }
-                        if (n >= matchSequence.length()) {
+                        if (nSites >= matchSequence.length()) {
                             throw new ImportException("Match sequences too short");
                         }
 
-                        bb.append(matchSequence.charAt(n));
+                        bb.append(matchSequence.charAt(nSites));
                         //sequence.append(matchSequence.charAt(n));
                     } else {
                         //sequence.append(ch);
                         bb.append(ch);
                     }
-                    n++;
+                    nSites++;
                 }
 
                 ch = read();

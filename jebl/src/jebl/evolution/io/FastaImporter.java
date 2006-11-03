@@ -134,7 +134,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 //                System.out.println("after create jebl sequence " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
                 // get rid of memeory used by the builder
-                seq.setLength(0); seq.trimToSize(); System.gc();
+                seq.setLength(0); seq.trimToSize(); // System.gc();
 
 //                s_runtime.gc();
 //                System.out.println("after reduceing of builder " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
