@@ -241,6 +241,15 @@ public final class Utils {
         return dist;
     }
 
+    /**
+     * Return a rooted tree from any tree.
+     *
+     * If tree already rooted, return it. Otherwise if there is a "natuarl root" (i.e. a node of
+     * degree 2) use it as root. Otherwise use an internal node close to the center of the tree as a root.
+     *
+     * @param tree  to root
+     * @return  rooted representation
+     */
     public static RootedTree rootTheTree(Tree tree) {
         // If already rooted, do nothing
         if (tree instanceof RootedTree) {
@@ -254,26 +263,35 @@ public final class Utils {
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
-        if (Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2) {
-            return rtree;
-        }
+        assert Graph.Utils.getDegree(rtree, rtree.getRootNode()) == 2;
+        //if (Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2) {
+        //    return rtree;
+        //}
 
         // Root at central internal node. The root of the tree has at least 3 children.
         // WARNING: using the implementation fact that childern of RootedFromUnrooted are in fact nodes from tree.
-        return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
+
+        for( Node n : rtree.getChildren(rtree.getRootNode()) ) {
+           if( ! rtree.isExternal(n) ) {
+               return new RootedFromUnrooted(tree, n, true);
+           }
+        }
+
+        return null; //never reached
+        //return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
     }
 
     private static String nodeName(Tree tree, Node n) {
         if( tree.isExternal(n) ) {
             return tree.getTaxon(n).getName();
         }
-        String s = n.toString();
+        final String s = n.toString();
         return s.substring(s.lastIndexOf('@'));
     }
 
     private static void showTree(Tree tree) {
        for (Node e : tree.getNodes())  {
-           String name = nodeName(tree, e);
+           final String name = nodeName(tree, e);
            System.out.print(name + ":");
            for( Node n : tree.getAdjacencies(e) ) {
                try {
@@ -289,7 +307,7 @@ public final class Utils {
     public static RootedTree rootTreeAtCenter(Tree tree) {
         HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
         try {
-           // showTree(tree);
+            // showTree(tree);
 
             double maxDistance =  -Double.MAX_VALUE;
             // node on maximal path
