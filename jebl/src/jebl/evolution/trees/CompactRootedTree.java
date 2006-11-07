@@ -397,7 +397,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     public Node getNode(Taxon taxon) {
         int i = Arrays.asList(taxa).indexOf(taxon);
         for(int k = 0; k < nodes.length; ++k) {
-            if( noSons[k] == (0x8000 | i) ) {
+            if( noSons[k] == (short)(0x8000 | i) ) {
                 return nodes[k];
             }
         }
