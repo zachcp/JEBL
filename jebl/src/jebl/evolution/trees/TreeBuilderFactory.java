@@ -104,7 +104,8 @@ public class TreeBuilderFactory {
      * convenience method. Convert arrays of trees, guaranteed to be rooted to the array of the appropriate
      * type.
      * @param trees trees - all must be rooted
-     * @param supportThreshold
+     * @param supportThreshold minimum required consensus support
+     * @param method which consensus method to use
      * @return consensus tree builder
      */
     static public ConsensusTreeBuilder buildRooted(Tree[] trees, double supportThreshold, ConsensusMethod method) {

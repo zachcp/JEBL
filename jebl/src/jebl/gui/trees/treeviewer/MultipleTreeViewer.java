@@ -84,7 +84,7 @@ public class MultipleTreeViewer extends TreeViewer {
                     final List<String> names = new ArrayList<String>();
                     for( Tree t : trees ) {
                         Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
-                        if( name == null ) {
+                        if( name == null || names.contains(name.toString())) {
                             name = trees.indexOf(t);
                         }
                         names.add(name.toString());
