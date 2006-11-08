@@ -94,12 +94,12 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
 
-    public boolean isCancelled() {
+    public boolean isCanceled() {
         return setProgress(currentOperationProgress);
     }
 
-    public boolean setIndefiniteProgress() {
-        return isCancelled();
+    public boolean setIndeterminateProgress() {
+        return isCanceled();
     }
 
     public boolean setMessage(String message) {

@@ -17,20 +17,21 @@ public abstract class ProgressListener {
     /**
      * Set visible user message.
      * @param message
-     * @return true if the user has requested that this operation be cancelled.
+     * @return true if the user has requested that this operation be canceled.
      */
     public abstract boolean setMessage(String message);
 
     /**
-     * @return true if the user has requested that this operation be cancelled.
+     * @return true if the user has requested that this operation be canceled.
      */
-    public abstract boolean isCancelled ();
+    public abstract boolean isCanceled();
 
     /**
-     * Sets as an indefinite progress listener.
-     * @return true if the user has requested that this operation be cancelled.
+     * Sets indefinite progress (i.e. "some progress has happened, but I don't
+     * know how close we are to finishing").
+     * @return true if the user has requested that this operation be canceled.
      */
-    public abstract boolean setIndefiniteProgress();
+    public abstract boolean setIndeterminateProgress();
 
     /**
      * a useful class to use when you don't care about the progress results or cancelling the operation.
@@ -47,11 +48,11 @@ public abstract class ProgressListener {
             return false;
         }
 
-        public boolean isCancelled() {
+        public boolean isCanceled() {
             return false;
         }
 
-        public boolean setIndefiniteProgress() {
+        public boolean setIndeterminateProgress() {
             return false;
         }
     }

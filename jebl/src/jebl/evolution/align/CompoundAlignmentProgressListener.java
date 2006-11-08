@@ -51,11 +51,11 @@ public class CompoundAlignmentProgressListener  {
             return cancelled;
         }
 
-        public boolean isCancelled() {
+        public boolean isCanceled() {
             return cancelled;
         }
 
-        public boolean setIndefiniteProgress() {
+        public boolean setIndeterminateProgress() {
             return cancelled;
         }
     };
