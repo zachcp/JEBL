@@ -6,7 +6,7 @@ import jebl.util.ProgressListener;
  * @author Matt Kearse
  * @version $Id$
  */
-public class CompoundAlignmentProgressListener  {
+class CompoundAlignmentProgressListener  {
     private boolean cancelled = false;
     private int sectionsCompleted = 0;
     private int totalSections;
