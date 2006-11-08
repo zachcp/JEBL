@@ -29,7 +29,6 @@ public final class CompositeProgressListener extends ProgressListener {
     protected int currentOperationNum = 0;
     protected double[] time;
     protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
-    protected boolean aborted = false;
     protected double currentOperationProgress = 0.0;
     private boolean beganFirstSubTask=false;
 
@@ -95,7 +94,7 @@ public final class CompositeProgressListener extends ProgressListener {
 
 
     public boolean isCanceled() {
-        return setProgress(currentOperationProgress);
+        return listener.isCanceled();
     }
 
     public boolean setIndeterminateProgress() {
@@ -103,9 +102,7 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     public boolean setMessage(String message) {
-        boolean result = listener.setMessage(message);
-        if (result) aborted=true;
-        return result;
+        return listener.setMessage(message);
     }
 
     public boolean addProgress(double fractionCompletedDiff) {
@@ -114,9 +111,7 @@ public final class CompositeProgressListener extends ProgressListener {
 
     public boolean setProgress(double fractionCompleted) {
         currentOperationProgress = fractionCompleted;
-        boolean result = listener.setProgress(baseTime + fractionCompleted * time[currentOperationNum]);
-        if (result) aborted=true;
-        return result;
+        return listener.setProgress(baseTime + fractionCompleted * time[currentOperationNum]);
     }
 
     public boolean setComplete() {
@@ -124,7 +119,6 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     /**
-     *
      * @return true if there is another subtask available after the current one
      */
     public boolean hasNextSubtask() {
@@ -132,7 +126,8 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     /**
-     * clear all progress, including that of previous operations
+     * Clear all progress, including that of previous subtasks.
+     * Note: if the task has already been canceled, this does not reset its status to non-canceled.
      */
     public void clearAllProgress () {
         currentOperationNum = 0;

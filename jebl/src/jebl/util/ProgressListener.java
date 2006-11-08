@@ -4,6 +4,20 @@ package jebl.util;
  * @author Matt Kearse
  *
  * @version $Id$
+ *
+ * ProgressListener guarantees the following contract:
+ *
+ *   A call to any of the methods setProgress(), setMessage(), isCanceled() and
+ *   setIndeterminateProgress() at a given time yields the same result as a call
+ *   to another of these methods would have resulted at the same time.
+ *
+ *   Once the task whose progress we are observing has been canceled, calls
+ *   to either of these methods reflect this. This does not prevent subclasses
+ *   from introducing a way to "reset" a ProgressListener that was previously
+ *   canceled from not being canceled any more.
+ *
+ * Any object may exhibit undefined behaviour when dealing with a ProgressListener 
+ * that is not fulfilling this contract.
  */
 public abstract class ProgressListener {
     /**
