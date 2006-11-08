@@ -18,8 +18,6 @@ import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.evolution.trees.Utils;
 import jebl.util.ProgressListener;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
@@ -99,15 +97,15 @@ public class BartonSternberg implements MultipleAligner {
 
         List<Node> children = tree.getChildren(node);                            assert( children.size() == 2 );
         final Profile left = align(tree, children.get(0), seqs, compoundProgress);
-        if( compoundProgress.isCancelled() ) return null;
+        if( compoundProgress.isCanceled() ) return null;
 
         final Profile right = align(tree, children.get(1), seqs, compoundProgress);
-        if( compoundProgress.isCancelled() ) return null;
+        if( compoundProgress.isCanceled() ) return null;
 
         compoundProgress.setSectionSize(1);
         AlignmentResult results[] = aligner.doAlignment(left, right, compoundProgress.getMinorProgress(), false);
         compoundProgress.incrementSectionsCompleted(1);
-        if(compoundProgress.isCancelled()) return null;
+        if(compoundProgress.isCanceled()) return null;
         return Profile.combine(left, right, results[0], results[1]);
     }
 
@@ -170,7 +168,7 @@ public class BartonSternberg implements MultipleAligner {
                                     this, compoundProgress.getMinorProgress()) :
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     aligner, compoundProgress.getMinorProgress());
-            if (compoundProgress.isCancelled()) return null;
+            if (compoundProgress.isCanceled()) return null;
             //long duration = System.currentTimeMillis() - start;
             //System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
 
@@ -198,7 +196,7 @@ public class BartonSternberg implements MultipleAligner {
             }
             progress.setMessage("Building alignment");
             profile = align(guideTree, guideTree.getRootNode(), sequencesForGuideTree, compoundProgress);
-            if (compoundProgress.isCancelled()) return null;
+            if (compoundProgress.isCanceled()) return null;
         }
 
         //now remove a single sequence, and we
@@ -227,7 +225,7 @@ public class BartonSternberg implements MultipleAligner {
 
                 AlignmentResult results[] = aligner.doAlignment(profile, sequenceProfilesWithoutGaps[i], compoundProgress.getMinorProgress(), false);
 //                aligner.setDebug(false);
-                if (compoundProgress.isCancelled()) return null;
+                if (compoundProgress.isCanceled()) return null;
                 compoundProgress.incrementSectionsCompleted(1);
                 if(display){
                     profile.print(false);
@@ -288,7 +286,7 @@ public class BartonSternberg implements MultipleAligner {
         final CompoundAlignmentProgressListener p = new CompoundAlignmentProgressListener(progress, count - 1);
 
         Profile profile = align(guideTree, guideTree.getRootNode(), seqs, p);
-        if (p.isCancelled()) {
+        if (p.isCanceled()) {
             return null;
         }
 

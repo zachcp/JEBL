@@ -10,7 +10,7 @@ class CompoundAlignmentProgressListener  {
     private boolean cancelled = false;
     private int sectionsCompleted = 0;
     private int totalSections;
-    private ProgressListener progress;
+    private final ProgressListener progress;
     private int sectionSize= 1;
 
     public CompoundAlignmentProgressListener(ProgressListener progress, int totalSections) {
@@ -26,7 +26,7 @@ class CompoundAlignmentProgressListener  {
         sectionsCompleted += count;
     }
 
-    public boolean isCancelled() {
+    public boolean isCanceled() {
         return cancelled;
     }
 
@@ -34,29 +34,24 @@ class CompoundAlignmentProgressListener  {
         return minorProgress;
     }
 
-    ProgressListener minorProgress = new ProgressListener() {
-
-        public boolean setProgress(double fractionCompleted) {
+    private ProgressListener minorProgress = new ProgressListener() {
+        protected void _setProgress(double fractionCompleted) {
 //            System.out.println("progress =" + fractionCompleted+ " sections =" + sectionsCompleted+ "/" + totalSections);
             double totalProgress = (sectionsCompleted + fractionCompleted*sectionSize) / totalSections;
-            if( totalProgress > 1.0 ) {
-                System.out.println(totalProgress);
-            }
-            if (progress.setProgress(totalProgress)) cancelled = true;
-            return cancelled;
+            // if( totalProgress > 1.0 )  System.out.println(totalProgress);
+            progress.setProgress(totalProgress);
         }
 
-        public boolean setMessage(String message) {
-            if (progress.setMessage(message)) cancelled = true;
-            return cancelled;
+        protected void _setIndeterminateProgress() {
+            progress.setIndeterminateProgress();
+        }
+
+        protected void _setMessage(String message) {
+            progress.setMessage(message);
         }
 
         public boolean isCanceled() {
-            return cancelled;
-        }
-
-        public boolean setIndeterminateProgress() {
-            return cancelled;
+            return progress.isCanceled();
         }
     };
 }

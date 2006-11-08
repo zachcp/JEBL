@@ -117,7 +117,7 @@ public class AlignmentTreeBuilderFactory {
         progress.setMessage("Building alignment for guide");
         p.setSectionSize(alignWork);
         final Alignment alignment = aligner.doAlign(seqs, gtree, minorProgress);
-        if (p.isCancelled()) {
+        if (p.isCanceled()) {
             return null;
         }
         p.incrementSectionsCompleted(alignWork);

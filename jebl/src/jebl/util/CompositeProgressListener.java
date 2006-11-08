@@ -38,7 +38,7 @@ public final class CompositeProgressListener extends ProgressListener {
             throw new IllegalArgumentException();
         }
         if (listener == null) {
-            this.listener = ProgressListener.EMPTY_PROGRESS_LISTENER;
+            this.listener = ProgressListener.EMPTY;
         } else {
             this.listener = listener;
         }
@@ -92,26 +92,25 @@ public final class CompositeProgressListener extends ProgressListener {
         beginSubtask();
     }
 
+    protected void _setProgress(double fractionCompleted) {
+        currentOperationProgress = fractionCompleted;
+        listener._setProgress(baseTime + fractionCompleted * time[currentOperationNum]);
+    }
+
+    protected void _setIndeterminateProgress() {
+        listener._setIndeterminateProgress();
+    }
+
+    protected void _setMessage(String message) {
+        listener._setMessage(message);
+    }
 
     public boolean isCanceled() {
         return listener.isCanceled();
     }
 
-    public boolean setIndeterminateProgress() {
-        return isCanceled();
-    }
-
-    public boolean setMessage(String message) {
-        return listener.setMessage(message);
-    }
-
     public boolean addProgress(double fractionCompletedDiff) {
         return setProgress(currentOperationProgress + fractionCompletedDiff);
-    }
-
-    public boolean setProgress(double fractionCompleted) {
-        currentOperationProgress = fractionCompleted;
-        return listener.setProgress(baseTime + fractionCompleted * time[currentOperationNum]);
     }
 
     public boolean setComplete() {
