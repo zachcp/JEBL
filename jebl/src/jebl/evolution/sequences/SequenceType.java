@@ -188,6 +188,10 @@ public interface SequenceType {
         public State[] toStateArray(byte[] indexArray) {
             return Nucleotides.toStateArray(indexArray);
         }
+
+        public String toString() {
+            return getName();
+        }
     };
 
     public static final SequenceType AMINO_ACID = new SequenceType() {
@@ -253,6 +257,10 @@ public interface SequenceType {
 
         public State[] toStateArray(byte[] indexArray) {
             return AminoAcids.toStateArray(indexArray);
+        }
+
+        public String toString() {
+            return getName();
         }
     };
 
@@ -320,6 +328,10 @@ public interface SequenceType {
 
         public State[] toStateArray(byte[] indexArray) {
             return Codons.toStateArray(indexArray);
+        }
+
+        public String toString() {
+            return getName();
         }
     };
 
