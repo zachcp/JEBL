@@ -187,42 +187,50 @@ public class Utils {
 
         final int canonicalStateCount = Nucleotides.getCanonicalStateCount();
 
+        boolean onlyValidNucleotides = true;
+        boolean onlyValidAminoAcids = true;
+
         // do not use toCharArray: it allocates an array size of sequence
-        for(int k = 0; k < seqLen; ++k) {
+        for(int k = 0; (k < seqLen) && (onlyValidNucleotides || onlyValidAminoAcids); ++k) {
             final char c = seq.charAt(k);
 
             final NucleotideState nucState = Nucleotides.getState(c);
             final boolean isNucState = nucState != null;
             final boolean isAminoState = AminoAcids.getState(c) != null;
 
-            if( ! (isNucState || isAminoState) ) {
-                return null;
-            }
+            onlyValidNucleotides &= isNucState;
+            onlyValidAminoAcids &= isAminoState;
 
-            if( !isNucState ) {
-                // must be amino
-                return SequenceType.AMINO_ACID;
-            }
-
-            if (nucState.getIndex() < canonicalStateCount) {
-                ++canonicalNucStates;
-            } else {
-                if (nucState == Nucleotides.GAP_STATE) {
-                  --sequenceLength;
-                } else if( nucState == Nucleotides.N_STATE ) {
-                    ++undeterminedStates;
+            if (onlyValidNucleotides) {
+                assert(isNucState);
+                if (nucState.getIndex() < canonicalStateCount) {
+                    ++canonicalNucStates;
+                } else {
+                    if (nucState == Nucleotides.GAP_STATE) {
+                        --sequenceLength;
+                    } else if( nucState == Nucleotides.N_STATE ) {
+                        ++undeterminedStates;
+                    }
                 }
             }
         }
 
-        // All sites are nucleotides (actual or ambigoues). If longer than 100 sites, declare it a nuc
-        if( sequenceLength >= 100 ) return SequenceType.NUCLEOTIDE;
-
-        // if short, ask for 70% of ACGT or N
-
-        final double threshold = 0.7;
-
-        final int nucStates = canonicalNucStates + undeterminedStates;
-        return nucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
+        SequenceType result;
+        if (onlyValidNucleotides) {  // only nucleotide states
+            // All sites are nucleotides (actual or ambigoues). If longer than 100 sites, declare it a nuc
+            if( sequenceLength >= 100 ) {
+                result = SequenceType.NUCLEOTIDE;
+            } else {
+                // if short, ask for 70% of ACGT or N
+                final double threshold = 0.7;
+                final int nucStates = canonicalNucStates + undeterminedStates;
+                result = nucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
+            }
+        } else if (onlyValidAminoAcids) {
+            result = SequenceType.AMINO_ACID;
+        } else {
+            result = null;
+        }
+        return result;
     }
 }
