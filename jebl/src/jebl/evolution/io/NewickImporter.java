@@ -23,6 +23,8 @@ public class NewickImporter implements TreeImporter {
 
     /**
      * Constructor
+     * @param reader  tree text
+     * @param unquotedLabels if true, try to read unqouted lables containing spaces
      */
     public NewickImporter(Reader reader, boolean unquotedLabels) {
         helper = new ImportHelper(reader);

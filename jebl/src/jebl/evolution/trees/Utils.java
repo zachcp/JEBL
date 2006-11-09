@@ -271,13 +271,21 @@ public final class Utils {
         // Root at central internal node. The root of the tree has at least 3 children.
         // WARNING: using the implementation fact that childern of RootedFromUnrooted are in fact nodes from tree.
 
+        Node root = null;
+        double minLength = 100;
         for( Node n : rtree.getChildren(rtree.getRootNode()) ) {
-           if( ! rtree.isExternal(n) ) {
-               return new RootedFromUnrooted(tree, n, true);
-           }
+            if( ! rtree.isExternal(n) ) {
+                final double length = rtree.getLength(n);
+                if( root == null || length < minLength ) {
+                    minLength = length;
+                    root = n;
+                }
+
+            }
         }
 
-        return null; //never reached
+        return new RootedFromUnrooted(tree, root, true);
+        //return null; //never reached
         //return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
     }
 
