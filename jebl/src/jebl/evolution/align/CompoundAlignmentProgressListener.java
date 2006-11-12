@@ -27,7 +27,8 @@ class CompoundAlignmentProgressListener  {
     }
 
     public boolean isCanceled() {
-        return cancelled;
+//        return cancelled;
+        return progress.isCanceled();
     }
 
     public ProgressListener getMinorProgress() {
