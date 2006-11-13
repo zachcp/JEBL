@@ -26,12 +26,12 @@ import java.util.List;
  * @version $Id$
  */
 
-public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
+public class MrBayesExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
     /**
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer) {
+    public MrBayesExporter(Writer writer) {
         this.writer = new PrintWriter(writer);
         this.writer.println("#NEXUS");
     }
@@ -61,9 +61,13 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
                 seqType = sequence.getSequenceType();
             }
         }
+        
+        
+        //writer.println("BEGIN DATA;")
+        writer.println("NCHAR="+maxLength+";");
 
-        writer.println("begin characters;");
-        writer.println("\tdimensions nchar=" + maxLength + ";");
+        //writer.println("begin characters;");
+        //writer.println("\tdimensions nchar=" + maxLength + ";");
         writer.println("\tformat datatype=" + seqType.getNexusDataType() +
                 " missing=" + seqType.getUnknownState().getName() +
                 " gap=" + seqType.getGapState().getCode() + ";");
@@ -83,7 +87,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             }
             writer.println(builder);
         }
-        writer.println(";\nend;");
+        writer.println(";\nEND;");
     }
 
     /**
@@ -182,19 +186,21 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     private void setTaxa(Taxon[] taxons) {
         taxa = new HashSet<Taxon>();
 
-        writer.println("begin taxa;");
-        writer.println("\tdimensions ntax=" + taxons.length + ";");
-        writer.println("\ttaxlabels");
-
-        for (Taxon taxon : taxons) {
-            taxa.add(taxon);
-
-            StringBuilder builder = new StringBuilder("\t");
-            appendTaxonName(taxon, builder);
-            appendAttributes(taxon, null, builder);
-            writer.println(builder);
-        }
-        writer.println(";\nend;\n");
+        writer.println("BEGIN DATA;");
+        writer.print("\tDIMENSIONS NTAX="+taxons.length+" ");
+//        writer.println("begin taxa;");
+//        writer.println("\tdimensions ntax=" + taxons.length + ";");
+//        writer.println("\ttaxlabels");
+//
+//        for (Taxon taxon : taxons) {
+//            taxa.add(taxon);
+//
+//            StringBuilder builder = new StringBuilder("\t");
+//            appendTaxonName(taxon, builder);
+//            appendAttributes(taxon, null, builder);
+//            writer.println(builder);
+//        }
+//        writer.println(";\nend;\n");
     }
 
     /**
