@@ -38,12 +38,13 @@ public class Utils {
 		return file.getAbsolutePath();
 	}
 
-	public static File getLoadFile(String message) {
+    @SuppressWarnings({"deprecation"})
+    public static File getLoadFile(String message) {
 		// No file name in the arguments so throw up a dialog box...
 		java.awt.Frame frame = new java.awt.Frame();
 		java.awt.FileDialog chooser = new java.awt.FileDialog(frame, message, 
 															java.awt.FileDialog.LOAD);
-		chooser.show();
+        chooser.show();
 		if (chooser.getFile() == null) return null;
 		java.io.File file = new java.io.File(chooser.getDirectory(), chooser.getFile());
 		chooser.dispose();

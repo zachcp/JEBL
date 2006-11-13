@@ -47,6 +47,7 @@ public class AuxilaryFrame extends AbstractFrame {
         return contentsPanel;
     }
 
+    @SuppressWarnings({"deprecation"})
     public void doCloseWindow() {
         hide();
     }
