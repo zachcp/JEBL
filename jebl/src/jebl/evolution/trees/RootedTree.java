@@ -73,11 +73,16 @@ public interface RootedTree extends Tree {
      * Due to current implementation limitations, trees store "branch" information in nodes. So, internally rooted trees
      * are genetrated when un-rooted would be more natural.
      *
-     * @deprecated This should be removed. If this is a rooted tree then it is rooted. This can really
+     * This should be removed. If this is a rooted tree then it is rooted. This can really
      * only confuse things. Trees are unrooted, RootedTrees are rooted. This is not an implementation
      * limitation. It may be that a RootedTree has an arbitrary root but it is still rooted. With a rooted
      * tree, it is convenient to store branch information at the node (i.e., for the branch above the node)
      * because there is no "branch" object. Andrew.
+     *
+     * This function will probably become deprecated once the "development"
+     * tree viewer becomes in sync with the main tree viewer branch and some
+     * method of handling this concept has been introduced. Until then, this method remains.
+     *
      * @return true if tree(s) are to be viewed as unrooted
      */
     boolean conceptuallyUnrooted();
