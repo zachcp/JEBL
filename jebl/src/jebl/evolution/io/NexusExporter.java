@@ -59,31 +59,38 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             }
             if (seqType == null) {
                 seqType = sequence.getSequenceType();
+            } else if( seqType != sequence.getSequenceType() ) {
+               throw new IllegalArgumentException("All seqeuences must have the same type");
             }
         }
 
         writer.println("begin characters;");
         writer.println("\tdimensions nchar=" + maxLength + ";");
-        writer.println("\tformat datatype=" + seqType.getNexusDataType() +
-                " missing=" + seqType.getUnknownState().getName() +
-                " gap=" + seqType.getGapState().getCode() + ";");
-        writer.println("\tmatrix");
-        for (Sequence sequence : sequences) {
-            if( sequence.getSequenceType() != seqType ) {
-                throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
-            }
-            StringBuilder builder = new StringBuilder("\t");
-            appendTaxonName(sequence.getTaxon(), builder);
-            builder.append("\t").append(sequence.getString());
-            int shortBy = maxLength - sequence.getLength();
-            if (shortBy > 0) {
-                for (int i = 0; i < shortBy; i++) {
-                    builder.append(seqType.getGapState().getCode());
+        if( seqType != null ) {
+            writer.println("\tformat datatype=" + seqType.getNexusDataType() +
+                    " missing=" + seqType.getUnknownState().getName() +
+                    " gap=" + seqType.getGapState().getCode() + ";");
+
+            writer.println("\tmatrix");
+            for (Sequence sequence : sequences) {
+
+
+                if( sequence.getSequenceType() != seqType ) {
+                    throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
                 }
+                StringBuilder builder = new StringBuilder("\t");
+                appendTaxonName(sequence.getTaxon(), builder);
+                builder.append("\t").append(sequence.getString());
+                int shortBy = maxLength - sequence.getLength();
+                if (shortBy > 0) {
+                    for (int i = 0; i < shortBy; i++) {
+                        builder.append(seqType.getGapState().getCode());
+                    }
+                }
+                writer.println(builder);
             }
-            writer.println(builder);
+            writer.println(";\nend;");
         }
-        writer.println(";\nend;");
     }
 
     /**
@@ -198,7 +205,9 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     /**
-     * name suitable as token - quotes if necessary
+     * Name suitable as token - quotes if necessary
+     * @param name to check
+     * @return the name
      */
     private String safeName(String name) {
         if (!name.matches("^\\w+$")) {
@@ -210,6 +219,9 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
     /**
      * name suitable for printing - quotes if necessary
+     * @param taxon
+     * @param builder
+     * @return
      */
     private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
         String name = taxon.getName();
