@@ -2,6 +2,7 @@ package jebl.evolution.io;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,12 +30,36 @@ public class MEGAExporter implements AlignmentExporter {
         }
     }
 
+    /**
+     * 
+     * @param alignment the alignment to export
+     * @param name the name of the alignment
+     * @throws IOException
+     */
+    public void exportAlignment(Alignment alignment, String name) throws IOException{
+        writer.print("!Title ");
+        writer.print(name);
+        writer.println(";");
+
+        writer.print("!Format DataType=");
+        String dataType =
+                alignment.getSequenceType() == SequenceType.NUCLEOTIDE?
+                "nucleotide": "protein";
+        writer.println(dataType + ";");
+        exportAlignment(alignment);
+    }
+
+    /**
+     * @deprecated Files created by this export method won't be importable by MEGA (because they don't have titles).  Use {@link #exportAlignment(jebl.evolution.alignments.Alignment, String)}  instead.
+     * @param alignment
+     * @throws IOException
+     */
     public void exportAlignment(Alignment alignment) throws IOException {
         List<Sequence> seqs = alignment.getSequenceList();
 
         for( Sequence seq : seqs )  {
             writer.println();
-            writer.println("#" + seq.getTaxon().getName());
+            writer.println("#" + seq.getTaxon().getName().replaceAll(" ","_"));
             writer.println(seq.getString());
         }
     }
