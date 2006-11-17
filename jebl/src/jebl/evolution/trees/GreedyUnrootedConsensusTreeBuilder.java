@@ -144,6 +144,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
             Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();
             double[] sumBranchesOfExternal = new double[taxons.size()];
 
+            int nTree = 0;
             for (Tree tree : trees) {
                 int initialCapacity = tree.getNodes().size();
                 Set<Node> scanSet = new LinkedHashSet<Node>(initialCapacity);
@@ -243,6 +244,11 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
                     scanSet = nextScanSet;
                 }
                 if (debug) System.out.println(nInternalEdges);
+
+                 ++nTree;
+                if( fireSetProgress((0.9 * nTree)/ trees.length) ) {
+                    return null;
+                }
             }
 
             // sorts support from largest to smallest
@@ -394,6 +400,8 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
             }
 
             consTree.setConceptuallyUnrooted(true);
+
+            fireSetProgress(1.0);
 
             return consTree;
         } catch (Graph.NoEdgeException e) {

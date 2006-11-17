@@ -120,13 +120,15 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
 
         // establish support
         Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();
+        int k = 0;
         for (RootedTree tree : rtrees) {
             if (debug) {
                 System.out.println("Tree: " + Utils.DEBUGsubTreeRep(tree, tree.getRootNode()));
             }
             rootedSupport(tree, tree.getRootNode(), support);
 
-	        if (fireSetProgress(0.0)) {
+            ++k;
+            if (fireSetProgress( (0.9 * k) / rtrees.length)) {
 		        return null;
 	        }
         }
@@ -184,7 +186,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
                 queue.add(se);
             }
 
-	        if (fireSetProgress(0.0)) {
+	        if (fireSetProgress(0.95)) {
 		        return null;
 	        }
         }
@@ -279,13 +281,13 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
                 assert(false);
             }
 
-	        if (fireSetProgress(0.0)) {
+	        if (fireSetProgress(0.99)) {
 		        return null;
 	        }
         }
 
         insureConsistency(consTree, consTree.getRootNode());
-
+        fireSetProgress(1.0);
         return consTree;
     }
 }

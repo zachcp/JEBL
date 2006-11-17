@@ -264,9 +264,6 @@ public final class Utils {
 
         RootedTree rtree = rootTreeAtCenter(tree);
         assert Graph.Utils.getDegree(rtree, rtree.getRootNode()) == 2;
-        //if (Graph.Utils.getDegree(rtree, rtree.getRootNode()) > 2) {
-        //    return rtree;
-        //}
 
         // Root at central internal node. The root of the tree has at least 3 children.
         // WARNING: using the implementation fact that childern of RootedFromUnrooted are in fact nodes from tree.
@@ -285,8 +282,6 @@ public final class Utils {
         }
 
         return new RootedFromUnrooted(tree, root, true);
-        //return null; //never reached
-        //return new RootedFromUnrooted(tree, rtree.getChildren(rtree.getRootNode()).get(0), true);
     }
 
     private static String nodeName(Tree tree, Node n) {

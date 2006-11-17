@@ -36,7 +36,7 @@ public class TreeBuilderFactory {
 
     /**
      *
-     * @param method
+     * @param method to check
      * @return Wheather method generates a rooted or unrooted tree.
      */
     public static boolean isRootedMethod(Method method) {

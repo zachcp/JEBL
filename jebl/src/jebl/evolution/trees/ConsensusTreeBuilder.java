@@ -61,7 +61,10 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
 
     /**
      * Check for consistmcy and establish the common taxa
-     * @param trees
+     * @param trees to build summary tree from
+     * @param supportAttributeName name of attribute describing amount of support
+     * @param asPercent when true, support is in percent (0 - 100), otherwise in number of trees
+     * from the set.
      */
     ConsensusTreeBuilder(Tree[] trees, String supportAttributeName, boolean asPercent) {
         Tree first = trees[0];
@@ -108,6 +111,4 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
     }
 
     private final List<ProgressListener> listeners = new ArrayList<ProgressListener>();
-
-
 }
