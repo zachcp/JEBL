@@ -17,16 +17,23 @@ import java.util.*;
 
 public final class SimpleTree implements Tree {
 
+    /**
+     * Tree (to be constructed by subsequent calls).
+     */
     public SimpleTree() {}
 
-	/**
-	 * Make a copy of the given rooted tree. This joins the two edges either side of the root,
-	 * forming a single edge.
-	 * @param tree a rooted tree
-	 */
-	public SimpleTree(RootedTree tree) throws NoEdgeException {
-		throw new UnsupportedOperationException("not implemented yet");
-	}
+    /**
+     *  Duplicate a tree.
+     *
+     * @param tree
+     */
+    public SimpleTree(Tree tree) {
+        try {
+            createTree(tree, tree.getExternalNodes().iterator().next(), null);
+        } catch (NoEdgeException e) {
+            throw new IllegalArgumentException("BUG: invalid tree");
+        }
+    }
 
     /**
      * Creates a new external node with the given taxon. See createInternalNode
@@ -63,7 +70,7 @@ public final class SimpleTree implements Tree {
     }
 
     /**
-     * Set edge distance between two nodes.
+     * Set edge distance between two adjacent nodes.
      * @param node1
      * @param node2
      * @param length
@@ -71,14 +78,23 @@ public final class SimpleTree implements Tree {
     public void setEdgeLength(final Node node1, final Node node2, final double length) {
         assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && length >= 0;
 
-        Edge edge = new SimpleEdge(node1, node2, length);
+        final Edge edge = new SimpleEdge(node1, node2, length);
 
         edges.put(new HashPair<Node>(node1, node2), edge);
         edges.put(new HashPair<Node>(node2, node1), edge);
     }
 
     /**
-     * Add a new edge between two existing nodes.
+     * Change length of an existing edge.
+     * @param edge
+     * @param length
+     */
+    public void setEdgeLength(final Edge edge, final double length) {
+       ((SimpleEdge)edge).length = length;
+    }
+
+    /**
+     * Add a new edge between two existing (non adjacent yet)  nodes.
      * @param node1
      * @param node2
      * @param length
@@ -89,6 +105,33 @@ public final class SimpleTree implements Tree {
         ((SimpleNode)node1).addAdjacency(node2);
         ((SimpleNode)node2).addAdjacency(node1);
         setEdgeLength(node1, node2, length);
+    }
+
+    /**
+     * Copy partition of source starting from node but skipping root.
+     *
+     * @param source to copy from
+     * @param node  in source to copy
+     * @param root  adjacent node already copied
+     * @return copy of node inside tree
+     * @throws NoEdgeException
+     */
+    private Node createTree(Tree source, Node node, Node root) throws NoEdgeException {
+        Node h;
+        if( source.isExternal(node) ) {
+            h = createExternalNode(source.getTaxon(node));
+        } else {
+            h = createInternalNode(new ArrayList<Node>() );
+        }
+
+        final List<Node> adjacencies = source.getAdjacencies(node);
+
+        for( Node c : adjacencies ) {
+            if( c == root ) continue;
+            final Node n = createTree(source, c, node);
+            addEdge(h, n, source.getEdgeLength(node, c) );
+        }
+        return h;
     }
 
     /* Graph IMPLEMENTATION */
@@ -167,7 +210,7 @@ public final class SimpleTree implements Tree {
      * @return true if the node is of degree 1.
      */
     public boolean isExternal(Node node) {
-        return ((SimpleNode)node).getDegree() == 1;
+        return node.getDegree() == 1;
     }
 
 	/**
@@ -356,7 +399,7 @@ public final class SimpleTree implements Tree {
         // PRIVATE members
         private List<Node> adjacencies;
         private final Taxon taxon;
-    };
+    }
 
 	final class SimpleEdge extends BaseEdge {
 

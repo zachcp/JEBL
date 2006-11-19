@@ -1,7 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
@@ -58,9 +58,10 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     /**
-     * Root tree source at root.
-     * @param source
-     * @param root
+     * Root tree at some internal node.
+     *
+     * @param source tree to root
+     * @param root  internal node to root at
      */
     public RootedFromUnrooted(Tree source, Node root, boolean intent) {
         this.source = source;
