@@ -106,6 +106,10 @@ public final class Taxon implements Attributable, Comparable {
     /**
      * A static method that returns a Taxon object with the given name. If this has
      * already been created then the same instance will be returned.
+     *
+     * Due to problems with the singleton model of taxa, this factory method now
+     * creates a new instance.
+     *
      * @param name
      * @return the taxon
      */
@@ -116,22 +120,21 @@ public final class Taxon implements Attributable, Comparable {
         if (name.length() == 0) {
             throw new IllegalArgumentException("Illegal empty string for taxon name");
         }
-        Taxon taxon = taxa.get(name);
 
-        if (taxon == null) {
-            taxon = new Taxon(name);
-            taxa.put(name, taxon);
-        }
+	    return new Taxon(name);
 
-        return taxon;
+//        Taxon taxon = taxa.get(name);
+//
+//        if (taxon == null) {
+//            taxon = new Taxon(name);
+//            taxa.put(name, taxon);
+//        }
+//
+//        return taxon;
     }
 
 	// private members
 
-    /**
-     * A lazily allocated Attribute Map .
-     */
-    private Map<String, Object> attributeMap = null;
 
     /**
      * The name of this taxon.
@@ -158,7 +161,7 @@ public final class Taxon implements Attributable, Comparable {
 
 
     public boolean equals(Taxon t) {
-        return this == t;
+	    return name.equals(t.getName());
     }
 
     public int hashCode() {
