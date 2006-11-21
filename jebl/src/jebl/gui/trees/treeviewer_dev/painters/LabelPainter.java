@@ -7,6 +7,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.prefs.Preferences;
+import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
@@ -21,7 +22,7 @@ public abstract class LabelPainter<T> extends AbstractPainter<T> {
 
 	public abstract String[] getAttributes();
 
-    public abstract void setupAttributes(Tree tree);
+    public abstract void setupAttributes(Collection<? extends Tree> trees);
 
     public abstract void setDisplayAttribute(String displayAttribute);
 

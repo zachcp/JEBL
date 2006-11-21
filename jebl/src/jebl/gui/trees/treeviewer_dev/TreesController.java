@@ -17,13 +17,13 @@ import java.util.prefs.Preferences;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreePaneController extends AbstractController {
+public class TreesController extends AbstractController {
 
-	private static final String CONTROLLER_TITLE = "Tree";
+	private static final String CONTROLLER_TITLE = "Trees";
 
-    private static Preferences PREFS = Preferences.userNodeForPackage(TreePaneController.class);
+    private static Preferences PREFS = Preferences.userNodeForPackage(TreesController.class);
 
-	private static final String CONTROLLER_KEY = "tree";
+	private static final String CONTROLLER_KEY = "trees";
 
     private static final String TRANSFORM_KEY = "transform";
     private static final String TRANSFORM_TYPE_KEY = "transformType";
@@ -31,8 +31,8 @@ public class TreePaneController extends AbstractController {
     private static final String ORDER_TYPE_KEY = "orderType";
 
 
-    public TreePaneController(final TreePane treePane) {
-        this.treePane = treePane;
+    public TreesController(final TreeViewer treeViewer) {
+        this.treeViewer = treeViewer;
 
         titleLabel = new JLabel(CONTROLLER_TITLE);
 
@@ -42,14 +42,14 @@ public class TreePaneController extends AbstractController {
         transformCheck.setOpaque(false);
         optionsPanel.addComponent(transformCheck);
 
-        transformCheck.setSelected(treePane.isTransformBranchesOn());
+        transformCheck.setSelected(treeViewer.isTransformBranchesOn());
 
         transformCombo = new JComboBox(TransformedRootedTree.Transform.values());
         transformCombo.setOpaque(false);
-        transformCombo.setSelectedItem(treePane.getBranchTransform());
+        transformCombo.setSelectedItem(treeViewer.getBranchTransform());
         transformCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                treePane.setBranchTransform(
+                treeViewer.setBranchTransform(
                         (TransformedRootedTree.Transform) transformCombo.getSelectedItem());
 
             }
@@ -64,7 +64,7 @@ public class TreePaneController extends AbstractController {
                 label1.setEnabled(selected);
                 transformCombo.setEnabled(selected);
 
-                treePane.setTransformBranchesOn(selected);
+                treeViewer.setTransformBranchesOn(selected);
             }
         });
 
@@ -72,14 +72,14 @@ public class TreePaneController extends AbstractController {
         orderCheck.setOpaque(false);
         optionsPanel.addComponent(orderCheck);
 
-        orderCheck.setSelected(treePane.isOrderBranchesOn());
+        orderCheck.setSelected(treeViewer.isOrderBranchesOn());
 
         orderCombo = new JComboBox(SortedRootedTree.BranchOrdering.values());
         orderCombo.setOpaque(false);
-        orderCombo.setSelectedItem(treePane.getBranchOrdering());
+        orderCombo.setSelectedItem(treeViewer.getBranchOrdering());
         orderCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                treePane.setBranchOrdering(
+                treeViewer.setBranchOrdering(
                         (SortedRootedTree.BranchOrdering) orderCombo.getSelectedItem());
             }
         });
@@ -93,7 +93,7 @@ public class TreePaneController extends AbstractController {
                 label2.setEnabled(orderCheck.isSelected());
                 orderCombo.setEnabled(orderCheck.isSelected());
 
-                treePane.setOrderBranchesOn(orderCheck.isSelected());
+                treeViewer.setOrderBranchesOn(orderCheck.isSelected());
             }
         });
 
@@ -112,10 +112,10 @@ public class TreePaneController extends AbstractController {
     }
 
     public void initialize() {
-        treePane.setTransformBranchesOn(transformCheck.isSelected());
-        treePane.setBranchTransform((TransformedRootedTree.Transform) transformCombo.getSelectedItem());
-        treePane.setOrderBranchesOn(orderCheck.isSelected());
-        treePane.setBranchOrdering((SortedRootedTree.BranchOrdering) orderCombo.getSelectedItem());
+        treeViewer.setTransformBranchesOn(transformCheck.isSelected());
+        treeViewer.setBranchTransform((TransformedRootedTree.Transform) transformCombo.getSelectedItem());
+        treeViewer.setOrderBranchesOn(orderCheck.isSelected());
+        treeViewer.setBranchOrdering((SortedRootedTree.BranchOrdering) orderCombo.getSelectedItem());
     }
 
     public void setSettings(Map<String,Object> settings) {
@@ -153,5 +153,5 @@ public class TreePaneController extends AbstractController {
     private final JCheckBox orderCheck;
     private final JComboBox orderCombo;
 
-    private final TreePane treePane;
+    private final TreeViewer treeViewer;
 }

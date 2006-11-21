@@ -13,35 +13,33 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
+import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
+import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
+import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
+import jebl.gui.trees.treeviewer_dev.painters.ScaleBarPainter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class DefaultTreeViewer extends JPanel implements TreeViewer {
+public class DefaultTreeViewer extends TreeViewer {
 
     private final static double MAX_ZOOM = 20;
     private final static double MAX_VERTICAL_EXPANSION = 20;
 
-	/**
-     * Creates new TreeViewer
-     */
-    public DefaultTreeViewer() {
-        this(new TreePane());
-    }
-
     /**
      * Creates new TreeViewer
      */
-    public DefaultTreeViewer(TreePane treePane) {
+    public DefaultTreeViewer() {
         setLayout(new BorderLayout());
 
-        this.treePane = treePane;
+        this.treePane = new TreePane();
         treePane.setAutoscrolls(true); //enable synthetic drag events
 
         JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -58,28 +56,91 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
     }
 
     public void setTree(Tree tree) {
-        if (tree == null) {
-	        return;
+        trees.clear();
+        addTree(tree);
+        showTree(0);
+    }
+
+    public void setTrees(Collection<? extends Tree> trees) {
+        this.trees.clear();
+        for (Tree tree : trees) {
+            addTree(tree);
+        }
+        showTree(0);
+    }
+
+    public void addTree(Tree tree) {
+        this.trees.add(tree);
+
+        if (treePane.getTipLabelPainter() != null) {
+            treePane.getTipLabelPainter().setupAttributes(trees);
         }
 
-	    if (tree instanceof RootedTree) {
-		    treePane.setTree((RootedTree)tree);
-	    } else {
+        if (treePane.getBranchLabelPainter() != null) {
+            treePane.getBranchLabelPainter().setupAttributes(trees);
+        }
+
+        if (treePane.getNodeLabelPainter() != null) {
+            treePane.getNodeLabelPainter().setupAttributes(trees);
+        }
+
+        if (treePane.getNodeBarPainter() != null) {
+            treePane.getNodeBarPainter().setupAttributes(trees);
+        }
+    }
+
+    public void addTrees(Collection<? extends Tree> trees) {
+        int count = getTreeCount();
+        for (Tree tree : trees) {
+            addTree(tree);
+        }
+        showTree(count);
+    }
+
+    public List<Tree> getTrees() {
+        return trees;
+    }
+
+    public Tree getCurrentTree() {
+        return trees.get(currentTreeIndex);
+    }
+
+    public int getCurrentTreeIndex() {
+        return currentTreeIndex;
+    }
+
+    public int getTreeCount() {
+        if (trees == null) return 0;
+        return trees.size();
+    }
+
+    public void showTree(int index) {
+        Tree tree = trees.get(index);
+        if (tree instanceof RootedTree) {
+            treePane.setTree((RootedTree)tree);
+        } else {
             treePane.setTree(Utils.rootTheTree(tree));
         }
 
+        currentTreeIndex = index;
+        fireTreeChanged();
+    }
+
+    public void showNextTree() {
+        if (currentTreeIndex < trees.size() - 1) {
+            showTree(currentTreeIndex + 1);
+        }
+    }
+
+    public void showPreviousTree() {
+        if (currentTreeIndex > 0) {
+            showTree(currentTreeIndex - 1);
+        }
     }
 
     public void setTreeLayout(TreeLayout treeLayout) {
         treePane.setTreeLayout(treeLayout);
-    }
-
-    public Tree getTree() {
-        return treePane.getTree();
-    }
-
-    public TreePane getTreePane() {
-        return treePane;
+        fireTreeSettingsChanged();
     }
 
     private boolean zoomPending = false;
@@ -96,7 +157,7 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
     }
 
     public boolean verticalExpansionAllowed() {
-        return !getTreePane().maintainAspectRatio();
+        return !treePane.maintainAspectRatio();
     }
 
     private void refreshZoom() {
@@ -127,6 +188,10 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
         Point newPosition = new Point((int) px, (int) py);
         viewport.setViewPosition(newPosition);
         treePane.revalidate();
+    }
+
+    public boolean hasSelection() {
+        return treePane.hasSelection();
     }
 
     public void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive) {
@@ -211,8 +276,19 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
         }
     }
 
-    public void collapseSelected() {
+    public void collapseSelectedNodes() {
         treePane.collapseSelectedNodes();
+        fireTreeSettingsChanged();
+    }
+
+    public void annotateSelectedNodes(String name, Object value) {
+        treePane.annotateSelectedNodes(name, value);
+        fireTreeSettingsChanged();
+    }
+
+    public void annotateSelectedTips(String name, Object value) {
+        treePane.annotateSelectedTips(name, value);
+        fireTreeSettingsChanged();
     }
 
     public void selectAll() {
@@ -225,6 +301,14 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
 
     public void clearSelectedTaxa() {
         treePane.clearSelection();
+    }
+
+    public void addTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
+        treePane.addTreeSelectionListener(treeSelectionListener);
+    }
+
+    public void removeTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
+        treePane.removeTreeSelectionListener(treeSelectionListener);
     }
 
     public void setSelectionMode(TreePaneSelector.SelectionMode selectionMode) {
@@ -248,7 +332,85 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
         treePaneSelector.setDragMode(dragMode);
     }
 
-    public JComponent getExportableComponent() {
+    // A load of deligated method calls through to treePane (which is now hidden outside the package).
+    public void setTipLabelPainter(LabelPainter<Node> tipLabelPainter) {
+        treePane.setTipLabelPainter(tipLabelPainter);
+        tipLabelPainter.setupAttributes(trees);
+
+    }
+
+    public void setNodeLabelPainter(LabelPainter<Node> nodeLabelPainter) {
+        treePane.setNodeLabelPainter(nodeLabelPainter);
+        nodeLabelPainter.setupAttributes(trees);
+    }
+
+    public void setNodeBarPainter(NodeBarPainter nodeBarPainter) {
+        treePane.setNodeBarPainter(nodeBarPainter);
+        nodeBarPainter.setupAttributes(trees);
+    }
+
+    public void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter) {
+        treePane.setBranchLabelPainter(branchLabelPainter);
+        branchLabelPainter.setupAttributes(trees);
+    }
+
+    public void setScaleBarPainter(ScaleBarPainter scaleBarPainter) {
+        treePane.setScaleBarPainter(scaleBarPainter);
+    }
+
+    public void setBranchDecorator(Decorator branchDecorator) {
+        treePane.setBranchDecorator(branchDecorator);
+    }
+
+    public void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator) {
+        treePane.setBranchColouringDecorator(branchColouringAttribute, branchColouringDecorator);
+    }
+
+    public void setSelectionPaint(Paint selectionPane) {
+        treePane.setSelectionPaint(selectionPane);
+    }
+
+    public Paint getSelectionPaint() {
+        return treePane.getSelectionPaint();
+    }
+
+    public void setBranchStroke(BasicStroke branchStroke) {
+        treePane.setBranchStroke(branchStroke);
+    }
+
+    public boolean isTransformBranchesOn() {
+        return treePane.isTransformBranchesOn();
+    }
+
+    public TransformedRootedTree.Transform getBranchTransform() {
+        return treePane.getBranchTransform();
+    }
+
+    public void setTransformBranchesOn(boolean transformBranchesOn) {
+        treePane.setTransformBranchesOn(transformBranchesOn);
+    }
+
+    public void setBranchTransform(TransformedRootedTree.Transform transform) {
+        treePane.setBranchTransform(transform);
+    }
+
+    public boolean isOrderBranchesOn() {
+        return treePane.isOrderBranchesOn();
+    }
+
+    public SortedRootedTree.BranchOrdering getBranchOrdering() {
+        return treePane.getBranchOrdering();
+    }
+
+    public void setOrderBranchesOn(boolean orderBranchesOn) {
+        treePane.setOrderBranchesOn(orderBranchesOn);
+    }
+
+    public void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering) {
+        treePane.setBranchOrdering(branchOrdering);
+    }
+
+    public JComponent getContentPane() {
         return treePane;
     }
 
@@ -264,21 +426,30 @@ public class DefaultTreeViewer extends JPanel implements TreeViewer {
         return treePane.print(g, pageFormat, pageIndex);
     }
 
-	public void addTreeViewerListener(TreeViewerListener listener) {
-		listeners.add(listener);
-	}
+    public void addTreeViewerListener(TreeViewerListener listener) {
+        listeners.add(listener);
+    }
 
-	public void removeTreeViewerListener(TreeViewerListener listener) {
-		listeners.remove(listener);
-	}
+    public void removeTreeViewerListener(TreeViewerListener listener) {
+        listeners.remove(listener);
+    }
 
-	public void fireTreeChanged() {
-		for (TreeViewerListener listener : listeners) {
-			listener.treeChanged();
-		}
-	}
+    public void fireTreeChanged() {
+        for (TreeViewerListener listener : listeners) {
+            listener.treeChanged();
+        }
+    }
 
-	private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
+    public void fireTreeSettingsChanged() {
+        for (TreeViewerListener listener : listeners) {
+            listener.treeSettingsChanged();
+        }
+    }
+
+    private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
+
+    private List<Tree> trees = new ArrayList<Tree>();
+    private int currentTreeIndex = 0;
 
     protected TreePane treePane;
     protected TreePaneSelector treePaneSelector;

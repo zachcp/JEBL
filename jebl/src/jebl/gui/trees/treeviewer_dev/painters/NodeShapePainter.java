@@ -71,7 +71,7 @@ public class NodeShapePainter extends NodePainter {
 
     public Rectangle2D calibrate(Graphics2D g2, Node item) {
         RootedTree tree = treePane.getTree();
-        Point2D nodePoint = treePane.getTreeLayout().getNodePoint(item);
+        Point2D nodePoint = treePane.getTreeLayoutCache().getNodePoint(item);
 
         preferredWidth = 20;
         preferredHeight = 20;

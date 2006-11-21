@@ -19,8 +19,6 @@ public class MultiPaneTreeViewerController extends AbstractController {
 
 	public MultiPaneTreeViewerController(final MultiPaneTreeViewer treeViewer) {
 
-		this.treeViewer = treeViewer;
-
 		titleLabel = new JLabel("Current Tree");
 		optionsPanel = new OptionsPanel();
 
@@ -57,7 +55,11 @@ public class MultiPaneTreeViewerController extends AbstractController {
 				}
 				titleLabel.setText("Current Tree: " + index + " / " + treeCount);
 			}
-		});
+
+            public void treeSettingsChanged() {
+                // nothing to do
+            }
+        });
 		optionsPanel.addComponentWithLabel("Name:", treeNameLabel);
 		optionsPanel.addComponentWithLabel("Tree:", currentTreeSpinner);
 		optionsPanel.addComponentWithLabel("Trees per page:", treesPerPageCombo);
@@ -88,7 +90,5 @@ public class MultiPaneTreeViewerController extends AbstractController {
 
 	private final JLabel titleLabel;
 	private final OptionsPanel optionsPanel;
-
-	private final MultiPaneTreeViewer treeViewer;
 
 }

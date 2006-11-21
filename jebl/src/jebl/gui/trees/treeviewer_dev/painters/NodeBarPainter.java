@@ -21,25 +21,27 @@ public class NodeBarPainter extends NodePainter {
 		setupAttributes(null);
 	}
 
-	public void setupAttributes(Tree tree) {
+	public void setupAttributes(Collection<? extends Tree> trees) {
 		java.util.Set<String> attributeNames = new TreeSet<String>();
-		if (tree != null) {
-			for (Node node : tree.getNodes()) {
-				for (String name : node.getAttributeNames()) {
-					if (!name.startsWith("!")) {
-						Object attr = node.getAttribute(name);
-						if (attr instanceof Object[]) {
-							Object[] array = (Object[])attr;
-							if (array.length == 2 &&
-									array[0] instanceof Double &&
-									array[1] instanceof Double) {
-								attributeNames.add(name);
-							}
-						}
-					}
-				}
-			}
-		}
+        if (trees != null) {
+            for (Tree tree : trees) {
+                for (Node node : tree.getNodes()) {
+                    for (String name : node.getAttributeNames()) {
+                        if (!name.startsWith("!")) {
+                            Object attr = node.getAttribute(name);
+                            if (attr instanceof Object[]) {
+                                Object[] array = (Object[])attr;
+                                if (array.length == 2 &&
+                                        array[0] instanceof Double &&
+                                        array[1] instanceof Double) {
+                                    attributeNames.add(name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 		if (attributeNames.size() == 0) {
 			attributeNames.add("no attributes");
 		}
@@ -63,7 +65,7 @@ public class NodeBarPainter extends NodePainter {
 
 		nodeBar = null;
 
-		Line2D barPath = treePane.getTreeLayout().getNodeBarPath(node);
+		Line2D barPath = treePane.getTreeLayoutCache().getNodeBarPath(node);
 		if (barPath != null) {
 
 			double height = tree.getHeight(node);

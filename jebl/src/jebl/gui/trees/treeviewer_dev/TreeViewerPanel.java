@@ -28,46 +28,44 @@ public class TreeViewerPanel extends JPanel {
         this.treeViewer = treeViewer;
         this.controlPalette = controlPalette;
 
-        TreePane treePane = treeViewer.getTreePane();
-
         controlPalette.getPanel().setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         controlPalette.getPanel().setBackground(new Color(231, 237, 246));
         controlPalette.getPanel().setOpaque(true);
 
         controlPalette.addController(new TreeViewerController(treeViewer));
 
-        controlPalette.addController(new TreeAppearanceController(treePane));
+        controlPalette.addController(new TreeAppearanceController(treeViewer));
 
-        controlPalette.addController(new TreePaneController(treePane));
+        controlPalette.addController(new TreesController(treeViewer));
 
         // Create a tip label painter and its controller
         BasicLabelPainter tipLabelPainter = new BasicLabelPainter(BasicLabelPainter.PainterIntent.TIP);
         controlPalette.addController(new LabelPainterController("Tip Labels", "tipLabels", tipLabelPainter));
-        treePane.setTipLabelPainter(tipLabelPainter);
+        treeViewer.setTipLabelPainter(tipLabelPainter);
 
         // Create a node label painter and its controller
         BasicLabelPainter nodeLabelPainter = new BasicLabelPainter(BasicLabelPainter.PainterIntent.NODE);
         nodeLabelPainter.setVisible(false);
         controlPalette.addController(new LabelPainterController("Node Labels", "nodeLabels", nodeLabelPainter));
-        treePane.setNodeLabelPainter(nodeLabelPainter);
+        treeViewer.setNodeLabelPainter(nodeLabelPainter);
 
         // Create a node shape painter and its controller
         NodeBarPainter nodeBarPainter = new NodeBarPainter();
         nodeBarPainter.setForeground(new Color(24, 32, 228, 128));
         nodeBarPainter.setVisible(false);
         controlPalette.addController(new NodeBarController("Node Bars", nodeBarPainter));
-        treePane.setNodeBarPainter(nodeBarPainter);
+        treeViewer.setNodeBarPainter(nodeBarPainter);
 
         // Create a branch label painter and its controller
         BasicLabelPainter branchLabelPainter = new BasicLabelPainter(BasicLabelPainter.PainterIntent.BRANCH);
         branchLabelPainter.setVisible(false);
         controlPalette.addController(new LabelPainterController("Branch Labels", "branchLabels", branchLabelPainter));
-        treePane.setBranchLabelPainter(branchLabelPainter);
+        treeViewer.setBranchLabelPainter(branchLabelPainter);
 
         // Create a scale bar painter and its controller
         ScaleBarPainter scaleBarPainter = new ScaleBarPainter();
         controlPalette.addController(new ScaleBarPainterController(scaleBarPainter));
-        treePane.setScaleBarPainter(scaleBarPainter);
+        treeViewer.setScaleBarPainter(scaleBarPainter);
 
         setLayout(new BorderLayout());
 
@@ -119,9 +117,9 @@ public class TreeViewerPanel extends JPanel {
 //        TreeImporter importer = new NewickImporter(new FileReader(inputFile));
             Reader reader = new BufferedReader(new FileReader(inputFile));
             TreeImporter importer = new NexusImporter(reader);
-            Tree tree = importer.importNextTree();
+            java.util.List<Tree> trees = importer.importTrees();
             reader.close();
-            treeViewer.setTree(tree);
+            treeViewer.setTrees(trees);
         } catch (Exception ie) {
             ie.printStackTrace();
             System.exit(1);

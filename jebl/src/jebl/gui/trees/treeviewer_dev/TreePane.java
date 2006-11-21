@@ -42,7 +42,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			invalidate();
 			repaint();
 		}
-		fireTreePaneSettingsChanged();
 	}
 
 	private void setupTree() {
@@ -56,22 +55,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			tree = new TransformedRootedTree(tree, branchTransform);
 		}
 
-		if (tipLabelPainter != null) {
-			tipLabelPainter.setupAttributes(tree);
-		}
-
-		if (nodeLabelPainter != null) {
-			nodeLabelPainter.setupAttributes(tree);
-		}
-
-		if (branchLabelPainter != null) {
-			branchLabelPainter.setupAttributes(tree);
-		}
-
-		if (nodeBarPainter != null) {
-			nodeBarPainter.setupAttributes(tree);
-		}
-
 		calibrated = false;
 		invalidate();
 		repaint();
@@ -80,6 +63,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	public TreeLayout getTreeLayout() {
 		return treeLayout;
 	}
+
+    public TreeLayoutCache getTreeLayoutCache() {
+        return treeLayoutCache;
+    }
 
 	public void setTreeLayout(TreeLayout treeLayout) {
 
@@ -97,8 +84,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		calibrated = false;
 		invalidate();
 		repaint();
-
-		fireTreePaneSettingsChanged();
 	}
 
 	public void setBranchDecorator(Decorator branchDecorator) {
@@ -344,7 +329,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	public void collapseSelectedNodes() {
 		collapseSelectedNodes(tree.getRootNode());
-		fireTreePaneSettingsChanged();
 	}
 
 	private void collapseSelectedNodes(Node node) {
@@ -374,7 +358,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			selectedNode.setAttribute(name, value);
 		}
 		repaint();
-		fireTreePaneSettingsChanged();
 	}
 
 	public void annotateSelectedTips(String name, Object value) {
@@ -383,7 +366,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			selectedTaxon.setAttribute(name, value);
 		}
 		repaint();
-		fireTreePaneSettingsChanged();
 	}
 
 	/**
@@ -406,11 +388,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.tipLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
-		this.tipLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
-	public Painter<Node> getTipLabelPainter() {
+	public LabelPainter<Node> getTipLabelPainter() {
 		return tipLabelPainter;
 	}
 
@@ -424,11 +405,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.nodeLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
-		this.nodeLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
-	public Painter<Node> getNodeLabelPainter() {
+	public LabelPainter<Node> getNodeLabelPainter() {
 		return nodeLabelPainter;
 	}
 
@@ -442,11 +422,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.branchLabelPainter.addPainterListener(this);
 		}
 		calibrated = false;
-		this.branchLabelPainter.setupAttributes(tree);
 		repaint();
 	}
 
-	public Painter<Node> getBranchLabelPainter() {
+	public LabelPainter<Node> getBranchLabelPainter() {
 		return branchLabelPainter;
 	}
 
@@ -460,11 +439,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			this.nodeBarPainter.addPainterListener(this);
 		}
 		calibrated = false;
-		this.nodeBarPainter.setupAttributes(tree);
 		repaint();
 	}
 
-	public Painter<Node> getNodeBarPainter() {
+	public NodeBarPainter getNodeBarPainter() {
 		return nodeBarPainter;
 	}
 
@@ -840,7 +818,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private void calibrate(Graphics2D g2, double width, double height) {
 
-		// First of all get the bounds for the unscaled tree
+        treeLayout.layout(tree, treeLayoutCache);
+        
+        // First of all get the bounds for the unscaled tree
 		treeBounds = null;
 		boolean showingRootBranch = treeLayout.isShowingRootBranch();
 
@@ -1187,22 +1167,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		return lineTransform;
 	}
-
-	public void addTreePaneListener(TreePaneListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeTreePaneListener(TreePaneListener listener) {
-		listeners.remove(listener);
-	}
-
-	public void fireTreePaneSettingsChanged() {
-		for (TreePaneListener listener : listeners) {
-			listener.treePaneSettingsChanged();
-		}
-	}
-
-	private final List<TreePaneListener> listeners = new ArrayList<TreePaneListener>();
 
 	// Overridden methods to recalibrate tree when bounds change
 	public void setBounds(int x, int y, int width, int height) {

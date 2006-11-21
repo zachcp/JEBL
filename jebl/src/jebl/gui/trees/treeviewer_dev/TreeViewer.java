@@ -1,45 +1,121 @@
 package jebl.gui.trees.treeviewer_dev;
 
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
+import jebl.gui.trees.treeviewer_dev.painters.BasicLabelPainter;
+import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
+import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
+import jebl.gui.trees.treeviewer_dev.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer_dev.decorators.AttributableDecorator;
+import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.TransformedRootedTree;
+import jebl.evolution.trees.SortedRootedTree;
 
 import javax.swing.*;
 import java.awt.print.Printable;
+import java.awt.*;
+import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public interface TreeViewer extends Printable {
+public abstract class TreeViewer extends JPanel implements Printable {
 
-	void setTreeLayout(TreeLayout treeLayout);
+    public abstract void setTrees(Collection<? extends Tree> trees);
 
-	void setZoom(double zoom);
+    public abstract java.util.List<Tree> getTrees();
 
-	void setVerticalExpansion(double verticalExpansion);
+    public abstract Tree getCurrentTree();
 
-	boolean verticalExpansionAllowed();
+    public abstract int getCurrentTreeIndex();
 
-	void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive);
+    public abstract int getTreeCount();
 
-	void selectNodes(String attribute, SearchType searchType, String searchString, boolean caseSensitive);
+    public abstract void showTree(int index);
 
-	void collapseSelected();
+	public abstract void setTreeLayout(TreeLayout treeLayout);
 
-	void selectAll();
+	public abstract void setZoom(double zoom);
 
-	void clearSelectedTaxa();
+	public abstract void setVerticalExpansion(double verticalExpansion);
 
-	void setSelectionMode(TreePaneSelector.SelectionMode selectionMode);
+	public abstract boolean verticalExpansionAllowed();
 
-	void setDragMode(TreePaneSelector.DragMode dragMode);
 
-	JComponent getExportableComponent();
+    public abstract boolean hasSelection();
 
-	void addTreeViewerListener(TreeViewerListener listener);
+    public abstract void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive);
 
-	void removeTreeViewerListener(TreeViewerListener listener);
+	public abstract void selectNodes(String attribute, SearchType searchType, String searchString, boolean caseSensitive);
 
-	public enum SearchType {
+	public abstract void collapseSelectedNodes();
+
+    public abstract void annotateSelectedNodes(String name, Object value);
+
+    public abstract void annotateSelectedTips(String name, Object value);
+
+    public abstract void selectAll();
+
+	public abstract void clearSelectedTaxa();
+
+    public abstract void addTreeSelectionListener(TreeSelectionListener treeSelectionListener);
+
+    public abstract void removeTreeSelectionListener(TreeSelectionListener treeSelectionListener);
+
+
+    public abstract void setSelectionMode(TreePaneSelector.SelectionMode selectionMode);
+
+	public abstract void setDragMode(TreePaneSelector.DragMode dragMode);
+
+    public abstract void setTipLabelPainter(LabelPainter<Node> tipLabelPainter);
+
+    public abstract void setNodeLabelPainter(LabelPainter<Node> nodeLabelPainter);
+
+    public abstract void setNodeBarPainter(NodeBarPainter nodeBarPainter);
+
+    public abstract void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter);
+
+    public abstract void setScaleBarPainter(ScaleBarPainter scaleBarPainter);
+
+    public abstract void setBranchDecorator(Decorator branchDecorator);
+
+    public abstract void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator);
+
+    public abstract void setSelectionPaint(Paint selectionPane);
+
+    public abstract Paint getSelectionPaint();
+
+    public abstract void setBranchStroke(BasicStroke branchStroke);
+
+
+    public abstract boolean isTransformBranchesOn();
+
+    public abstract TransformedRootedTree.Transform getBranchTransform();
+
+    public abstract void setTransformBranchesOn(boolean transformBranchesOn);
+
+    public abstract void setBranchTransform(TransformedRootedTree.Transform transform);
+
+
+    public abstract boolean isOrderBranchesOn();
+
+    public abstract SortedRootedTree.BranchOrdering getBranchOrdering();
+
+    public abstract void setOrderBranchesOn(boolean orderBranchesOn);
+
+    public abstract void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering);
+
+
+    public abstract JComponent getContentPane();
+
+	public abstract void addTreeViewerListener(TreeViewerListener listener);
+
+	public abstract void removeTreeViewerListener(TreeViewerListener listener);
+
+
+    public enum SearchType {
 	    CONTAINS("Contains"),
 	    STARTS_WITH("Starts with"),
 	    ENDS_WITH("Ends with"),

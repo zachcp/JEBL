@@ -13,11 +13,9 @@ import java.util.Map;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class MultipleTreeViewerController extends AbstractController {
+public class MultipleTreesController extends AbstractController {
 
-	public MultipleTreeViewerController(final MultipleTreeViewer treeViewer) {
-
-		this.treeViewer = treeViewer;
+	public MultipleTreesController(final TreeViewer treeViewer) {
 
 		titleLabel = new JLabel("Current Tree");
 		optionsPanel = new OptionsPanel();
@@ -36,7 +34,8 @@ public class MultipleTreeViewerController extends AbstractController {
 			public void treeChanged() {
 				int index = treeViewer.getCurrentTreeIndex() + 1;
 				int treeCount = treeViewer.getTrees().size();
-				Tree tree = treeViewer.getCurrentTree();
+                if (treeCount > 0) {
+                Tree tree = treeViewer.getCurrentTree();
 				spinnerModel.setValue(index);
 				spinnerModel.setMaximum(treeCount);
 				String name = (String)tree.getAttribute("name");
@@ -46,8 +45,16 @@ public class MultipleTreeViewerController extends AbstractController {
 					treeNameLabel.setText("Tree " + index);
 				}
 				titleLabel.setText("Current Tree: " + index + " / " + treeCount);
-			}
-		});
+                } else {
+                    titleLabel.setText("No trees");
+
+                }
+            }
+
+            public void treeSettingsChanged() {
+                // nothing to do
+            }
+        });
 		optionsPanel.addComponentWithLabel("Name:", treeNameLabel);
 		optionsPanel.addComponentWithLabel("Tree:", currentTreeSpinner);
 
@@ -77,7 +84,5 @@ public class MultipleTreeViewerController extends AbstractController {
 
 	private final JLabel titleLabel;
 	private final OptionsPanel optionsPanel;
-
-	private final MultipleTreeViewer treeViewer;
 
 }

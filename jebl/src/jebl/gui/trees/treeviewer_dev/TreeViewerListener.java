@@ -6,4 +6,6 @@ package jebl.gui.trees.treeviewer_dev;
  */
 public interface TreeViewerListener {
 	void treeChanged();
+
+    void treeSettingsChanged();
 }
