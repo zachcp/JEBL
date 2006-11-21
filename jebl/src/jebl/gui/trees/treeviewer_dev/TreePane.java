@@ -5,8 +5,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 import jebl.gui.trees.treeviewer_dev.painters.*;
-import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
-import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayoutListener;
+import jebl.gui.trees.treeviewer_dev.treelayouts.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -73,13 +72,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			nodeBarPainter.setupAttributes(tree);
 		}
 
-		if (treeLayout != null) {
-			treeLayout.setTree(tree);
-
-			calibrated = false;
-			invalidate();
-			repaint();
-		}
+		calibrated = false;
+		invalidate();
+		repaint();
 	}
 
 	public TreeLayout getTreeLayout() {
@@ -91,9 +86,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		this.treeLayout = treeLayout;
 
 		treeLayout.setCollapseAttributeName(COLLAPSE_ATTRIBUTE_NAME);
-        treeLayout.setBranchColouringAttribute(branchColouringAttribute);
+		treeLayout.setBranchColouringAttributeName(branchColouringAttribute);
 
-		treeLayout.setTree(tree);
 		treeLayout.addTreeLayoutListener(new TreeLayoutListener() {
 			public void treeLayoutChanged() {
 				calibrated = false;
@@ -112,12 +106,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
-    public void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator) {
-        this.branchColouringAttribute = branchColouringAttribute;
-        treeLayout.setBranchColouringAttribute(branchColouringAttribute);
-        this.branchColouringDecorator = branchColouringDecorator;
-        repaint();
-    }
+	public void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator) {
+		this.branchColouringAttribute = branchColouringAttribute;
+		treeLayout.setBranchColouringAttributeName(branchColouringAttribute);
+		this.branchColouringDecorator = branchColouringDecorator;
+		repaint();
+	}
 
 	public Rectangle2D getTreeBounds() {
 		return treeBounds;
@@ -365,7 +359,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 					Object[] values = new Object[] { tipCount, height };
 					node.setAttribute(COLLAPSE_ATTRIBUTE_NAME, values);
 				}
-				treeLayout.invalidate();
+				calibrated = false;
 				repaint();
 			} else {
 				for (Node child : tree.getChildren(node)) {
@@ -522,11 +516,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 		for (Node node : tree.getNodes()) {
-			Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
+			Shape branchPath = transform.createTransformedShape(treeLayoutCache.getBranchPath(node));
 			if (branchPath != null && g2.hit(rect, branchPath, true)) {
 				return node;
 			}
-			Shape collapsedShape = transform.createTransformedShape(treeLayout.getCollapsedShape(node));
+			Shape collapsedShape = transform.createTransformedShape(treeLayoutCache.getCollapsedShape(node));
 			if (collapsedShape != null && g2.hit(rect, collapsedShape, false)) {
 				return node;
 			}
@@ -546,11 +540,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 		for (Node node : tree.getNodes()) {
-			Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
+			Shape branchPath = transform.createTransformedShape(treeLayoutCache.getBranchPath(node));
 			if (branchPath != null && g2.hit(rect, branchPath, true)) {
 				nodes.add(node);
 			}
-			Shape collapsedShape = transform.createTransformedShape(treeLayout.getCollapsedShape(node));
+			Shape collapsedShape = transform.createTransformedShape(treeLayoutCache.getCollapsedShape(node));
 			if (collapsedShape != null && g2.hit(rect, collapsedShape, false)) {
 				nodes.add(node);
 			}
@@ -611,14 +605,14 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		Stroke oldStroke = g2.getStroke();
 
 		for (Node selectedNode : selectedNodes) {
-			Shape branchPath = treeLayout.getBranchPath(selectedNode);
+			Shape branchPath = treeLayoutCache.getBranchPath(selectedNode);
 			if (branchPath != null) {
 				Shape transPath = transform.createTransformedShape(branchPath);
 				g2.setPaint(selectionPaint);
 				g2.setStroke(selectionStroke);
 				g2.draw(transPath);
 			}
-			Shape collapsedShape = treeLayout.getCollapsedShape(selectedNode);
+			Shape collapsedShape = treeLayoutCache.getCollapsedShape(selectedNode);
 			if (collapsedShape != null) {
 				Shape transPath = transform.createTransformedShape(collapsedShape);
 				g2.setPaint(selectionPaint);
@@ -684,8 +678,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		g2.setStroke(branchLineStroke);
 
 		// Paint collapsed nodes
-		for (Node node : treeLayout.getCollapsedShapeMap().keySet() ) {
-			Shape collapsedShape = treeLayout.getCollapsedShape(node);
+		for (Node node : treeLayoutCache.getCollapsedShapeMap().keySet() ) {
+			Shape collapsedShape = treeLayoutCache.getCollapsedShape(node);
 
 			Shape transShape = transform.createTransformedShape(collapsedShape);
 			Paint paint = Color.BLACK;
@@ -706,14 +700,14 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 		// Paint branches
-		for (Node node : treeLayout.getBranchPathMap().keySet() ) {
+		for (Node node : treeLayoutCache.getBranchPathMap().keySet() ) {
 
 			Object[] branchColouring = null;
 			if (treeLayout.isShowingColouring() && branchColouringAttribute != null) {
 				branchColouring = (Object[])node.getAttribute(branchColouringAttribute);
 			}
 
-			Shape branchPath = treeLayout.getBranchPath(node);
+			Shape branchPath = treeLayoutCache.getBranchPath(node);
 
 			if (branchColouring != null) {
 				PathIterator iter = branchPath.getPathIterator(transform);
@@ -727,8 +721,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 					iter.currentSegment(coords2);
 
 					int colour = ((Number)branchColouring[i]).intValue();
-                    branchColouringDecorator.setItem(colour);
-                    g2.setPaint(branchColouringDecorator.getPaint(Color.BLACK));
+					branchColouringDecorator.setItem(colour);
+					g2.setPaint(branchColouringDecorator.getPaint(Color.BLACK));
 					g2.draw(new Line2D.Float(coords1[0], coords1[1], coords2[0], coords2[1]));
 
 					coords1 = coords2;
@@ -736,8 +730,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 				// Draw the remaining branch as a path so it has proper line joins...
 				int colour = ((Number)branchColouring[branchColouring.length - 1]).intValue();
-                branchColouringDecorator.setItem(colour);
-                g2.setPaint(branchColouringDecorator.getPaint(Color.BLACK));
+				branchColouringDecorator.setItem(colour);
+				g2.setPaint(branchColouringDecorator.getPaint(Color.BLACK));
 
 				GeneralPath path = new GeneralPath();
 				path.moveTo(coords1[0], coords1[1]);
@@ -786,7 +780,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				g2.setTransform(oldTransform);
 
 				if (showingTipCallouts) {
-					Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
+					Shape calloutPath = transform.createTransformedShape(treeLayoutCache.getCalloutPath(node));
 					if (calloutPath != null) {
 						g2.setStroke(calloutStroke);
 						g2.draw(calloutPath);
@@ -859,7 +853,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		// as labels and the like.
 
 		// bounds on branches
-		for (Shape branchPath : treeLayout.getBranchPathMap().values()) {
+		for (Shape branchPath : treeLayoutCache.getBranchPathMap().values()) {
 			// Add the bounds of the branch path to the overall bounds
 			final Rectangle2D branchBounds = branchPath.getBounds2D();
 			if (treeBounds == null) {
@@ -869,7 +863,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
-		for (Shape collapsedShape : treeLayout.getCollapsedShapeMap().values()) {
+		for (Shape collapsedShape : treeLayoutCache.getCollapsedShapeMap().values()) {
 			// Add the bounds of the branch path to the overall bounds
 			final Rectangle2D branchBounds = collapsedShape.getBounds2D();
 			if (treeBounds == null) {
@@ -913,11 +907,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			final double tipLabelHeight = tipLabelPainter.getPreferredHeight();
 
 			// Iterate though the nodes with tip labels
-			for (Node node : treeLayout.getTipLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getTipLabelPathMap().keySet()) {
 				Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, tipLabelHeight);
 
 				// Get the line that represents the path for the taxon label
-				Line2D taxonPath = treeLayout.getTipLabelPath(node);
+				Line2D taxonPath = treeLayoutCache.getTipLabelPath(node);
 
 				// Work out how it is rotated and create a transform that matches that
 				AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, tipLabelHeight, true);
@@ -929,9 +923,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 			// Iterate though the nodes with node labels
-			for (Node node : treeLayout.getNodeLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getNodeLabelPathMap().keySet()) {
 				// Get the line that represents the path for the taxon label
-				final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+				final Line2D labelPath = treeLayoutCache.getNodeLabelPath(node);
 
 				nodeLabelPainter.calibrate(g2, node);
 				final double labelHeight = nodeLabelPainter.getPreferredHeight();
@@ -948,9 +942,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 			// Iterate though the nodes with branch labels
-			for (Node node : treeLayout.getBranchLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getBranchLabelPathMap().keySet()) {
 				// Get the line that represents the path for the branch label
-				final Line2D labelPath = treeLayout.getBranchLabelPath(node);
+				final Line2D labelPath = treeLayoutCache.getBranchLabelPath(node);
 
 				branchLabelPainter.calibrate(g2, node);
 				final double labelHeight = branchLabelPainter.getHeightBound();
@@ -968,8 +962,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
 			scaleBarPainter.calibrate(g2, this);
-            scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), treeBounds.getY(),
-                    treeBounds.getWidth(), scaleBarPainter.getPreferredHeight());
+			scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), treeBounds.getY(),
+					treeBounds.getWidth(), scaleBarPainter.getPreferredHeight());
 			bounds.add(scaleBarBounds);
 		}
 
@@ -1009,10 +1003,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			// the tree to that (to keep the aspect ratio.
 			if ((w / treeBounds.getWidth()) < (h / treeBounds.getHeight())) {
 				xScale = w / treeBounds.getWidth();
-                yScale = xScale;
+				yScale = xScale;
 			} else {
 				yScale = h / treeBounds.getHeight();
-                xScale = yScale;
+				xScale = yScale;
 			}
 
 			treeScale = xScale;   assert treeScale > 0;
@@ -1043,9 +1037,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		treeBounds = null;
 
 		// bounds on branches
-		for (Shape branchPath : treeLayout.getBranchPathMap().values()) {
+		for (Shape branchPath : treeLayoutCache.getBranchPathMap().values()) {
 			// Add the bounds of the branch path to the overall bounds
-            final Rectangle2D branchBounds = transform.createTransformedShape(branchPath).getBounds2D();
+			final Rectangle2D branchBounds = transform.createTransformedShape(branchPath).getBounds2D();
 			if (treeBounds == null) {
 				treeBounds = branchBounds;
 			} else {
@@ -1063,9 +1057,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, tipLabelWidth, labelHeight);
 
 			// Iterate though the external nodes with tip labels
-			for (Node node : treeLayout.getTipLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getTipLabelPathMap().keySet()) {
 				// Get the line that represents the path for the tip label
-				Line2D tipPath = treeLayout.getTipLabelPath(node);
+				Line2D tipPath = treeLayoutCache.getTipLabelPath(node);
 
 				// Work out how it is rotated and create a transform that matches that
 				AffineTransform taxonTransform = calculateTransform(transform, tipPath, tipLabelWidth, labelHeight, true);
@@ -1094,9 +1088,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
 
 			// Iterate though the external nodes with node labels
-			for (Node node : treeLayout.getNodeLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getNodeLabelPathMap().keySet()) {
 				// Get the line that represents the path for the node label
-				final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+				final Line2D labelPath = treeLayoutCache.getNodeLabelPath(node);
 
 				// Work out how it is rotated and create a transform that matches that
 				AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
@@ -1123,10 +1117,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 
 			// Iterate though the external nodes with branch labels
-			for (Node node : treeLayout.getBranchLabelPathMap().keySet()) {
+			for (Node node : treeLayoutCache.getBranchLabelPathMap().keySet()) {
 
 				// Get the line that represents the path for the branch label
-				Line2D labelPath = treeLayout.getBranchLabelPath(node);
+				Line2D labelPath = treeLayoutCache.getBranchLabelPath(node);
 
 				// AR - I don't think we need to recalibrate this here
 				// branchLabelPainter.calibrate(g2, node);
@@ -1234,6 +1228,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private RootedTree originalTree = null;
 	private RootedTree tree = null;
 	private TreeLayout treeLayout = null;
+	private TreeLayoutCache treeLayoutCache = new TreeLayoutCache();
 
 	private boolean orderBranchesOn = false;
 	private SortedRootedTree.BranchOrdering branchOrdering = SortedRootedTree.BranchOrdering.INCREASING_NODE_DENSITY;
@@ -1254,8 +1249,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Rectangle2D dragRectangle = null;
 
 	private Decorator branchDecorator = null;
-    private Decorator branchColouringDecorator = null;
-    private String branchColouringAttribute = null;
+	private Decorator branchColouringDecorator = null;
+	private String branchColouringAttribute = null;
 
 	private float labelXOffset = 5.0F;
 	private LabelPainter<Node> tipLabelPainter = null;

@@ -8,7 +8,7 @@ import java.util.*;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class MultipleTreeViewer extends TreeViewer {
+public class MultipleTreeViewer extends DefaultTreeViewer {
 
     public MultipleTreeViewer() {
         super();
@@ -45,6 +45,10 @@ public class MultipleTreeViewer extends TreeViewer {
     public List<Tree> getTrees() {
         return trees;
     }
+
+	public Tree getCurrentTree() {
+		return trees.get(currentTreeIndex);
+	}
 
     public int getCurrentTreeIndex() {
         return currentTreeIndex;

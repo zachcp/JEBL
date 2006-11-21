@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -11,6 +12,10 @@ import java.util.List;
  * @version $Id$
  */
 public class RectilinearTreeLayout extends AbstractTreeLayout {
+
+	private double curvature = 0.0;
+	private double rootLength = 0.01;
+	private boolean alignTipLabels = false;
 
     public AxisType getXAxisType() {
         return AxisType.CONTINUOUS;
@@ -61,58 +66,52 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
     public void setAlignTipLabels(boolean alignTipLabels) {
         this.alignTipLabels = alignTipLabels;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
     public void setCurvature(double curvature) {
         this.curvature = curvature;
-        invalidate();
+	    fireTreeLayoutChanged();
     }
 
     public void setRootLength(double rootLength) {
         this.rootLength = rootLength;
-        invalidate();
+	    fireTreeLayoutChanged();
     }
 
-    protected void validate() {
+    public void layout(RootedTree tree, TreeLayoutCache cache) {
 
-        nodePoints.clear();
-        branchPaths.clear();
-        collapsedShapes.clear();
-        tipLabelPaths.clear();
-        nodeLabelPaths.clear();
-        nodeBarPaths.clear();
-        calloutPaths.clear();
+        cache.clear();
 
         maxXPosition = 0.0;
 
         yPosition = 0.0;
         yIncrement = 1.0 / (tree.getExternalNodes().size() + 1);
 
-        Node root = this.tree.getRootNode();
-        double rl = rootLength * this.tree.getHeight(root);
+        Node root = tree.getRootNode();
+        double rl = rootLength * tree.getHeight(root);
 
         maxXPosition = 0.0;
-        getMaxXPosition(root, rl);
+        getMaxXPosition(tree, root, rl);
 
-        Point2D rootPoint = constructNode(root, rl);
+        Point2D rootPoint = constructNode(tree, root, rl, cache);
 
         // construct a root branch line
         Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
 
         // add the line to the map of branch paths
-        branchPaths.put(root, line);
+        cache.branchPaths.put(root, line);
 
     }
 
-    private Point2D constructNode(Node node, double xPosition) {
+    private Point2D constructNode(RootedTree tree, Node node, double xPosition, TreeLayoutCache cache) {
 
         Point2D nodePoint;
 
         if (!tree.isExternal(node)) {
 
             if (collapseAttributeName != null && node.getAttribute(collapseAttributeName) != null) {
-                nodePoint = constructCollapsedNode(node, xPosition);
+                nodePoint = constructCollapsedNode(tree, node, xPosition, cache);
             } else {
                 double yPos = 0.0;
 
@@ -120,7 +119,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 for (Node child : children) {
 
                     double length = tree.getLength(child);
-                    Point2D childPoint = constructNode(child, xPosition + length);
+                    Point2D childPoint = constructNode(tree, child, xPosition + length, cache);
                     yPos += childPoint.getY();
                 }
 
@@ -131,7 +130,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
                 for (Node child : children) {
 
-                    Point2D childPoint = nodePoints.get(child);
+                    Point2D childPoint = cache.nodePoints.get(child);
 
                     GeneralPath branchPath = new GeneralPath();
 
@@ -191,27 +190,27 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 
                     // add the branchPath to the map of branch paths
-                    branchPaths.put(child, branchPath);
+                    cache.branchPaths.put(child, branchPath);
 
                     double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
                     Line2D branchLabelPath = new Line2D.Double(
                             x3 - 1.0, childPoint.getY(),
                             x3 + 1.0, childPoint.getY());
 
-                    branchLabelPaths.put(child, branchLabelPath);
+                    cache.branchLabelPaths.put(child, branchLabelPath);
                 }
 
                 Line2D nodeLabelPath = new Line2D.Double(
                         nodePoint.getX(), nodePoint.getY(),
                         nodePoint.getX() + 1.0, nodePoint.getY());
 
-                nodeLabelPaths.put(node, nodeLabelPath);
+                cache.nodeLabelPaths.put(node, nodeLabelPath);
 
                 Line2D nodeBarPath = new Line2D.Double(
                         nodePoint.getX(), nodePoint.getY(),
                         nodePoint.getX() - 1.0, nodePoint.getY());
 
-                nodeBarPaths.put(node, nodeBarPath);
+                cache.nodeBarPaths.put(node, nodeBarPath);
             }
         } else {
 
@@ -229,7 +228,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                         nodePoint.getX(), nodePoint.getY(),
                         maxXPosition, nodePoint.getY());
 
-                calloutPaths.put(node, calloutPath);
+                cache.calloutPaths.put(node, calloutPath);
 
             } else {
                 tipLabelPath = new Line2D.Double(
@@ -238,19 +237,19 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             }
 
-            tipLabelPaths.put(node, tipLabelPath);
+            cache.tipLabelPaths.put(node, tipLabelPath);
 
             yPosition += yIncrement;
 
         }
 
         // add the node point to the map of node points
-        nodePoints.put(node, nodePoint);
+        cache.nodePoints.put(node, nodePoint);
 
         return nodePoint;
     }
 
-    private Point2D constructCollapsedNode(Node node, double xPosition) {
+    private Point2D constructCollapsedNode(RootedTree tree, Node node, double xPosition, TreeLayoutCache cache) {
 
         Point2D nodePoint;
 
@@ -288,32 +287,34 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         collapsedShape.closePath();
 
         // add the collapsedShape to the map of branch paths
-        collapsedShapes.put(node, collapsedShape);
+        cache.collapsedShapes.put(node, collapsedShape);
 
         Line2D nodeLabelPath = new Line2D.Double(
                 nodePoint.getX(), nodePoint.getY(),
                 nodePoint.getX() + 1.0, nodePoint.getY());
 
-        nodeLabelPaths.put(node, nodeLabelPath);
+        cache.nodeLabelPaths.put(node, nodeLabelPath);
 
         Line2D nodeBarPath = new Line2D.Double(
                 nodePoint.getX(), nodePoint.getY(),
                 nodePoint.getX() - 1.0, nodePoint.getY());
 
-        nodeBarPaths.put(node, nodeBarPath);
+        cache.nodeBarPaths.put(node, nodeBarPath);
 
         if (showingCollapsedTipLabels) {
-            constructCollapsedTipLabelPaths(node, maxXPos, new double[] { minYPos });
+            constructCollapsedTipLabelPaths(tree, node, maxXPos, new double[] { minYPos }, cache);
         }
 
         return nodePoint;
     }
 
-    private void constructCollapsedTipLabelPaths(Node node, double xPosition, double[] yPosition) {
+    private void constructCollapsedTipLabelPaths(RootedTree tree, Node node,
+                                                 double xPosition, double[] yPosition,
+                                                 TreeLayoutCache cache) {
 
         if (!tree.isExternal(node)) {
             for (Node child :  tree.getChildren(node)) {
-                constructCollapsedTipLabelPaths(child, xPosition, yPosition);
+                constructCollapsedTipLabelPaths(tree, child, xPosition, yPosition, cache);
             }
         } else {
 
@@ -331,7 +332,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                         nodePoint.getX(), nodePoint.getY(),
                         maxXPosition, nodePoint.getY());
 
-                calloutPaths.put(node, calloutPath);
+                cache.calloutPaths.put(node, calloutPath);
 
             } else {
                 tipLabelPath = new Line2D.Double(
@@ -340,14 +341,14 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             }
 
-            tipLabelPaths.put(node, tipLabelPath);
+            cache.tipLabelPaths.put(node, tipLabelPath);
 
             yPosition[0] += yIncrement;
 
         }
     }
 
-    private void getMaxXPosition(Node node, double xPosition) {
+    private void getMaxXPosition(RootedTree tree, Node node, double xPosition) {
 
         if (!tree.isExternal(node)) {
 
@@ -355,7 +356,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             for (Node child : children) {
                 double length = tree.getLength(child);
-                getMaxXPosition(child, xPosition + length);
+                getMaxXPosition(tree, child, xPosition + length);
             }
 
         } else {
@@ -370,10 +371,5 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
     private double maxXPosition;
 
-    private double curvature = 0.0;
-
-    private double rootLength = 0.01;
-
-    private boolean alignTipLabels = false;
 
 }

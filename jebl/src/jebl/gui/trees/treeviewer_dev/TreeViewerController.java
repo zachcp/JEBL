@@ -19,23 +19,23 @@ import java.util.prefs.Preferences;
  */
 public class TreeViewerController extends AbstractController {
 
+	public enum TreeLayoutType {
+	    RECTILINEAR("Rectangle"),
+	    POLAR("Polar"),
+	    RADIAL("Radial");
+
+	    TreeLayoutType(String name) {
+	        this.name = name;
+	    }
+
+	    public String toString() {
+	        return name;
+	    }
+
+	    private final String name;
+	}
+
 	private static final String CONTROLLER_TITLE = "Layout";
-
-    public enum TreeLayoutType {
-        RECTILINEAR("Rectangle"),
-        POLAR("Polar"),
-        RADIAL("Radial");
-
-        TreeLayoutType(String name) {
-            this.name = name;
-        }
-
-        public String toString() {
-            return name;
-        }
-
-        private final String name;
-    }
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewerController.class);
 
@@ -186,9 +186,9 @@ public class TreeViewerController extends AbstractController {
     }
 
 	public void setColouringAttributeName(String attributeName) {
-		rectilinearTreeLayout.setBranchColouringAttribute(attributeName);
-		polarTreeLayout.setBranchColouringAttribute(attributeName);
-		radialTreeLayout.setBranchColouringAttribute(attributeName);
+		rectilinearTreeLayout.setBranchColouringAttributeName(attributeName);
+		polarTreeLayout.setBranchColouringAttributeName(attributeName);
+		radialTreeLayout.setBranchColouringAttributeName(attributeName);
 	}
 
     public void initialize() {

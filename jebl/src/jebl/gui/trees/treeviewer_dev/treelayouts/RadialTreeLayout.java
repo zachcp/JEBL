@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -12,6 +13,8 @@ import java.util.List;
  * @version $Id$
  */
 public class RadialTreeLayout extends AbstractTreeLayout {
+
+	private double spread = 0.0;
 
     public AxisType getXAxisType() {
         return AxisType.CONTINUOUS;
@@ -47,30 +50,26 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
     public void setSpread(double spread) {
         this.spread = spread;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
-    protected void validate() {
-        nodePoints.clear();
-        branchPaths.clear();
-        collapsedShapes.clear();
-        tipLabelPaths.clear();
-        nodeLabelPaths.clear();
-        nodeBarPaths.clear();
-        calloutPaths.clear();
+	public void layout(RootedTree tree, TreeLayoutCache cache) {
+        cache.clear();
 
         try {
             final Node root = tree.getRootNode();
 
-            constructNode(root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0);
+            constructNode(tree, root, 0.0, Math.PI * 2, 0.0, 0.0, 0.0, cache);
 
         } catch (Graph.NoEdgeException e) {
             e.printStackTrace();
         }
     }
 
-    private Point2D constructNode(Node node, double angleStart, double angleFinish, double xPosition,
-                                  double yPosition, double length) throws Graph.NoEdgeException {
+    private Point2D constructNode(RootedTree tree, Node node,
+                                  double angleStart, double angleFinish, double xPosition,
+                                  double yPosition, double length,
+                                  TreeLayoutCache cache) throws Graph.NoEdgeException {
 
         final double branchAngle = (angleStart + angleFinish) / 2.0;
 
@@ -110,7 +109,8 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 double a1 = a2;
                 a2 = a1 + (span * leafCounts[i] / sumLeafCount);
 
-                Point2D childPoint = constructNode(child, a1, a2, nodePoint.getX(), nodePoint.getY(), childLength);
+                Point2D childPoint = constructNode(tree, child, a1, a2,
+		                nodePoint.getX(), nodePoint.getY(), childLength, cache);
 
 	            Line2D branchLine = new Line2D.Double(
 				            nodePoint.getX(), nodePoint.getY(),
@@ -147,14 +147,14 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 		            branchPath.lineTo(x0, y0);
 
 		            // add the branchPath to the map of branch paths
-		            branchPaths.put(child, branchPath);
+		            cache.branchPaths.put(child, branchPath);
 
 	            } else {
 		            // add the branchLine to the map of branch paths
-		            branchPaths.put(child, branchLine);
+		            cache.branchPaths.put(child, branchLine);
 	            }
 
-                branchLabelPaths.put(child, (Line2D)branchLine.clone());
+                cache.branchLabelPaths.put(child, (Line2D)branchLine.clone());
                 i++;
             }
 
@@ -162,27 +162,26 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                     yPosition + ((length + 1.0) * directionY));
 
             Line2D nodeLabelPath = new Line2D.Double(nodePoint, nodeLabelPoint);
-            nodeLabelPaths.put(node, nodeLabelPath);
+            cache.nodeLabelPaths.put(node, nodeLabelPath);
 
             Point2D nodeBarPoint = new Point2D.Double(xPosition + ((length - 1.0) * directionX),
                     yPosition + ((length - 1.0) * directionY));
             Line2D nodeBarPath = new Line2D.Double(nodePoint, nodeBarPoint);
 
-            nodeBarPaths.put(node, nodeBarPath);
+            cache.nodeBarPaths.put(node, nodeBarPath);
         } else {
 
             Point2D taxonPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),
                     yPosition + ((length + 1.0) * directionY));
 
             Line2D taxonLabelPath = new Line2D.Double(nodePoint, taxonPoint);
-            tipLabelPaths.put(node, taxonLabelPath);
+            cache.tipLabelPaths.put(node, taxonLabelPath);
         }
 
         // add the node point to the map of node points
-        nodePoints.put(node, nodePoint);
+        cache.nodePoints.put(node, nodePoint);
 
         return nodePoint;
     }
 
-    private double spread = 0.0;
 }

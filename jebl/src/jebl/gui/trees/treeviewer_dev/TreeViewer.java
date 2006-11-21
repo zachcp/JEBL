@@ -1,305 +1,58 @@
-/*
- * AlignmentPanel.java
- *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
- * Lesser Gnu Public Licence (LGPL)
- */
-
 package jebl.gui.trees.treeviewer_dev;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.print.*;
-import java.util.ArrayList;
+import java.awt.print.Printable;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreeViewer extends JPanel implements Printable {
+public interface TreeViewer extends Printable {
 
-    private final static double MAX_ZOOM = 20;
-    private final static double MAX_VERTICAL_EXPANSION = 20;
+	void setTreeLayout(TreeLayout treeLayout);
 
-    public enum SearchType {
-        CONTAINS("Contains"),
-        STARTS_WITH("Starts with"),
-        ENDS_WITH("Ends with"),
-        MATCHES("Matches");
+	void setZoom(double zoom);
 
-        SearchType(String name) {
-            this.name = name;
-        }
+	void setVerticalExpansion(double verticalExpansion);
 
-        public String toString() {
-            return name;
-        }
+	boolean verticalExpansionAllowed();
 
-        private final String name;
-    }
+	void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive);
 
-    /**
-     * Creates new TreeViewer
-     */
-    public TreeViewer() {
-        this(new TreePane());
-    }
+	void selectNodes(String attribute, SearchType searchType, String searchString, boolean caseSensitive);
 
-    /**
-     * Creates new TreeViewer
-     */
-    public TreeViewer(TreePane treePane) {
-        setLayout(new BorderLayout());
+	void collapseSelected();
 
-        this.treePane = treePane;
-        treePane.setAutoscrolls(true); //enable synthetic drag events
+	void selectAll();
 
-        JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setMinimumSize(new Dimension(150, 150));
+	void clearSelectedTaxa();
 
-        scrollPane.setBorder(null);
-        viewport = scrollPane.getViewport();
+	void setSelectionMode(TreePaneSelector.SelectionMode selectionMode);
 
-        add(scrollPane, BorderLayout.CENTER);
+	void setDragMode(TreePaneSelector.DragMode dragMode);
 
-        // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
-        // It installs itself within the constructor.
-        treePaneSelector = new TreePaneSelector(treePane);
-    }
+	JComponent getExportableComponent();
 
-    public void setTree(Tree tree) {
-        if (tree == null) {
-	        return;
-        }
+	void addTreeViewerListener(TreeViewerListener listener);
 
-	    if (tree instanceof RootedTree) {
-		    treePane.setTree((RootedTree)tree);
-	    } else {
-            treePane.setTree(Utils.rootTheTree(tree));
-        }
+	void removeTreeViewerListener(TreeViewerListener listener);
 
-    }
+	public enum SearchType {
+	    CONTAINS("Contains"),
+	    STARTS_WITH("Starts with"),
+	    ENDS_WITH("Ends with"),
+	    MATCHES("Matches");
 
-    public void setTreeLayout(TreeLayout treeLayout) {
-        treePane.setTreeLayout(treeLayout);
-    }
+	    SearchType(String name) {
+	        this.name = name;
+	    }
 
-    public Tree getTree() {
-        return treePane.getTree();
-    }
+	    public String toString() {
+	        return name;
+	    }
 
-    public TreePane getTreePane() {
-        return treePane;
-    }
-
-    private boolean zoomPending = false;
-    private double zoom = 0.0, verticalExpansion = 0.0;
-
-    public void setZoom(double zoom) {
-        this.zoom = zoom * MAX_ZOOM;
-        refreshZoom();
-    }
-
-    public void setVerticalExpansion(double verticalExpansion) {
-        this.verticalExpansion = verticalExpansion * MAX_VERTICAL_EXPANSION;
-        refreshZoom();
-    }
-
-    public boolean verticalExpansionAllowed() {
-        return !treePane.maintainAspectRatio();
-    }
-
-    private void refreshZoom() {
-        setZoom(zoom, zoom + verticalExpansion);
-    }
-
-    private void setZoom(double xZoom, double yZoom) {
-
-        Dimension viewportSize = viewport.getViewSize();
-        Point position = viewport.getViewPosition();
-
-        Dimension extentSize = viewport.getExtentSize();
-        double w = extentSize.getWidth() * (1.0 + xZoom);
-        double h = extentSize.getHeight() * (1.0 + yZoom);
-
-        Dimension newSize = new Dimension((int) w, (int) h);
-        treePane.setPreferredSize(newSize);
-
-        double cx = position.getX() + (0.5 * extentSize.getWidth());
-        double cy = position.getY() + (0.5 * extentSize.getHeight());
-
-        double rx = ((double) newSize.getWidth()) / viewportSize.getWidth();
-        double ry = ((double) newSize.getHeight()) / viewportSize.getHeight();
-
-        double px = (cx * rx) - (extentSize.getWidth() / 2.0);
-        double py = (cy * ry) - (extentSize.getHeight() / 2.0);
-
-        Point newPosition = new Point((int) px, (int) py);
-        viewport.setViewPosition(newPosition);
-        treePane.revalidate();
-    }
-
-    public void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive) {
-        treePane.clearSelection();
-
-        if (searchType == SearchType.MATCHES && !caseSensitive) {
-            throw new IllegalArgumentException("Regular expression matching cannot be case-insensitive");
-        }
-
-        String query = (caseSensitive ? searchString : searchString.toUpperCase());
-
-        Tree tree = treePane.getTree();
-
-        for (Node node : tree.getExternalNodes()) {
-            Taxon taxon = tree.getTaxon(node);
-            String target = (caseSensitive ? taxon.getName() : taxon.getName().toUpperCase());
-            switch (searchType) {
-                case CONTAINS:
-                    if (target.contains(query)) {
-                        treePane.addSelectedTip(node);
-                    }
-                    break;
-                case STARTS_WITH:
-                    if (target.startsWith(query)) {
-                        treePane.addSelectedTip(node);
-                    }
-                    break;
-                case ENDS_WITH:
-                    if (target.endsWith(query)) {
-                        treePane.addSelectedTip(node);
-                    }
-                    break;
-                case MATCHES:
-                    if (target.matches(query)) {
-                        treePane.addSelectedTip(node);
-                    }
-                    break;
-            }
-        }
-    }
-
-    public void selectNodes(String attribute, SearchType searchType, String searchString, boolean caseSensitive) {
-        treePane.clearSelection();
-
-        if (searchType == SearchType.MATCHES && !caseSensitive) {
-            throw new IllegalArgumentException("Regular expression matching cannot be case-insensitive");
-        }
-
-        String query = (caseSensitive ? searchString : searchString.toUpperCase());
-
-        Tree tree = treePane.getTree();
-
-        for (Node node : tree.getNodes()) {
-            Object value = node.getAttribute(attribute);
-
-            if (value != null) {
-                String target = (caseSensitive ?
-                        value.toString() : value.toString().toUpperCase());
-                switch (searchType) {
-                    case CONTAINS:
-                        if (target.contains(query)) {
-                            treePane.addSelectedNode(node);
-                        }
-                        break;
-                    case STARTS_WITH:
-                        if (target.startsWith(query)) {
-                            treePane.addSelectedNode(node);
-                        }
-                        break;
-                    case ENDS_WITH:
-                        if (target.endsWith(query)) {
-                            treePane.addSelectedNode(node);
-                        }
-                        break;
-                    case MATCHES:
-                        if (target.matches(query)) {
-                            treePane.addSelectedNode(node);
-                        }
-                        break;
-                }
-            }
-        }
-    }
-
-    public void collapseSelected() {
-        treePane.collapseSelectedNodes();
-    }
-
-    public void selectAll() {
-        if (treePaneSelector.getSelectionMode() == TreePaneSelector.SelectionMode.TAXA) {
-            treePane.selectAllTaxa();
-        } else {
-            treePane.selectAllNodes();
-        }
-    }
-
-    public void clearSelectedTaxa() {
-        treePane.clearSelection();
-    }
-
-    public void setSelectionMode(TreePaneSelector.SelectionMode selectionMode) {
-        TreePaneSelector.SelectionMode oldSelectionMode = treePaneSelector.getSelectionMode();
-
-        if (selectionMode == oldSelectionMode) {
-            return;
-        }
-
-        if (oldSelectionMode == TreePaneSelector.SelectionMode.TAXA) {
-            treePane.selectNodesFromSelectedTips();
-        } else if (selectionMode == TreePaneSelector.SelectionMode.TAXA) {
-            treePane.selectTipsFromSelectedNodes();
-        } else if (selectionMode == TreePaneSelector.SelectionMode.CLADE) {
-            treePane.selectCladesFromSelectedNodes();
-        }
-        treePaneSelector.setSelectionMode(selectionMode);
-    }
-
-    public void setDragMode(TreePaneSelector.DragMode dragMode) {
-        treePaneSelector.setDragMode(dragMode);
-    }
-
-    public JComponent getExportableComponent() {
-        return treePane;
-    }
-
-    public void paint(Graphics g) {
-        if( zoomPending  ) {
-            refreshZoom();
-            zoomPending = false;
-        }
-        super.paint(g);
-    }
-
-    public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        return treePane.print(g, pageFormat, pageIndex);
-    }
-
-	public void addTreeViewerListener(TreeViewerListener listener) {
-		listeners.add(listener);
+	    private final String name;
 	}
-
-	public void removeTreeViewerListener(TreeViewerListener listener) {
-		listeners.remove(listener);
-	}
-
-	public void fireTreeChanged() {
-		for (TreeViewerListener listener : listeners) {
-			listener.treeChanged();
-		}
-	}
-
-	private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
-
-    protected TreePane treePane;
-    protected TreePaneSelector treePaneSelector;
-
-    protected JViewport viewport;
-
 }

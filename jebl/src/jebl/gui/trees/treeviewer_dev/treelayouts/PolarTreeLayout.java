@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -11,6 +12,14 @@ import java.util.List;
  * @version $Id$
  */
 public class PolarTreeLayout extends AbstractTreeLayout {
+
+	private double rootAngle = 180.0;
+	private double rootLength = 0.01;
+	private double angularRange = 360.0;
+
+	private boolean showingRootBranch = true;
+
+	private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
 
     public enum TipLabelPosition {
         FLUSH,
@@ -68,48 +77,43 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
     public void setRootAngle(double rootAngle) {
         this.rootAngle = rootAngle;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
     public void setAngularRange(double angularRange) {
         this.angularRange = angularRange;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
     public void setShowingRootBranch(boolean showingRootBranch) {
         this.showingRootBranch = showingRootBranch;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
     public void setRootLength(double rootLength) {
         this.rootLength = rootLength;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
     public void setTipLabelPosition(TipLabelPosition tipLabelPosition) {
         this.tipLabelPosition = tipLabelPosition;
-        invalidate();
+        fireTreeLayoutChanged();
     }
 
-    protected void validate() {
-        nodePoints.clear();
-        branchPaths.clear();
-        collapsedShapes.clear();
-        tipLabelPaths.clear();
-        nodeLabelPaths.clear();
-        nodeBarPaths.clear();
-        calloutPaths.clear();
+	public void layout(RootedTree tree, TreeLayoutCache cache) {
 
-        Node root = this.tree.getRootNode();
-        double rl = (rootLength * this.tree.getHeight(root)) * 10.0;
+	    cache.clear();
+
+        Node root = tree.getRootNode();
+        double rl = (rootLength * tree.getHeight(root)) * 10.0;
 
         maxXPosition = 0.0;
-        getMaxXPosition(root, rl);
+        getMaxXPosition(tree, root, rl);
 
         yPosition = 0.0;
         yIncrement = 1.0 / tree.getExternalNodes().size();
 
-        final Point2D rootPoint = constructNode(root, rl);
+        final Point2D rootPoint = constructNode(tree, root, rl, cache);
 
         if (showingRootBranch) {
             // construct a root branch line
@@ -117,18 +121,18 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             Line2D line = new Line2D.Double(transform(0.0, y), transform(rootPoint.getX(), y));
 
             // add the line to the map of branch paths
-            branchPaths.put(root, line);
+            cache.branchPaths.put(root, line);
         }
     }
 
-    private Point2D constructNode(Node node, double xPosition) {
+    private Point2D constructNode(RootedTree tree, Node node, double xPosition, TreeLayoutCache cache) {
 
         Point2D nodePoint;
 
         if (!tree.isExternal(node)) {
 
             if (collapseAttributeName != null && node.getAttribute(collapseAttributeName) != null) {
-                nodePoint = constructCollapsedNode(node, xPosition);
+                nodePoint = constructCollapsedNode(tree, node, xPosition, cache);
             } else {
                 double yPos = 0.0;
 
@@ -139,7 +143,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 for (Node child : children) {
 
                     final double length = tree.getLength(child);
-                    childPoints[i] = constructNode(child, xPosition + length);
+                    childPoints[i] = constructNode(tree, child, xPosition + length, cache);
                     yPos += childPoints[i].getY();
 
                     i++;
@@ -210,7 +214,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                     branchPath.append(arc, true);
 
                     // add the branchPath to the map of branch paths
-                    branchPaths.put(child, branchPath);
+                    cache.branchPaths.put(child, branchPath);
 
                     final double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
 
@@ -218,7 +222,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                             transform(x3 - 1.0, childPoints[i].getY()),
                             transform(x3 + 1.0, childPoints[i].getY()));
 
-                    branchLabelPaths.put(child, branchLabelPath);
+                    cache.branchLabelPaths.put(child, branchLabelPath);
 
                     i++;
                 }
@@ -227,16 +231,16 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                         transform(nodePoint.getX(), yPos),
                         transform(nodePoint.getX() + 1.0, yPos));
 
-                nodeLabelPaths.put(node, nodeLabelPath);
+                cache.nodeLabelPaths.put(node, nodeLabelPath);
 
                 Line2D nodeBarPath = new Line2D.Double(
                         transform(nodePoint.getX(), yPos),
                         transform(nodePoint.getX() - 1.0, yPos));
 
-                nodeBarPaths.put(node, nodeBarPath);
+                cache.nodeBarPaths.put(node, nodeBarPath);
 
                 // add the node point to the map of node points
-                nodePoints.put(node, transformedNodePoint);
+                cache.nodePoints.put(node, transformedNodePoint);
             }
         } else {
 
@@ -256,7 +260,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
                 Line2D calloutPath = new Line2D.Double(transformedNodePoint, transform(maxXPosition, yPosition));
 
-                calloutPaths.put(node, calloutPath);
+                cache.calloutPaths.put(node, calloutPath);
 
             } else if (tipLabelPosition == TipLabelPosition.HORIZONTAL) {
                 // this option disabled in getControls (JH)
@@ -266,18 +270,18 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 throw new IllegalArgumentException("Unrecognized enum value");
             }
 
-            tipLabelPaths.put(node, tipLabelPath);
+            cache.tipLabelPaths.put(node, tipLabelPath);
 
             yPosition += yIncrement;
 
             // add the node point to the map of node points
-            nodePoints.put(node, transformedNodePoint);
+            cache.nodePoints.put(node, transformedNodePoint);
         }
 
         return nodePoint;
     }
 
-    private Point2D constructCollapsedNode(Node node, double xPosition) {
+    private Point2D constructCollapsedNode(RootedTree tree, Node node, double xPosition, TreeLayoutCache cache) {
 
         Point2D nodePoint;
 
@@ -312,35 +316,35 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         collapsedShape.closePath();
 
         // add the collapsedShape to the map of branch paths
-        collapsedShapes.put(node, collapsedShape);
+        cache.collapsedShapes.put(node, collapsedShape);
 
         Line2D nodeLabelPath = new Line2D.Double(
                 transform(nodePoint.getX(), yPos),
                 transform(nodePoint.getX() + 1.0, yPos));
 
-        nodeLabelPaths.put(node, nodeLabelPath);
+        cache.nodeLabelPaths.put(node, nodeLabelPath);
 
         Line2D nodeBarPath = new Line2D.Double(
                 transform(nodePoint.getX(), yPos),
                 transform(nodePoint.getX() - 1.0, yPos));
 
-        nodeBarPaths.put(node, nodeBarPath);
+        cache.nodeBarPaths.put(node, nodeBarPath);
 
         if (showingCollapsedTipLabels) {
-            constructCollapsedTipLabelPaths(node, maxXPos, new double[] { minYPos });
+            constructCollapsedTipLabelPaths(tree, node, maxXPos, new double[] { minYPos }, cache);
         }
 
         // add the node point to the map of node points
-        nodePoints.put(node, transformedNodePoint0);
+        cache.nodePoints.put(node, transformedNodePoint0);
 
         return nodePoint;
     }
 
-    private void constructCollapsedTipLabelPaths(Node node, double xPosition, double[] yPosition) {
+    private void constructCollapsedTipLabelPaths(RootedTree tree, Node node, double xPosition, double[] yPosition, TreeLayoutCache cache) {
 
         if (!tree.isExternal(node)) {
             for (Node child :  tree.getChildren(node)) {
-                constructCollapsedTipLabelPaths(child, xPosition, yPosition);
+                constructCollapsedTipLabelPaths(tree, child, xPosition, yPosition, cache);
             }
         } else {
 
@@ -361,7 +365,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
                 Line2D calloutPath = new Line2D.Double(transformedNodePoint, transform(maxXPosition, yPosition[0]));
 
-                calloutPaths.put(node, calloutPath);
+	            cache.calloutPaths.put(node, calloutPath);
 
             } else if (tipLabelPosition == TipLabelPosition.HORIZONTAL) {
                 // this option disabled in getControls (JH)
@@ -371,14 +375,14 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 throw new IllegalArgumentException("Unrecognized enum value");
             }
 
-            tipLabelPaths.put(node, tipLabelPath);
+            cache.tipLabelPaths.put(node, tipLabelPath);
 
             yPosition[0] += yIncrement;
 
         }
     }
 
-    private void getMaxXPosition(Node node, double xPosition) {
+    private void getMaxXPosition(RootedTree tree, Node node, double xPosition) {
 
         if (!tree.isExternal(node)) {
 
@@ -386,7 +390,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
             for (Node child : children) {
                 final double length = tree.getLength(child);
-                getMaxXPosition(child, xPosition + length);
+                getMaxXPosition(tree, child, xPosition + length);
             }
 
         } else {
@@ -429,11 +433,4 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
     private double maxXPosition;
 
-    private double rootAngle = 180.0;
-    private double rootLength = 0.01;
-    private double angularRange = 360.0;
-
-    private boolean showingRootBranch = true;
-
-    private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
 }

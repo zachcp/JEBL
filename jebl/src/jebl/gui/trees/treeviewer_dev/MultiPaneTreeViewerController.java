@@ -7,15 +7,17 @@ import org.virion.jam.panels.OptionsPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Map;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class MultipleTreeViewerController extends AbstractController {
+public class MultiPaneTreeViewerController extends AbstractController {
 
-	public MultipleTreeViewerController(final MultipleTreeViewer treeViewer) {
+	public MultiPaneTreeViewerController(final MultiPaneTreeViewer treeViewer) {
 
 		this.treeViewer = treeViewer;
 
@@ -31,6 +33,14 @@ public class MultipleTreeViewerController extends AbstractController {
 				treeViewer.showTree((Integer)spinnerModel.getValue() - 1);
 			}
 		});
+
+		final JComboBox treesPerPageCombo = new JComboBox(new String[] { "1", "2", "3", "4", "5", "6", "7", "8" });
+		treesPerPageCombo.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				treeViewer.setTreesPerPage(treesPerPageCombo.getSelectedIndex() + 1);
+			}
+		});
+
 
 		treeViewer.addTreeViewerListener(new TreeViewerListener() {
 			public void treeChanged() {
@@ -50,6 +60,7 @@ public class MultipleTreeViewerController extends AbstractController {
 		});
 		optionsPanel.addComponentWithLabel("Name:", treeNameLabel);
 		optionsPanel.addComponentWithLabel("Tree:", currentTreeSpinner);
+		optionsPanel.addComponentWithLabel("Trees per page:", treesPerPageCombo);
 
 	}
 
@@ -78,6 +89,6 @@ public class MultipleTreeViewerController extends AbstractController {
 	private final JLabel titleLabel;
 	private final OptionsPanel optionsPanel;
 
-	private final MultipleTreeViewer treeViewer;
+	private final MultiPaneTreeViewer treeViewer;
 
 }
