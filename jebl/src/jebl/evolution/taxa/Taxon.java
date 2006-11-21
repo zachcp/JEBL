@@ -121,16 +121,14 @@ public final class Taxon implements Attributable, Comparable {
             throw new IllegalArgumentException("Illegal empty string for taxon name");
         }
 
-	    return new Taxon(name);
+        Taxon taxon = taxa.get(name);
 
-//        Taxon taxon = taxa.get(name);
-//
-//        if (taxon == null) {
-//            taxon = new Taxon(name);
-//            taxa.put(name, taxon);
-//        }
-//
-//        return taxon;
+        if (taxon == null) {
+            taxon = new Taxon(name);
+            taxa.put(name, taxon);
+        }
+
+        return taxon;
     }
 
 	// private members
