@@ -52,7 +52,7 @@ public class MultiPaneTreeViewer extends TreeViewer {
     }
 
     public void setTrees(Collection<? extends Tree> trees) {
-        trees.clear();
+        this.trees.clear();
         for (Tree tree : trees) {
             addTree(tree);
         }
@@ -112,12 +112,6 @@ public class MultiPaneTreeViewer extends TreeViewer {
                 treePanes.remove(treePanes.size() - 1);
             }
         }
-        removeAll();
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        for (TreePane treePane : treePanes) {
-            add(treePane);
-            setupTreePane(treePane);
-        }
         showTree(currentTreeIndex);
     }
 
@@ -160,6 +154,14 @@ public class MultiPaneTreeViewer extends TreeViewer {
             i++;
         }
         currentTreeIndex = index;
+
+	    treePanePanel.removeAll();
+	    setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+	    for (TreePane treePane : treePanes) {
+	        treePanePanel.add(treePane);
+	        setupTreePane(treePane);
+	    }
+
         fireTreeChanged();
     }
 
