@@ -2,14 +2,14 @@ package jebl.evolution.io;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Sequence;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Export alignment to Phylip format.
@@ -21,7 +21,7 @@ import java.util.Set;
  * @author Joseph Heled
  * @version $Id$
  */
-public class PHYLIPExporter implements AlignmentExporter {
+public class PHYLIPExporter implements AlignmentExporter, TreeExporter {
     private PrintWriter writer;
 
     /**
@@ -99,5 +99,19 @@ public class PHYLIPExporter implements AlignmentExporter {
             writer.print(names.get(i) + " ");
             writer.println(seqs.get(i).getString());
         }
+    }
+
+    // Should call those only after the alignment
+
+    public void exportTree(Tree tree) throws IOException {
+        final RootedTree rtree = Utils.rootTheTree(tree);
+        writer.print(Utils.toNewick(rtree));
+        writer.println(";");
+    }
+
+    public void exportTrees(Collection<? extends Tree> trees) throws IOException {
+       for( Tree t : trees ) {
+           exportTree(t);
+       }
     }
 }

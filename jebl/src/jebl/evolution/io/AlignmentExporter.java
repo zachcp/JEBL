@@ -13,7 +13,9 @@ import java.io.IOException;
 public interface AlignmentExporter {
 
 	/**
-	 * exportAlignment.
-	 */
+	 * export one alignment.
+     * @param alignment  to export
+     * @throws java.io.IOException
+     */
 	void exportAlignment(Alignment alignment) throws IOException;
 }
