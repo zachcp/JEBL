@@ -130,14 +130,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 // now we need more again
                 BasicSequence sequence = new BasicSequence(type, taxon, seq);
 
-//                s_runtime.gc();
-//                System.out.println("after create jebl sequence " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
-
                 // get rid of memeory used by the builder
                 seq.setLength(0); seq.trimToSize(); // System.gc();
-
-//                s_runtime.gc();
-//                System.out.println("after reduceing of builder " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
                 if (description != null && description.length() > 0) {
                     sequence.setAttribute(descriptionPropertyName, description);
@@ -156,14 +150,10 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
             // catch end of file the ugly way.
         } catch (NoSuchElementException e) {
             throw new ImportException("Incorrectly formatted fasta file (near line " + helper.getLineNumber() + ")");
-        }
-
-//        Runtime s_runtime = Runtime.getRuntime();
-//        s_runtime.gc();
-//        System.out.println("at end " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
-
-        if (closeReaderAtEnd) {
-            reader.close();
+        } finally {
+            if (closeReaderAtEnd && reader != null) {
+                reader.close();
+            }
         }
         return sequences;
     }
