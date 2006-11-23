@@ -1,21 +1,21 @@
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.Sequence;
 import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.Writer;
-import java.io.PrintWriter;
 
 /**
  * Export alignment to Phylip format.
  *
  * Must be one of the most braindead format around. Try to output something that hopefuly any
- * "Phylip suppor" variant can read - up to 9 name chars, followed by a blank, followed by 
+ * "Phylip supported" variant can read - up to 9 name chars, followed by a blank, followed by 
  * sequence on one line.
  *
  * @author Joseph Heled
