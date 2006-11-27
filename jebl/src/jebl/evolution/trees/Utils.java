@@ -59,7 +59,7 @@ public final class Utils {
     private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
-            if (!name.matches("^\\w+$")) {
+            if (!name.matches("^(\\w|-)+$")) {
                 name = "\'" + name + "\'";
             }
             buffer.append(name);
