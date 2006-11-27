@@ -204,13 +204,17 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         writer.println(";\nend;\n");
     }
 
+    final private String nameRegex = "^(\\w|-)+$";
+
     /**
      * Name suitable as token - quotes if necessary
      * @param name to check
      * @return the name
      */
     private String safeName(String name) {
-        if (!name.matches("^\\w+$")) {
+        // allow dash in names
+
+        if (!name.matches(nameRegex)) {
             name = name.replace("\'", "\'\'");
             return "\'" + name + "\'";
         }
@@ -225,7 +229,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      */
     private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
         String name = taxon.getName();
-        if (!name.matches("^\\w+$")) {
+        if (!name.matches(nameRegex)) {
             // JEBL way of quoting the quote character
             name = name.replace("\'", "\'\'");
             builder.append("\'").append(name).append("\'");
