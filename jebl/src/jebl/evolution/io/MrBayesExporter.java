@@ -209,7 +209,7 @@ public class MrBayesExporter implements AlignmentExporter, SequenceExporter, Tre
     private String safeName(String name) {
         if (!name.matches("^\\w+$")) {
             name = name.replace("\'", "\'\'");
-            return "\'" + name + "\'";
+            return name;
         }
         return name;
     }
@@ -221,8 +221,8 @@ public class MrBayesExporter implements AlignmentExporter, SequenceExporter, Tre
         String name = taxon.getName();
         if (!name.matches("^\\w+$")) {
             // JEBL way of quoting the quote character
-            name = name.replace("\'", "\'\'");
-            builder.append("\'").append(name).append("\'");
+            name = name.replace("\'", "");
+            builder.append(name);
             return builder;
         }
         return builder.append(name);
