@@ -9,7 +9,7 @@ import jebl.evolution.graphs.Node;
  * are 1.0) and cladogram (the height of a node is proportional
  * to the number of external nodes). Note that all these functions
  * are recalculated on the fly for every call to getHeight and
- * getLength and it may be desirable to precalculate them.
+ * getLength and it may be desirable to precalculate and cache them.
  * @author Andrew Rambaut
  * @version $Id$
  */

@@ -28,16 +28,16 @@ public class RootedFromUnrooted implements RootedTree {
      */
     private Node root;
     /**
-     * Maps each nodes to it's parent.
+     * Maps each nodes to its parent.
      */
     private Map<Node, Node> parents;
 
     /**
-     *  Childern of the synthetic root (when rooted between nodes)
+     *  Children of the synthetic root (when rooted between nodes)
      */
     private Node topLeft, topRight;
     /**
-     * branch lengths from synthetic root to it's children (when rooted between nodes)
+     * branch lengths from synthetic root to its children (when rooted between nodes)
      */
     private double rootToLeft, rootToRight;
     private boolean intentUnrooted;

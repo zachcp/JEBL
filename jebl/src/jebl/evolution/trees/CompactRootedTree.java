@@ -30,7 +30,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     /**
      * Array of all nodes.
      *
-     * Orederd by levels. i.e. for the tree (a, ((e,f), d) ) the layout is
+     * Ordered by levels. i.e. for the tree (a, ((e,f), d) ) the layout is
      *
      *   0    1  2 3 4 5 6
      *  root  a  b c d e f
