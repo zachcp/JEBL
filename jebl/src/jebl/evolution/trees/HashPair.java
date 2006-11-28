@@ -20,7 +20,7 @@ class HashPair<T> {
 
     public boolean equals(Object x) {
         if( x instanceof HashPair ) {
-            return ((HashPair<T>)x).first == first &&  ((HashPair<T>)x).second == second;
+            return ((HashPair) x).first.equals(first) &&  ((HashPair )x).second.equals(second);
         }
         return false;
     }
