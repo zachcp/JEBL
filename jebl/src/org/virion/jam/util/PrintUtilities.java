@@ -83,7 +83,7 @@ public class PrintUtilities implements Printable {
         if (pageIndex > 0) {
             return (NO_SUCH_PAGE);
         } else {
-            //copy the graphics so we dont leave any risidual scalings etc
+            //copy the graphics so we dont leave any residual scalings etc
             //on the graphics.
             Graphics2D g2d = (Graphics2D) g.create();
 
@@ -120,8 +120,6 @@ public class PrintUtilities implements Printable {
      * The speed and quality of printing suffers dramatically if
      * any of the containers have double buffering turned on.
      * So this turns if off globally.
-     *
-     * @see enableDoubleBuffering
      */
     public static void disableDoubleBuffering(Component c) {
         RepaintManager currentManager = RepaintManager.currentManager(c);
