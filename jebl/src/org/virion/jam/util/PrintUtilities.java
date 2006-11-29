@@ -6,7 +6,6 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * A simple utility class that lets you very simply print
@@ -84,7 +83,9 @@ public class PrintUtilities implements Printable {
         if (pageIndex > 0) {
             return (NO_SUCH_PAGE);
         } else {
-            Graphics2D g2d = (Graphics2D) g;
+            //copy the graphics so we dont leave any risidual scalings etc
+            //on the graphics.
+            Graphics2D g2d = (Graphics2D) g.create();
 
             double x0 = pageFormat.getImageableX();
             double y0 = pageFormat.getImageableY();
