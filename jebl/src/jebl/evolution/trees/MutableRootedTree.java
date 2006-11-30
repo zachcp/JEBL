@@ -26,7 +26,7 @@ public class MutableRootedTree implements RootedTree {
     /**
      * Construct a rooted tree from unrooted.
      *
-     * @param tree      Unrooted tree to toor
+     * @param tree      Unrooted tree to root
      * @param outGroup  Node in tree assumed to be the outgroup
      */
     public MutableRootedTree(Tree tree, Node outGroup) {

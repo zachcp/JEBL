@@ -64,6 +64,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             case TIP: {
                 sources.add(TAXON_NAMES);
                 wantHeightsIfPossible = true;
+                for (Node node : tree.getExternalNodes() ) {
+                    names.addAll(node.getAttributeNames());
+                }
                 break;
             }
             case NODE: {
@@ -79,23 +82,20 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         }
 
         if( addNodeAttributes ) {
-            for (Node node : tree.getNodes()) {
+            for( Node node : tree.getInternalNodes() ) {
                 names.addAll(node.getAttributeNames());
             }
         }
 
-      //  if (tree instanceof RootedTree ) {
-     //       final RootedTree rtree = (RootedTree) tree;
-            if( wantHeightsIfPossible && tree.hasHeights() && !tree.conceptuallyUnrooted() ) {
-                sources.add(NODE_HEIGHTS);
-                hasNumericAttributs = true;
-            }
+        if( wantHeightsIfPossible && tree.hasHeights() && !tree.conceptuallyUnrooted() ) {
+            sources.add(NODE_HEIGHTS);
+            hasNumericAttributs = true;
+        }
 
-            if( wantBranchesIfPossible && tree.hasLengths()) {
-                sources.add(BRANCH_LENGTHS);
-                hasNumericAttributs = true;
-            }
-    //    }
+        if( wantBranchesIfPossible && tree.hasLengths()) {
+            sources.add(BRANCH_LENGTHS);
+            hasNumericAttributs = true;
+        }
 
         sources.addAll(names);
 
@@ -214,7 +214,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
-        Font oldFont = g2.getFont();
+        final Font oldFont = g2.getFont();
 
         if (background != null) {
             g2.setPaint(background);
@@ -230,7 +230,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         g2.setPaint(foreground);
         g2.setFont(taxonLabelFont);
 
-        String label = getLabel(item);
+        final String label = getLabel(item);
         if (label != null) {
 
             Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);

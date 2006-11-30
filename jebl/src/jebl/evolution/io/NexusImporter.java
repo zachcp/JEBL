@@ -63,13 +63,21 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Constructor
 	 */
-	public NexusImporter(Reader reader) {
+	public NexusImporter(Reader reader, long expectedLength) {
 		helper = new ImportHelper(reader);
+        helper.setExpectedInputLength(expectedLength);
         initHelper();
 	}
 
-    public NexusImporter(Reader reader, boolean compactTrees) {
-        this(reader);
+    /**
+	 * Constructor
+	 */
+	public NexusImporter(Reader reader) {
+		this(reader, 0);
+	}
+
+    public NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength) {
+        this(reader, expectedInputLength);
         this.compactTrees = compactTrees;
     }
 
@@ -1139,7 +1147,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Reads a node in. This could be a polytomy. Calls readBranch on each branch
 	 * in the node.
-	 */
+     * @param tree
+     * @return
+     */
 	private Node readInternalNode(SimpleRootedTree tree) throws IOException, ImportException
 	{
 		List<Node> children = new ArrayList<Node>();
@@ -1283,7 +1293,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			}
 		}
 
-		if (value.equalsIgnoreCase("TRUE") || value.equalsIgnoreCase("FALSE")) {
+        // A string qouted by the nexus exporter and such
+        if( value.startsWith("\"") && value.endsWith("\"") ) {
+            return value.subSequence(1, value.length() - 1);
+        }
+
+        if (value.equalsIgnoreCase("TRUE") || value.equalsIgnoreCase("FALSE")) {
 			return Boolean.valueOf(value);
 		}
 

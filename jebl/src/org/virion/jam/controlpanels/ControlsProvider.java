@@ -18,9 +18,9 @@ public interface ControlsProvider {
      * Get a list of Controls handled by this provider.
      *
      * @param detachPrimaryCheckbox When false, do nothing. When true, if controls have a "main" on/off switch
-     *                              (implemented as a JCheckBox), that checkbox should not be included in the controls panel but returned in
+     *                              (implemented as a JCheckBox), that checkbox should not be included in the controls
+     *                               panel but returned in {@link Controls#getPrimaryCheckbox}
      * @return A list of Controls
-     * @see Controls#getPrimaryCheckbox
      */
     List<Controls> getControls(boolean detachPrimaryCheckbox);
 

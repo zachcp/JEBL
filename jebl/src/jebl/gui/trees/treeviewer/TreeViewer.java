@@ -35,10 +35,10 @@ import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -592,9 +592,7 @@ public class TreeViewer extends JPanel implements Printable {
                 chooser.dispose();
             }
 
-            if (inputFile == null) {
-                throw new RuntimeException("No file specified");
-            }
+            assert inputFile != null;
 
 //        TreeImporter importer = new NewickImporter(new FileReader(inputFile));
             Reader reader = new BufferedReader(new FileReader(inputFile));

@@ -66,7 +66,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 //slider1.setPaintTicks(true);
                 //slider1.setPaintLabels(true);
 
-
                 slider1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         double value = slider1.getValue();
@@ -156,7 +155,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
         // add the line to the map of branch paths
         branchPaths.put(root, line);
-
     }
 
     private Point2D constructNode(Node node, double xPosition) {
@@ -180,19 +178,19 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             nodePoint = new Point2D.Double(xPosition, yPos);
 
-            for (Node child : children) {
+            for ( final Node child : children) {
 
-                Point2D childPoint = nodePoints.get(child);
+                final Point2D childPoint = nodePoints.get(child);
 
                 GeneralPath branchPath = new GeneralPath();
 
                 // start point
-                float x0 = (float) nodePoint.getX();
-                float y0 = (float) nodePoint.getY();
+                final float x0 = (float) nodePoint.getX();
+                final float y0 = (float) nodePoint.getY();
 
                 // end point
-                float x1 = (float) childPoint.getX();
-                float y1 = (float) childPoint.getY();
+                final float x1 = (float) childPoint.getX();
+                final float y1 = (float) childPoint.getY();
 
                 float x2 = x1 - ((x1 - x0) * (float) xProportion);
                 float y2 = y0 + ((y1 - y0) * (float) yProportion);
@@ -205,7 +203,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
-                double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
+                final double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
                 Line2D branchLabelPath = new Line2D.Double(
                         x3 - 1.0, childPoint.getY(),
                         x3 + 1.0, childPoint.getY());
@@ -263,7 +261,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             List<Node> children = tree.getChildren(node);
 
             for (Node child : children) {
-                double length = tree.getLength(child);
+                final double length = tree.getLength(child);
                 getMaxXPosition(child, xPosition + length);
             }
 

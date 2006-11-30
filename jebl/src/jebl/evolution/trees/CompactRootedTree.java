@@ -38,7 +38,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      * where c = (e,f) and b = ((e,f), d)
      *
      * The major advantage is that all decendents of a node are grouped together.
-     * Nodes will be reffered to by their index in the array in the comments.
+     * In subsequent comments nodes will be reffered to by their index in the array above.
      */
     SimpleRootedNode[] nodes;
 
@@ -53,6 +53,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      *  For the example tree, this would be (1 - 3 5 - - -)
      */
     short[] sons;
+
     /**
      * Number of Decendents of node x is noSons[x]
      * For the example tree, this would be (2 0 2 2 0 0 0)
@@ -520,6 +521,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 abstract class AttributableImp implements Attributable {
     /**
      * Get attribute map for object.
+     * @return the map
      */
     abstract Map<String, Object>  getMap();
 

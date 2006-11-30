@@ -90,7 +90,8 @@ public interface TreeLayout extends ControlsProvider {
      * Return a shape that defines a particular height interval. Some layouts
      * won't be able to produce this and may throw an UnsupportedOperationException.
      *
-     * @param height
+     * @param height1
+     * @param height2
      * @return the area
      */
     Shape getHeightArea(double height1, double height2);
@@ -104,10 +105,10 @@ public interface TreeLayout extends ControlsProvider {
     Point2D getNodePoint(Node node);
 
     /**
-     * Return the shape that represents the given branch
+     * Return the shape that represents the branch from node parent to itself.
      *
      * @param node
-     * @return the branch shape
+     * @return the branch as a shape
      */
     Shape getBranchPath(Node node);
 

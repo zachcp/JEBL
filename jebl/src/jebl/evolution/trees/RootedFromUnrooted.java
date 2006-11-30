@@ -62,11 +62,12 @@ public class RootedFromUnrooted implements RootedTree {
      *
      * @param source tree to root
      * @param root  internal node to root at
+     * @param intentUnrooted
      */
-    public RootedFromUnrooted(Tree source, Node root, boolean intent) {
+    public RootedFromUnrooted(Tree source, Node root, boolean intentUnrooted) {
         this.source = source;
         this.root = root;
-        intentUnrooted = intent;
+        this.intentUnrooted = intentUnrooted;
         topLeft = topRight  = null;
         rootToLeft = rootToRight = 0.0;
         parents = new HashMap<Node, Node>();
@@ -187,8 +188,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public boolean isExternal(Node node) {
-        if( node == root ) return false;
-        return source.isExternal(node);
+        return node != root && source.isExternal(node);
     }
 
     public Node getNode(Taxon taxon) {
@@ -313,5 +313,4 @@ public class RootedFromUnrooted implements RootedTree {
     public Map<String, Object> getAttributeMap() {
         return source.getAttributeMap();
     }
-
 }

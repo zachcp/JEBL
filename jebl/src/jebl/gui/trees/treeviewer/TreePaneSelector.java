@@ -21,14 +21,10 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
         TAXA
     }
 
-    ;
-
     public enum DragMode {
         SELECT,
         SCROLL
     }
-
-    ;
 
     public void setSelectionMode(SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
@@ -45,9 +41,15 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
     }
 
     public void mouseClicked(MouseEvent mouseEvent) {
-        Node selectedNode = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
-        if (!mouseEvent.isShiftDown()) {
-            treePane.clearSelection();
+        final Point mousePoint = mouseEvent.getPoint();
+        final Node[] selectedNode = treePane.getNodeAt(mousePoint);
+        final boolean doubleClick = mouseEvent.getClickCount() > 1;
+
+        if( ! doubleClick ) {
+            // keep selection on double click
+            if (!mouseEvent.isShiftDown()) {
+                treePane.clearSelection();
+            }
         }
 
         SelectionMode mode = selectionMode;
@@ -61,13 +63,19 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
 
         switch (mode) {
             case NODE:
-                treePane.addSelectedNode(selectedNode);
+                treePane.addSelectedNode(selectedNode[0]);
                 break;
             case CLADE:
-                treePane.addSelectedClade(selectedNode);
+
+                if( doubleClick ) {
+                    if( selectedNode[0] != null )
+                        treePane.expandContract(selectedNode[0]);
+                } else {
+                    treePane.addSelectedClade(selectedNode);
+                }
                 break;
             case TAXA:
-                treePane.addSelectedTaxa(selectedNode);
+                treePane.addSelectedTaxa(selectedNode[0]);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
@@ -103,7 +111,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
                         treePane.addSelectedNode(selectedNode);
                         break;
                     case CLADE:
-                        treePane.addSelectedClade(selectedNode);
+                        treePane.addSelectedClade(new Node[]{selectedNode, null});
                         break;
                     case TAXA:
                         treePane.addSelectedTaxa(selectedNode);
@@ -174,7 +182,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
 
     private TreePane treePane;
 
-    private SelectionMode selectionMode = SelectionMode.NODE;
+    private SelectionMode selectionMode = SelectionMode.CLADE;
 
     private DragMode dragMode = DragMode.SELECT;
     private Point2D dragPoint = null;

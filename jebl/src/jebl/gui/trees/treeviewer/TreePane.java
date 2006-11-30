@@ -116,7 +116,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.transformBranches = transformBranches;
         this.branchTransform = branchTransform;
         setupTree();
-        PREFS.putBoolean(transforNanchesPREFSkey, transformBranches);
+        PREFS.putBoolean(transformBanchesPREFSkey, transformBranches);
     }
 
     public boolean isShowingRootBranch() {
@@ -152,7 +152,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         addSelectedTaxon(selectedTaxon);
     }
 
-    public void setSelectedClade(Node selectedNode) {
+    public void setSelectedClade(Node[] selectedNode) {
         selectedNodes.clear();
         selectedTaxa.clear();
         addSelectedClade(selectedNode);
@@ -165,8 +165,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     private boolean canSelectNode(Node selectedNode) {
-       return selectedNode != null && !(tree.conceptuallyUnrooted() && selectedNode == tree.getRootNode());
+       return selectedNode != null; //  && !(tree.conceptuallyUnrooted() && selectedNode == tree.getRootNode());
     }
+
     public void addSelectedNode(Node selectedNode) {
         if ( canSelectNode(selectedNode) ) {
             selectedNodes.add(selectedNode);
@@ -183,18 +184,28 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
-    public void addSelectedClade(Node selectedNode) {
-        if ( canSelectNode(selectedNode) ) {
+    public void addSelectedClade(Node[] selectedNode) {
+        if ( canSelectNode(selectedNode[0]) ) {
             addSelectedChildClades(selectedNode);
         }
         fireSelectionChanged();
         repaint();
     }
 
-    private void addSelectedChildClades(Node selectedNode) {
+    private void addSelectedChildClades(Node[] selectedNode) {
+        if( selectedNode[1] == null ) {
+            addSelectedChildClades(selectedNode[0], null);
+        } else {
+           addSelectedChildClades(tree.getRootNode(), selectedNode[0]);
+        }
+    }
+
+    private void addSelectedChildClades(Node selectedNode, Node exclude) {
+        if( selectedNode == exclude ) return;
+
         selectedNodes.add(selectedNode);
         for (Node child : tree.getChildren(selectedNode)) {
-            addSelectedChildClades(child);
+            addSelectedChildClades(child, exclude);
         }
     }
 
@@ -233,6 +244,51 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         for (Taxon selectedTaxon : selectedTaxa) {
             selectedTaxon.setAttribute(name, value);
         }
+        repaint();
+    }
+
+    final private String clpsdName = "&collapsed";
+    final String visibleAttributeName = "&visible";
+
+    private boolean isNodeVisible(Node node) {
+        return node.getAttribute(visibleAttributeName) == null;
+    }
+
+    private boolean isNodeCollapsed(Node node) {
+         return node.getAttribute(clpsdName) != null;
+    }
+
+    private void setCladeVisisblty(Node node, boolean visible) {
+        for( Node n : tree.getChildren(node) ) {
+            if( visible ) {
+                n.removeAttribute(visibleAttributeName);
+            } else {
+                n.setAttribute(visibleAttributeName, Boolean.TRUE);
+            }
+            // leave collapsed subtress alone
+
+            if( ! isNodeCollapsed(n) ) {
+                setCladeVisisblty(n, visible);
+            }
+        }
+    }
+
+    public void expandContract(Node selectedNode) {
+        assert selectedNode != null;
+
+        // no point for non internal nodes
+        if( tree.isExternal(selectedNode) ) return;
+
+        final boolean wasCollapsed = selectedNode.getAttribute(clpsdName) != null;
+        if( wasCollapsed )  {
+            selectedNode.removeAttribute(clpsdName);
+        }
+        // node should not be in collapsed mode when calling this
+        setCladeVisisblty(selectedNode, wasCollapsed);
+        if( !wasCollapsed ) {
+            selectedNode.setAttribute(clpsdName, Boolean.TRUE);
+        }
+        //fireSelectionChanged();
         repaint();
     }
 
@@ -350,28 +406,60 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return treeLayout.getHeightOfPoint(point);
     }
 
-    public Node getNodeAt(Graphics2D g2, Point point) {
+
+    final private int circRadius = 9;
+
+    // result[0] is the selected node
+    // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
+    // direction, null otherwise
+    Node[] getNodeAt(final Point point) {
+        final Graphics2D g2 = (Graphics2D)getGraphics();
+        Node[] result = new Node[2];
+
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
         for (Node node : tree.getExternalNodes()) {
-            Shape taxonLabelBound = taxonLabelBounds.get(tree.getTaxon(node));
+            final Shape taxonLabelBound = taxonLabelBounds.get(tree.getTaxon(node));
 
             if (taxonLabelBound != null && g2.hit(rect, taxonLabelBound, false)) {
-                return node;
+                result[0] = node;
+                return result;
             }
         }
 
-        for (Node node : tree.getNodes()) {
-            Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-            if (branchPath != null && g2.hit(rect, branchPath, true)) {
-                return node;
+        final Set<Node> nodes = tree.getNodes();
+        for (Node node : nodes) {
+            final Point2D.Double coord = nodeCoord(node);
+            final double v = coord.distanceSq(point);
+            if( v < circRadius*circRadius ) {
+                result[0] = node;
+                return result;
             }
         }
 
-        return null;
+        for( Node node : nodes ) {
+            final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
+            if( branchPath != null && g2.hit(rect, branchPath, true) ) {
+                result[0] = node;
+                final RootedTree rootedTree = getTree();
+                if( rootedTree.conceptuallyUnrooted() ) {
+                    final Point2D.Double nodeLocation = nodeCoord(node);
+                    final Node parent = rootedTree.getParent(node);
+                    final Point2D.Double parentLocation = nodeCoord(parent);
+                    final double toNode = point.distanceSq(nodeLocation);
+                    final double toParent = point.distanceSq(parentLocation);
+                    if( toParent < toNode ) {
+                        result[1] = parent;
+                    }
+                }
+                return result;
+            }
+        }
+
+        return result;
     }
 
-    public Set<Node> getNodesAt(Graphics2D g2, Rectangle rect) {
+    Set<Node> getNodesAt(Graphics2D g2, Rectangle rect) {
 
         Set<Node> nodes = new HashSet<Node>();
         for (Node node : tree.getExternalNodes()) {
@@ -435,7 +523,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             transformCheck = new JCheckBox("Transform branches");
             optionsPanel.addComponent(transformCheck);
 
-            transformBranches = PREFS.getBoolean(transforNanchesPREFSkey, transformBranches);
+            transformBranches = PREFS.getBoolean(transformBanchesPREFSkey, transformBranches);
 
             transformCheck.setSelected(transformBranches);
             if (!originalTree.hasLengths()) {
@@ -446,8 +534,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             combo1.setSelectedItem(branchTransform);
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
-                    setBranchTransform(true,
-                            (TransformedRootedTree.Transform) combo1.getSelectedItem());
+                    setBranchTransform(true, (TransformedRootedTree.Transform) combo1.getSelectedItem());
 
                 }
             });
@@ -634,10 +721,78 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return PAGE_EXISTS;
     }
 
+    private Point2D.Double nodeCoord(Node node) {
+        final Point2D nodePoint = treeLayout.getNodePoint(node);
+        final Point2D.Double result = new Point2D.Double();
+        transform.transform(nodePoint, result);
+        return result;
+    }
+
+    private void nodeCirc(Graphics2D g2, Node node) {
+        final Point2D.Double nodeLocation = nodeCoord(node);
+        final boolean isSelected = selectedNodes.contains(node);
+        final Color color = g2.getColor();
+
+        final Color c = isSelected ? Color.BLUE : Color.LIGHT_GRAY;
+        g2.setColor(c);
+
+        final double x = nodeLocation.getX();
+        final int ix1 = (int) x;
+        final double y = nodeLocation.getY();
+        final int iy1 = (int) y;
+
+        final Node parent = tree.getParent(node);
+        if( parent != null ) {
+            final Point2D.Double parentLocation = nodeCoord(parent);
+
+            if( parentLocation.distanceSq(nodeLocation) < 4*circRadius ) {
+                return;
+            }
+        }
+        
+        if( isNodeCollapsed(node) ) {
+            Line2D labelPath = treeLayout.getBranchLabelPath(node);
+            if( labelPath == null ) {
+                // root only?
+                labelPath = new Line2D.Double(0,0, 1,0);
+            }
+            final Point2D d1 = labelPath.getP2();
+            final Point2D d2 = labelPath.getP1();
+            final double dx = d1.getX() - d2.getX();
+            final double dy = d1.getY() - d2.getY();
+            final double branchLength = Math.sqrt(dx*dx + dy*dy);
+
+            double sint = dy / branchLength;
+            double cost = dx / branchLength;
+
+            int r = circRadius*2;
+            int h = 172*r/200;
+            int[] xp = {0, h, h};
+            int[] yp = {0, r/2, -r/2};
+
+            for(int k = 0; k < 3; ++k) {
+                double rx = x + xp[k] * cost - yp[k] * sint;
+                double ry = y + xp[k] * sint + yp[k] * cost;
+                xp[k] = (int)(rx + 0.5);
+                yp[k] = (int)(ry + 0.5);
+            }
+            g2.drawPolygon(xp, yp, 3);
+        } else {
+            int o = (circRadius-1)/2;
+            final int x1 = ix1 - o;
+
+            final int y1 = iy1 - o;
+
+            g2.fillOval(x1, y1, circRadius, circRadius);
+        }
+        // g2.setTransform(oldTransform);
+        g2.setColor(color);
+    }
+
     protected void drawTree(Graphics2D g2, double width, double height) {
         RenderingHints rhints = g2.getRenderingHints();
         g2.setColor(Color.WHITE);
-        g2.fillRect(0, 0,  (int)width, (int)height);
+        g2.fillRect(0, 0, (int)width, (int)height);
         boolean antialiasOn = rhints.containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
         if( ! antialiasOn ) {
           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -646,27 +801,24 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (!calibrated) calibrate(g2, width, height);
 
         AffineTransform oldTransform = g2.getTransform();
-        Paint oldPaint = g2.getPaint();
-        Stroke oldStroke = g2.getStroke();
-        Font oldFont = g2.getFont();
+        final Paint oldPaint = g2.getPaint();
+        final Stroke oldStroke = g2.getStroke();
+        final Font oldFont = g2.getFont();
 
-        Set<Node> externalNodes = tree.getExternalNodes();
+//        Stack<Node> stack = new Stack<Node>();
+//        stack.add(tree.getRootNode());
+//        while( !stack.isEmpty() )  {
+//            final Node node = stack.pop();
+//
+//            for( Node n : tree.getChildren(node) ) {
+//
+//            }
+//        }
+        final Set<Node> externalNodes = tree.getExternalNodes();
         for (Node node : externalNodes) {
-
-            Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-            Taxon taxon = tree.getTaxon(node);
-
-            if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
-
-                AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
-                Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
-                g2.transform(taxonTransform);
-
-                taxonLabelPainter.paint(g2, node, taxonLabelJustification,
-                        new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, taxonLabelPainter.getPreferredHeight()));
-
-                g2.setTransform(oldTransform);
-            }
+             if( !isNodeVisible(node) ) continue;
+            
+            final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
 
             if (showingTaxonCallouts) {
                 Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
@@ -684,11 +836,28 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             g2.setStroke(branchLineStroke);
             g2.draw(branchPath);
+
+            nodeCirc(g2, node);
+
+            final Taxon taxon = tree.getTaxon(node);
+
+            if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
+
+                AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
+                Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
+                g2.transform(taxonTransform);
+
+                taxonLabelPainter.paint(g2, node, taxonLabelJustification,
+                        new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, taxonLabelPainter.getPreferredHeight()));
+
+                g2.setTransform(oldTransform);
+            }
         }
 
         final Node rootNode = tree.getRootNode();
         for (Node node : tree.getNodes() ) {
-            if ( showingRootBranch || node != rootNode ) {
+            if (showingRootBranch || node != rootNode) {
+                if( !isNodeVisible(node) ) continue;
                 if( !tree.isExternal(node) ) {
                     Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
                     g2.setStroke(branchLineStroke);
@@ -699,15 +868,18 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     }
                     g2.draw(branchPath);
 
+                    nodeCirc(g2, node);
+
                     if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 
                         AffineTransform nodeTransform = nodeLabelTransforms.get(node);
                         if (nodeTransform != null) {
-                            Painter.Justification nodeLabelJustification = nodeLabelJustifications.get(node);
+                            final Painter.Justification nodeLabelJustification = nodeLabelJustifications.get(node);
                             g2.transform(nodeTransform);
 
-                            nodeLabelPainter.paint(g2, node, nodeLabelJustification,
-                                    new Rectangle2D.Double(0.0, 0.0, nodeLabelPainter.getPreferredWidth(), nodeLabelPainter.getPreferredHeight()));
+                            final Rectangle2D.Double bounds = new Rectangle2D.Double(0.0, 0.0,
+                                    nodeLabelPainter.getPreferredWidth(), nodeLabelPainter.getPreferredHeight());
+                            nodeLabelPainter.paint(g2, node, nodeLabelJustification, bounds);
 
                             g2.setTransform(oldTransform);
                         }
@@ -724,10 +896,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         final double preferredWidth = branchLabelPainter.getPreferredWidth();
                         final double preferredHeight = branchLabelPainter.getPreferredHeight();
 
-                        //Line2D labelPath = treeLayout.getBranchLabelPath(node);
-
                         branchLabelPainter.paint(g2, node, Painter.Justification.CENTER,
-                                  //new Rectangle2D.Double(-preferredWidth/2, -preferredHeight, preferredWidth, preferredHeight));
                                 new Rectangle2D.Double(0, 0, preferredWidth, preferredHeight));
 
                         g2.setTransform(oldTransform);
@@ -735,6 +904,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         }
+
+        g2.setStroke(branchLineStroke);
+        nodeCirc(g2, rootNode);
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.paint(g2, this, Painter.Justification.CENTER, scaleBarBounds);
@@ -749,12 +921,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
     }
 
+
     private void calibrate(Graphics2D g2, double width, double height) {
 
         // First of all get the bounds for the unscaled tree
         treeBounds = null;
 
-        Node rootNode = tree.getRootNode();
+        final Node rootNode = tree.getRootNode();
 
         // bounds on branches
         for (Node node : tree.getNodes()) {
@@ -771,7 +944,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         // add the tree bounds
-        final Rectangle2D bounds = treeBounds.getBounds2D(); // (YH) same as (Rectangle2D) treeBounds.clone();
+        final Rectangle2D bounds = treeBounds.getBounds2D(); // (JH) same as (Rectangle2D) treeBounds.clone();
 
         final Set<Node> externalNodes = tree.getExternalNodes();
 
@@ -781,7 +954,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             // Find the longest taxon label
             for (Node node : externalNodes) {
-
                 taxonLabelPainter.calibrate(g2, node);
                 taxonLabelWidth = Math.max(taxonLabelWidth, taxonLabelPainter.getPreferredWidth());
             }
@@ -789,7 +961,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             final double labelHeight = taxonLabelPainter.getPreferredHeight();
 
             for (Node node : externalNodes) {
-                // don't see why is that needed here? taxonLabelPainternot used in this loop (YH)?
+                // don't see why is that needed here? taxonLabelPainter not used in this loop (JH)?
                 //taxonLabelPainter.calibrate(g2, node);
                 Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
 
@@ -807,7 +979,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
             // Iterate though the nodes
             for (Node node : tree.getNodes()) {
-                // Get the line that represents the path for the taxon label
+                // Get the line that represents the label path
                 final Line2D labelPath = treeLayout.getNodeLabelPath(node);
 
                 if (labelPath != null) {
@@ -888,15 +1060,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             // If the tree is layed out in both dimensions then we
             // need to find out which axis has the least space and scale
             // the tree to that (to keep the aspect ratio.
-            if ((w / treeBounds.getWidth()) < (h / treeBounds.getHeight())) {
-                xScale = w / treeBounds.getWidth();
-                yScale = xScale;
-            } else {
-                yScale = h / treeBounds.getHeight();
-                xScale = yScale;
-            }
-
-            treeScale = xScale;   assert treeScale > 0;
+            final boolean widthLimit = (w / treeBounds.getWidth()) < (h / treeBounds.getHeight());
+            final double scale = widthLimit ? w / treeBounds.getWidth() : h / treeBounds.getHeight();
+            treeScale = xScale = yScale = scale;                            assert treeScale > 0;
 
             // and set the origin so that the center of the tree is in
             // the center of the canvas
@@ -920,7 +1086,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         transform.translate(xOffset + insets.left, yOffset + insets.top);
         transform.scale(xScale, yScale);
 
-        // Get the bounds for the newly scaled tree
+        // Get the bounds for the actual scaled tree
         treeBounds = null;
         for (Node node : tree.getNodes()) {
             if (showingRootBranch || node != rootNode) {
@@ -934,7 +1100,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        // Clear the map of individual taxon label bounds and transforms
+        // Clear previous values of taxon label bounds and transforms
         taxonLabelBounds.clear();
         taxonLabelTransforms.clear();
         taxonLabelJustifications.clear();
@@ -945,10 +1111,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             // Iterate though the external nodes
             for (Node node : externalNodes) {
-                Taxon taxon = tree.getTaxon(node);
+                final Taxon taxon = tree.getTaxon(node);
 
                 // Get the line that represents the path for the taxon label
-                Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
+                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
 
                 // Work out how it is rotated and create a transform that matches that
                 AffineTransform taxonTransform = calculateTransform(transform, taxonPath, taxonLabelWidth, labelHeight, true);
@@ -1003,7 +1169,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
 
-
             // Iterate though the external nodes
             for (Node node : tree.getNodes()) {
 
@@ -1020,23 +1185,30 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     final double dy = labelPath.getP2().getY() - labelPath.getP1().getY();
                     final double branchLength = Math.sqrt(dx*dx + dy*dy);
 
-                     final Painter.Justification just = labelPath.getX1() < labelPath.getX2() ? Painter.Justification.LEFT :
-                             Painter.Justification.RIGHT;
+                    final Painter.Justification just = labelPath.getX1() < labelPath.getX2() ? Painter.Justification.LEFT :
+                            Painter.Justification.RIGHT;
 
                     // Work out how it is rotated and create a transform that matches that
                     AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, false);
+
                     // move to middle of branch - since the move is before the rotation
                     final double direction = just == Painter.Justification.RIGHT ? 1 : -1;
                     labelTransform.translate(-direction * xScale * branchLength /2, 0);
 
                     // Store the transformed bounds in the map for use when selecting
-                    branchLabelBounds.put(node, labelTransform.createTransformedShape(labelBounds));
+                    final Shape value = labelTransform.createTransformedShape(labelBounds);
+                    final Rectangle2D d = value.getBounds2D();
+                    final double x1 = d.getMinX();
+                    final double x2 = d.getMaxX();
+                    // put in table based on x1. maintain max(dx) for search
+                    branchLabelBounds.put(node, value);
 
                     // Store the transform in the map for use when drawing
                     branchLabelTransforms.put(node, labelTransform);
 
+                    // unused at the moment
                     // Store the alignment in the map for use when drawing
-                    branchLabelJustifications.put(node, just);
+                    //branchLabelJustifications.put(node, just);
                 }
             }
         }
@@ -1047,7 +1219,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), height - h1, treeBounds.getWidth(), h1);
         }
 
-        calloutPaths.clear();
+        // unused at the moment
+        //calloutPaths.clear();
 
         calibrated = true;
     }
@@ -1098,8 +1271,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         super.setSize(width, height);
     }
 
+    // Tree passed in
     private RootedTree originalTree = null;
+    //  Tree possibly transformed by the viewer
     private RootedTree tree = null;
+
     private TreeLayout treeLayout = null;
 
     private boolean orderBranches = false;
@@ -1152,11 +1328,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     private Map<Node, AffineTransform> branchLabelTransforms = new HashMap<Node, AffineTransform>();
     private Map<Node, Shape> branchLabelBounds = new HashMap<Node, Shape>();
-    private Map<Node, Painter.Justification> branchLabelJustifications = new HashMap<Node, Painter.Justification>();
 
-    private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
+    // unused at the moment
+    //private Map<Node, Painter.Justification> branchLabelJustifications = new HashMap<Node, Painter.Justification>();
 
-    private String transforNanchesPREFSkey = "transformBranches";
+    // unused at the moment
+    // private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
+
+    private String transformBanchesPREFSkey = "transformBranches";
     private String orderBranchesPREFSkey = "orderBranches";
     private String showRootPREFSkey = "showRootBranch";
     private String branchWeightPREFSkey = "branchWeight";

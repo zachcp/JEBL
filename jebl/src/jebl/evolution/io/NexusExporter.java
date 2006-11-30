@@ -281,6 +281,8 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * Prepare for writing a tree. If a taxa block exists and is suitable for tree,
      * do nothing. If not, write a new taxa block.
      * @param tree
+     * @param node
+     * @param builder
      */
     private void appendTree(RootedTree tree, Node node, StringBuilder builder) {
         if (tree.isExternal(node)) {
