@@ -173,25 +173,6 @@ public class Utils {
     }
 
     /**
-     * @param sequenceString A nucleotide or amino acid sequence string, possibly containing some illegal characters.
-     * @param replacement String to replace each illegal character with
-     * @return sequenceString with all characters that are neither a valid nucleotide nor amino acid symbol
-     *         replaced.
-     */
-    public static String replaceNonAminoAcidOrNucleotideCharactersWith(String sequenceString, String replacement) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < sequenceString.length(); i++) {
-            char c = sequenceString.charAt(i);
-            if (SequenceType.AMINO_ACID.getState(c)!= null || SequenceType.NUCLEOTIDE.getState(c) != null) {
-                result.append(c);
-            } else {
-                result.append(replacement);
-            }
-        }
-        return result.toString();  
-    }
-
-    /**
      * Guess type of sequence from contents.
      * @param seq the sequence
      * @return SequenceType.NUCLEOTIDE or SequenceType.AMINO_ACID, if sequence is believed to be of that type.

@@ -114,13 +114,14 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 
                 final String description = tokenizer.hasMoreElements() ?
                         ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
+                StringBuilder seq = new StringBuilder();
 
 
 //                Runtime s_runtime = Runtime.getRuntime();
 //                s_runtime.gc();
 //                System.out.println("before read " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
-                String seq = helper.readSequence(seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
+                helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
 
 //                s_runtime.gc();
 //                System.out.println("after readSeeuqnece " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
@@ -164,8 +165,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                     }
                     switch (illegalCharacterPolicyForThisImport.get()) {
                         case strip:
-                            seq = Utils.replaceNonAminoAcidOrNucleotideCharactersWith(seq, "");
+                            removeNonAminoAcidOrNucleotideCharacters(seq);
                             type = Utils.guessSequenceType(seq);
+                            assert(type != null);
                             break;
                         default:
                             throw new ImportException(errorMessage);
@@ -174,6 +176,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 
                 // now we need more again
                 BasicSequence sequence = new BasicSequence(type, taxon, seq);
+
+                // get rid of memory used by the builder
+                seq.setLength(0); seq.trimToSize(); // System.gc();
 
                 if (description != null && description.length() > 0) {
                     sequence.setAttribute(descriptionPropertyName, description);
@@ -198,6 +203,24 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
             }
         }
         return sequences;
+    }
+
+    /**
+     * @param sequence A nucleotide or amino acid sequence, possibly containing some illegal characters.
+     * @return sequence with all characters that are neither a valid nucleotide nor amino acid symbol
+     *         replaced.
+     */
+    static void removeNonAminoAcidOrNucleotideCharacters(StringBuilder sequence) {
+        StringBuilder result = new StringBuilder();
+        int writeIndex = 0;
+        for (int readIndex = 0; readIndex < sequence.length(); readIndex++) {
+            char c = sequence.charAt(readIndex);
+            if (SequenceType.AMINO_ACID.getState(c)!= null || SequenceType.NUCLEOTIDE.getState(c) != null) {
+                sequence.setCharAt(writeIndex, c);
+                writeIndex++;
+            }
+        }
+        sequence.setLength(writeIndex);
     }
 
 
