@@ -11,11 +11,14 @@ import jebl.evolution.sequences.Utils;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.ProgressListener;
 
+import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class for importing Fasta sequential file format.
@@ -41,6 +44,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     private final boolean closeReaderAtEnd;
 
     private final Reader reader;
+    private IllegalCharacterPolicy illegalCharacterPolicy = IllegalCharacterPolicy.abort;
 
     /**
      * Use this constructor if you are reading from a file. The advantage over the
@@ -53,6 +57,10 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     public FastaImporter(File file, SequenceType sequenceType) throws FileNotFoundException {
         this(new BufferedReader(new FileReader(file)), sequenceType, true);
         helper.setExpectedInputLength(file.length());
+    }
+
+    public void setIllegalCharacterPolicy(IllegalCharacterPolicy newPolicy) {
+        this.illegalCharacterPolicy = newPolicy;
     }
 
     /**
@@ -76,9 +84,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     }
 
     /**
-     * @param callback Callback to report imported sequences to.
+     * @param callback Optional callback to report imported sequences to.
      * @param progressListener Listener to report progress to. Must not be null.
-     * @return sequences from file.
+     * @return null if a callback was specified; otherwise, return list of sequences from file.
      * @throws IOException
      * @throws ImportException
      */
@@ -90,6 +98,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
         final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
+        final AtomicReference<IllegalCharacterPolicy> illegalCharacterPolicyForThisImport
+                = new AtomicReference<IllegalCharacterPolicy>(illegalCharacterPolicy);
 
         try {
             // find fasta line start
@@ -124,11 +134,39 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 }
 
                 // fixed guessSequenceType so it does not allocate anything
-                final SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(seq);
+                SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(seq);
 
+                // todo: We don't normally want to pop up dialogs in an importer, but I don't see
+                // another clean way of handling this case. Note that the dialog only appears
+                // if illegalCharacterPolicy has been set to a non-default value.
                 if( type == null ) {
-                    throw new ImportException("Sequence contains illegal characters (near line " + helper.getLineNumber() + ")");
+                    final String errorMessage = "Illegal sequence characters encountered on or before line " + helper.getLineNumber() + ". What do you want to do?";
+                    if (illegalCharacterPolicyForThisImport.get().equals(IllegalCharacterPolicy.askUser)) {
+                        try {
+                            SwingUtilities.invokeAndWait(new Runnable() {
+                                public void run() {
+                                    IllegalCharacterPolicy[] options = {IllegalCharacterPolicy.abort, IllegalCharacterPolicy.strip};
+                                    int choice = JOptionPane.showOptionDialog(null,errorMessage, "Illegal characters in sequences",
+                                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                                    illegalCharacterPolicyForThisImport.set(options[choice]);
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            illegalCharacterPolicyForThisImport.set(IllegalCharacterPolicy.abort);
+                        } catch (InvocationTargetException e) {
+                            illegalCharacterPolicyForThisImport.set(IllegalCharacterPolicy.abort);
+                        }
+                    }
+                    switch (illegalCharacterPolicyForThisImport.get()) {
+                        case strip:
+                            seq = Utils.replaceNonAminoAcidOrNucleotideCharactersWith(seq, "");
+                            type = Utils.guessSequenceType(seq);
+                            break;
+                        default:
+                            return sequences;
+                    }
                 }
+
                 // now we need more again
                 BasicSequence sequence = new BasicSequence(type, taxon, seq);
 

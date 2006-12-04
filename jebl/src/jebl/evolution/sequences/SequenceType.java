@@ -52,10 +52,16 @@ public interface SequenceType {
      * Get state corresponding to a string code
      *
      * @param code a string code
-     * @return the state
+     * @return the state with the given code, or null if there is no such state
      */
     State getState(String code);
 
+    /**
+     * Get state whose code is the one-character string consisting only of code.
+     *
+     * @param code
+     * @return the state with the given code, or null if there is no such state
+     */
     State getState(char code);
 
     /**

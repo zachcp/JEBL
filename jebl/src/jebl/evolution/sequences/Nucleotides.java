@@ -67,6 +67,10 @@ public final class Nucleotides {
 
 	public static int getStateCount() { return STATE_COUNT; }
 
+    /**
+     *
+     * @return A list of all possible states, including the gap and ambiguity states.
+     */
     public static List<State> getStates() { return Collections.unmodifiableList(Arrays.asList((State[])STATES)); }
 
 	public static int getCanonicalStateCount() { return CANONICAL_STATE_COUNT; }
