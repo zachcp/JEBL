@@ -76,6 +76,8 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     }
 
     /**
+     * @param callback Callback to report imported sequences to.
+     * @param progressListener Listener to report progress to. Must not be null.
      * @return sequences from file.
      * @throws IOException
      * @throws ImportException
@@ -102,13 +104,13 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 
                 final String description = tokenizer.hasMoreElements() ?
                         ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
-                final StringBuilder seq = new StringBuilder();
+
 
 //                Runtime s_runtime = Runtime.getRuntime();
 //                s_runtime.gc();
 //                System.out.println("before read " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
-                helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
+                String seq = helper.readSequence(seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
 
 //                s_runtime.gc();
 //                System.out.println("after readSeeuqnece " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
@@ -129,9 +131,6 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 }
                 // now we need more again
                 BasicSequence sequence = new BasicSequence(type, taxon, seq);
-
-                // get rid of memeory used by the builder
-                seq.setLength(0); seq.trimToSize(); // System.gc();
 
                 if (description != null && description.length() > 0) {
                     sequence.setAttribute(descriptionPropertyName, description);

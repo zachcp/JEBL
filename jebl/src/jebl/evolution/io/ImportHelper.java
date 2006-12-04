@@ -203,18 +203,17 @@ public class ImportHelper {
         return line.toString();
     }
 
-    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+    public String readSequence(SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
-        readSequence(sequence, sequenceType, delimiters, maxSites, gapCharacters, missingCharacters,
-                matchCharacters, matchSequence, null);
+        return readSequence(sequenceType, delimiters, maxSites, gapCharacters, missingCharacters,
+                matchCharacters, matchSequence, ProgressListener.EMPTY);
     }
 
     /**
      *
      * Reads sequence, skipping over any comments and filtering using sequenceType.
-     * @param sequence a StringBuffer into which the sequence is put
      * @param sequenceType the sequenceType of the sequence
      * @param delimiters list of characters that will stop the reading
      * @param gapCharacters list of characters that will be read as gaps
@@ -222,14 +221,19 @@ public class ImportHelper {
      * @param matchCharacters list of characters that will be read as matching the matchSequence
      * @param matchSequence the sequence string to match match characters to
      * @param maxSites maximum number of sites to read
-     * @param progress optional ProgressListener. May be null if not interested in progress
+     * @param progress optional ProgressListener. Must not be null.
+     * @return the sequence string
+     *
+     * @throws IOException if such an exception is thrown while reading from the
+     *         Reader passed to this class's constructor.
+     * @throws ImportException if any other error occurs during the import
      */
-    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+    public String readSequence(SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence,
-                             ProgressListener progress) throws IOException, ImportException {
-
+                             ProgressListener progress) throws IOException, ImportException
+    {
         char ch = read();
 
         final char gapCode = sequenceType.getGapState().getCode().charAt(0);
@@ -241,7 +245,8 @@ public class ImportHelper {
             int nSites = 0;
 
             while (nSites < maxSites && delimiters.indexOf(ch) == -1) {
-                if(progress!= null && (nSites%1024) == 0 && progress.setProgress(getProgress())) return;
+                // check for progress every 1024 residues
+                if ((nSites%1024) == 0 && progress.setProgress(getProgress())) break;
 
                 if (hasComments && (ch == startComment || ch == lineComment)) {
                     skipComments(ch);
@@ -249,11 +254,9 @@ public class ImportHelper {
                 }
 
                 if (!Character.isWhitespace(ch)) {
-
-                    if (gapCharacters.indexOf(ch) != -1) {
+                    if (gapCharacters != null && gapCharacters.indexOf(ch) != -1) {
                         bb.append(gapCode);
-                        //sequence.append(gapCode);
-                    } else if (missingCharacters.indexOf(ch) != -1) {
+                    } else if (missingCharacters != null && missingCharacters.indexOf(ch) != -1) {
                         bb.append(unknownCode);
                         //sequence.append(unknownCode);
                     } else if (matchCharacters.indexOf(ch) != -1) {
@@ -284,13 +287,10 @@ public class ImportHelper {
                     lastDelimiter = readCharacter();
                 }
             }
-
         } catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
         }
-
-        sequence.ensureCapacity(bb.length());
-        sequence.append(bb);
+        return bb.toString();
     }
 
     /**

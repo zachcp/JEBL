@@ -59,17 +59,13 @@ public class PhylipSequentialImporter implements SequenceImporter {
                     n++;
                 }
 
-                StringBuilder seq = new StringBuilder(siteCount);
-                helper.readSequence(seq, sequenceType, "", siteCount, "-", "?", ".", firstSeq);
+                String seq = helper.readSequence(sequenceType, "", siteCount, "-", "?", ".", firstSeq);
 
                 if (firstSeq == null) {
-                    firstSeq = seq.toString();
+                    firstSeq = seq;
                 }
-
-                sequences.add(new BasicSequence(sequenceType, Taxon.getTaxon(name.toString()), seq.toString()));
+                sequences.add(new BasicSequence(sequenceType, Taxon.getTaxon(name.toString()), seq));
             }
-
-
         } catch (EOFException e) {
         }
 
