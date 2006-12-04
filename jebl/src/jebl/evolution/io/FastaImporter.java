@@ -94,7 +94,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                                 ProgressListener progressListener)
             throws IOException, ImportException
     {
-        List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
+        final List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
         final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
@@ -140,17 +140,22 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 // another clean way of handling this case. Note that the dialog only appears
                 // if illegalCharacterPolicy has been set to a non-default value.
                 if( type == null ) {
-                    final String errorMessage = "Illegal sequence characters encountered on or before line " + helper.getLineNumber() + ". What do you want to do?";
+                    final String errorMessage = "Illegal sequence characters encountered on or before line " + helper.getLineNumber() + ".";
                     if (illegalCharacterPolicyForThisImport.get().equals(IllegalCharacterPolicy.askUser)) {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {
                                 public void run() {
                                     IllegalCharacterPolicy[] options = {IllegalCharacterPolicy.abort, IllegalCharacterPolicy.strip};
-                                    int choice = JOptionPane.showOptionDialog(null,errorMessage, "Illegal characters in sequences",
+                                    int choice = JOptionPane.showOptionDialog(null,errorMessage +  " What do you want to do?", "Illegal characters in sequences",
                                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
                                     illegalCharacterPolicyForThisImport.set(options[choice]);
                                 }
                             });
+
+                            if (illegalCharacterPolicyForThisImport.equals(IllegalCharacterPolicy.abort)) {
+                                // user was presented warning and chose to abort -> abort without an exception
+                                return sequences;
+                            }
                         } catch (InterruptedException e) {
                             illegalCharacterPolicyForThisImport.set(IllegalCharacterPolicy.abort);
                         } catch (InvocationTargetException e) {
@@ -163,7 +168,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                             type = Utils.guessSequenceType(seq);
                             break;
                         default:
-                            return sequences;
+                            throw new ImportException(errorMessage);
                     }
                 }
 
