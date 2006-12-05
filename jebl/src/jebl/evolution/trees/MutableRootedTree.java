@@ -44,8 +44,8 @@ public class MutableRootedTree implements RootedTree {
             setLength(out, tree.getEdgeLength(outGroup, root));
             // Create new root
             ArrayList<MutableRootedNode> rootChildren = new ArrayList<MutableRootedNode>();
-            rootChildren.add(newSubtreeRoot);
             rootChildren.add(out);
+            rootChildren.add(newSubtreeRoot);
             //MutableRootedNode newRoot = 
             	this.createInternalNode( rootChildren );
             setLength(newSubtreeRoot,0);	
