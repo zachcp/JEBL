@@ -79,7 +79,7 @@ public final class Utils {
             Node parent = tree.getParent(node);
             // Don't write root length. This is ignored elsewhere and the nexus importer fails
             // whet it is present.
-            if (parent != null) {
+            if (parent != null && tree.hasLengths() ) {
                 buffer.append(":").append(tree.getLength(node));
             }
         }
