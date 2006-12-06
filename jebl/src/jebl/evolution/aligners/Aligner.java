@@ -7,6 +7,11 @@ import jebl.util.ProgressListener;
 import java.util.Collection;
 
 /**
+ *
+ * As of 2006-12-06, this interface is not used anywhere in JEBL, and it doesn't have
+ * any implementing classes. It is only a proposed future alternative to the existing
+ * abstract class Align
+ *
  * @author Andrew Rambaut
  * @author Alexei Drummond
  * @version $Id$
