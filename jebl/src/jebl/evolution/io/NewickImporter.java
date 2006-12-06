@@ -136,6 +136,8 @@ public class NewickImporter implements TreeImporter {
         if (helper.getLastDelimiter() == ':') {
             double length = helper.readDouble(",():;");
             tree.setLength(branch, length);
+        } else {
+        	tree.setLength(branch, 1.0);
         }
 
         return branch;
