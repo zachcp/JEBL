@@ -81,6 +81,16 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         this.compactTrees = compactTrees;
     }
 
+    /**
+     * @param reader
+     * @param compactTrees
+     * @deprecated Use NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength) 
+     */
+    public NexusImporter(Reader reader, boolean compactTrees) {
+        // a wild guess on the low side
+        this(reader, compactTrees, 4*1024);
+    }
+
     private void initHelper() {
         // ! defines a comment to be written out to a log file
         // & defines a meta comment
