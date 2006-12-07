@@ -158,7 +158,7 @@ public final class Utils {
     }
 
     private static String rep(char c, int count) {
-        StringBuilder b = new StringBuilder();
+        final StringBuilder b = new StringBuilder();
         while (count > 0) {
             b.append(c);
             --count;
@@ -284,34 +284,21 @@ public final class Utils {
         return new RootedFromUnrooted(tree, root, true);
     }
 
-    private static String nodeName(Tree tree, Node n) {
-        if( tree.isExternal(n) ) {
-            return tree.getTaxon(n).getName();
-        }
-        final String s = n.toString();
-        return s.substring(s.lastIndexOf('@'));
-    }
-
-    private static void showTree(Tree tree) {
-       for (Node e : tree.getNodes())  {
-           final String name = nodeName(tree, e);
-           System.out.print(name + ":");
-           for( Node n : tree.getAdjacencies(e) ) {
-               try {
-                   System.out.print(" {" + nodeName(tree, n) + " : " + tree.getEdgeLength(e, n) + "}");
-               } catch (Graph.NoEdgeException e1) {
-                   e1.printStackTrace();
-               }
-           }
-           System.out.println();
-       }
-    }
-
+    /**
+     * Root any tree by locating the "center" of tree and adding a new root node at that point
+     *
+     * for any point on the tree x let D(x) = Max{distance between x and t : for all tips t}
+     * The "center" c is the point with the smallest distance, i.e. D(c) = min{ D(x) : x in tree }
+     *
+     * @param tree to root
+     * @return rooted tree
+     */
     public static RootedTree rootTreeAtCenter(Tree tree) {
+        // Method - find the pair of tips with the longest distance. It is easy to see that the center
+        // is at the midpoint of the path between them.
+
         HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
         try {
-            // showTree(tree);
-
             double maxDistance =  -Double.MAX_VALUE;
             // node on maximal path
             Node current = null;
@@ -336,9 +323,8 @@ public final class Utils {
             while( true ) {
                 final double len = tree.getEdgeLength(current, direction);
                 if( distanceLeft <= len ) {
-                    RootedFromUnrooted rtree = new RootedFromUnrooted(tree, current, direction, distanceLeft);
                     //System.out.println(toNewick(rtree));
-                    return rtree;
+                    return new RootedFromUnrooted(tree, current, direction, distanceLeft);
                 }
                 distanceLeft -= len;
 
@@ -359,92 +345,6 @@ public final class Utils {
             return null; // serious bug, should not happen
         }
     }
-
-//    public static RootedTree rootTreeAtCenter1(Tree tree) {
-//        try {
-//            HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
-//
-//            double minOfMaxes = Double.MAX_VALUE;
-//            HashPair<Node> best = null;
-//            for (Node i : tree.getInternalNodes()) {
-//                double maxDist = -Double.MAX_VALUE;
-//                HashPair<Node> maxDirection = null;
-//                for (Node n : tree.getAdjacencies(i)) {
-//                    HashPair<Node> p = new HashPair<Node>(i, n);
-//                    double d = dist(tree, p.first, p.second, dists);
-//                    if (maxDist < d) {
-//                        maxDist = d;
-//                        maxDirection = p;
-//                    }
-//                }
-//
-//                if (maxDist < minOfMaxes) {
-//                    minOfMaxes = maxDist;
-//                    best = maxDirection;
-//                }
-//            }
-//
-//            if (best == null) {
-//                minOfMaxes = Double.MAX_VALUE;
-//                best = null;
-//                for (Node i : tree.getInternalNodes()) {
-//                    double maxDist = -Double.MAX_VALUE;
-//                    HashPair<Node> maxDirection = null;
-//                    for (Node n : tree.getAdjacencies(i)) {
-//                        HashPair<Node> p = new HashPair<Node>(i, n);
-//                        double d = dist(tree, p.first, p.second, dists);
-//                        if (maxDist < d) {
-//                            maxDist = d;
-//                            maxDirection = p;
-//                        }
-//                    }
-//
-//                    if (maxDist < minOfMaxes) {
-//                        minOfMaxes = maxDist;
-//                        best = maxDirection;
-//                    }
-//
-//                    if (best == null) {
-//                        maxDist = -Double.MAX_VALUE;
-//                        maxDirection = null;
-//                        for (Node n : tree.getAdjacencies(i)) {
-//                            HashPair<Node> p = new HashPair<Node>(i, n);
-//                            double d = dist(tree, p.first, p.second, dists);
-//                            if (maxDist < d) {
-//                                maxDist = d;
-//                                maxDirection = p;
-//                            }
-//                        }
-//
-//                        if (maxDist < minOfMaxes) {
-//                            minOfMaxes = maxDist;
-//                            best = maxDirection;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            double distToSecond = -Double.MAX_VALUE;
-//            for (Node n : tree.getAdjacencies(best.first)) {
-//                if (n != best.second) {
-//                    double d1 = dists.get(new HashPair<Node>(best.first, n));
-//                    if (d1 > distToSecond) {
-//                        distToSecond = d1;
-//                    }
-//                }
-//            }
-//
-//            double d = (minOfMaxes - distToSecond) / 2;
-//            if (d > tree.getEdgeLength(best.first, best.second) ||
-//                    Graph.Utils.getDegree(tree, best.first) < 3 || Graph.Utils.getDegree(tree, best.second) == 2) {
-//                return new RootedFromUnrooted(tree, best.first, true);
-//            }
-//
-//            return new RootedFromUnrooted(tree, best.first, best.second, d);
-//        } catch (Graph.NoEdgeException e1) {
-//            return null; // bug
-//        }
-//    }
 
     /**
      * @param tree  the tree
@@ -490,7 +390,7 @@ public final class Utils {
      */
     public static int getExternalNodeCount(RootedTree tree, Node node) {
 
-        List<Node> children = tree.getChildren(node);
+        final List<Node> children = tree.getChildren(node);
         if (children.size() == 0) return 1;
 
         int externalNodeCount = 0;
@@ -499,6 +399,93 @@ public final class Utils {
         }
 
         return externalNodeCount;
+    }
+
+    /**
+     * All nodes in subtree - parents before children (pre - order).
+     * @param tree
+     * @param node
+     * @return nodes in pre-order
+     */
+    public static List<Node> getNodes(RootedTree tree, Node node) {
+        final List<Node> nodes = new ArrayList<Node>();
+        nodes.add(node);
+
+        for( Node child : tree.getChildren(node) ) {
+            nodes.addAll( getNodes(tree, child) );
+        }
+
+        return nodes;
+    }
+
+    /**
+     * Right Neighbour of a tip (taxon).
+     *
+     * When tree is laid with children in given order, this would be the taxon to the right.
+     *
+     * @param tree
+     * @param tipNode
+     * @return Right Neighbour. null if node is the rightmost in tree or not a tip.
+     */
+    public static Node rightNb(RootedTree tree, Node tipNode) {
+        if( ! tree.isExternal(tipNode) ) return null;
+
+        // Go up to the first ancestor of tip so that tip is not in the rightmost (last) sub tree
+        List<Node> children;
+        int loc;
+        Node parent = tipNode;   // start th loop below with correct node
+        do {
+            tipNode = parent;
+            parent = tree.getParent(tipNode);
+            if( parent == null ) return null; // rightmost in tree
+            children = tree.getChildren(parent);
+            loc = children.indexOf(tipNode);
+        }  while( loc == children.size() -1  );
+
+        assert( loc < children.size() -1 );
+
+        // now find the leftmost tip down the sub tree to the right of ancestor
+        Node n = children.get(loc + 1);
+        while( ! tree.isExternal(n) ) {
+            n = tree.getChildren(n).get(0);
+        }
+        return n;
+    }
+
+    /**
+     * Left Neighbour of a tip (taxon).
+     *
+     * When tree is laid with children in given order, this would be the taxon to the left.
+     *
+     * @param tree
+     * @param node
+     * @return Left Neighbour. null if node is the leftmost in tree or not a tip.
+     */
+    public static Node leftNb(RootedTree tree, Node node) {
+        if( ! tree.isExternal(node) ) return null;
+
+        // Go up to the first ancestor of tip so that tip is not in the first sub tree
+        Node parent = node;
+        List<Node> children;
+        int loc;
+        do {
+            node = parent;
+            parent = tree.getParent(node);
+            if( parent == null ) return null; // rightmost in tree
+            children = tree.getChildren(parent);
+            loc = children.indexOf(node);
+        }  while( loc == 0  );
+
+        assert( loc > 0 );
+
+        // now find the rightmost tip down the sub tree to the left of ancestor
+
+        Node n = children.get(loc - 1);
+        while( ! tree.isExternal(n) ) {
+            final List<Node> ch = tree.getChildren(n);
+            n = ch.get(ch.size() - 1);
+        }
+        return n;
     }
 
     /**
@@ -556,16 +543,42 @@ public final class Utils {
         };
     }
 
-    // debig aid - print a representetion of node omitting branches
-    static public String DEBUGsubTreeRep(RootedTree t, Node n) {
-        if (t.isExternal(n)) {
-            return t.getTaxon(n).getName();
+    // debug aid - print a representetion of node omitting branches
+    static public String DEBUGsubTreeRep(RootedTree tree, Node node) {
+        if (tree.isExternal(node)) {
+            return tree.getTaxon(node).getName();
         }
         StringBuilder b = new StringBuilder();
-        for (Node x : t.getChildren(n)) {
+        for (Node x : tree.getChildren(node)) {
             if (b.length() > 0) b.append(",");
-            b.append(DEBUGsubTreeRep(t, x));
+            b.append(DEBUGsubTreeRep(tree, x));
         }
         return '(' + b.toString() + ')';
     }
+
+    // debug aid - unrooted tree printout - un-comment in emergency
+
+//    private static String nodeName(Tree tree, Node n) {
+//        if( tree.isExternal(n) ) {
+//            return tree.getTaxon(n).getName();
+//        }
+//        final String s = n.toString();
+//        return s.substring(s.lastIndexOf('@'));
+//    }
+//
+//    private static void DEBUGshowTree(Tree tree) {
+//       for (Node e : tree.getNodes())  {
+//           final String name = nodeName(tree, e);
+//           System.out.print(name + ":");
+//           for( Node n : tree.getAdjacencies(e) ) {
+//               try {
+//                   System.out.print(" {" + nodeName(tree, n) + " : " + tree.getEdgeLength(e, n) + "}");
+//               } catch (Graph.NoEdgeException e1) {
+//                   e1.printStackTrace();
+//               }
+//           }
+//           System.out.println();
+//       }
+//    }
+
 }

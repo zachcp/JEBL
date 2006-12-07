@@ -5,6 +5,7 @@ import jebl.evolution.trees.Tree;
 import org.virion.jam.controlpanels.ControlsProvider;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -13,6 +14,7 @@ import java.awt.geom.Point2D;
  * @version $Id$
  */
 public interface TreeLayout extends ControlsProvider {
+
 
     enum AxisType {
         CONTINUOUS,
@@ -119,4 +121,10 @@ public interface TreeLayout extends ControlsProvider {
     Line2D getNodeLabelPath(Node node);
 
     Shape getCalloutPath(Node node);
+
+    Shape getCollapsedNode(Node node, double ratio);
+
+    int getNodeMarkerUpperLimit(Node node, AffineTransform transform);
+
+    boolean smallSubTree(Node node, AffineTransform transform);
 }

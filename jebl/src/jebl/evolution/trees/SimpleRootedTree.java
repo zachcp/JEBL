@@ -18,7 +18,6 @@ import java.util.*;
  */
 final public class SimpleRootedTree implements RootedTree {
 
-
     public SimpleRootedTree() {
     }
 
@@ -31,11 +30,22 @@ final public class SimpleRootedTree implements RootedTree {
     }
 
     /**
+     * Make a copy of the given rooted tree
+     * @param tree a rooted tree
+     * @param nodeMapping store {source tree node -> new tree node} mapping in here if non-null 
+     */
+    public SimpleRootedTree(RootedTree tree, Map<Node, Node> nodeMapping) {
+        createNodes(tree, tree.getRootNode(), nodeMapping);
+        setConceptuallyUnrooted(tree.conceptuallyUnrooted());
+    }
+
+    /**
      * Make a copy of the given unrooted tree
      * @param tree an unrooted tree
      * @param ingroupNode the node on one side of the root
      * @param outgroupNode the node on the other side of the root
      * @param ingroupBranchLength the branch length from the root to the ingroup node
+     * @throws jebl.evolution.graphs.Graph.NoEdgeException
      */
     public SimpleRootedTree(Tree tree, Node ingroupNode, Node outgroupNode, double ingroupBranchLength) throws NoEdgeException {
         List<Node> children = new ArrayList<Node>();
@@ -57,18 +67,36 @@ final public class SimpleRootedTree implements RootedTree {
      * @param node
      */
     public Node createNodes(RootedTree tree, Node node) {
+        return createNodes(tree, node, (Map<Node, Node>)null);
+    }
 
-        Node newNode = null;
+    /**
+     * Clones the entire tree structure from the given RootedTree.
+     * @param tree
+     * @param node
+     * @param nodeMapping may be null
+     * @return
+     */
+    private Node createNodes(RootedTree tree, Node node, Map<Node, Node> nodeMapping) {
+
+        Node newNode;
         if (tree.isExternal(node)) {
             newNode = createExternalNode(tree.getTaxon(node));
+
         } else {
             List<Node> children = new ArrayList<Node>();
             for (Node child : tree.getChildren(node)) {
-                children.add(createNodes(tree, child));
+                children.add(createNodes(tree, child, nodeMapping));
             }
             newNode = createInternalNode(children);
         }
 
+        if( nodeMapping != null ) nodeMapping.put(node, newNode);
+
+        final Map<String, Object> map = node.getAttributeMap();
+        if( map.size() > 0 ) {
+            newNode.getAttributeMap().putAll(map);
+        }
         setHeight(newNode, tree.getHeight(node));
 
         return newNode;
@@ -142,7 +170,10 @@ final public class SimpleRootedTree implements RootedTree {
         return node;
     }
 
-
+    public void swapNodes(Node n, int i0, int i1) {
+        ((SimpleRootedNode)n).swapChildren(i0, i1);
+    }
+    
     /**
      * @param node the node whose height is being set
      * @param height the height
@@ -587,7 +618,6 @@ final public class SimpleRootedTree implements RootedTree {
             this.taxon = null;
         }
 
-
         public void removeChild(Node node) {
             List<Node> c = new ArrayList<Node>(children);
             c.remove(node);
@@ -608,6 +638,13 @@ final public class SimpleRootedTree implements RootedTree {
             children = Collections.unmodifiableList(new ArrayList<Node>(nodes));
         }
 
+        void swapChildren(int i0, int i1) {
+            ArrayList<Node> nc = new ArrayList<Node>(children);
+            final Node ni0 = nc.get(i0);
+            nc.set(i0, nc.get(i1));
+            nc.set(i1, ni0);
+            children = nc;
+        }
 
         public Node getParent() {
             return parent;
@@ -683,5 +720,5 @@ final public class SimpleRootedTree implements RootedTree {
         private double length;
 
         private Edge edge = null;
-    };
+    }
 }

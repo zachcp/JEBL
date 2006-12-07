@@ -12,10 +12,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +50,19 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
     public Shape getHeightArea(double height1, double height2) {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    }
+
+    public Shape getCollapsedNode(Node node, double ratio) {
+        final Point2D nodePoint = getNodePoint(node);
+        return new Line2D.Double(nodePoint.getX(), nodePoint.getY(), nodePoint.getX() + .01, nodePoint.getY());
+    }
+
+    public boolean smallSubTree(Node node, AffineTransform transform) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public int getNodeMarkerUpperLimit(Node node, AffineTransform transform) {
+        return -1; // todo
     }
 
     public void setControlPalette(ControlPalette controlPalette) {
@@ -162,8 +172,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         taxonLabelPaths.clear();
         calloutPaths.clear();
 
-        Node root = this.tree.getRootNode();
-        double rl = (rootLength * this.tree.getHeight(root)) * 10.0;
+        final Node root = this.tree.getRootNode();
+        final double rl = (rootLength * this.tree.getHeight(root)) * 10.0;
 
         maxXPosition = 0.0;
         getMaxXPosition(root, rl);
@@ -190,8 +200,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
             double yPos = 0.0;
 
-            List<Node> children = tree.getChildren(node);
-            Point2D[] childPoints = new Point2D[children.size()];
+            final List<Node> children = tree.getChildren(node);
+            final Point2D[] childPoints = new Point2D[children.size()];
 
             int i = 0;
             for (Node child : children) {

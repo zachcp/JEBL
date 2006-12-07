@@ -113,6 +113,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         }
     }
 
+    public void setTree(RootedTree tree) {
+        this.tree = tree;
+    }
+
     protected String getLabel(Node node) {
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
             return tree.getTaxon(node).getName();
@@ -399,7 +403,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private NumberFormatter formatter = null;
 
-    private final Tree tree;
+    private Tree tree;
     protected String attribute;
     protected String[] attributes;
 }

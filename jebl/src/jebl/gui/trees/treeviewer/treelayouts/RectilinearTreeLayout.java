@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Utils;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -10,9 +11,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,71 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
     public Shape getHeightArea(double height1, double height2) {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
+    }
+
+    public Shape getCollapsedNode(Node node, double ratio) {
+        Node first = node;
+        while( ! tree.isExternal(first) ) {
+            first = tree.getChildren(first).get(0);
+        }
+        Node last = node;
+        while( ! tree.isExternal(last) ) {
+            final List<Node> children = tree.getChildren(last);
+            last = children.get(children.size()- 1);
+        }
+
+        final Point2D c1 = getNodePoint(first);
+        final Point2D cn = getNodePoint(last);
+        final Point2D n = getNodePoint(node);
+        final double dy = cn.getY() - c1.getY();
+        final double dx = cn.getX() - n.getX();   assert dx >= 0.0 && dy >= 0;
+
+        return new Rectangle2D.Double(n.getX(), n.getY() + (c1.getY() - n.getY()) * ratio, dx * ratio, dy * ratio);
+    }
+
+    public int getNodeMarkerUpperLimit(Node node, AffineTransform transform) {
+        //final Node parent = tree.getParent(node);
+        double lim = Double.MAX_VALUE;
+        final Point2D n = getNodePoint(node);
+        for( Node a : tree.getAdjacencies(node) ) {
+            //final Point2D n = getNodePoint(node);
+            final Point2D loc = getNodePoint(a);
+            final double d = Math.abs(n.getX() - loc.getX()) * transform.getScaleX();  
+            lim = Math.min(lim, d);
+        }
+
+        final List<Node> nodes = tree.getChildren(node);
+        final int nNodes = nodes.size();
+        if( nNodes >= 2 ) {
+            final Point2D c1 = getNodePoint(nodes.get(0));
+            final Point2D cn = getNodePoint(nodes.get(nodes.size()-1));
+
+            final double d = 0.33 * (cn.getY() - c1.getY()) * transform.getScaleY();
+            lim = Math.min(lim, d);
+        } else if( nNodes == 0 ) {
+            final Node[] rnode = {Utils.rightNb(tree, node), Utils.leftNb(tree, node)};
+//            System.err.println("right/left of " + tree.getTaxon(node).getName() + " "
+//                    + ((rnode[0] == null) ? " - " :  tree.getTaxon(rnode[0]).getName()) + " " +
+//                      ((rnode[1] == null) ? " - " :  tree.getTaxon(rnode[1]).getName()) );
+
+            for( Node nb : rnode ) {
+                if( nb != null ) {
+                    final Point2D pt = getNodePoint(nb);
+                    final double dy = 0.33 * Math.abs((pt.getY() - n.getY())) * transform.getScaleY();
+                    double d;
+                    if( pt.getX() > n.getX() ) {
+                        d = dy;
+                    } else {
+                        final double dx = 0.33 * Math.abs((pt.getX() - n.getX())) * transform.getScaleX();
+                        d = Math.sqrt(dx*dx + dy*dy);
+                    }
+
+                    lim = Math.min(lim, d);
+                }
+            }
+        }
+        assert lim >= 0;
+        return (int) lim;
     }
 
     public void setControlPalette(ControlPalette controlPalette) {
@@ -142,8 +206,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         yPosition = 0.0;
         yIncrement = 1.0 / (tree.getExternalNodes().size() + 1);
 
-        Node root = this.tree.getRootNode();
-        double rl = rootLength * this.tree.getHeight(root);
+        final Node root = this.tree.getRootNode();
+        final double rl = rootLength * this.tree.getHeight(root);
 
         maxXPosition = 0.0;
         getMaxXPosition(root, rl);
@@ -151,7 +215,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         Point2D rootPoint = constructNode(root, rl);
 
         // construct a root branch line
-        Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
+        final Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
 
         // add the line to the map of branch paths
         branchPaths.put(root, line);
@@ -165,11 +229,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
             double yPos = 0.0;
 
-            List<Node> children = tree.getChildren(node);
+            final List<Node> children = tree.getChildren(node);
             for (Node child : children) {
-
-                double length = tree.getLength(child);
-                Point2D childPoint = constructNode(child, xPosition + length);
+                final double length = tree.getLength(child);
+                final Point2D childPoint = constructNode(child, xPosition + length);
                 yPos += childPoint.getY();
             }
 
@@ -177,16 +240,18 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             yPos /= children.size();
 
             nodePoint = new Point2D.Double(xPosition, yPos);
+            final double x = xPosition;
+            final double y = yPos;
 
-            for ( final Node child : children) {
+            for( final Node child : children ) {
 
                 final Point2D childPoint = nodePoints.get(child);
 
                 GeneralPath branchPath = new GeneralPath();
 
                 // start point
-                final float x0 = (float) nodePoint.getX();
-                final float y0 = (float) nodePoint.getY();
+                final float x0 = (float) x;
+                final float y0 = (float) y;
 
                 // end point
                 final float x1 = (float) childPoint.getX();
@@ -203,7 +268,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
-                final double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
+                final double x3 = (x + childPoint.getX()) / 2;
                 Line2D branchLabelPath = new Line2D.Double(
                         x3 - 1.0, childPoint.getY(),
                         x3 + 1.0, childPoint.getY());
@@ -211,35 +276,28 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 branchLabelPaths.put(child, branchLabelPath);
             }
 
-            Line2D nodeLabelPath = new Line2D.Double(
-                    nodePoint.getX(), nodePoint.getY(),
-                    nodePoint.getX() + 1.0, nodePoint.getY());
+            Line2D nodeLabelPath = new Line2D.Double(x, y, x + 1.0, y);
 
             nodeLabelPaths.put(node, nodeLabelPath);
 
         } else {
 
             nodePoint = new Point2D.Double(xPosition, yPosition);
+            final double x = xPosition;
+            final double y = yPosition;
 
             Line2D taxonLabelPath;
 
             if (alignTaxonLabels) {
 
-                taxonLabelPath = new Line2D.Double(
-                        maxXPosition, nodePoint.getY(),
-                        maxXPosition + 1.0, nodePoint.getY());
+                taxonLabelPath = new Line2D.Double(maxXPosition, y, maxXPosition + 1.0, y);
 
-                Line2D calloutPath = new Line2D.Double(
-                        nodePoint.getX(), nodePoint.getY(),
-                        maxXPosition, nodePoint.getY());
+                final Line2D calloutPath = new Line2D.Double(x, y, maxXPosition, y);
 
                 calloutPaths.put(node, calloutPath);
 
             } else {
-                taxonLabelPath = new Line2D.Double(
-                        nodePoint.getX(), nodePoint.getY(),
-                        nodePoint.getX() + 1.0, nodePoint.getY());
-
+                taxonLabelPath = new Line2D.Double(x, y, x + 1.0, y);
             }
 
             taxonLabelPaths.put(node, taxonLabelPath);
@@ -254,20 +312,32 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return nodePoint;
     }
 
-    private void getMaxXPosition(Node node, double xPosition) {
+    public boolean smallSubTree(Node node, AffineTransform transform) {
+        int th = 7;
+        final List<Node> children = tree.getChildren(node);
+        if( children.size() < 2 ) return false;
 
-        if (!tree.isExternal(node)) {
+        final Node[] ch = {children.get(0), children.get(1)};
+//        final Point2D[] loc = {new Point2D.Double(), new Point2D.Double()};
+//        for(int k = 0; k < 2; ++k) {
+//            final Point2D location = nodePoints.get(ch[k]);
+//            transform.transform(location, loc[k]);
+//        }
+        final double d = (nodePoints.get(ch[1]).getY() - nodePoints.get(ch[0]).getY()) * transform.getScaleY();
+        assert d >= 0;
+        //final double d =  Math.abs(loc[0].getY() - loc[1].getY())
+        return d <= th;
+    }
 
-            List<Node> children = tree.getChildren(node);
+    private void getMaxXPosition(final Node node, final double xPosition) {
 
-            for (Node child : children) {
-                final double length = tree.getLength(child);
-                getMaxXPosition(child, xPosition + length);
-            }
-
-        } else {
+        if ( tree.isExternal(node)) {
             if (xPosition > maxXPosition) {
                 maxXPosition = xPosition;
+            }
+        } else {
+            for (final Node child : tree.getChildren(node)) {
+                getMaxXPosition(child, xPosition + tree.getLength(child));
             }
         }
     }

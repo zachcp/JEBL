@@ -174,14 +174,14 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     public void setTree(Tree inTree, int defaultLabelSize) {
-        boolean isRooted = (inTree instanceof RootedTree);
+        final boolean isRooted = (inTree instanceof RootedTree);
         if (isRooted) {
             tree = (RootedTree) inTree;
         } else {
             tree = Utils.rootTheTree(inTree);
         }
 
-        treePane.setTree(tree);
+        treePane.setTree(tree, null);
 
         BasicLabelPainter taxonLabelPainter =
                 new BasicLabelPainter("Tip Labels", tree, BasicLabelPainter.PainterIntent.TIP, defaultLabelSize);

@@ -45,37 +45,41 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
         final Node[] selectedNode = treePane.getNodeAt(mousePoint);
         final boolean doubleClick = mouseEvent.getClickCount() > 1;
 
+        final boolean addToSelection = mouseEvent.isShiftDown() || mouseEvent.isControlDown();
+
+        // keep selection on double click
         if( ! doubleClick ) {
-            // keep selection on double click
-            if (!mouseEvent.isShiftDown()) {
+            if ( ! addToSelection ) {
                 treePane.clearSelection();
             }
         }
 
         SelectionMode mode = selectionMode;
         if (mouseEvent.isAltDown()) {
-            if (mode == SelectionMode.NODE) {
-                mode = SelectionMode.CLADE;
-            } else if (mode == SelectionMode.CLADE) {
-                mode = SelectionMode.NODE;
+            switch( mode ) {
+                case NODE:  mode = SelectionMode.CLADE; break;
+                case CLADE: mode = SelectionMode.NODE; break;
+                default: break;
             }
         }
 
+        final Node mainSelectedNode = selectedNode[0];
+        final boolean alreadySelected = treePane.getSelectedNodes().contains(mainSelectedNode);
         switch (mode) {
             case NODE:
-                treePane.addSelectedNode(selectedNode[0]);
+                treePane.addSelectedNode(mainSelectedNode, !(addToSelection && alreadySelected));
                 break;
             case CLADE:
 
                 if( doubleClick ) {
-                    if( selectedNode[0] != null )
-                        treePane.expandContract(selectedNode[0]);
+                    if( mainSelectedNode != null )
+                        treePane.toggleExpandContract(mainSelectedNode);
                 } else {
-                    treePane.addSelectedClade(selectedNode);
+                    treePane.addSelectedClade(selectedNode, !(addToSelection && alreadySelected));
                 }
                 break;
             case TAXA:
-                treePane.addSelectedTaxa(selectedNode[0]);
+                treePane.addSelectedTaxa(mainSelectedNode);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
@@ -108,10 +112,10 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
             for (Node selectedNode : selectedNodes) {
                 switch (mode) {
                     case NODE:
-                        treePane.addSelectedNode(selectedNode);
+                        treePane.addSelectedNode(selectedNode, true);
                         break;
                     case CLADE:
-                        treePane.addSelectedClade(new Node[]{selectedNode, null});
+                        treePane.addSelectedClade(new Node[]{selectedNode, null}, true);
                         break;
                     case TAXA:
                         treePane.addSelectedTaxa(selectedNode);
