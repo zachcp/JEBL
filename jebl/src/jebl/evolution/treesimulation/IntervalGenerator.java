@@ -1,4 +1,4 @@
-package jebl.evolution.trees;
+package jebl.evolution.treesimulation;
 
 /**
  * @author Andrew Rambaut

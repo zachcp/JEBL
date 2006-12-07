@@ -1,6 +1,6 @@
 package jebl.evolution.coalescent;
 
-import jebl.evolution.trees.IntervalGenerator;
+import jebl.evolution.treesimulation.IntervalGenerator;
 
 /**
  * This is a class that draws coalescent intervals under the given demographic function. If

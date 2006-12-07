@@ -1,8 +1,10 @@
-package jebl.evolution.trees;
+package jebl.evolution.treesimulation;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.NexusExporter;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.math.Random;
 
 import java.io.*;
@@ -187,6 +189,7 @@ public class TreeSimulator {
 				0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0
 		};
 
+		// A simple uniform interval generator..
 		IntervalGenerator intervals = new IntervalGenerator() {
 			public double getInterval(double criticalValue, int lineageCount, double currentHeight) {
 				return criticalValue;
