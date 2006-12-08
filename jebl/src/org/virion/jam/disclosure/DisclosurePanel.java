@@ -4,8 +4,11 @@ import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author Andrew Rambaut
@@ -52,9 +55,19 @@ public class DisclosurePanel extends JPanel {
 			}
 		};
         panel1.setOpaque(false);
+        panel1.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                button.doClick();
+            }
+        });
 
-        panel1.add(button, BorderLayout.WEST);
-		panel1.add(titleComponent, BorderLayout.CENTER);
+        JPanel componentPanel = new JPanel(new BorderLayout(6, 0));
+        componentPanel.setOpaque(false);
+
+        componentPanel.add(button, BorderLayout.WEST);
+		componentPanel.add(titleComponent, BorderLayout.CENTER);
+        panel1.add(componentPanel, BorderLayout.WEST);
+
         add(panel1, BorderLayout.NORTH);
 
 		add(panel, BorderLayout.CENTER);
