@@ -14,7 +14,13 @@ import jebl.evolution.taxa.Taxon;
 import java.util.Set;
 
 /**
- * An unrooted tree.
+ * A rooted or unrooted tree. This interface is the common base class for all trees,
+ * and contains only operations for unrooted trees. The subinterface RootedTree
+ * contains additional methods that make sense only on rooted trees.
+ *
+ * Both interfaces contain no mutator methods. As of 2006-12-08, the only way
+ * to mutate a tree after it has been built is to use its concrete class
+ * instead of the Tree or RootedTree interface.
  *
  * @author rambaut
  * @author Alexei Drummond
