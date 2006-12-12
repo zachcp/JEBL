@@ -1,4 +1,4 @@
-/*
+/**
  * Taxon.java
  *
  * (c) 2005 JEBL Development Team
