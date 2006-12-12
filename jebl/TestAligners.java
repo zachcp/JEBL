@@ -9,7 +9,6 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
 
 /**
- *
  * @author Alexei Drummond
  *
  * @version $Id$
