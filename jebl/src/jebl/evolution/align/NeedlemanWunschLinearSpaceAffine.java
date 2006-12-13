@@ -25,6 +25,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         this(sub, openGapPenalty, extendGapPenalty, false);
     }
 
+    
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds) {
         super(sub, d, e);
         this.freeGapsAtEnds = freeGapsAtEnds;
