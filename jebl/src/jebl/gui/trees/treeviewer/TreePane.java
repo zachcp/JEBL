@@ -778,7 +778,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         long start = System.currentTimeMillis();
         drawTree(g2, getWidth(), getHeight());
-        System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
+        //System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
             g2.setPaint(new Color(128, 128, 128, 128));
@@ -1036,7 +1036,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 
     private void calibrate(Graphics2D g2, double width, double height) {
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
 
         // First of all get the bounds for the unscaled tree
         treeBounds = null;
@@ -1235,7 +1235,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
             final double labelHeight = taxonLabelPainter.getPreferredHeight();
-            Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
+            final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
 
             // Iterate though the external nodes
             for (Node node : externalNodes) {
@@ -1300,7 +1300,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             for (Node node : tree.getNodes()) {
 
                 // Get the line that represents the path for the branch label
-                Line2D labelPath = treeLayout.getBranchLabelPath(node);
+                final Line2D labelPath = treeLayout.getBranchLabelPath(node);
 
                 if (labelPath != null) {
                     branchLabelPainter.calibrate(g2, node);
@@ -1320,13 +1320,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     // move to middle of branch - since the move is before the rotation
                     final double direction = just == Painter.Justification.RIGHT ? 1 : -1;
-                    labelTransform.translate(-direction * xScale * branchLength /2, 0);
+                    labelTransform.translate(-direction * xScale * branchLength / 2, 0);
 
                     // Store the transformed bounds in the map for use when selecting
                     final Shape value = labelTransform.createTransformedShape(labelBounds);
-                    final Rectangle2D d = value.getBounds2D();
-                    final double x1 = d.getMinX();
-                    final double x2 = d.getMaxX();
+                   // final Rectangle2D d = value.getBounds2D();
+                   // final double x1 = d.getMinX();
+                   // final double x2 = d.getMaxX();
                     // put in table based on x1. maintain max(dx) for search
                     branchLabelBounds.put(node, value);
 
@@ -1353,7 +1353,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
         
         calibrated = true;
-        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+       // System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
 
     private AffineTransform calculateTransform(AffineTransform globalTransform, Line2D line, double width, double height, boolean just) {
