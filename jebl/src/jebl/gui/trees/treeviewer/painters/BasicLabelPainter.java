@@ -122,7 +122,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             return tree.getTaxon(node).getName();
         }
 
-        if ( tree instanceof RootedTree) {
+        if( tree instanceof RootedTree ) {
             final RootedTree rtree = (RootedTree) tree;
 
             if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
@@ -132,11 +132,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             }
         }
 
-        Object value = node.getAttribute(attribute);
+        final Object value = node.getAttribute(attribute);
         if (value != null) {
             if (value instanceof Double) {
-                Double x = (Double) value;
-                return formatter.getFormattedValue(x);
+                return formatter.getFormattedValue((Double) value);
             }
             return value.toString();
         }
@@ -162,7 +161,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         final Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
 
-        FontMetrics fm = g2.getFontMetrics();
+        final FontMetrics fm = g2.getFontMetrics();
         preferredHeight = fm.getHeight();
         preferredWidth = 0;
 
