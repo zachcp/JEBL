@@ -32,7 +32,7 @@ public interface Attributable {
 
     /**
      * @return an object representing the named attributed for this object.
-     * @param name the name of the attribute of interest.
+     * @param name the name of the attribute of interest, or null if the attribute doesn't exist.
      */
     Object getAttribute(String name);
 
