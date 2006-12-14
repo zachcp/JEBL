@@ -56,6 +56,12 @@ public class MachineAccuracy
         //  2.) same() was asymmetric: let a = 1.0, b = 1.0 - MachineAccuracy.SQRT_EPSILON.
         //      Then same(a,b) == false and same(b,a) == true with the old version of same().
         //return Math.abs((a/b)-1.0) <= SQRT_EPSILON;
-        return ((b / (1.0+SQRT_EPSILON)) <= a) && (a <= (1+SQRT_EPSILON) * b);
+        if ((a < 0) != (b < 0)) {
+            return false;
+        } else {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            return ((b / (1.0+SQRT_EPSILON)) <= a) && (a <= (1+SQRT_EPSILON) * b);
+        }
     }
 }
