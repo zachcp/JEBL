@@ -45,9 +45,17 @@ public class MachineAccuracy
 
 	/**
 	 * @return true if the relative difference between the two parameters
-	 * is smaller than SQRT_EPSILON.
+	 * is no larger than SQRT_EPSILON.
+     *
+     * (TT: I think this means (b / (1+SQRT_EPSILON)) <= a <= b * (1+SQRT_EPSILON) )
 	 */
 	public static boolean same(double a, double b) {
-		return Math.abs((a/b)-1.0) <= SQRT_EPSILON;
-	}
+        // Tobias: I changed the formula on 2006-12-14. The old version had two
+        // problems:
+        //  1.) same(0,0) was false (because of a division by zero)
+        //  2.) same() was asymmetric: let a = 1.0, b = 1.0 - MachineAccuracy.SQRT_EPSILON.
+        //      Then same(a,b) == false and same(b,a) == true with the old version of same().
+        //return Math.abs((a/b)-1.0) <= SQRT_EPSILON;
+        return ((b / (1.0+SQRT_EPSILON)) <= a) && (a <= (1+SQRT_EPSILON) * b);
+    }
 }
