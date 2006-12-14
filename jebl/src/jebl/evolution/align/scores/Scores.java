@@ -57,6 +57,34 @@ public abstract class Scores implements ScoreMatrix {
         return name.substring(name.lastIndexOf(".")+1);
     }
 
+    /**
+     * @param scoreMatrix A ScoreMatrix with only low ascii characters (< chr(127)) in the alphabet
+     * @return A Scores instance corresponding to scoreMatrix.
+     */
+    public static Scores forMatrix(ScoreMatrix scoreMatrix) {
+        final String alphabet = scoreMatrix.getAlphabet();
+        final String name = scoreMatrix.getName();
+        float[][] scores = new float[alphabet.length()][alphabet.length()];
+        for (int i=0; i < alphabet.length(); i++) {
+            char a = alphabet.charAt(i);
+            for (int j=0; j < alphabet.length(); j++) {
+                char b = alphabet.charAt(j);
+                scores[i][j] = scoreMatrix.getScore(a,b);
+            }
+        }
+        Scores result = new Scores() {
+            public String getAlphabet() {
+                return alphabet;
+            }
+
+            public String getName() {
+                return name;
+            }
+        };
+        result.buildScores(scores);
+        return result;
+    }
+
     public static Scores duplicate(Scores scores) {
         Scores result;
         if(scores instanceof AminoAcidScores)
