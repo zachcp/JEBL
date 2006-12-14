@@ -43,12 +43,18 @@ public final class AminoAcids {
     public static final AminoAcidState V_STATE = new AminoAcidState("V", "V", 17);
     public static final AminoAcidState W_STATE = new AminoAcidState("W", "W", 18);
     public static final AminoAcidState Y_STATE = new AminoAcidState("Y", "Y", 19);
+    // If you use these, make sure to change the numbers of B..- below to 22..27,
+    // and increase CANONICAL_STATE_COUNT to 20, STATE_COUNT to 28
+    //public static final AminoAcidState U_STATE = new AminoAcidState("U", "U", 20); // Selenocysteine
+    // As of 2006-12-14 I think there is no IUPAC one letter code for Pyrrolysine, but BioJava uses "O"
+    //public static final AminoAcidState O_STATE = new AminoAcidState("O", "O", 21); // Pyrrolysine
 
     public static final AminoAcidState[] CANONICAL_STATES = new AminoAcidState[]{
             A_STATE, C_STATE, D_STATE, E_STATE, F_STATE,
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
-            S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE
+            S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE,
+           // U_STATE, O_STATE,
     };
 
     public static final AminoAcidState B_STATE = new AminoAcidState("B", "B", 20, new AminoAcidState[]{D_STATE, N_STATE});
@@ -63,6 +69,7 @@ public final class AminoAcids {
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
             S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE,
+            //U_STATE, O_STATE,
             B_STATE, Z_STATE, X_STATE, UNKNOWN_STATE,
             STOP_STATE, GAP_STATE
     };
@@ -92,15 +99,21 @@ public final class AminoAcids {
      * situations arising from converting coding DNA to an amino acid sequences.
      */
     /**
-     * A table to map state numbers (0-25) to their three letter codes.
+     * A table to map state numbers (0-27) to their three letter codes.
      */
     private static final String[] AMINOACID_TRIPLETS = {
-            //		A		C		D		E		F		G		H		I		K
+            // A     C      D      E      F      G      H      I      K
             "Ala", "Cys", "Asp", "Glu", "Phe", "Gly", "His", "Ile", "Lys",
-            //		L		M		N		P		Q		R		S		T		V
+            // L     M      N      P      Q      R      S      T      V
             "Leu", "Met", "Asn", "Pro", "Gln", "Arg", "Ser", "Thr", "Val",
-            //		W		Y		B		Z		X		*		?		-
-            "Trp", "Tyr", "Asx", "Glx", " X ", " * ", " ? ", " - "
+            //W      Y      B
+            "Trp", "Tyr", "Asx",
+
+            //  U      O
+            //"Sec", "Pyl",
+
+            // Z      X      *      ?     -
+            "Glx", " X ", " * ", " ? ", " - "
     };
     private static final int STATE_BY_CODE_SIZE = 128;
 
