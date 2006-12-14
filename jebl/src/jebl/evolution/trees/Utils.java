@@ -26,10 +26,27 @@ public final class Utils {
      * @param tree
      * @return the rooted tree as a newick format string
      */
-    public static String toNewick(RootedTree tree) {
+    public static String toNewick(jebl.evolution.trees.RootedTree tree) {
         StringBuilder buffer = new StringBuilder();
         toNewick(tree, tree.getRootNode(), buffer);
         return buffer.toString();
+    }
+
+
+	  /**
+     * Constructs a unique newick representation of a tree
+     * @param tree
+     */
+    public static String toUniqueNewick(jebl.evolution.trees.RootedTree tree) {
+    	return toUniqueNewick(tree,tree.getRootNode());
+    }
+
+    /**
+     * Constructs a unique newick representation of a tree print only an attribute
+     * @param tree
+     */
+    public static String toUniqueNewickByAttribute(jebl.evolution.trees.RootedTree tree, String attribute) {
+    	return toUniqueNewickByAttribute(tree,tree.getRootNode(),attribute);
     }
 
 //    private static void addMetaComment(Node node, StringBuilder buffer) {
@@ -56,7 +73,7 @@ public final class Utils {
 //  Andrew - Comments are not part of the Newick format so should not be included except within
 //  a NEXUS file. I have copied the tree writing code (with metacomments) to NexusExport and
 //  simplified this on to produce the straight Newick format.
-    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
+    private static void toNewick(jebl.evolution.trees.RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
@@ -508,7 +525,7 @@ public final class Utils {
         return minNodeHeight;
     }
 
-    public static Comparator<Node> createNodeDensityComparator(final RootedTree tree) {
+    public static Comparator<Node> createNodeDensityComparator(final jebl.evolution.trees.RootedTree tree) {
 
         return new Comparator<Node>() {
 
@@ -522,7 +539,7 @@ public final class Utils {
         };
     }
 
-    public static Comparator<Node> createNodeDensityMinNodeHeightComparator(final RootedTree tree) {
+    public static Comparator<Node> createNodeDensityMinNodeHeightComparator(final jebl.evolution.trees.RootedTree tree) {
 
         return new Comparator<Node>() {
 
@@ -543,8 +560,104 @@ public final class Utils {
         };
     }
 
+
+	/*
+	    * Generates a unique representation of a node
+	    * @param tree tree
+	    * @param node node
+	    * @param buffer buffer in which to store text representation
+	    */
+	   private static String toUniqueNewick(jebl.evolution.trees.RootedTree tree, Node node) {
+		   StringBuilder buffer = new StringBuilder();
+	       if (tree.isExternal(node)) {
+	           String name = tree.getTaxon(node).getName();
+	           if (!name.matches("^(\\w|-)+$")) {
+	               name = "\'" + name + "\'";
+	           }
+	           buffer.append(name);
+	           if( tree.hasLengths() ) {
+	             buffer.append(':');
+	             buffer.append(tree.getLength(node));
+	           }
+	       } else {
+	           buffer.append('(');
+	           List<Node> children = tree.getChildren(node);
+
+	           final int last = children.size() - 1;
+		        // Generate a uniquely sorted list of children
+	           List<String> childStrings = new ArrayList<String>();
+	           for(int i=0; i < children.size(); i ++)
+		           childStrings.add(toUniqueNewick(tree,children.get(i)));
+	           Collections.sort(childStrings,
+			           new Comparator<String>() {
+						   public int compare(String arg0, String arg1) {
+							   return arg1.compareTo(arg0);
+						   }
+	           });
+	           for (int i = 0; i < children.size(); i++) {
+	               buffer.append(childStrings.get(i));
+	               buffer.append(i == last ? ')' : ',');
+	           }
+
+	           Node parent = tree.getParent(node);
+	           if (parent != null && tree.hasLengths() ) {
+	               buffer.append(":").append(tree.getLength(node));
+	           }
+	       }
+	       return buffer.toString();
+	   }
+
+	   /*
+	    * Generates a unique representation of a node printing only its attribute
+	    * @param tree tree
+	    * @param node node
+	    * @param buffer buffer in which to store text representation
+	    */
+	   private static String toUniqueNewickByAttribute(jebl.evolution.trees.RootedTree tree, Node node, String attribute) {
+		   StringBuilder buffer = new StringBuilder();
+	       if (tree.isExternal(node)) {
+	           String name = (String) tree.getTaxon(node).getAttribute(attribute);
+	           buffer.append(name);
+	           if( tree.hasLengths() ) {
+	             buffer.append(':');
+	             buffer.append(tree.getLength(node));
+	           }
+	       } else {
+		        buffer.append('(');
+		        List<Node> children = tree.getChildren(node);
+//        	 if( children.size() == 1)
+//        		 return toUniqueNewickByAttribute(tree,children.get(0),attribute);
+//
+
+
+	           final int last = children.size() - 1;
+		        // Generate a uniquely sorted list of children
+	           List<String> childStrings = new ArrayList<String>();
+	           for(int i=0; i < children.size(); i ++)
+		           childStrings.add(toUniqueNewickByAttribute(tree,children.get(i),attribute));
+	           Collections.sort(childStrings,
+			           new Comparator<String>() {
+						   public int compare(String arg0, String arg1) {
+							   return arg1.compareTo(arg0);
+						   }
+	           });
+	           for (int i = 0; i < children.size(); i++) {
+	               buffer.append(childStrings.get(i));
+	               buffer.append(i == last ? ')' : ',');
+	           }
+
+	           Node parent = tree.getParent(node);
+	           if (parent != null && tree.hasLengths() ) {
+	               buffer.append(":").append(tree.getLength(node));
+	           }
+	       }
+	       return buffer.toString();
+	   }
+    	
+
+
     // debug aid - print a representetion of node omitting branches
-    static public String DEBUGsubTreeRep(RootedTree tree, Node node) {
+    static public String DEBUGsubTreeRep(jebl.evolution.trees.RootedTree tree, Node node) {
         if (tree.isExternal(node)) {
             return tree.getTaxon(node).getName();
         }
