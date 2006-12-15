@@ -93,10 +93,24 @@ public abstract class Scores implements ScoreMatrix {
 
     public static Scores duplicate(Scores scores) {
         Scores result;
-        if(scores instanceof AminoAcidScores)
+        if(scores instanceof AminoAcidScores) {
             result = new AminoAcidScores();
-        else
+        } else if (scores instanceof NucleotideScores) {
             result = new NucleotideScores((NucleotideScores) scores);
+        } else {
+            // what was part of the extra residues in the original class now becomes normal residues,
+            // just as in duplicate().
+            final String alphabet = scores.getAlphabet();
+            final String name = scores.getName();
+            result = new Scores() {
+                public String getAlphabet() {
+                    return alphabet + getExtraResidues();
+                }
+                public String getName() {
+                    return name;
+                }
+            };
+        }
         result.extraResidues = scores.getExtraResidues();
         result.score = new float[127][127];
         for (int i = 0; i < 127; i++) {
