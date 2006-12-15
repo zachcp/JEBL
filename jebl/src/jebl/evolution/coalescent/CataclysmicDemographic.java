@@ -30,6 +30,8 @@ public class CataclysmicDemographic extends ExponentialGrowth {
 
 	/**
 	 * Construct demographic model with given settings
+     * @param N0 present-day population size
+     * @param r growth rate
 	 */
 	public CataclysmicDemographic(double N0, double r, double d, double t) {
 
