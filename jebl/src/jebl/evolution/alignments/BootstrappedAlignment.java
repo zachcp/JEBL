@@ -10,9 +10,9 @@ import jebl.math.Random;
  * @version $Id$
  *
  */
-public class BootrappedAlignment extends ResampledAlignment {
+public class BootstrappedAlignment extends ResampledAlignment {
 
-    public BootrappedAlignment(Alignment srcAlignment) {
+    public BootstrappedAlignment(Alignment srcAlignment) {
         final int nSites = srcAlignment.getSiteCount();
         int[] sites = new int[nSites];
 
