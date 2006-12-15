@@ -118,7 +118,7 @@ public class BartonSternberg implements MultipleAligner {
      * and this function will only refine the alignment.
      */
     public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly,
-                          boolean estimateMatchMIsmatchCosts) {
+                          boolean estimateMatchMismatchCosts) {
         if( origScores != null ) {
             establishScores(origScores);
         }
@@ -160,7 +160,7 @@ public class BartonSternberg implements MultipleAligner {
             // We want a binary rooted tree
 
             //long start = System.currentTimeMillis();
-            final boolean estimateMatchCost = estimateMatchMIsmatchCosts && scores instanceof NucleotideScores;
+            final boolean estimateMatchCost = estimateMatchMismatchCosts && scores instanceof NucleotideScores;
 
             final AlignmentTreeBuilderFactory.Result unrootedGuideTree =
                     fastGuide ?

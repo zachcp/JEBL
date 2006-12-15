@@ -14,23 +14,29 @@ public abstract class Scores implements ScoreMatrix {
     public float[][] score;
     private String extraResidues = "";
 
+    /**
+     * @param scores float[][] with position [i][j] holding the score for
+     *        getScore(getAlphabet().charAt(i), getAlphabet().charAt(j)).
+     */
     protected void buildScores(float[][] scores) {
-
-        String states = getAlphabet();
+        String states = getAlphabet().toUpperCase();
         // Allow lowercase and uppercase states (ASCII code <= 127):
         score = new float[127][127];
         for (int i=0; i<states.length(); i++) {
-            char res1 = states.charAt(i);
+            char a = states.charAt(i);
+            char lca = Character.toLowerCase(a);
             for (int j=0; j<=i; j++) {
-                char res2 = states.charAt(j);
-                score[res1][res2] = score[res2][res1]
-                    = score[res1][res2+32] = score[res2+32][res1]
-                    = score[res1+32][res2] = score[res2][res1+32]
-                    = score[res1+32][res2+32] = score[res2+32][res1+32]
+                char b = states.charAt(j);
+                char lcb = Character.toLowerCase(b);
+                score[a][b] = score[b][a]
+                    = score[a][lcb] = score[lcb][a]
+                    = score[lca][b] = score[b][lca]
+                    = score[lca][lcb] = score[lcb][lca]
                     = scores[i][j];
             }
         }
     }
+    
 
     void buildScores(float match, float mismatch) {
         int states = getAlphabet().length();
