@@ -10,6 +10,7 @@ package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
 
@@ -26,27 +27,29 @@ public final class Utils {
      * @param tree
      * @return the rooted tree as a newick format string
      */
-    public static String toNewick(jebl.evolution.trees.RootedTree tree) {
+    public static String toNewick(RootedTree tree) {
         StringBuilder buffer = new StringBuilder();
         toNewick(tree, tree.getRootNode(), buffer);
         return buffer.toString();
     }
 
 
-	  /**
+    /**
      * Constructs a unique newick representation of a tree
+     *
      * @param tree
      */
-    public static String toUniqueNewick(jebl.evolution.trees.RootedTree tree) {
-    	return toUniqueNewick(tree,tree.getRootNode());
+    public static String toUniqueNewick(RootedTree tree) {
+        return toUniqueNewick(tree, tree.getRootNode());
     }
 
     /**
      * Constructs a unique newick representation of a tree print only an attribute
+     *
      * @param tree
      */
-    public static String toUniqueNewickByAttribute(jebl.evolution.trees.RootedTree tree, String attribute) {
-    	return toUniqueNewickByAttribute(tree,tree.getRootNode(),attribute);
+    public static String toUniqueNewickByAttribute(RootedTree tree, String attribute) {
+        return toUniqueNewickByAttribute(tree, tree.getRootNode(), attribute);
     }
 
 //    private static void addMetaComment(Node node, StringBuilder buffer) {
@@ -72,17 +75,18 @@ public final class Utils {
 
 //  Andrew - Comments are not part of the Newick format so should not be included except within
 //  a NEXUS file. I have copied the tree writing code (with metacomments) to NexusExport and
-//  simplified this on to produce the straight Newick format.
-    private static void toNewick(jebl.evolution.trees.RootedTree tree, Node node, StringBuilder buffer) {
+
+    //  simplified this on to produce the straight Newick format.
+    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
                 name = "\'" + name + "\'";
             }
             buffer.append(name);
-            if( tree.hasLengths() ) {
-              buffer.append(':');
-              buffer.append(tree.getLength(node));
+            if (tree.hasLengths()) {
+                buffer.append(':');
+                buffer.append(tree.getLength(node));
             }
         } else {
             buffer.append('(');
@@ -96,7 +100,7 @@ public final class Utils {
             Node parent = tree.getParent(node);
             // Don't write root length. This is ignored elsewhere and the nexus importer fails
             // whet it is present.
-            if (parent != null && tree.hasLengths() ) {
+            if (parent != null && tree.hasLengths()) {
                 buffer.append(":").append(tree.getLength(node));
             }
         }
@@ -107,7 +111,7 @@ public final class Utils {
             return;
         }
 
-        if (! tree.hasLengths()) {
+        if (!tree.hasLengths()) {
             bounds[0] = bounds[1] = 1;
             return;
         }
@@ -167,7 +171,7 @@ public final class Utils {
         }
 
         for (String ss : x) {
-            assert(ss.length() == x.get(0).length());
+            assert (ss.length() == x.get(0).length());
         }
 
         return x.toArray(new String[]{});
@@ -197,7 +201,7 @@ public final class Utils {
     }
 
     public static double safeNodeHeight(final RootedTree tree, final Node node) {
-       if (tree.hasHeights()) {
+        if (tree.hasHeights()) {
             return tree.getHeight(node);
         }
         return nodeDistance(tree, node);
@@ -260,12 +264,12 @@ public final class Utils {
 
     /**
      * Return a rooted tree from any tree.
-     *
+     * <p/>
      * If tree already rooted, return it. Otherwise if there is a "natuarl root" (i.e. a node of
      * degree 2) use it as root. Otherwise use an internal node close to the center of the tree as a root.
      *
-     * @param tree  to root
-     * @return  rooted representation
+     * @param tree to root
+     * @return rooted representation
      */
     public static RootedTree rootTheTree(Tree tree) {
         // If already rooted, do nothing
@@ -287,10 +291,10 @@ public final class Utils {
 
         Node root = null;
         double minLength = 100;
-        for( Node n : rtree.getChildren(rtree.getRootNode()) ) {
-            if( ! rtree.isExternal(n) ) {
+        for (Node n : rtree.getChildren(rtree.getRootNode())) {
+            if (!rtree.isExternal(n)) {
                 final double length = rtree.getLength(n);
-                if( root == null || length < minLength ) {
+                if (root == null || length < minLength) {
                     minLength = length;
                     root = n;
                 }
@@ -303,7 +307,7 @@ public final class Utils {
 
     /**
      * Root any tree by locating the "center" of tree and adding a new root node at that point
-     *
+     * <p/>
      * for any point on the tree x let D(x) = Max{distance between x and t : for all tips t}
      * The "center" c is the point with the smallest distance, i.e. D(c) = min{ D(x) : x in tree }
      *
@@ -316,17 +320,17 @@ public final class Utils {
 
         HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
         try {
-            double maxDistance =  -Double.MAX_VALUE;
+            double maxDistance = -Double.MAX_VALUE;
             // node on maximal path
             Node current = null;
             // next node on maximal path
             Node direction = null;
 
             // locate one terminal node of longest path
-            for (Node e : tree.getExternalNodes() ) {
+            for (Node e : tree.getExternalNodes()) {
                 for (Node n : tree.getAdjacencies(e)) {
                     final double d = dist(tree, e, n, dists);
-                    if( d > maxDistance ) {
+                    if (d > maxDistance) {
                         maxDistance = d;
                         current = e;
                         direction = n;
@@ -337,9 +341,9 @@ public final class Utils {
             // traverse along maximal path to it's middle
             double distanceLeft = maxDistance / 2.0;
 
-            while( true ) {
+            while (true) {
                 final double len = tree.getEdgeLength(current, direction);
-                if( distanceLeft <= len ) {
+                if (distanceLeft <= len) {
                     //System.out.println(toNewick(rtree));
                     return new RootedFromUnrooted(tree, current, direction, distanceLeft);
                 }
@@ -348,17 +352,17 @@ public final class Utils {
                 maxDistance = -Double.MAX_VALUE;
                 Node next = null;
                 for (Node n : tree.getAdjacencies(direction)) {
-                    if( n == current ) continue;
+                    if (n == current) continue;
                     final double d = dist(tree, direction, n, dists);
-                    if( d > maxDistance ) {
-                       maxDistance = d;
-                       next = n;
+                    if (d > maxDistance) {
+                        maxDistance = d;
+                        next = n;
                     }
                 }
                 current = direction;
                 direction = next;
             }
-        } catch( Graph.NoEdgeException e1)  {
+        } catch (Graph.NoEdgeException e1) {
             return null; // serious bug, should not happen
         }
     }
@@ -420,6 +424,7 @@ public final class Utils {
 
     /**
      * All nodes in subtree - parents before children (pre - order).
+     *
      * @param tree
      * @param node
      * @return nodes in pre-order
@@ -428,8 +433,8 @@ public final class Utils {
         final List<Node> nodes = new ArrayList<Node>();
         nodes.add(node);
 
-        for( Node child : tree.getChildren(node) ) {
-            nodes.addAll( getNodes(tree, child) );
+        for (Node child : tree.getChildren(node)) {
+            nodes.addAll(getNodes(tree, child));
         }
 
         return nodes;
@@ -437,7 +442,7 @@ public final class Utils {
 
     /**
      * Right Neighbour of a tip (taxon).
-     *
+     * <p/>
      * When tree is laid with children in given order, this would be the taxon to the right.
      *
      * @param tree
@@ -445,7 +450,7 @@ public final class Utils {
      * @return Right Neighbour. null if node is the rightmost in tree or not a tip.
      */
     public static Node rightNb(RootedTree tree, Node tipNode) {
-        if( ! tree.isExternal(tipNode) ) return null;
+        if (!tree.isExternal(tipNode)) return null;
 
         // Go up to the first ancestor of tip so that tip is not in the rightmost (last) sub tree
         List<Node> children;
@@ -454,16 +459,16 @@ public final class Utils {
         do {
             tipNode = parent;
             parent = tree.getParent(tipNode);
-            if( parent == null ) return null; // rightmost in tree
+            if (parent == null) return null; // rightmost in tree
             children = tree.getChildren(parent);
             loc = children.indexOf(tipNode);
-        }  while( loc == children.size() -1  );
+        } while (loc == children.size() - 1);
 
-        assert( loc < children.size() -1 );
+        assert (loc < children.size() - 1);
 
         // now find the leftmost tip down the sub tree to the right of ancestor
         Node n = children.get(loc + 1);
-        while( ! tree.isExternal(n) ) {
+        while (!tree.isExternal(n)) {
             n = tree.getChildren(n).get(0);
         }
         return n;
@@ -471,7 +476,7 @@ public final class Utils {
 
     /**
      * Left Neighbour of a tip (taxon).
-     *
+     * <p/>
      * When tree is laid with children in given order, this would be the taxon to the left.
      *
      * @param tree
@@ -479,7 +484,7 @@ public final class Utils {
      * @return Left Neighbour. null if node is the leftmost in tree or not a tip.
      */
     public static Node leftNb(RootedTree tree, Node node) {
-        if( ! tree.isExternal(node) ) return null;
+        if (!tree.isExternal(node)) return null;
 
         // Go up to the first ancestor of tip so that tip is not in the first sub tree
         Node parent = node;
@@ -488,17 +493,17 @@ public final class Utils {
         do {
             node = parent;
             parent = tree.getParent(node);
-            if( parent == null ) return null; // rightmost in tree
+            if (parent == null) return null; // rightmost in tree
             children = tree.getChildren(parent);
             loc = children.indexOf(node);
-        }  while( loc == 0  );
+        } while (loc == 0);
 
-        assert( loc > 0 );
+        assert (loc > 0);
 
         // now find the rightmost tip down the sub tree to the left of ancestor
 
         Node n = children.get(loc - 1);
-        while( ! tree.isExternal(n) ) {
+        while (!tree.isExternal(n)) {
             final List<Node> ch = tree.getChildren(n);
             n = ch.get(ch.size() - 1);
         }
@@ -525,7 +530,7 @@ public final class Utils {
         return minNodeHeight;
     }
 
-    public static Comparator<Node> createNodeDensityComparator(final jebl.evolution.trees.RootedTree tree) {
+    public static Comparator<Node> createNodeDensityComparator(final RootedTree tree) {
 
         return new Comparator<Node>() {
 
@@ -539,7 +544,7 @@ public final class Utils {
         };
     }
 
-    public static Comparator<Node> createNodeDensityMinNodeHeightComparator(final jebl.evolution.trees.RootedTree tree) {
+    public static Comparator<Node> createNodeDensityMinNodeHeightComparator(final RootedTree tree) {
 
         return new Comparator<Node>() {
 
@@ -561,103 +566,67 @@ public final class Utils {
     }
 
 
-	/*
-	    * Generates a unique representation of a node
-	    * @param tree tree
-	    * @param node node
-	    * @param buffer buffer in which to store text representation
-	    */
-	   private static String toUniqueNewick(jebl.evolution.trees.RootedTree tree, Node node) {
-		   StringBuilder buffer = new StringBuilder();
-	       if (tree.isExternal(node)) {
-	           String name = tree.getTaxon(node).getName();
-	           if (!name.matches("^(\\w|-)+$")) {
-	               name = "\'" + name + "\'";
-	           }
-	           buffer.append(name);
-	           if( tree.hasLengths() ) {
-	             buffer.append(':');
-	             buffer.append(tree.getLength(node));
-	           }
-	       } else {
-	           buffer.append('(');
-	           List<Node> children = tree.getChildren(node);
+    /**
+     * Generates a unique representation of a node
+     * @param tree tree
+     * @param node node
+     */
+    private static String toUniqueNewick(RootedTree tree, Node node) {
+        return toUniqueNewickByAttribute(tree, node, null);
+    }
 
-	           final int last = children.size() - 1;
-		        // Generate a uniquely sorted list of children
-	           List<String> childStrings = new ArrayList<String>();
-	           for(int i=0; i < children.size(); i ++)
-		           childStrings.add(toUniqueNewick(tree,children.get(i)));
-	           Collections.sort(childStrings,
-			           new Comparator<String>() {
-						   public int compare(String arg0, String arg1) {
-							   return arg1.compareTo(arg0);
-						   }
-	           });
-	           for (int i = 0; i < children.size(); i++) {
-	               buffer.append(childStrings.get(i));
-	               buffer.append(i == last ? ')' : ',');
-	           }
-
-	           Node parent = tree.getParent(node);
-	           if (parent != null && tree.hasLengths() ) {
-	               buffer.append(":").append(tree.getLength(node));
-	           }
-	       }
-	       return buffer.toString();
-	   }
-
-	   /*
-	    * Generates a unique representation of a node printing only its attribute
-	    * @param tree tree
-	    * @param node node
-	    * @param buffer buffer in which to store text representation
-	    */
-	   private static String toUniqueNewickByAttribute(jebl.evolution.trees.RootedTree tree, Node node, String attribute) {
-		   StringBuilder buffer = new StringBuilder();
-	       if (tree.isExternal(node)) {
-	           String name = (String) tree.getTaxon(node).getAttribute(attribute);
-	           buffer.append(name);
-	           if( tree.hasLengths() ) {
-	             buffer.append(':');
-	             buffer.append(tree.getLength(node));
-	           }
-	       } else {
-		        buffer.append('(');
-		        List<Node> children = tree.getChildren(node);
+    /**
+     * Generates a unique representation of a node printing only its attribute
+     * @param tree tree
+     * @param node node
+     * @param attribute when not null, use attribute to get taxa name
+     * @return tree representation
+     */
+    private static String toUniqueNewickByAttribute(RootedTree tree, Node node, String attribute) {
+        StringBuilder buffer = new StringBuilder();
+        if (tree.isExternal(node)) {
+            final Taxon taxon = tree.getTaxon(node);
+            final String name = attribute != null ? (String) taxon.getAttribute(attribute) : taxon.getName();
+            buffer.append(name);
+            if (tree.hasLengths()) {
+                buffer.append(':');
+                buffer.append(tree.getLength(node));
+            }
+        } else {
+            buffer.append('(');
+            List<Node> children = tree.getChildren(node);
 //        	 if( children.size() == 1)
 //        		 return toUniqueNewickByAttribute(tree,children.get(0),attribute);
 //
 
 
-	           final int last = children.size() - 1;
-		        // Generate a uniquely sorted list of children
-	           List<String> childStrings = new ArrayList<String>();
-	           for(int i=0; i < children.size(); i ++)
-		           childStrings.add(toUniqueNewickByAttribute(tree,children.get(i),attribute));
-	           Collections.sort(childStrings,
-			           new Comparator<String>() {
-						   public int compare(String arg0, String arg1) {
-							   return arg1.compareTo(arg0);
-						   }
-	           });
-	           for (int i = 0; i < children.size(); i++) {
-	               buffer.append(childStrings.get(i));
-	               buffer.append(i == last ? ')' : ',');
-	           }
+            final int last = children.size() - 1;
+            // Generate a uniquely sorted list of children
+            List<String> childStrings = new ArrayList<String>();
+            for (Node aChildren : children) {
+                childStrings.add(toUniqueNewickByAttribute(tree, aChildren, attribute));
+            }
+            Collections.sort(childStrings,
+                    new Comparator<String>() {
+                        public int compare(String arg0, String arg1) {
+                            return arg1.compareTo(arg0);
+                        }
+                    });
+            for (int i = 0; i <= last; i++) {
+                buffer.append(childStrings.get(i));
+                buffer.append(i == last ? ')' : ',');
+            }
 
-	           Node parent = tree.getParent(node);
-	           if (parent != null && tree.hasLengths() ) {
-	               buffer.append(":").append(tree.getLength(node));
-	           }
-	       }
-	       return buffer.toString();
-	   }
-    	
-
+            final Node parent = tree.getParent(node);
+            if (parent != null && tree.hasLengths()) {
+                buffer.append(":").append(tree.getLength(node));
+            }
+        }
+        return buffer.toString();
+    }
 
     // debug aid - print a representetion of node omitting branches
-    static public String DEBUGsubTreeRep(jebl.evolution.trees.RootedTree tree, Node node) {
+    static public String DEBUGsubTreeRep(RootedTree tree, Node node) {
         if (tree.isExternal(node)) {
             return tree.getTaxon(node).getName();
         }
