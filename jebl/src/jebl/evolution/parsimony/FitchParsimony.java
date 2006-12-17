@@ -42,8 +42,8 @@ public class FitchParsimony implements ParsimonyCriterion {
     private Map<Node, boolean[][]> stateSets = new HashMap<Node, boolean[][]>();
     private Map<Node, State[]> states = new HashMap<Node, State[]>();
 
-    private boolean[][] union;
-    private boolean[][] intersection;
+//    private boolean[][] union;         // Must now be local to recursive function
+//    private boolean[][] intersection;  // as nodes are not guaranteed to be called in post-order
 
     private RootedTree tree = null;
     private final List<Pattern> patterns;
@@ -159,7 +159,7 @@ public class FitchParsimony implements ParsimonyCriterion {
 
         for (Node node : tree.getNodes()) {
             boolean[][] stateSet = new boolean[patterns.size()][stateCount];
-            stateSets.put(node, stateSet);
+	        stateSets.put(node, stateSet);
 
             State[] stateArray = new State[patterns.size()];
             states.put(node, stateArray);
@@ -179,12 +179,11 @@ public class FitchParsimony implements ParsimonyCriterion {
 
                 State state = pattern.getState(index);
                 stateArray[i] = state;
-
                 if (gapsAreStates && state.isGap()) {
                     stateSet[i][stateCount - 1] = true;
                 } else {
                     for (State canonicalState : state.getCanonicalStates()) {
-                        stateSet[i][canonicalState.getIndex()] = true;
+                         stateSet[i][canonicalState.getIndex()] = true;
                     }
 
                 }
@@ -192,8 +191,8 @@ public class FitchParsimony implements ParsimonyCriterion {
             }
         }
 
-        union = new boolean[patterns.size()][stateCount];
-        intersection = new boolean[patterns.size()][stateCount];
+//        union = new boolean[patterns.size()][stateCount];
+//        intersection = new boolean[patterns.size()][stateCount];
 
     }
 
@@ -205,7 +204,15 @@ public class FitchParsimony implements ParsimonyCriterion {
      */
     private boolean[][] calculateSteps(Node node) {
 
-        boolean[][] nodeStateSet = stateSets.get(node);
+
+	    boolean[][] nodeStateSet = stateSets.get(node);
+
+	    // Must be local, since function is called recursively,
+	    // or may work if nodes are ordered in a post-traversal fashion
+	    // the above is currently not guaranteed
+	    boolean[][] union = new boolean[patterns.size()][stateCount];
+	    boolean[][] intersection = new boolean[patterns.size()][stateCount];
+	    
 
         List<Node> children = tree.getChildren(node);
         if (children.size() > 0) {
@@ -244,6 +251,34 @@ public class FitchParsimony implements ParsimonyCriterion {
         }
         return nodeStateSet;
     }
+
+
+	private String printState(boolean[][] stateSet) {
+		StringBuffer sb = new StringBuffer();
+		for(int i=0,n=stateSet.length; i<n; i++) {
+			sb.append("site "+i);
+			for(int j=0,l=stateSet[i].length; j<l; j++) {
+				sb.append(" "+(stateSet[i][j] ? "T" : "F"));
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+
+	private String printState(boolean[] stateSet) {
+			StringBuffer sb = new StringBuffer();
+//			for(int i=0,n=stateSet.length; i<n; i++) {
+//		int i = 0;
+//				sb.append("site "+i);
+				for(int j=0,l=stateSet.length; j<l; j++) {
+					sb.append(" "+(stateSet[j] ? "T" : "F"));
+				}
+//				sb.append("\n");
+//			}
+			return sb.toString();
+		}
+
 
     /**
      * The second pass of the Fitch algorithm. This reconstructs the ancestral states at
