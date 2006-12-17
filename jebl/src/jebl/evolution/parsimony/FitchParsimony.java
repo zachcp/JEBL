@@ -20,7 +20,6 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -110,7 +109,7 @@ public class FitchParsimony implements ParsimonyCriterion {
             for (int i = 0; i < siteScores.length; i++) {
                 siteScores[i] = 0;
             }
-            calculateSteps(this.tree.getRootNode());
+            calculateSteps(this.tree); //this.tree.getRootNode());
             hasCalculatedSteps = true;
         }
 
@@ -149,8 +148,7 @@ public class FitchParsimony implements ParsimonyCriterion {
             hasRecontructedStates = true;
         }
 
-        State[] s = states.get(node);
-        return s;
+        return states.get(node);
     }
 
     private void initialize() {
@@ -164,96 +162,82 @@ public class FitchParsimony implements ParsimonyCriterion {
             State[] stateArray = new State[patterns.size()];
             states.put(node, stateArray);
         }
-
-        for (Node node : tree.getExternalNodes()) {
-            boolean[][] stateSet = stateSets.get(node);
-            State[] stateArray = states.get(node);
-
-            int i = 0;
-            for (Pattern pattern : patterns) {
-
-                Taxon taxon = tree.getTaxon(node);
-                int index = taxa.indexOf(taxon);
-
-                if (index == -1) throw new IllegalArgumentException("Unknown taxon, " + taxon.getName() + " in tree");
-
-                State state = pattern.getState(index);
-                stateArray[i] = state;
-                if (gapsAreStates && state.isGap()) {
-                    stateSet[i][stateCount - 1] = true;
-                } else {
-                    for (State canonicalState : state.getCanonicalStates()) {
-                         stateSet[i][canonicalState.getIndex()] = true;
-                    }
-
-                }
-                i++;
-            }
-        }
-
-//        union = new boolean[patterns.size()][stateCount];
-//        intersection = new boolean[patterns.size()][stateCount];
-
     }
 
     /**
      * This is the first pass of the Fitch algorithm. This calculates the set of states
      * at each node and counts the total number of siteScores (the score). If that is all that
      * is required then the second pass is not necessary.
-     * @param node
      */
-    private boolean[][] calculateSteps(Node node) {
+    private void calculateSteps(RootedTree tree) {
 
+        // nodes in pre-order
+        final List<Node> nodes = Utils.getNodes(tree, tree.getRootNode());
 
-	    boolean[][] nodeStateSet = stateSets.get(node);
+        // used as locals in the loop below, allocated once
+        boolean[][] union = new boolean[patterns.size()][stateCount];
+        boolean[][] intersection = new boolean[patterns.size()][stateCount];
 
-	    // Must be local, since function is called recursively,
-	    // or may work if nodes are ordered in a post-traversal fashion
-	    // the above is currently not guaranteed
-	    boolean[][] union = new boolean[patterns.size()][stateCount];
-	    boolean[][] intersection = new boolean[patterns.size()][stateCount];
-	    
+        // iterate in reverse - post order. State of child is gurantted to be reasy before parent
+        
+        for(int k = nodes.size()-1; k >= 0; --k) {
+            final Node node = nodes.get(k);
+            final boolean[][] nodeStateSet = stateSets.get(node);
 
-        List<Node> children = tree.getChildren(node);
-        if (children.size() > 0) {
+            if( tree.isExternal(node) ) {
+                boolean[][] stateSet = stateSets.get(node);
+                State[] stateArray = states.get(node);
 
-            Iterator<Node> iter = children.iterator();
+                for(int i = 0; i < patterns.size(); ++i) {
+                    Pattern pattern = patterns.get(i);
 
-            Node child = iter.next();
+                    Taxon taxon = tree.getTaxon(node);
+                    int index = taxa.indexOf(taxon);
 
-            boolean[][] stateSet = calculateSteps(child);
+                    if (index == -1) throw new IllegalArgumentException("Unknown taxon, " + taxon.getName() + " in tree");
 
-            for (int i = 0; i < patterns.size(); i++) {
-                copyOf(stateSet[i], union[i]);
-                copyOf(stateSet[i], intersection[i]);
-            }
-
-            while (iter.hasNext()) {
-                child = iter.next();
-
-                stateSet = calculateSteps(child);
+                    State state = pattern.getState(index);
+                    stateArray[i] = state;
+                    if (gapsAreStates && state.isGap()) {
+                        stateSet[i][stateCount - 1] = true;
+                    } else {
+                        for (State canonicalState : state.getCanonicalStates()) {
+                            stateSet[i][canonicalState.getIndex()] = true;
+                        }
+                    }
+                }
+            } else {
+                boolean first = true;
+                for( Node child : tree.getChildren(node) ) {
+                    boolean[][] childStateSet = stateSets.get(child);
+                    if( first ) {
+                        for (int i = 0; i < patterns.size(); i++) {
+                            copyOf(childStateSet[i], union[i]);
+                            copyOf(childStateSet[i], intersection[i]);
+                        }
+                        first = false;
+                    } else {
+                        for (int i = 0; i < patterns.size(); i++) {
+                            unionOf(union[i], childStateSet[i], union[i]);
+                            intersectionOf(intersection[i], childStateSet[i], intersection[i]);
+                        }
+                    }
+                }
 
                 for (int i = 0; i < patterns.size(); i++) {
-                    unionOf(union[i], stateSet[i], union[i]);
-                    intersectionOf(intersection[i], stateSet[i], intersection[i]);
+                    if (sizeOf(intersection[i]) > 0) {
+                        copyOf(intersection[i], nodeStateSet[i]);
+                    } else {
+                        copyOf(union[i], nodeStateSet[i]);
+                        siteScores[i] ++;
+                    }
                 }
             }
-
-            for (int i = 0; i < patterns.size(); i++) {
-                if (sizeOf(intersection[i]) > 0) {
-                    copyOf(intersection[i], nodeStateSet[i]);
-                } else {
-                    copyOf(union[i], nodeStateSet[i]);
-                    siteScores[i] ++;
-                }
-            }
-
         }
-        return nodeStateSet;
     }
 
 
-	private String printState(boolean[][] stateSet) {
+    private String printState(boolean[][] stateSet) {
 		StringBuffer sb = new StringBuffer();
 		for(int i=0,n=stateSet.length; i<n; i++) {
 			sb.append("site "+i);
