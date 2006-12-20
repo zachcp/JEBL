@@ -1234,6 +1234,17 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
         try {
             final Node node = tree.createExternalNode(taxon);
+
+	        // Attempt to parse external node attributes
+	        // If there is a metacomment before the branch length indicator (:), then it is a node attribute
+	        if (helper.getLastMetaComment() != null) {
+		        // There was a meta-comment which should be in the form:
+		        // \[&label[=value][,label[=value]>[,/..]]\]
+		        parseMetaCommentPairs(helper.getLastMetaComment(), node);
+
+		        helper.clearLastMetaComment();
+	        }
+
             return node;
         } catch (IllegalArgumentException e) {
            throw new ImportException.DuplicateTaxaException(e.getMessage());
