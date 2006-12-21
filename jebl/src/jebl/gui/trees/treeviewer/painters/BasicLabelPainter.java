@@ -35,6 +35,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         this(title, tree, intent, 6);
     }
 
+
     public enum PainterIntent {
         NODE,
         BRANCH,
@@ -45,7 +46,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         this.title = title;
 
         this.defaultFontSize = defaultSize;
-        taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
+        taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultSize);
 
         this.tree = tree;
 
@@ -142,7 +143,16 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return null;
     }
 
-    private int defaultFontSize;
+    public float getFontSize() {
+        return defaultFontSize;
+    }
+
+    public float getFontMinSize() {
+        return defaultMinFontSize;
+    }
+
+    private float defaultFontSize;
+    private float defaultMinFontSize;
     private int defaultDigits = 4;
 
     public boolean isVisible() {
@@ -188,9 +198,23 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return preferredHeight + yOffset;
     }
 
-    public void setFontSize(float size) {
-        taxonLabelFont = taxonLabelFont.deriveFont(size);
-        firePainterChanged();
+    public boolean setFontSize(float size, boolean fire) {
+        if( defaultFontSize != size ) {
+            taxonLabelFont = taxonLabelFont.deriveFont(size);
+            defaultFontSize = size;
+            if( fire ) firePainterChanged();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean setFontMinSize(float fontsize, boolean fire) {
+        if( defaultMinFontSize != fontsize ) {
+            defaultMinFontSize = fontsize;
+            if( fire ) firePainterChanged();
+            return true;
+        }
+        return false;
     }
 
     private void setSignificantDigits(int digits) {
@@ -258,6 +282,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             }
 
             g2.drawString(label, xOffset, y);
+            //g2.draw(bounds);
         }
 
         g2.setFont(oldFont);
@@ -326,24 +351,49 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             optionsPanel.addComponentWithLabel("Display:", combo1);
             final JSpinner fontSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
 
-            final JLabel label1 = optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
+            optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
             //final boolean xselected = showTextCHeckBox.isSelected();
             //label1.setEnabled(selected);
             //fontSizeSpinner.setEnabled(selected);
 
             final String fontSizePrefKey = getTitle() + "_fontsize";
             final float fontsize = PREFS.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
-            setFontSize(fontsize);
+            setFontSize(fontsize, false);
             fontSizeSpinner.setValue(fontsize);
 
             fontSizeSpinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     final float size = ((Double) fontSizeSpinner.getValue()).floatValue();
-                    setFontSize(size);
+                    setFontSize(size, true);
                     PREFS.putFloat(fontSizePrefKey, size);
                 }
             });
 
+
+            //-----------------------------------------
+
+
+
+            //final boolean xselected = showTextCHeckBox.isSelected();
+            //label1.setEnabled(selected);
+            //fontSizeSpinner.setEnabled(selected);
+
+            final String fontMinSizePrefKey = getTitle() + "_fontminsize";
+            final float size = PREFS.getFloat(fontMinSizePrefKey, 6);
+            setFontMinSize(size, false);
+
+            final JSpinner fontMinSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultMinFontSize, 0.01, 48, 1));
+            optionsPanel.addComponentWithLabel("Minumum Size:", fontMinSizeSpinner);
+            //fontMinSizeSpinner.setValue(size);
+
+            fontMinSizeSpinner.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    final float size = ((Double) fontMinSizeSpinner.getValue()).floatValue();
+                    setFontMinSize(size, true);
+                    PREFS.putFloat(fontMinSizePrefKey, size);
+                }
+            });
+            //-------------------------
             final JSpinner digitsSpinner = new JSpinner(new SpinnerNumberModel(defaultDigits, 2, 14, 1));
 
             if( formatter != null ) {
@@ -372,6 +422,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         return controlsList;
     }
+
 
 
     public void setSettings(ControlsSettings settings) {

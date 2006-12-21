@@ -52,6 +52,10 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
+    public boolean alignedTaxa() {
+        return false;
+    }
+
     public Shape getCollapsedNode(Node node, double ratio) {
         final Point2D nodePoint = getNodePoint(node);
         return new Line2D.Double(nodePoint.getX(), nodePoint.getY(), nodePoint.getX() + .01, nodePoint.getY());

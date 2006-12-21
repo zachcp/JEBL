@@ -35,6 +35,7 @@ public class FixedBitSet {
 
     /**
      * Given a bit index, return a unit that masks that bit in its unit.
+     * @return the mask
      */
     private static int bit(int bitIndex) {
         return 1 << (bitIndex & BIT_INDEX_MASK);

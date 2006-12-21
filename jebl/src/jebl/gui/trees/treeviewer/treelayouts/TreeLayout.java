@@ -15,7 +15,6 @@ import java.awt.geom.Point2D;
  */
 public interface TreeLayout extends ControlsProvider {
 
-
     enum AxisType {
         CONTINUOUS,
         DISCRETE
@@ -105,6 +104,8 @@ public interface TreeLayout extends ControlsProvider {
      * @return the point
      */
     Point2D getNodePoint(Node node);
+
+    boolean alignedTaxa();
 
     /**
      * Return the shape that represents the branch from node parent to itself.

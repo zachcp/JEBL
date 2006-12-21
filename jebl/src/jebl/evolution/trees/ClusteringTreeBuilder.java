@@ -38,7 +38,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
                 break;
 
             newCluster();
-
+            assert(progress <= totalPairs );
             fireSetProgress(progress / totalPairs);
             progress++;
         }

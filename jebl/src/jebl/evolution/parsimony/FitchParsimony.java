@@ -38,11 +38,12 @@ public class FitchParsimony implements ParsimonyCriterion {
     private final int stateCount;
     private final boolean gapsAreStates;
 
+    // for each node a boolean array for each site. At each site a true/false depending if residue is present or not
+    // [#site][#residue]
     private Map<Node, boolean[][]> stateSets = new HashMap<Node, boolean[][]>();
-    private Map<Node, State[]> states = new HashMap<Node, State[]>();
 
-//    private boolean[][] union;         // Must now be local to recursive function
-//    private boolean[][] intersection;  // as nodes are not guaranteed to be called in post-order
+    // for each site at a node the "reconstructed" residue, i.e. the residue inferred by parsimony.
+    private Map<Node, State[]> states = new HashMap<Node, State[]>();
 
     private RootedTree tree = null;
     private final List<Pattern> patterns;
@@ -62,12 +63,7 @@ public class FitchParsimony implements ParsimonyCriterion {
         this.gapsAreStates = gapsAreStates;
         this.taxa = patterns.get(0).getTaxa();
 
-        if (gapsAreStates) {
-            stateCount = sequenceType.getCanonicalStateCount() + 1;
-        } else {
-            stateCount = sequenceType.getCanonicalStateCount();
-
-        }
+        stateCount = sequenceType.getCanonicalStateCount() + (gapsAreStates ? 1 : 0);
 
         this.patterns = patterns;
 
@@ -117,16 +113,13 @@ public class FitchParsimony implements ParsimonyCriterion {
         return siteScores;
     }
 
-    public double getScore(Tree tree) {
-
+    public double getScore(final Tree tree) {
         getSiteScores(tree);
 
         double score = 0;
 
-        int i = 0;
-        for (Pattern pattern : patterns) {
-            score += siteScores[i] * pattern.getWeight();
-            i++;
+        for(int i = 0;  i < patterns.size(); ++i) {
+            score += siteScores[i] * patterns.get(i).getWeight();
         }
         return score;
     }
@@ -140,7 +133,6 @@ public class FitchParsimony implements ParsimonyCriterion {
      * @return an array containing the reconstructed states for this node
      */
     public State[] getStates(Tree tree, Node node) {
-
         getSiteScores(tree);
 
         if (!hasRecontructedStates) {
@@ -156,11 +148,8 @@ public class FitchParsimony implements ParsimonyCriterion {
         hasRecontructedStates = false;
 
         for (Node node : tree.getNodes()) {
-            boolean[][] stateSet = new boolean[patterns.size()][stateCount];
-	        stateSets.put(node, stateSet);
-
-            State[] stateArray = new State[patterns.size()];
-            states.put(node, stateArray);
+            stateSets.put(node, new boolean[patterns.size()][stateCount]);
+            states.put(node, new State[patterns.size()]);
         }
     }
 
@@ -168,8 +157,9 @@ public class FitchParsimony implements ParsimonyCriterion {
      * This is the first pass of the Fitch algorithm. This calculates the set of states
      * at each node and counts the total number of siteScores (the score). If that is all that
      * is required then the second pass is not necessary.
+     * @param tree to calculate parsimony of
      */
-    private void calculateSteps(RootedTree tree) {
+    private void calculateSteps(final RootedTree tree) {
 
         // nodes in pre-order
         final List<Node> nodes = Utils.getNodes(tree, tree.getRootNode());
@@ -212,14 +202,16 @@ public class FitchParsimony implements ParsimonyCriterion {
                     boolean[][] childStateSet = stateSets.get(child);
                     if( first ) {
                         for (int i = 0; i < patterns.size(); i++) {
-                            copyOf(childStateSet[i], union[i]);
-                            copyOf(childStateSet[i], intersection[i]);
+                            final boolean[] s = childStateSet[i];
+                            copyOf(s, union[i]);
+                            copyOf(s, intersection[i]);
                         }
                         first = false;
                     } else {
                         for (int i = 0; i < patterns.size(); i++) {
-                            unionOf(union[i], childStateSet[i], union[i]);
-                            intersectionOf(intersection[i], childStateSet[i], intersection[i]);
+                            final boolean[] s2 = childStateSet[i];
+                            unionOf(union[i], s2, union[i]);
+                            intersectionOf(intersection[i], s2, intersection[i]);
                         }
                     }
                 }
@@ -237,31 +229,31 @@ public class FitchParsimony implements ParsimonyCriterion {
     }
 
 
-    private String printState(boolean[][] stateSet) {
-		StringBuffer sb = new StringBuffer();
-		for(int i=0,n=stateSet.length; i<n; i++) {
-			sb.append("site "+i);
-			for(int j=0,l=stateSet[i].length; j<l; j++) {
-				sb.append(" "+(stateSet[i][j] ? "T" : "F"));
-			}
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
-
-
-	private String printState(boolean[] stateSet) {
-			StringBuffer sb = new StringBuffer();
-//			for(int i=0,n=stateSet.length; i<n; i++) {
-//		int i = 0;
-//				sb.append("site "+i);
-				for(int j=0,l=stateSet.length; j<l; j++) {
-					sb.append(" "+(stateSet[j] ? "T" : "F"));
-				}
-//				sb.append("\n");
+//    private String printState(boolean[][] stateSet) {
+//		StringBuffer sb = new StringBuffer();
+//		for(int i=0,n=stateSet.length; i<n; i++) {
+//			sb.append("site "+i);
+//			for(int j=0,l=stateSet[i].length; j<l; j++) {
+//				sb.append(" "+(stateSet[i][j] ? "T" : "F"));
 //			}
-			return sb.toString();
-		}
+//			sb.append("\n");
+//		}
+//		return sb.toString();
+//	}
+//
+//
+//	private String printState(boolean[] stateSet) {
+//			StringBuffer sb = new StringBuffer();
+////			for(int i=0,n=stateSet.length; i<n; i++) {
+////		int i = 0;
+////				sb.append("site "+i);
+//				for(int j=0,l=stateSet.length; j<l; j++) {
+//					sb.append(" "+(stateSet[j] ? "T" : "F"));
+//				}
+////				sb.append("\n");
+////			}
+//			return sb.toString();
+//		}
 
 
     /**
@@ -273,48 +265,43 @@ public class FitchParsimony implements ParsimonyCriterion {
     private void reconstructStates(Node node, State[] parentStates) {
 
         if (!tree.isExternal(node)) {
-            boolean[][] nodeStateSet = stateSets.get(node);
-            State[] nodeStates = states.get(node);
+            final boolean[][] nodeStateSet = stateSets.get(node);
+            final State[] nodeStates = states.get(node);
 
             for (int i = 0; i < patterns.size(); i++) {
-
+               // has parent state as one of the options, take it
                 if (parentStates != null && nodeStateSet[i][parentStates[i].getIndex()]) {
                     nodeStates[i] = parentStates[i];
                 } else {
+                    // take a random state, count one change
                     int first = firstIndexOf(nodeStateSet[i]);
                     nodeStates[i] = sequenceType.getState(first);
                 }
             }
 
-            for (Node child : tree.getChildren(node)) {
+            for( Node child : tree.getChildren(node) ) {
                 reconstructStates(child, nodeStates);
             }
         }
     }
 
     private static void copyOf(boolean[] s, boolean[] d) {
-
-        for (int i = 0; i < d.length; i++) {
-            d[i] = s[i];
-        }
+        System.arraycopy(s, 0, d, 0, d.length);
     }
 
     private static void unionOf(boolean[] s1, boolean[] s2, boolean[] d) {
-
         for (int i = 0; i < d.length; i++) {
             d[i] = s1[i] || s2[i];
         }
     }
 
     private static void intersectionOf(boolean[] s1, boolean[] s2, boolean[] d) {
-
         for (int i = 0; i < d.length; i++) {
             d[i] = s1[i] && s2[i];
         }
     }
 
     private static int firstIndexOf(boolean[] s1) {
-
         for (int i = 0; i < s1.length; i++) {
             if (s1[i]) {
                 return i;
@@ -326,10 +313,9 @@ public class FitchParsimony implements ParsimonyCriterion {
     private static int sizeOf(boolean[] s1) {
 
         int count = 0;
-        for (int i = 0; i < s1.length; i++) {
-            if (s1[i]) count += 1;
+        for ( boolean b : s1 ) {
+            if (b) count += 1;
         }
         return count;
     }
-
 }

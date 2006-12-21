@@ -45,6 +45,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
+    public boolean alignedTaxa() {
+        return true;
+    }
+
     public Shape getCollapsedNode(Node node, double ratio) {
         Node first = node;
         while( ! tree.isExternal(first) ) {

@@ -49,6 +49,10 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
+    public boolean alignedTaxa() {
+        return false;
+    }
+
     public Shape getCollapsedNode(Node node, double ratio) {
         Node first = node;
         while( ! tree.isExternal(first) ) {
