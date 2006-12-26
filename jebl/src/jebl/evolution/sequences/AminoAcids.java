@@ -75,12 +75,13 @@ public final class AminoAcids {
 
     // Hydropathy classifications
     public static final StateClassification HYDROPATHY_CLASSIFICATION = new StateClassification.Default("hydropathy",
+            // should the first entry be "hydrophobic" instead of "hydropathic" ?
             new String[]{"hydropathic", "neutral", "hydrophilic"},
             new State[][]{{I_STATE, V_STATE, L_STATE, F_STATE, C_STATE, M_STATE, A_STATE, W_STATE},
                     {G_STATE, T_STATE, S_STATE, Y_STATE, P_STATE, H_STATE},
                     {D_STATE, E_STATE, K_STATE, N_STATE, Q_STATE, R_STATE}});
 
-    // Hydropathy classifications
+    // TT: I think the unit used here may be Angstrom^3, but I'm not sure
     public static final StateClassification VOLUME_CLASSIFICATION = new StateClassification.Default("volume",
             new String[]{"60-90", "108-117", "138-154", "162-174", "189-228"},
             new State[][]{{G_STATE, A_STATE, S_STATE}, {C_STATE, D_STATE, P_STATE, N_STATE, T_STATE},
