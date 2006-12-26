@@ -458,7 +458,7 @@ public class ImportHelper {
                         lastDelimiter = ' ';
 
                         if (hasComments && (ch2 == startComment || ch2 == lineComment)) {
-                            skipComments(ch2);
+                            skipComments(ch2, startComment!= '\"' && startComment != '\'');
                         } else {
                             unreadCharacter(ch2);
                         }
@@ -473,7 +473,7 @@ public class ImportHelper {
                     first = false;
                     space = 0;
                 } else if ( ch == startComment || ch == lineComment ) {
-                    skipComments(ch);
+                    skipComments(ch, startComment!= '\"' && startComment != '\'');
                     lastDelimiter = ' ';
                     done = true;
                 } else {
@@ -523,8 +523,20 @@ public class ImportHelper {
 
     /**
      * Skips over any comments. The opening comment delimiter is passed.
+     * @param delimiter
+     * @throws java.io.IOException
      */
     protected void skipComments(char delimiter) throws IOException {
+       skipComments(delimiter, false);
+    }
+
+    /**
+     * Skips over any comments. The opening comment delimiter is passed.
+     * @param delimiter 
+     * @param gobbleStrings
+     * @throws java.io.IOException
+     */
+    protected void skipComments(char delimiter, boolean gobbleStrings) throws IOException {
 
         char ch;
         int n=1;
@@ -550,16 +562,33 @@ public class ImportHelper {
                 meta.append(line);
             }
         } else {
+            Character inString = null;
             do {
                 ch = read();
-                if (ch == startComment) {
-                    n++;
-                } else if (ch == stopComment) {
-                    if (write && commentWriter != null) {
-                        commentWriter.newLine();
+
+                if( ch == '\"' || ch == '\'' ) {
+                    if( gobbleStrings ) {
+                        if( inString == null ) {
+                            inString = ch;
+                        } else if( inString == ch ) {
+                          inString = null;
+                        }
                     }
-                    n--;
-                } else if (write && commentWriter != null) {
+                }
+                if( inString == null )  {
+                    if (ch == startComment) {
+                        n++;
+                        continue;
+                    } else if (ch == stopComment) {
+                        if (write && commentWriter != null) {
+                            commentWriter.newLine();
+                        }
+                        n--;
+                        continue;
+                    }
+                }
+
+                if (write && commentWriter != null) {
                     commentWriter.write(ch);
                 } else if (meta != null) {
                     meta.append(ch);
