@@ -167,27 +167,50 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         PREFS.putBoolean(getTitle() + isOPenKey, visible);
     }
 
-    public void calibrate(Graphics2D g2, Node item) {
+//    public void calibrate(Graphics2D g2, Node item) {
+//        final Font oldFont = g2.getFont();
+//        g2.setFont(taxonLabelFont);
+//
+//        final FontMetrics fm = g2.getFontMetrics();
+//        preferredHeight = fm.getHeight();
+//        preferredWidth = 0;
+//
+//        String label = getLabel(item);
+//        if (label != null) {
+//            Rectangle2D rect = fm.getStringBounds(label, g2);
+//            preferredWidth = rect.getWidth();
+//        }
+//
+//        yOffset = (float)fm.getAscent();
+//
+//        g2.setFont(oldFont);
+//    }
+
+     public void calibrate(Graphics2D g2) {
         final Font oldFont = g2.getFont();
         g2.setFont(taxonLabelFont);
 
         final FontMetrics fm = g2.getFontMetrics();
         preferredHeight = fm.getHeight();
-        preferredWidth = 0;
-
-        String label = getLabel(item);
-        if (label != null) {
-            Rectangle2D rect = fm.getStringBounds(label, g2);
-            preferredWidth = rect.getWidth();
-        }
 
         yOffset = (float)fm.getAscent();
 
         g2.setFont(oldFont);
     }
 
-    public double getPreferredWidth() {
-        return preferredWidth;
+    public double getWidth(Graphics2D g2, Node item) {
+        final String label = getLabel(item);
+        if( label != null ) {
+            final Font oldFont = g2.getFont();
+            g2.setFont(taxonLabelFont);
+
+            final FontMetrics fm = g2.getFontMetrics();
+            Rectangle2D rect = fm.getStringBounds(label, g2);
+            g2.setFont(oldFont);
+            return rect.getWidth();
+        }
+
+        return 0.0;
     }
 
     public double getPreferredHeight() {
@@ -262,12 +285,13 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
             Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
 
-            float xOffset;
+            float xOffset = 0;
             float y = yOffset + (float) bounds.getY();
             switch (justification) {
                 case CENTER:
-                    xOffset = (float)(-rect.getWidth()/2.0);
-                    y = yOffset + (float) rect.getY();
+                    //xOffset = (float)(-rect.getWidth()/2.0);
+                    //y = yOffset + (float) rect.getY();
+                    y = (float)bounds.getHeight()/2;
                     //xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
                     break;
                 case FLUSH:
@@ -445,7 +469,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private Stroke borderStroke = null;
 
     private Font taxonLabelFont;
-    private double preferredWidth;
+    //private double preferredWidth;
     private double preferredHeight;
     private float yOffset;
 

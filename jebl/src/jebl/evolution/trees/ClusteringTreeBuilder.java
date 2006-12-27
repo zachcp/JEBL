@@ -22,7 +22,6 @@ import java.util.List;
 
 public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuilder<T> {
 
-
     public T build() {
         init(distanceMatrix);
 
@@ -34,11 +33,11 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
 
             abi = alias[besti];
             abj = alias[bestj];
-            if (numClusters < minimumTaxa)
+            if (numClusters < numberOfRootSubtrees)
                 break;
 
             newCluster();
-            assert(progress <= totalPairs );
+            assert( progress <= totalPairs );
             fireSetProgress(progress / totalPairs);
             progress++;
         }
@@ -86,23 +85,23 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         }
         return builder;
     }
+
     //
     // Protected and Private stuff
     //
 
     /**
-     * Constructor
-     * @param distanceMatrix
-     * @param minimumTaxa
-     * @throws IllegalArgumentException
+     * @param distanceMatrix pair distances to use when building
+     * @param rootSubtrees Number of root subtrees. Typically 2 for rooted (completly bifurcating) or 3 for unrooted.
+     * @throws IllegalArgumentException when number of taxa is not compatibale with rootSubtrees (i.e. #taxa < #subtrees)
      */
-    protected ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int minimumTaxa) throws IllegalArgumentException {
+    protected ClusteringTreeBuilder(DistanceMatrix distanceMatrix, int rootSubtrees) throws IllegalArgumentException {
         this.distanceMatrix = distanceMatrix;
 
-        this.minimumTaxa = minimumTaxa;
+        this.numberOfRootSubtrees = rootSubtrees;
 
-        if (distanceMatrix.getSize() < minimumTaxa) {
-            throw new IllegalArgumentException("less than " + minimumTaxa + " taxa in distance matrix");
+        if (distanceMatrix.getSize() < rootSubtrees) {
+            throw new IllegalArgumentException("less than " + rootSubtrees + " taxa in distance matrix");
         }
     }
 
@@ -198,9 +197,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         distance[abj][abj] = -1.0;
 
         // Update alias
-        for (int i = bestj; i < numClusters-1; i++) {
-            alias[i] = alias[i+1];
-        }
+        System.arraycopy(alias, bestj + 1, alias, bestj, numClusters - 1 - bestj);
 
         tipCount[abi] += tipCount[abj];
         tipCount[abj] = 0;
@@ -223,8 +220,10 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
 
     // Indices of two clusters in [0 .. numClusters-1], besti < bestj
     protected int besti, bestj;
+
     //  Actual index of besti,bestj into arrays (clusters,tipCount,distance)
     private int abi, abj;
+
     // Number of tips in cluster
     protected int[] tipCount;
 
@@ -234,5 +233,5 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
     // Distance between clusters
     protected double[][] distance;
 
-    protected int minimumTaxa;
+    protected int numberOfRootSubtrees;
 }

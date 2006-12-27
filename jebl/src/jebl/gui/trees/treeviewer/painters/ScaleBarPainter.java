@@ -53,37 +53,38 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         firePainterChanged();
     }
 
-    public void calibrate(Graphics2D g2, TreePane treePane) {
+    public void calibrate(Graphics2D g2) {
         Font oldFont = g2.getFont();
         g2.setFont(scaleFont);
 
         FontMetrics fm = g2.getFontMetrics();
-        double labelHeight = fm.getHeight();
 
-        if( userScaleRange != 0.0 ) {
-            scaleRange = userScaleRange;
-        } else {
-            final double treeScale = treePane.getTreeScale();
-            if( treeScale == 0.0 ) {
-                scaleRange = 0.0;
-            } else {
-                int w10 = treePane.getWidth() / 10;
+//        if( userScaleRange != 0.0 ) {
+//            scaleRange = userScaleRange;
+//        } else {
+//            final double treeScale = treePane.getTreeScale();
+//            if( treeScale == 0.0 ) {
+//                scaleRange = 0.0;
+//            } else {
+//                int w10 = treePane.getWidth() / 10;
+//
+//                double low = w10 /treeScale;
+//                double b = -(Math.ceil(Math.log10(low)) - 1);
+//                for(int n = 0; n < 3; ++n) {
+//                    double factor = Math.pow(10, b);
+//                    double x = ((int)(low * factor) + 1)/factor;
+//                    if( n == 2 || x < w10 * 2 ) {
+//                        scaleRange = x;
+//                        break;
+//                    }
+//                    ++b;
+//                }
+//            }
+//        }
 
-                double low = w10 /treeScale;
-                double b = -(Math.ceil(Math.log10(low)) - 1);
-                for(int n = 0; n < 3; ++n) {
-                    double factor = Math.pow(10, b);
-                    double x = ((int)(low * factor) + 1)/factor;
-                    if( n == 2 || x < w10 * 2 ) {
-                        scaleRange = x;
-                        break;
-                    }
-                    ++b;
-                }
-            }
-        }
+        final double labelHeight = fm.getHeight();
 
-        preferredWidth = treePane.getTreeScale() * scaleRange;
+//        preferredWidth = treePane.getTreeScale() * scaleRange;
         preferredHeight = labelHeight + 4 + scaleBarStroke.getLineWidth();
 
         yOffset = (float) (fm.getAscent()) + 4 + scaleBarStroke.getLineWidth();
@@ -109,6 +110,9 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
         g2.setFont(scaleFont);
 
+        // sets scale range
+        final double preferredWidth = getWidth(g2, treePane);
+
         // we don't need accuracy but a nice short number
         final String label = Double.toString(scaleRange);
 
@@ -119,6 +123,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         switch (justification) {
             case CENTER:
                 xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
+
                 x1 = (bounds.getX() + (bounds.getWidth() - preferredWidth) / 2.0);
                 x2 = x1 + preferredWidth;
                 break;
@@ -149,7 +154,37 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         g2.setStroke(oldStroke);
     }
 
-    public double getPreferredWidth() {
+    public double getWidth(Graphics2D g2, TreePane treePane) {
+        Font oldFont = g2.getFont();
+        g2.setFont(scaleFont);
+
+        FontMetrics fm = g2.getFontMetrics();
+
+        if( userScaleRange != 0.0 ) {
+            scaleRange = userScaleRange;
+        } else {
+            final double treeScale = treePane.getTreeScale();
+            if( treeScale == 0.0 ) {
+                scaleRange = 0.0;
+            } else {
+                int w10 = treePane.getWidth() / 10;
+
+                double low = w10 /treeScale;
+                double b = -(Math.ceil(Math.log10(low)) - 1);
+                for(int n = 0; n < 3; ++n) {
+                    double factor = Math.pow(10, b);
+                    double x = ((int)(low * factor) + 1)/factor;
+                    if( n == 2 || x < w10 * 2 ) {
+                        scaleRange = x;
+                        break;
+                    }
+                    ++b;
+                }
+            }
+        }
+
+        double preferredWidth = treePane.getTreeScale() * scaleRange;
+        g2.setFont(oldFont);
         return preferredWidth;
     }
 
@@ -289,7 +324,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
     private Font scaleFont;
     private double preferredHeight;
-    private double preferredWidth;
+    //private double preferredWidth;
 
     private float yOffset;
 }

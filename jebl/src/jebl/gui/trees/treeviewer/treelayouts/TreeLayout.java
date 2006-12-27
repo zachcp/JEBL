@@ -105,7 +105,11 @@ public interface TreeLayout extends ControlsProvider {
      */
     Point2D getNodePoint(Node node);
 
-    boolean alignedTaxa();
+    /**
+     *
+     * @return true if all taxa should have the same width, false otherwise
+     */
+    boolean alignTaxa();
 
     /**
      * Return the shape that represents the branch from node parent to itself.

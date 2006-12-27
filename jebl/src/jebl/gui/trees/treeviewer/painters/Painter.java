@@ -30,12 +30,14 @@ public interface Painter<T> extends ControlsProvider {
 
     boolean isVisible();
 
-    void calibrate(Graphics2D g2, T item);
+    //void calibrate(Graphics2D g2, T item);
+
+    void calibrate(Graphics2D g2);
 
     // May change paint and stroke
     void paint(Graphics2D g2, T item, Justification justification, Rectangle2D bounds);
 
-    double getPreferredWidth();
+    double getWidth(Graphics2D g2, T item);
     double getPreferredHeight();
     double getHeightBound();
 

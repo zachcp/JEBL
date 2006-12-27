@@ -45,7 +45,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }
 
-    public boolean alignedTaxa() {
+    public boolean alignTaxa() {
         return true;
     }
 
@@ -259,7 +259,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
                 // end point
                 final float x1 = (float) childPoint.getX();
-                final float y1 = (float) childPoint.getY();
+                final double yChild = childPoint.getY();
+                final float y1 = (float) yChild;
 
                 float x2 = x1 - ((x1 - x0) * (float) xProportion);
                 float y2 = y0 + ((y1 - y0) * (float) yProportion);
@@ -274,8 +275,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
                 final double x3 = (x + childPoint.getX()) / 2;
                 Line2D branchLabelPath = new Line2D.Double(
-                        x3 - 1.0, childPoint.getY(),
-                        x3 + 1.0, childPoint.getY());
+                        x/*x3 - 1.0*/, yChild,
+                        childPoint.getX()/*x3 + 1.0*/, yChild);
 
                 branchLabelPaths.put(child, branchLabelPath);
             }
