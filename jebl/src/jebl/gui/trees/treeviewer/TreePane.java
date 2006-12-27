@@ -488,7 +488,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
 
-    final private int circRadius = 9;
+    final private int circDiameter = 9;
 
     // result[0] is the selected node
     // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
@@ -512,7 +512,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         for (Node node : nodes) {
             final Point2D.Double coord = nodeCoord(node);
             final double v = coord.distanceSq(point);
-            if( v < circRadius*circRadius ) {
+            if( v < circDiameter * circDiameter) {
                 result[0] = node;
                 return result;
             }
@@ -788,7 +788,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         long start = System.currentTimeMillis();
         drawTree(g2, getWidth(), getHeight());
-        //System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
+        System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
             g2.setPaint(new Color(128, 128, 128, 128));
@@ -878,27 +878,22 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             final Paint c = isSelected ? selectionPaint : Color.LIGHT_GRAY;
             g2.setPaint(c);
 
-            final int limit = treeLayout.getNodeMarkerUpperLimit(node, transform);
+            final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
 
             final double x = nodeLocation.getX();
-            final int ix1 = (int) x;
+            final int ix1 = (int) Math.round(x);
             final double y = nodeLocation.getY();
-            final int iy1 = (int) y;
+            final int iy1 = (int) Math.round(y);
 
-            int r = circRadius;
-            if( limit >= 0 ) {
-                r = Math.min(2*limit+1, r);
+            int d = circDiameter;
+            if( rlimit >= 0 ) {
+                d = Math.min(2*rlimit+1, d);
             }
 
-            int o = (r-1)/2;
+            final int r = (d-1)/2;
 
-            final int x1 = ix1 - o;
-
-            final int y1 = iy1 - o;
-
-            g2.fillOval(x1, y1, r, r);  
+            g2.fillOval(ix1 - r, iy1 - r, d, d);  
         }
-        // g2.setTransform(oldTransform);
         g2.setPaint(color);
     }
 
@@ -922,16 +917,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final Paint oldPaint = g2.getPaint();
         final Stroke oldStroke = g2.getStroke();
         final Font oldFont = g2.getFont();
-
-//        if( autoExpantion ) {
-//            for( Node node : tree.getNodes() ) {
-//                if( node.getAttribute(clpsdName + "-auto") != null ) {
-//                    // make sure it is not collapsed
-//                    node.removeAttribute(clpsdName);
-//                    expandContract(node);
-//                }
-//            }
-//        }
 
         final Set<Node> externalNodes = tree.getExternalNodes();
         final boolean showingTaxonLables = taxonLabelPainter != null && taxonLabelPainter.isVisible();
@@ -960,24 +945,23 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             nodeMarker(g2, node);
 
             if( oldCode ) {
-            if (showingTaxonLables) {
-                final Taxon taxon = tree.getTaxon(node);
-                if( ! alignedTaxa ) {
-                    taxonLabelPainter.calibrate(g2);
-                    taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+                if (showingTaxonLables) {
+                    final Taxon taxon = tree.getTaxon(node);
+                    if( ! alignedTaxa ) {
+                        taxonLabelPainter.calibrate(g2);
+                        taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+                    }
+                    AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
+                    Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
+                    g2.transform(taxonTransform);
+
+                    final Rectangle2D.Double bounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, taxonLabelPainter.getPreferredHeight());
+                    taxonLabelPainter.paint(g2, node, taxonLabelJustification, bounds);
+
+                    g2.setTransform(oldTransform);
                 }
-                AffineTransform taxonTransform = taxonLabelTransforms.get(taxon);
-                Painter.Justification taxonLabelJustification = taxonLabelJustifications.get(taxon);
-                g2.transform(taxonTransform);
-
-                final Rectangle2D.Double bounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, taxonLabelPainter.getPreferredHeight());
-                taxonLabelPainter.paint(g2, node, taxonLabelJustification, bounds);
-
-                g2.setTransform(oldTransform);
-            }
             }
         }
-
 
         final Node rootNode = tree.getRootNode();
         final boolean nodesLables = nodeLabelPainter != null && nodeLabelPainter.isVisible();
@@ -1055,160 +1039,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! antialiasOn ) {
            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        }
-    }
-
-    private class TreeBoundsHelper {
-        private double[] xbounds;
-        private double[] ybounds;
-        int nv;
-        double availableW;
-        double availableH;
-
-        public TreeBoundsHelper(int n, double availableW, double availableH) {
-            n = 3 * (n + 2);
-            xbounds = new double[n];
-            ybounds = new double[n];
-            nv = 0;
-            this.availableH = availableH;
-            this.availableW = availableW;
-
-            xbounds[nv] = treeBounds.getWidth();
-            xbounds[nv+1] = availableW;
-            xbounds[nv+2] = 0;
-            ybounds[nv] = treeBounds.getHeight();
-            ybounds[nv+1] = availableH;
-            ybounds[nv+2] = 0;
-            nv += 3;
-            xbounds[nv] = 0;
-            xbounds[nv+1] = availableW;
-            xbounds[nv+2] = 0;
-            ybounds[nv] = 0;
-            ybounds[nv+1] = availableH;
-            ybounds[nv+2] = 0;
-            nv += 3;
-        }
-
-        private int quadrantOf(Line2D line, double[] sincos) {
-            Point2D start = line.getP1();
-            Point2D end = line.getP2();
-            double dy = end.getY() - start.getY();
-            double dx = end.getX() - start.getX();
-            double r = Math.sqrt(dx * dx + dy * dy);
-            sincos[0] = dy / r;
-            sincos[1] = dx / r;
-            return (dy>=0 ? 0 : 2) + ((dy>=0) == (dx>=0) ? 0 : 1);
-        }
-
-        //  v, height - y-extra(max), -y-extra(min)
-        void addBounds(Line2D taxonPath, double labelHeight, double labelWidth, boolean centered)  {
-            double[] sincos = {0.0, 1.0};
-
-            int quad = quadrantOf(taxonPath, sincos);
-            final double yHigh = labelHeight / 2;
-            final double xHigh = centered ? labelWidth / 2 : labelWidth;
-            final double xLow =  centered ? -xHigh : 0;
-            // origin here before rotate is midpoint on left edge for non centered, center for centered
-            // order is counter-clockwise from upper right corner, which makes the corner number match the quadrant number
-            // for max X. other limits are relative to that.
-
-            double[] pts = {xHigh, yHigh, xLow, yHigh, xLow, -yHigh, xHigh, -yHigh};
-            int ixmax = 2*quad;
-            int ixmin = 2*((quad+2) & 0x3);
-            int iymax = 2*((quad+3) & 0x3);
-            int iymin = 2*((quad+1) & 0x3);
-
-            final double thesin = -sincos[0];
-            final double thecos = sincos[1];
-
-            double dx = thecos * pts[ixmax] -  thesin * pts[ixmax + 1];    assert dx >= 0;
-
-            final Point2D start = taxonPath.getP1();
-            final Point2D end = taxonPath.getP2();
-            final double xInTreeAbs = centered ? (start.getX() + end.getX()) / 2 : start.getX();
-            // yikes - some code determining the paths uses floats, so when used with doubles small discrapencies can make
-            // valus small negatives
-            double x = (float)xInTreeAbs - (float)treeBounds.getMinX();            assert x >= 0 : x;
-            xbounds[nv] = x;
-            xbounds[nv+1] = availableW - dx;
-            dx = -(thecos * pts[ixmin] - thesin * pts[ixmin + 1]);                 assert dx >= 0;
-            xbounds[nv+2] = dx;
-
-            double dy = -(thesin * pts[iymax] + thecos * pts[iymax+1]);            assert dy >= 0;
-            // y0 + scale(y) * y + y-extra <= height
-            // y0 + scale(y) * y + y-extra >= 0
-
-            final double yTreeAbs = centered ? (start.getY() + end.getY()) / 2 : start.getY();
-            double y = (float) yTreeAbs - (float)treeBounds.getMinY();             assert y >= 0 : y;
-            ybounds[nv] = y;
-            ybounds[nv+1] = availableH - dy;
-
-            dy = thesin * pts[iymin] + thecos * pts[iymin+1];                      assert dy >= 0;
-            ybounds[nv+2] = dy;
-
-            nv += 3;
-        }
-
-        double[] getOrigionAndScale(boolean isx) {
-            double[] values = isx ? xbounds : ybounds;
-
-            double scale = Double.MAX_VALUE;
-            double origin = 0.0;
-            double minOrigin = Double.MAX_VALUE;
-            for(int k = 0; k < nv; k += 3) {
-                if( values[k] == 0.0 ) {
-                    origin = Math.max(origin, values[k+2]);
-                }
-                minOrigin = Math.min(minOrigin, values[k+1]);
-            }
-
-            if( origin > minOrigin ) {
-                origin = minOrigin/2;
-            }
-
-            while( true ) {
-                double scaleMin = -Double.MAX_VALUE;
-                for(int k = 0; k < nv; k += 3) {
-                    if( values[k] != 0.0 ) {
-                        double lim = (values[k+1] - origin) / values[k];
-                        scale = Math.min(scale, lim);
-                    }
-
-                    double d = (values[k + 2] - origin);
-                    // do limit only if y0 is no suffcient in this case
-                    if( d > 0 ) {
-                        double lim = d / values[k];
-                        scaleMin = Math.max(scaleMin, lim);
-                    }
-                }
-                // origin < minOrigin ||
-                if( origin < minOrigin || (float)scaleMin <= (float)scale ) {
-                    break;
-                }
-                origin = -Double.MAX_VALUE;
-                for(int k = 0; k < nv; k += 3) {
-                    double l = values[k + 2] - scale * values[k];
-                    origin = Math.max(origin, l);
-                }
-            }
-            assert scale > 0 : scale;
-            assert origin >= 0.0 : origin;
-            double[] r = {origin, scale};
-            return r;
-        }
-
-        double getRange(boolean isx, double origin, double scale) {
-            double[] values = isx ? xbounds : ybounds;
-            double target = isx ? availableW : availableH;
-
-            double mx =  -Double.MAX_VALUE, mn = Double.MAX_VALUE;
-
-            for(int k = 0; k < nv; k += 3) {
-                final double v = origin + values[k] * scale;
-                mx = Math.max(mx, v + (target - values[k+1]));
-                mn = Math.min(mn, v - values[k+2]);
-            }
-            return mx - mn;
         }
     }
 
@@ -1360,9 +1190,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        double xScale = Double.MAX_VALUE;
-        double yScale = Double.MAX_VALUE;
-        double yorigion = 0, xorigion = 0;
+        double xScale;
+        double yScale;
+        double yorigion, xorigion;
 
         if( oldScaleCode ) {
           availableH = height - insets.top - insets.bottom;
@@ -1417,21 +1247,23 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             } else {
 
                 if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
+                    xorigion = tbh.getOrigion(true, yScale);
                     treeScale = yScale;
                 } else {
                     assert yorigion + xScale * treeBounds.getHeight() <= availableH;
+                    yorigion = tbh.getOrigion(false, xScale);
                     treeScale  = xScale;
                 }
 
                 //System.out.println("xs/ys " + xScale + "/" + yScale +  " (" + treeScale + ")" + " xo/yo " + xorigion + "/" + yorigion);
                 xScale = yScale = treeScale;
 
-                xOffset = xorigion - treeBounds.getX() * xScale;
-                yOffset = yorigion - treeBounds.getY() * yScale;
-                double xRange = tbh.getRange(true, xorigion, xScale);
+                xOffset = xorigion - treeBounds.getX() * treeScale;
+                yOffset = yorigion - treeBounds.getY() * treeScale;
+                double xRange = tbh.getRange(true, xorigion, treeScale);
                 double dx = (availableW - xRange)/2;
                 xOffset += dx;
-                double yRange = tbh.getRange(false, yorigion, xScale);
+                double yRange = tbh.getRange(false, yorigion, treeScale);
                 double dy = (availableH - yRange)/2;
                 yOffset += dy > 0 ? dy : 0;
                 //System.out.println("xof/yof " + xOffset + "/" + yOffset);
@@ -1644,11 +1476,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
+        long now = System.currentTimeMillis();
         TreeDrawableElement.setClashingVisiblitiy(treeElements, g2);
+        System.err.println("Clash " + (System.currentTimeMillis() - now));
 
         calibrated = true;
 
-        //System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
 
 
@@ -1682,6 +1516,171 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         lineTransform.translate(tx, ty);
         return lineTransform;
     }
+
+    private class TreeBoundsHelper {
+        private double[] xbounds;
+        private double[] ybounds;
+        int nv;
+        double availableW;
+        double availableH;
+
+        public TreeBoundsHelper(int n, double availableW, double availableH) {
+            n = 3 * (n + 2);
+            xbounds = new double[n];
+            ybounds = new double[n];
+            nv = 0;
+            this.availableH = availableH;
+            this.availableW = availableW;
+
+            xbounds[nv] = treeBounds.getWidth();
+            xbounds[nv+1] = availableW;
+            xbounds[nv+2] = 0;
+            ybounds[nv] = treeBounds.getHeight();
+            ybounds[nv+1] = availableH;
+            ybounds[nv+2] = 0;
+            nv += 3;
+            xbounds[nv] = 0;
+            xbounds[nv+1] = availableW;
+            xbounds[nv+2] = 0;
+            ybounds[nv] = 0;
+            ybounds[nv+1] = availableH;
+            ybounds[nv+2] = 0;
+            nv += 3;
+        }
+
+        private int quadrantOf(Line2D line, double[] sincos) {
+            Point2D start = line.getP1();
+            Point2D end = line.getP2();
+            double dy = end.getY() - start.getY();
+            double dx = end.getX() - start.getX();
+            double r = Math.sqrt(dx * dx + dy * dy);
+            sincos[0] = dy / r;
+            sincos[1] = dx / r;
+            return (dy>=0 ? 0 : 2) + ((dy>=0) == (dx>=0) ? 0 : 1);
+        }
+
+        //  v, height - y-extra(max), -y-extra(min)
+        void addBounds(Line2D taxonPath, double labelHeight, double labelWidth, boolean centered)  {
+            double[] sincos = {0.0, 1.0};
+
+            int quad = quadrantOf(taxonPath, sincos);
+            final double yHigh = labelHeight / 2;
+            final double xHigh = centered ? labelWidth / 2 : labelWidth;
+            final double xLow =  centered ? -xHigh : 0;
+            // origin here before rotate is midpoint on left edge for non centered, center for centered
+            // order is counter-clockwise from upper right corner, which makes the corner number match the quadrant number
+            // for max X. other limits are relative to that.
+
+            double[] pts = {xHigh, yHigh, xLow, yHigh, xLow, -yHigh, xHigh, -yHigh};
+            int ixmax = 2*quad;
+            int ixmin = 2*((quad+2) & 0x3);
+            int iymax = 2*((quad+3) & 0x3);
+            int iymin = 2*((quad+1) & 0x3);
+
+            final double thesin = -sincos[0];
+            final double thecos = sincos[1];
+
+            double dx = thecos * pts[ixmax] -  thesin * pts[ixmax + 1];    assert dx >= 0;
+
+            final Point2D start = taxonPath.getP1();
+            final Point2D end = taxonPath.getP2();
+            final double xInTreeAbs = centered ? (start.getX() + end.getX()) / 2 : start.getX();
+            // yikes - some code determining the paths uses floats, so when used with doubles small discrapencies can make
+            // valus small negatives
+            double x = (float)xInTreeAbs - (float)treeBounds.getMinX();            assert x >= 0 : x;
+            xbounds[nv] = x;
+            xbounds[nv+1] = availableW - dx;
+            dx = -(thecos * pts[ixmin] - thesin * pts[ixmin + 1]);                 assert dx >= 0;
+            xbounds[nv+2] = dx;
+
+            double dy = -(thesin * pts[iymax] + thecos * pts[iymax+1]);            assert dy >= 0;
+            // y0 + scale(y) * y + y-extra <= height
+            // y0 + scale(y) * y + y-extra >= 0
+
+            final double yTreeAbs = centered ? (start.getY() + end.getY()) / 2 : start.getY();
+            double y = (float) yTreeAbs - (float)treeBounds.getMinY();             assert y >= 0 : y;
+            ybounds[nv] = y;
+            ybounds[nv+1] = availableH - dy;
+
+            dy = thesin * pts[iymin] + thecos * pts[iymin+1];                      assert dy >= 0;
+            ybounds[nv+2] = dy;
+
+            nv += 3;
+        }
+
+        double[] getOrigionAndScale(boolean isx) {
+            double[] values = isx ? xbounds : ybounds;
+
+            double scale = Double.MAX_VALUE;
+            double origin = 0.0;
+            double minOrigin = Double.MAX_VALUE;
+            for(int k = 0; k < nv; k += 3) {
+                if( values[k] == 0.0 ) {
+                    origin = Math.max(origin, values[k+2]);
+                }
+                minOrigin = Math.min(minOrigin, values[k+1]);
+            }
+
+            if( origin > minOrigin ) {
+                origin = minOrigin/2;
+            }
+
+            while( true ) {
+                double scaleMin = -Double.MAX_VALUE;
+                for(int k = 0; k < nv; k += 3) {
+                    if( values[k] != 0.0 ) {
+                        double lim = (values[k+1] - origin) / values[k];
+                        scale = Math.min(scale, lim);
+                    }
+
+                    double d = (values[k + 2] - origin);
+                    // do limit only if y0 is no suffcient in this case
+                    if( d > 0 ) {
+                        double lim = d / values[k];
+                        scaleMin = Math.max(scaleMin, lim);
+                    }
+                }
+                // origin < minOrigin ||
+                if( origin < minOrigin || (float)scaleMin <= (float)scale ) {
+                    break;
+                }
+                origin = -Double.MAX_VALUE;
+                for(int k = 0; k < nv; k += 3) {
+                    double l = values[k + 2] - scale * values[k];
+                    origin = Math.max(origin, l);
+                }
+            }
+            assert scale > 0 : scale;
+            assert origin >= 0.0 : origin;
+            double[] r = {origin, scale};
+            return r;
+        }
+
+        double getOrigion(boolean isx, double scale) {
+            double origin = -Double.MAX_VALUE;
+            double[] values = isx ? xbounds : ybounds;
+            for(int k = 0; k < nv; k += 3) {
+                double l = values[k + 2] - scale * values[k];
+                origin = Math.max(origin, l);
+            }
+            return origin;
+        }
+
+        double getRange(boolean isx, double origin, double scale) {
+            double[] values = isx ? xbounds : ybounds;
+            double target = isx ? availableW : availableH;
+
+            double mx = -Double.MAX_VALUE, mn = Double.MAX_VALUE;
+
+            for(int k = 0; k < nv; k += 3) {
+                final double v = origin + values[k] * scale;
+                mx = Math.max(mx, v + (target - values[k+1]));
+                mn = Math.min(mn, v - values[k+2]);
+            }
+            return mx - mn;
+        }
+    }
+
 
     // Overridden methods to recalibrate tree when bounds change
     public void setBounds(int x, int y, int width, int height) {

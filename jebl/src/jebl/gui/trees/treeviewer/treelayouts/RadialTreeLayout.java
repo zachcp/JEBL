@@ -118,7 +118,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return dx*dx + dy *dy;
     }
 
-    public int getNodeMarkerUpperLimit(Node node, AffineTransform transform) {
+    public int getNodeMarkerRadiusUpperLimit(Node node, AffineTransform transform) {
         final Node parent = tree.getParent(node);
         double d = Double.MAX_VALUE;
         final Point2D nodeLoc = getNodePoint(node);

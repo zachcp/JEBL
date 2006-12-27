@@ -46,7 +46,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     public boolean alignTaxa() {
-        return true;
+        return alignTaxonLabels;
     }
 
     public Shape getCollapsedNode(Node node, double ratio) {
@@ -69,7 +69,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         return new Rectangle2D.Double(n.getX(), n.getY() + (c1.getY() - n.getY()) * ratio, dx * ratio, dy * ratio);
     }
 
-    public int getNodeMarkerUpperLimit(Node node, AffineTransform transform) {
+    public int getNodeMarkerRadiusUpperLimit(Node node, AffineTransform transform) {
         //final Node parent = tree.getParent(node);
         double lim = Double.MAX_VALUE;
         final Point2D n = getNodePoint(node);

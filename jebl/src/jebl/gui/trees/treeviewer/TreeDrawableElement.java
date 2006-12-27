@@ -97,8 +97,8 @@ public abstract class TreeDrawableElement {
     enum ElementSortMethod {SORTO, SORTX, SORTY}
 
     // debugging
-    static boolean expensiveAssert = false;
-    static boolean smallAsserts = false;
+    static boolean expensiveAssert = true;
+    static boolean smallAsserts = true;
     static boolean prints = false;
 
     static void setClashingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
