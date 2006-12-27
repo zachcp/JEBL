@@ -1066,7 +1066,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         double availableH;
 
         public TreeBoundsHelper(int n, double availableW, double availableH) {
-            n = 3 * (3*n + 2);
+            n = 3 * (n + 2);
             xbounds = new double[n];
             ybounds = new double[n];
             nv = 0;
@@ -1253,7 +1253,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final Set<Node> externalNodes = tree.getExternalNodes();
         Node nodeWithLongestTaxon = null;
 
-        TreeBoundsHelper tbh = new TreeBoundsHelper(externalNodes.size(), availableW, availableH);
+        TreeBoundsHelper tbh =
+                new TreeBoundsHelper(externalNodes.size() + 2*tree.getNodes().size(), availableW, availableH);
         
         if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
 
