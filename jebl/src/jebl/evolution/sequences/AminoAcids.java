@@ -81,7 +81,7 @@ public final class AminoAcids {
                     {G_STATE, T_STATE, S_STATE, Y_STATE, P_STATE, H_STATE},
                     {D_STATE, E_STATE, K_STATE, N_STATE, Q_STATE, R_STATE}});
 
-    // TT: I think the unit used here may be Angstrom^3, but I'm not sure
+    // TT: I think the unit used here may be Angstrom^3, but I'm not sure; see http://www.imb-jena.de/IMAGE_AA.html
     public static final StateClassification VOLUME_CLASSIFICATION = new StateClassification.Default("volume",
             new String[]{"60-90", "108-117", "138-154", "162-174", "189-228"},
             new State[][]{{G_STATE, A_STATE, S_STATE}, {C_STATE, D_STATE, P_STATE, N_STATE, T_STATE},
