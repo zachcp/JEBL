@@ -258,7 +258,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 final float y0 = (float) y;
 
                 // end point
-                final float x1 = (float) childPoint.getX();
+                final double cx = childPoint.getX();
+                final float x1 = (float) cx;
                 final double yChild = childPoint.getY();
                 final float y1 = (float) yChild;
 
@@ -273,10 +274,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
 
-                final double x3 = (x + childPoint.getX()) / 2;
-                Line2D branchLabelPath = new Line2D.Double(
-                        x/*x3 - 1.0*/, yChild,
-                        childPoint.getX()/*x3 + 1.0*/, yChild);
+                final boolean zeroBramch = cx == x;
+                final double dd = 0.0001;
+
+                Line2D branchLabelPath =
+                        new Line2D.Double(zeroBramch ? x - dd :x, yChild, zeroBramch ? cx + dd : cx, yChild);
 
                 branchLabelPaths.put(child, branchLabelPath);
             }

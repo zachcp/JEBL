@@ -345,11 +345,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             showTextCHeckBox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     final boolean selected = showTextCHeckBox.isSelected();
-                    //label1.setEnabled(selected);
-                    //fontSizeSpinner.setEnabled(selected);
-                    //label2.setEnabled(selected);
-                    //digitsSpinner.setEnabled(selected);
-                    setVisible(selected);
+                    if( isVisible() != selected ) {
+                        setVisible(selected);
+                    }
                 }
             });
 
