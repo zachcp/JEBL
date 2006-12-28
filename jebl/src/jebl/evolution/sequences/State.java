@@ -55,7 +55,8 @@ public abstract class State implements Comparable {
 
     /**
      * @param other another state to check for the quality with.
-     * @return true if the other state is or possibly is equal to this state, taking ambiguities into account.
+     * @return true if the other state is or possibly is equal to this state, taking ambiguities into account,
+     *         i.e. if the ambiguity sets of this and the other state intersect.
      */
     public boolean possiblyEqual(State other) {
         for (State state : getCanonicalStates()) {
