@@ -1342,7 +1342,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	// private stuff
-
 	private NexusBlock nextBlock = null;
 	private String nextBlockName = null;
 

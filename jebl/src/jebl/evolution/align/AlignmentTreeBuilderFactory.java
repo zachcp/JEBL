@@ -9,57 +9,22 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.TreeBuilder;
 import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.util.ProgressListener;
+import jebl.util.CompositeProgressListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Joseph Heled
  * @version $Id$
  */
 public class AlignmentTreeBuilderFactory {
-    static public Result build(Alignment alignment, TreeBuilderFactory.Method method, TreeBuilderFactory.DistanceModel model, ProgressListener progress) {
+    private final static Logger logger = Logger.getLogger(AlignmentTreeBuilderFactory.class.getName());
 
-        if( progress != null ) {
-            progress.setMessage("Computing genetic distance for all pairs");
-        }
-        DistanceMatrix distMat;
-
-        boolean timeit = false;
-
-        if( timeit ) progress = null;
-        long start = timeit ? System.currentTimeMillis() : 0;
-
-        switch( model ) {
-            case JukesCantor:
-            default:
-                distMat = new JukesCantorDistanceMatrix(alignment, progress);
-                break;
-            case F84:
-                distMat = new F84DistanceMatrix(alignment, progress);
-                break;
-            case HKY:
-                distMat = new HKYDistanceMatrix(alignment, progress);
-                break;
-            case TamuraNei:
-                distMat = new TamuraNeiDistanceMatrix(alignment, progress);
-                break;
-        }
-        if( timeit ) {
-            System.out.println("took " +(System.currentTimeMillis() - start) + " to build distance matrix");
-        }
-
-        if( progress != null ) {
-            progress.setMessage("Building tree");
-        }
-
-        TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, distMat);
-        if( progress != null ) {
-            treeBuilder.addProgressListener(progress);
-        }
-        return new Result(treeBuilder.build(), distMat);
+    private static interface DistanceMatrixBuilder {
+        DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener);
     }
-
 
     static public class Result {
         public final Tree tree;
@@ -69,17 +34,77 @@ public class AlignmentTreeBuilderFactory {
             this.tree = tree;
             this.distance = distance;
         }
+    }    
+
+    /**
+     * private utility method to get rid of former code duplication in the two build methods from
+     * alignment and list of sequences with pairwise aligner.
+     * @param distanceMatrixBuilder Encapsulation of all information required to build distance matrix
+     * @param method the tree building method to use
+     * @param _progressListener must not be null
+     * @return A tree building result (containing a tree and a distance matrix)
+     */
+    private static Result build(DistanceMatrixBuilder distanceMatrixBuilder, TreeBuilderFactory.Method method, ProgressListener _progressListener) {
+        // The requirement that progress isn't null has only been added on 2006-12-29.
+        // For a grace period, we check whether it is null and only warn.
+        if (_progressListener == null) {
+            logger.warning("ProgressListener is null");
+            _progressListener = ProgressListener.EMPTY;
+        }
+        CompositeProgressListener progressListener = new CompositeProgressListener(_progressListener, new double[] { .5, .5 });
+
+        progressListener.beginSubtask("Computing genetic distance for all pairs");
+        long start = System.currentTimeMillis();
+        DistanceMatrix distanceMatrix = distanceMatrixBuilder.buildDistanceMatrix(progressListener);
+        logger.fine("took " +(System.currentTimeMillis() - start) + " to build distance matrix");
+        progressListener.beginSubtask("Building tree");
+        TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, distanceMatrix);
+        treeBuilder.addProgressListener(progressListener);
+        return new Result(treeBuilder.build(), distanceMatrix);
     }
 
-    static public Result build(List<Sequence> seqs, TreeBuilderFactory.Method method, PairwiseAligner aligner,
-                               ProgressListener progress) {
-        progress.setMessage("Computing genetic distance for all pairs");
-        final DistanceMatrix d = new SequenceAlignmentsDistanceMatrix(seqs, aligner, progress);
-        progress.setMessage("Building tree");
-        TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, d);
-        treeBuilder.addProgressListener(progress);
-        final Tree t = treeBuilder.build();
-        return new Result(t, d);
+    /**
+     * @param alignment Alignment to calculate distance matrix from
+     * @param method the tree building method to use
+     * @param model substitution model for distance matrix: JukesCantor, TamuraNei, HKY or F84.
+     * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
+     * @return A tree building result (containing a tree and a distance matrix)
+     */
+    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener) {
+        DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
+            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) {
+                switch( model ) {
+                    case F84:
+                        return new F84DistanceMatrix(alignment, progressListener);
+                    case HKY:
+                        return new HKYDistanceMatrix(alignment, progressListener);
+                    case TamuraNei:
+                        return new TamuraNeiDistanceMatrix(alignment, progressListener);
+                    case JukesCantor:
+                    default:
+                        return new JukesCantorDistanceMatrix(alignment, progressListener);
+                }
+            }
+        };
+        return build(matrixBuilder, method, progressListener);
+    }
+
+    /**
+     *
+     * @param seqs Sequences to build distance matrix from
+     * @param method method the tree building method to use
+     * @param aligner pairwise aligner which will be used to calculate a pairwise distance
+     * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
+     * @return A tree building result (containing a tree and a distance matrix)
+     */
+    static public Result build(final List<Sequence> seqs, TreeBuilderFactory.Method method, final PairwiseAligner aligner,
+                               ProgressListener progressListener) {
+        DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
+            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) {
+                return new SequenceAlignmentsDistanceMatrix(seqs, aligner, progressListener);
+            }
+        };
+        return build(matrixBuilder, method, progressListener);
     }
 
     static public Result build(List<Sequence> seqs, TreeBuilderFactory.Method method, MultipleAligner aligner,
