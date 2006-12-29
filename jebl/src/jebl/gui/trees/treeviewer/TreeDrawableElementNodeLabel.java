@@ -19,32 +19,33 @@ import java.awt.geom.Rectangle2D;
  *          Date: 19/12/2006
  *          Time: 12:38:58
  */
-public class TreeDrawableElementTaxonLabel extends TreeDrawableElementLabel {
+public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
 
     private Rectangle2D defaultBounds;
     private Rectangle2D minBounds = null;
-    private Node nodeWithLongestTaxon;
+    // when size for node lable is to be taken from another node, known to be larger
+    private Node nodeSizeReference;
     private BasicLabelPainter painter;
-    int defaultSize;
+    private int defaultSize;
     private int curSize;
     private Painter.Justification taxonLabelJustification;
-    AffineTransform save;
+    //private AffineTransform save;
     // debug
-    Tree tree;
+    private Tree tree;
 
-    TreeDrawableElementTaxonLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
+    TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
                                   Rectangle2D labelBounds, AffineTransform transform, int priority,
-                                  Node nodeWithLongestTaxon, BasicLabelPainter painter) {
+                                  Node nodeSizeReference, BasicLabelPainter painter) {
         super(node, labelBounds, transform, priority);
 
         defaultBounds = labelBounds;
-        this.nodeWithLongestTaxon = nodeWithLongestTaxon != null ? nodeWithLongestTaxon : node;
+        this.nodeSizeReference = nodeSizeReference != null ? nodeSizeReference : node;
         //this.node = node;
         this.taxonLabelJustification = taxonLabelJustification;
         this.painter = painter;
         curSize = defaultSize = (int)painter.getFontSize();
 
-        save = new AffineTransform(transform);
+        //save = new AffineTransform(transform);
 
         this.tree = tree;
     }
@@ -63,7 +64,7 @@ public class TreeDrawableElementTaxonLabel extends TreeDrawableElementLabel {
                 float s = painter.getFontSize();
                 painter.setFontSize(size, false);
                 painter.calibrate(g2);
-                newBounds = new Rectangle2D.Double(0.0, 0.0, painter.getWidth(g2, nodeWithLongestTaxon), painter.getPreferredHeight());
+                newBounds = new Rectangle2D.Double(0.0, 0.0, painter.getWidth(g2, nodeSizeReference), painter.getPreferredHeight());
                 if( size == getMinSize() ) {
                     minBounds = newBounds;
                 }

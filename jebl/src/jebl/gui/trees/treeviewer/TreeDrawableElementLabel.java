@@ -33,6 +33,10 @@ public abstract class TreeDrawableElementLabel extends TreeDrawableElement {
         return false;
     }
 
+    public boolean hit(Graphics2D g2, Rectangle rect) {
+       return g2.hit(rect, getLableShape(), false);
+    }
+    
     public Rectangle2D getBounds() {
         return getLableShape().getBounds();
     }
@@ -50,22 +54,10 @@ public abstract class TreeDrawableElementLabel extends TreeDrawableElement {
      //  System.out.println(l2.getDebugName() + " transform " + l2.transform.toString());
 
         // todo (efficency) when lables are not rotated this is not required, as the bounds and real space taken
-        // by label are the same
+        // todo by label are the same
         final double[] l2p = l2.getPoints();
-//        final Shape lableShape = l1.getLableShape();
-//
-//        for(int k = 0; k < 8; k += 2) {
-//            if( lableShape.contains(l2p[k], l2p[k+1]) ) {
-//                return true;
-//            }
-//        }
-//
-       final double[] l1p = l1.getPoints();
-//        for(int k = 0; k < 8; k += 2) {
-//            if( l2.getLableShape().contains(l1p[k], l1p[k+1]) ) {
-//                return true;
-//            }
-//        }
+
+        final double[] l1p = l1.getPoints();
 
         Line2D[] ln1 = {
                 new Line2D.Double(l1p[0], l1p[1], l1p[2], l1p[3]) ,

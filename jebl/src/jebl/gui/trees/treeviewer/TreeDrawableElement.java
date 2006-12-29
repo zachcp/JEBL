@@ -77,6 +77,8 @@ public abstract class TreeDrawableElement {
 
     public abstract int getPriority();
 
+    public abstract boolean hit(Graphics2D g2, Rectangle rect);
+
     private static class Stats {
         double sum = 0.0;
         double sum2 = 0.0;
