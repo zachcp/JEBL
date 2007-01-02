@@ -1365,7 +1365,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
 
         // Get the bounds for the actual scaled tree (not anymore)
-        treeBounds = null;
+        //treeBounds = null;
         {
             Set<Node> small = new HashSet<Node>();
             for (Node node : tree.getNodes()) {
@@ -1421,8 +1421,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 // Work out how it is rotated and create a transform that matches that
                 AffineTransform taxonTransform = calculateTransform(transform, taxonPath, taxonLabelWidth, labelHeight, true);
 
-
-
                 // Store the alignment in the map for use when drawing
                 final Painter.Justification just = (taxonPath.getX1() < taxonPath.getX2()) ?
                         Painter.Justification.LEFT : Painter.Justification.RIGHT;
@@ -1439,7 +1437,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                 final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, 10,
-                                                          nodeWithLongestTaxon, ((BasicLabelPainter) taxonLabelPainter));
+                                                          nodeWithLongestTaxon, (BasicLabelPainter) taxonLabelPainter
+                        ,null);
 
                 treeElements.add(e);
             }
@@ -1482,7 +1481,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 9,
-                                                          null, ((BasicLabelPainter) nodeLabelPainter));
+                                                          null, ((BasicLabelPainter) nodeLabelPainter), "node");
 
                     treeElements.add(e);
                 }
@@ -1530,7 +1529,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 9,
-                                                          null, ((BasicLabelPainter) branchLabelPainter));
+                                                          null, ((BasicLabelPainter) branchLabelPainter), "branch");
 
                     treeElements.add(e);
                 }
@@ -1562,7 +1561,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         long now = System.currentTimeMillis();
-        TreeDrawableElement.setClashingVisiblitiy(treeElements, g2);
+        TreeDrawableElement.setOverlappingVisiblitiy(treeElements, g2);
         System.err.println("Clash " + (System.currentTimeMillis() - now));
 
         calibrated = true;

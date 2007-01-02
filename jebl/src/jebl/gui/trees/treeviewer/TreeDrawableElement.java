@@ -79,7 +79,8 @@ public abstract class TreeDrawableElement {
 
     public abstract boolean hit(Graphics2D g2, Rectangle rect);
 
-    private static class Stats {
+    // Size of variance for a set
+    private static class VarianceIndication {
         double sum = 0.0;
         double sum2 = 0.0;
         long n = 0;
@@ -90,7 +91,7 @@ public abstract class TreeDrawableElement {
             ++n;
         }
 
-        double std2() {
+        double variance() {
             final double avg = sum / n;
             return (sum2 / n) - avg*avg;
         }
@@ -103,42 +104,55 @@ public abstract class TreeDrawableElement {
     static boolean smallAsserts = true;
     static boolean prints = false;
 
-    static void setClashingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
+    static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
-        double maxRadious2 = 0.0, maxDY = 0.0, maxDX = 0.0;
-        Stats x = new Stats();
-        Stats y = new Stats();
-        Stats o = new Stats();
 
-        final Map<TreeDrawableElement, double[]> d = new HashMap<TreeDrawableElement, double[]>(list.size());
+        // get variance of each "axis of projection" (x y and distance-from origin) and element maximum along each
+        // axis
+        double maxRadious2 = 0.0, maxDY = 0.0, maxDX = 0.0;
+        VarianceIndication x = new VarianceIndication();
+        VarianceIndication y = new VarianceIndication();
+        VarianceIndication o = new VarianceIndication();
+
+        // establish a map in the process which saves the 3 values for each element. Used in sorting later
+        final Map<TreeDrawableElement, double[]> elementAxisValues =
+                new HashMap<TreeDrawableElement, double[]>(list.size());
 
         for( TreeDrawableElement e : elements ) {
             final Rectangle2D bounds = e.getBounds();
             final double x1 = bounds.getMinX();
             x.add(x1);
+
             final double y1 = bounds.getMinY();
             y.add(y1);
+
             final double o1 = e.getCenter().distance(0, 0);
             o.add(o1);
 
-            d.put(e, new double[]{o1, x1, y1});
+            elementAxisValues.put(e, new double[]{o1, x1, y1});
 
             if( bounds.getHeight() > maxDY ) {
                 maxDY = bounds.getHeight();
             }
+
             if( bounds.getWidth() > maxDX ) {
                 maxDX = bounds.getWidth();
             }
+
             final double r = e.getRadious2();
             if( r > maxRadious2 ) {
                 maxRadious2 = r;
             }
         }
+
+        // use the projection which has the largest ratio of variance to max, which is the one likely to require
+        // the least number of pairwise element comparisons
+
         final double maxRadious = Math.sqrt(maxRadious2);
 
-        final double xstd2 = x.std2() / maxDX;
-        final double ystd2 = y.std2() / maxDY;
-        final double ostd2 = o.std2() / maxRadious;
+        final double xstd2 = x.variance() / maxDX;
+        final double ystd2 = y.variance() / maxDY;
+        final double ostd2 = o.variance() / maxRadious;
         final ElementSortMethod s;
 
         if( ostd2 > Math.max(xstd2, ystd2) ) {
@@ -147,30 +161,38 @@ public abstract class TreeDrawableElement {
             s = xstd2 > ystd2 ? ElementSortMethod.SORTX :  ElementSortMethod.SORTY;
         }
 
+        // which projection is used
         final int which = s.ordinal();
+
         // order must match that of enum
         double[] limits = {2*maxRadious, maxDX, maxDY};
-        double maxxRadious =  limits[which];
 
+        // distance along projection which insures two elements further apart than that can't overlap
+        double nonOverlapRadius =  limits[which];
+
+        // order elements according to projection
         Collections.sort(list, new Comparator<TreeDrawableElement>() {
             public int compare(TreeDrawableElement o1, TreeDrawableElement o2) {
-                final double[] v1 = d.get(o1);
-                final double[] v2 = d.get(o2);
+                final double[] v1 = elementAxisValues.get(o1);
+                final double[] v2 = elementAxisValues.get(o2);
 
                 return (int)Math.signum(v1[which] - v2[which]);
             }
         });
 
+        // debug prints only
         int nChecks = 0;
 
         // build list of clashes for each element at max size
         Map<TreeDrawableElement, List<TreeDrawableElement> >
                 conflicts = new HashMap<TreeDrawableElement, List<TreeDrawableElement>>();
 
+        // first element that need to be compared with current one. all the ones prior to it
+        // are known to be non clashing
         int last = 0;
         for(int k = 0; k < list.size(); ++k) {
             final TreeDrawableElement ek = list.get(k);
-            final double ekd = d.get(ek)[which];
+            final double ekd = elementAxisValues.get(ek)[which];
 
             if( expensiveAssert ) {
                 for( int j = 0; j < last; ++j) {
@@ -180,11 +202,23 @@ public abstract class TreeDrawableElement {
                     }
                 }
             }
+            if(prints) System.out.println("checking " + k + " " + ek.getDebugName() + "(" + ek.getCurrentSize() + ")");
 
             for(int j = last; j < k; ++j) {
                 final TreeDrawableElement ej = list.get(j);
+
+                if( ekd - elementAxisValues.get(ej)[which] > nonOverlapRadius ) {
+                    if( smallAsserts ) assert ! intersects(ek, ej);
+                    assert last == j;
+                    ++last;
+                    continue;
+                }
+
                 ++nChecks;
+                if(prints) System.out.print("  against " + j +  ej.getDebugName() + "(" + ej.getCurrentSize() + ")");
+
                 if( intersects(ek, ej) ) {
+                    // add ej on ek conflict list and vice versa
                     if( ! conflicts.containsKey(ek) ) {
                         conflicts.put(ek, new ArrayList<TreeDrawableElement>());
                     }
@@ -194,11 +228,10 @@ public abstract class TreeDrawableElement {
                         conflicts.put(ej, new ArrayList<TreeDrawableElement>());
                     }
                     conflicts.get(ej).add(ek);
-                }
 
-                if( ekd - d.get(ej)[which] > maxxRadious ) {
-                    assert last == j;
-                    ++last;
+                    if(prints) System.out.println(" - overlapps " );
+                }  else {
+                    if(prints) System.out.println(" - non overlapp");
                 }
             }
         }
@@ -212,7 +245,7 @@ public abstract class TreeDrawableElement {
             return;
         }
 
-        // Resize all clashing elements to smallest size. Remove element so that no more clashes remain.
+        // Resize all clashing elements to smallest size. Remove elements as needed so that no clashes remain.
         // inspect elemnents in decending priority order to remove lower priority elements first.
 
         final Set<TreeDrawableElement> clashingElements = conflicts.keySet();
@@ -270,14 +303,13 @@ public abstract class TreeDrawableElement {
             }
 
             if (conflicting.size() == 0) {
-                 // not clashed after removing, can bring back to normal size
+                // no clashed after removing, can simply restore normal size
                 e.setSize(e.getMaxSize(), g2);
                 clashingElements.remove(e);
             }
         }
 
-        //ascheck(list);
-
+        // second pass. Node try to enlarge remaining elements
         queue.clear();
 
         for (TreeDrawableElement e : clashingElements) {
@@ -286,44 +318,55 @@ public abstract class TreeDrawableElement {
 
         while (queue.peek() != null) {
             TreeDrawableElement e = queue.poll();
-            final List<TreeDrawableElement> conflicting = conflicts.get(e);
+            final List<TreeDrawableElement> overlapping = conflicts.get(e);
 
+            // start with maximal size for element
             int size = e.getMaxSize();
             e.setSize(size, g2);
 
-            if(prints) System.out.println("** Start for " + e.getDebugName());
+            if(prints) System.out.println("** Start for " + e.getDebugName() + " (" + e.getCurrentSize() + ")");
 
+            // loop until finding a size where no overlaps. this must be the case
+            // for the min size
             while( size >= e.getMinSize() ) {
                 e.setSize(size, g2);
                 int nc = 0;
-                for(; nc < conflicting.size(); ++nc) {
-                   if( intersects(e, conflicting.get(nc) ) ) {
+                for(; nc < overlapping.size(); ++nc) {
+                   if( intersects(e, overlapping.get(nc) ) ) {
+                        if(prints) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                         + " overlaps " + overlapping.get(nc).getDebugName() +
+                         " (" + overlapping.get(nc).getCurrentSize() + ")" );
                        break;
                    }
-                    if(prints) System.out.println(e.getDebugName() + " is ok with " + conflicting.get(nc).getDebugName() +
-                         " (" + conflicting.get(nc).getCurrentSize() + ")" );
+                   if(prints) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                         + " is ok with " + overlapping.get(nc).getDebugName() +
+                         " (" + overlapping.get(nc).getCurrentSize() + ")" );
                 }
-                if( nc == conflicting.size() ) {
+                if( nc == overlapping.size() ) {
+                    // no overlaps - use this size
                     break;
                 }
                 --size;
             }
 
-           // ascheck(list);
-
             assert size >= e.getMinSize() : "for " + e.getDebugName();
 
+            // try to get elements with same priority to the same size if possible
             int priority = e.getPriority();
 
-            for( TreeDrawableElement ec : conflicting ) {
+            for( TreeDrawableElement ec : overlapping ) {
                 if( ec.getPriority() == priority ) {
                     final int ecs = ec.getCurrentSize();
                     // size should only go down to accomodate others of same priority
                     if( ecs >= size )  {
+                        // overlapping element is already larger
                         continue;
                     }
+
+                    // save size as it is not allowed to go up
                     final int sizeMax = size;
 
+                    // size for overlapping element
                     int ecSize = ecs;
                     
                     if(prints) System.out.println("resolve conflict of " + e.getDebugName() + " with " + ec.getDebugName() + " - " + ecs);
@@ -344,13 +387,7 @@ public abstract class TreeDrawableElement {
                         }
                         if( smallAsserts  ) assert ! intersects(e, ec);
 
-//                        boolean intersects = false;
-//                        while( ecSize < size && size > e.getMinSize() && ! intersects ) {
-//                            --size;
-//                            e.setSize(size, g2);
-//                            intersects = intersects(e, ec);
-//                        }
-
+                        // if overlapping element has still smaller size, take element size one down
                         if( ecSize < size && size > e.getMinSize() ) {
                             --size;
                             e.setSize(size, g2);
@@ -358,6 +395,7 @@ public abstract class TreeDrawableElement {
                         if( smallAsserts  ) assert ! intersects(e, ec);
                     }
 
+                    // now set size of element to largest possible given known overlapper size
                     while( size+1 < sizeMax ) {
                         e.setSize(size+1, g2);
                         if( intersects(e, ec) ) {
@@ -368,12 +406,16 @@ public abstract class TreeDrawableElement {
                     }
 
                     if( smallAsserts  ) assert ! intersects(e, ec);
+
+                    // restore overlapper to original size. it's true size will be known only when checked
+                    // against all it's overlappers
                     ec.setSize(ecs, g2);
                     if( smallAsserts  ) assert ! intersects(e, ec);
                 }
             }
+
             if( smallAsserts  ) {
-                for (TreeDrawableElement aConflicting : conflicting) {
+                for (TreeDrawableElement aConflicting : overlapping) {
                     if (intersects(e, aConflicting)) {
                         System.out.println(e.getDebugName() + " " + e.getCurrentSize() + " conflicts with " +
                                 aConflicting.getDebugName() + " " + aConflicting.getCurrentSize());
@@ -381,7 +423,6 @@ public abstract class TreeDrawableElement {
                     }
                 }
             }
-          //  ascheck(list);
         }
         ascheck(list);
     }
@@ -401,7 +442,7 @@ public abstract class TreeDrawableElement {
                                 System.out.println(ek.getDebugName() + " (" + ek.getCurrentSize() + ") & "
                                         + ej.getDebugName() + " (" + ej.getCurrentSize() + ")");
                             }
-                            assert !b;
+                           // assert !b;
                         }
                     }
                 }

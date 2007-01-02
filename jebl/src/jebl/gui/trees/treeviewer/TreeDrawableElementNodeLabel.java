@@ -32,10 +32,12 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
     //private AffineTransform save;
     // debug
     private Tree tree;
+    String dtype;
 
     TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
                                   Rectangle2D labelBounds, AffineTransform transform, int priority,
-                                  Node nodeSizeReference, BasicLabelPainter painter) {
+                                  Node nodeSizeReference, BasicLabelPainter painter,
+                                  String dtype) {
         super(node, labelBounds, transform, priority);
 
         defaultBounds = labelBounds;
@@ -48,6 +50,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         //save = new AffineTransform(transform);
 
         this.tree = tree;
+        this.dtype = dtype;
     }
 
     public void setSize(int size, Graphics2D g2) {
@@ -86,8 +89,14 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
     }
 
     public String getDebugName() {
-       if( tree.isExternal(node) ) return  tree.getTaxon(node).getName();
-       return Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node);
+        String name;
+        if( tree.isExternal(node) ) {
+            name = tree.getTaxon(node).getName();
+
+        } else {
+            name =Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node);
+        }
+        return name + (dtype != null ? "(" + dtype + ")" : "");
     }
 
     public int getCurrentSize() {

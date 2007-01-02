@@ -62,9 +62,9 @@ public interface TreeLayout extends ControlsProvider {
 
     /**
      * Return whether the two axis scales should be maintained
-     * relative to each other
+     * relative to each other. Implies centering of the tree as well.
      *
-     * @return a boolean
+     * @return aspect indication
      */
     boolean maintainAspectRatio();
 
