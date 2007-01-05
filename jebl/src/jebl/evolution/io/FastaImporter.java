@@ -50,6 +50,10 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
      * Use this constructor if you are reading from a file. The advantage over the
      * other constructor is that a) the input size is known, so read() can report
      * meaningful progress, and b) the file is closed at the end.
+     *
+     * WARNING: You cannot reuse the FastaImporter thus constructed to import sequences
+     * from the same file again. 
+     *
      * @param file
      * @param sequenceType
      * @throws FileNotFoundException
