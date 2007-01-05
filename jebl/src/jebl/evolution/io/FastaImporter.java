@@ -94,7 +94,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                                 ProgressListener progressListener)
             throws IOException, ImportException
     {
-        final List<Sequence> sequences = callback != null ? new ArrayList<Sequence>() : null;
+        final List<Sequence> sequences = (callback == null) ? new ArrayList<Sequence>() : null;
         final char fastaFirstChar = '>';
         final String fasta1stCharAsString = new String(new char[]{fastaFirstChar});
         final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
