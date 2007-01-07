@@ -54,7 +54,6 @@ public class CalculateSplitRates {
 
 
 	/**
-	 * @param treeList     List of all trees to be added to density map
 	 * @param numRateBoxes Voxel count in rate dimension
 	 * @param numTimeBoxes Voxel count in time dimension
 	 * @return A density map of proper dimension
