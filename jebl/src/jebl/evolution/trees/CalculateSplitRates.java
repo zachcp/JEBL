@@ -1,11 +1,8 @@
-package jebl;
+package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.RootedTreeUtils;
-import jebl.evolution.trees.Tree;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +16,7 @@ import java.util.*;
  */
 public class CalculateSplitRates {
 
-	List<Tree> treeList;
+	List<RootedTree> treeList;
 	NexusImporter importer;
 
 	public final String INDICATOR = "changed";
@@ -29,34 +26,87 @@ public class CalculateSplitRates {
 	private DensityMap densityMap;
 
 	public CalculateSplitRates(NexusImporter importer) {
-//		this.treeList = treeList;
 		this.importer = importer;
-		treeList = new ArrayList<Tree>(100);
-//		System.out.println(treeList.size()) ;
+		treeList = new ArrayList<RootedTree>(100);
 		cladeList = new ArrayList<Clade>(100);
 		intervalList = new ArrayList<List<TimeInterval>>(100);
 		densityMap = new DensityMap(70, 20, 0, 0, 70, 5);
 	}
 
-	private int maxTrees = 4000;
-	private int burnIn = 1000;
+//	private int maxTrees = 40;
+//	private int burnIn = 0;
 
-	public void loadTrees() throws IOException, ImportException {
+	public void loadTrees(int maxTrees, int burnIn) throws IOException, ImportException {
 		int cnt = 0;
+		int cntBurnin = 0;
 		while (importer.hasTree() && cnt < maxTrees) {
 			RootedTree tree = (RootedTree) importer.importNextTree();
-			if (cnt > burnIn) {
+			if (cntBurnin > burnIn) {
 				treeList.add(tree);
+				cnt++;
 //			addCladeRateInforamtion(tree);
 //			intervalList.add( getTimeIntervals(tree) );
-				addTreeToDensityMap(tree);
+//				addTreeToDensityMap(tree);
 			}
-			cnt++;
-//			System.exit(0);
+			cntBurnin++;
 		}
-		//System.out.println("Processed "+treeList.size()+" trees.");
 	}
 
+
+	/**
+	 * @param treeList     List of all trees to be added to density map
+	 * @param numRateBoxes Voxel count in rate dimension
+	 * @param numTimeBoxes Voxel count in time dimension
+	 * @return A density map of proper dimension
+	 */
+	private DensityMap createDensityMap(int numRateBoxes, int numTimeBoxes) {
+		double maxTreeHeight = 0;
+		double minRate = 1;
+		double maxRate = 1;
+		for (RootedTree tree : treeList) {
+			double thisHeight = tree.getHeight(tree.getRootNode());
+			if (thisHeight > maxTreeHeight)
+				maxTreeHeight = thisHeight;
+			Set<Node> nodeList = tree.getNodes();
+			for (Node node : nodeList) {
+				if (node != tree.getRootNode()) {
+					double rate = getRate(node);
+					if (rate < minRate)
+						minRate = rate;
+					if (rate > maxRate)
+						maxRate = rate;
+				}
+			}
+		}
+		maxTreeHeight *= 1.0 + edgeFraction;
+		double rateSpread = maxRate - minRate;
+		minRate -= rateSpread * edgeFraction;
+		if (minRate < 0)
+			minRate = 0;
+		System.out.println("real max = " + maxRate);
+		maxRate += rateSpread * edgeFraction;
+		System.out.println("new  max = " + maxRate);
+//		System.out.println("max treeheight = "+maxTreeHeight);
+//		System.out.println("min rate = "+minRate);
+//		System.out.println("max rate = "+maxRate);
+//		System.exit(-1);
+		DensityMap densityMap =
+				new DensityMap(numTimeBoxes, numRateBoxes, 0,
+						minRate, maxTreeHeight, maxRate);
+		for (RootedTree tree : treeList) {
+			addTreeToDensityMap(densityMap, tree);
+		}
+		return densityMap;
+	}
+
+	private void displayLongestDwellTimeInfo() {
+		for (RootedTree tree : treeList) {
+			double longestDwell = getLongestClockDwellTime(
+					getClockDwellTimes(tree));
+			double treeLenght = getTreeLength(tree);
+			System.out.printf("%5.4f\n", (longestDwell / treeLenght));
+		}
+	}
 
 	public void displayStatistics() {
 //		if( treeList.size() == 0 ) {
@@ -64,7 +114,8 @@ public class CalculateSplitRates {
 //			return;
 //		}
 //		System.out.println("Analyzed "+treeList.size()+" trees.");
-		if (cladeList.size() > 0) {
+
+		/*	if (cladeList.size() > 0) {
 			System.out.println("Clade Information:");
 			System.out.println("\t" + cladeList.size() + " observed unique clades.");
 			Collections.sort(cladeList, new CladeFrequencyComparator());
@@ -72,14 +123,17 @@ public class CalculateSplitRates {
 				System.out.println("\t\t" + clade.getCount() + " : " + clade.getName());
 
 		}
-		displayIntervals();
-		System.out.println(densityMap.toString());
+		displayIntervals();*/
 
+		//	displayLongestDwellTimeInfo();
+
+//		System.out.println(densityMap.toString());
+//
 
 	}
 
 
-	public void addTreeToDensityMap(RootedTree tree) {
+	public void addTreeToDensityMap(DensityMap densityMap, RootedTree tree) {
 		Set<Node> nodeList = tree.getNodes();
 		for (Node node : nodeList) {
 			if (node != tree.getRootNode())
@@ -112,7 +166,7 @@ public class CalculateSplitRates {
 		return rateDouble.doubleValue();
 	}
 
-	private boolean ratedChanged(Node node) {
+	private boolean rateChanged(Node node) {
 		Integer changedInt = (Integer) node.getAttribute(INDICATOR);
 		return changedInt.intValue() == 1 ? true : false;
 	}
@@ -123,6 +177,85 @@ public class CalculateSplitRates {
 
 	}
 
+
+	private double getLongestClockDwellTime(Map<Double, Double> dwellTimes) {
+		double time = 0;
+		Set<Double> rates = dwellTimes.keySet();
+		for (Double rate : rates) {
+			Double dwell = dwellTimes.get(rate);
+			if (dwell > time)
+				time = dwell;
+		}
+		return time;
+	}
+
+	private Map<Double, Double> getClockDwellTimes(RootedTree tree) {
+		Map<Double, Double> rateDwellTimes = new HashMap<Double, Double>();
+		Set<Node> nodes = tree.getNodes();
+		for (Node node : nodes) {
+			if (node != tree.getRootNode()) {
+				double branchLength = tree.getLength(node);
+				double rate = getRate(node);
+				Double thisRate = new Double(rate);
+				Double dwellTime = rateDwellTimes.get(thisRate);
+				if (dwellTime == null)                //   {
+					rateDwellTimes.put(thisRate, new Double(branchLength));
+				else
+					rateDwellTimes.put(thisRate, new Double(dwellTime.doubleValue() + branchLength));
+			}
+		}
+		// Test
+/*		System.out.println("# of unique rates: "+rateDwellTimes.size());
+		Set<Double> keySet = rateDwellTimes.keySet();
+		double total = 0;
+		for (Double key : keySet) {
+			Double dwell = rateDwellTimes.get(key);
+			System.out.printf("%5.4f : %5.4f\n",key,dwell);
+			total += dwell;
+		}
+		System.out.printf("Sum of dwell = %5.4f\n",total);*/
+		return rateDwellTimes;
+
+
+	}
+
+	private double getTreeLength(RootedTree tree) {
+		double total = 0;
+		Set<Node> nodes = tree.getNodes();
+		for (Node node : nodes)
+			total += tree.getLength(node);
+		return total;
+	}
+
+	/*private List<DwellTime> getDwellTimes(RootedTree tree) {
+		return getDwellTimes(tree, tree.getRootNode(),
+				tree.getHeight(tree.getRootNode()), 0.0, new ArrayList<DwellTime>());
+	}
+
+	private List<DwellTime> getDwellTimes(RootedTree tree, Node node, double startTime, double currentLenght, List<DwellTime> dwellTimes) {
+		if (tree.isExternal(node)) {
+			DwellTime dwellTime = new DwellTime(
+				startTime, currentLenght, getRate(node)
+			);
+			dwellTimes.add(dwellTime);
+			return null;
+		}
+		List<Node> children = tree.getChildren(node);
+		for (Node child : children) {
+			double branchLength = tree.getHeight(node) - tree.getHeight(child);
+			if (rateChanged(child)) { // end dwell
+				DwellTime dwellTime = new DwellTime(startTime,currentLenght,getRate(node));
+				dwellTimes.add(dwellTime);
+
+				getDwellTimes(tree,child,tree.getHeight(node),
+						branchLength, dwellTimes);
+			}  else {
+				getDwellTimes(tree,child,startTime,currentLenght+branchLength, dwellTimes);
+			}
+		}
+		return dwellTimes;
+	}*/
+
 	private List<TimeInterval> getTimeIntervals(RootedTree tree, Node node, double startTime, List<TimeInterval> intervals) {
 		if (tree.isExternal(node)) {
 			TimeInterval timeInterval = new TimeInterval(
@@ -132,7 +265,7 @@ public class CalculateSplitRates {
 		}
 		List<Node> children = tree.getChildren(node);
 		for (Node child : children) {
-			if (ratedChanged(child)) { // end interval
+			if (rateChanged(child)) { // end interval
 				TimeInterval timeInterval = new TimeInterval(
 						startTime, tree.getHeight(node), getRate(node));
 				intervals.add(timeInterval);
@@ -233,6 +366,26 @@ public class CalculateSplitRates {
 		}
 	}
 
+	private class DwellTime implements Comparable<DwellTime> {
+
+		private double start;
+		private double rate;
+		private double length;
+
+		public DwellTime(double start, double length, double rate) {
+			this.start = start;
+			this.length = length;
+			this.rate = rate;
+		}
+
+		public int compareTo(DwellTime dwellTime) {
+			return (int) (getLength() - dwellTime.getLength());
+		}
+
+		public double getLength() {
+			return length;
+		}
+	}
 
 	private class TimeInterval implements Comparable<TimeInterval> {
 
@@ -315,7 +468,7 @@ public class CalculateSplitRates {
 		}
 
 		public String toString() {
-			double dblTotal = (double) total;
+//			double dblTotal = (double) total;
 			StringBuilder sb = new StringBuilder();
 			sb.append("0.0");
 			for (int i = 0; i < binX; i++) {
@@ -401,16 +554,39 @@ public class CalculateSplitRates {
 		}
 	}
 
+	/**
+	 * @param args args[0] = Beast tree log,
+	 *             args[1] = max number of trees to read
+	 *             args[2] = number of burnin trees to discard
+	 *             args[3] = proportion file name,
+	 *             args[4] = density map filename
+	 */
+
 	public static void main(String[] args) {
 		try {
 			NexusImporter importer = new NexusImporter(
 					new BufferedReader(new FileReader(new File(args[0]))));
 
-			//List<Tree> treeList = importer.importTrees();
 			CalculateSplitRates calculator =
 					new CalculateSplitRates(importer);
-			calculator.loadTrees();
-			calculator.displayStatistics();
+			calculator.loadTrees(
+					Integer.parseInt(args[1]),
+					Integer.parseInt(args[2])
+			);
+			//	calculator.getLongestClock();
+
+//			try {
+			PrintWriter printWriter = new PrintWriter(args[3]);
+			calculator.writeLongestDwellTimeInfo(printWriter);
+			printWriter.close();
+
+//			}
+
+			printWriter = new PrintWriter(args[4]);
+			calculator.writeDensityMap(printWriter);
+			printWriter.close();
+
+			//calculator.displayStatistics();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -420,6 +596,28 @@ public class CalculateSplitRates {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 		System.exit(0);
+	}
+
+	public int numRateBoxes = 25;
+	public int numTimeBoxes = 100;
+	public double edgeFraction = 0.05;
+
+	private void writeDensityMap(PrintWriter printWriter) {
+		densityMap = createDensityMap(numRateBoxes, numTimeBoxes);
+		printWriter.println(densityMap.toString());
+
+	}
+
+	private void writeLongestDwellTimeInfo(PrintWriter printWriter) {
+		printWriter.print("DwellTime\tTreeLength\tProportion\n");
+		for (RootedTree tree : treeList) {
+			Map<Double, Double> map = getClockDwellTimes(tree);
+			double longestDwell = getLongestClockDwellTime(map);
+			//double rate = map.
+			double treeLenght = getTreeLength(tree);
+			double proportion = longestDwell / treeLenght;
+			printWriter.printf("%5.4f\t%5.4f\t%5.4f\n", longestDwell, treeLenght, proportion);
+		}
 	}
 
 }
