@@ -351,9 +351,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     void toggleExpandContract(final Node selectedNode) {
-       autoExpantion = false;
-       autoEx.setSelected(false);
-       expandContract(selectedNode);
+        if( canSelectNode(selectedNode) ) {
+            autoExpantion = false;
+            autoEx.setSelected(false);
+            expandContract(selectedNode);
+        }
     }
 
     private void setTreeAttributesForAutoExpansion() {
@@ -1310,11 +1312,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 yOffset = ((height - (treeBounds.getHeight() * yScale)) / 2) - (treeBounds.getY() * yScale);
             } else {
 
-                if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
+                if( tbh.getRange(true, xorigion, yScale) <= availableW ) {
+                //if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
                     xorigion = tbh.getOrigion(true, yScale);
                     treeScale = yScale;
                 } else {
-                    assert yorigion + xScale * treeBounds.getHeight() <= availableH;
+                    assert tbh.getRange(false, yorigion, xScale) <= availableH;
+                    //assert yorigion + xScale * treeBounds.getHeight() <= availableH;
                     yorigion = tbh.getOrigion(false, xScale);
                     treeScale  = xScale;
                 }
@@ -1325,11 +1329,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 xOffset = xorigion - treeBounds.getX() * treeScale;
                 yOffset = yorigion - treeBounds.getY() * treeScale;
                 double xRange = tbh.getRange(true, xorigion, treeScale);
-                double dx = (availableW - xRange)/2;
+                final double dx = (availableW - xRange)/2;
                 xOffset += dx;
                 double yRange = tbh.getRange(false, yorigion, treeScale);
-                double dy = (availableH - yRange)/2;
-                yOffset += dy > 0 ? dy : 0;
+                final double dy = (availableH - yRange)/2;
+                yOffset += dy; //  > 0 ? dy : 0;
                 //System.out.println("xof/yof " + xOffset + "/" + yOffset);
             }
 
@@ -1667,7 +1671,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             final double thecos = sincos[1];
 
             double dx = thecos * pts[ixmax] -  thesin * pts[ixmax + 1];
-            assert dx >= 0 : dx + " " + thecos + " " + thesin;
+            if( Double.isNaN(dx) ) {
+              assert dx >= 0 : dx + " " + thecos + " " + thesin;
+            }
 
             final Point2D start = taxonPath.getP1();
             final Point2D end = taxonPath.getP2();
@@ -1712,7 +1718,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 origin = minOrigin/2;
             }
 
-            while( true ) {
+            int nit = 0;
+            while( nit < 100 ) {
+                ++nit; // safty net, should converge long before that
                 double scaleMin = -Double.MAX_VALUE;
                 for(int k = 0; k < nv; k += 3) {
                     if( values[k] != 0.0 ) {
@@ -1727,8 +1735,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         scaleMin = Math.max(scaleMin, lim);
                     }
                 }
-                // origin < minOrigin ||
-                if( origin < minOrigin || (float)scaleMin <= (float)scale ) {
+           
+                boolean b = scaleMin <= scale || nit > 10 &&  scaleMin - scale < 1e-5;
+                if( origin < minOrigin && b) {
                     break;
                 }
                 origin = -Double.MAX_VALUE;
