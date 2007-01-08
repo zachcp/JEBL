@@ -9,12 +9,9 @@ import jebl.util.FixedBitSet;
 import java.util.*;
 
 /**
- * Work in progress. may contain serious bugs
  *
- * Given a set of trees determine the most probable tree, i.e. the most frequent topology.
- * Set branch lengths / node heights conditional on this topology.
- *
- *
+ * Given a set of trees determine the most probable trees, i.e. the most frequent topologies.
+ * Set branch lengths / node heights from set conditional on topology.
  *
  * @author Joseph Heled
  * @version $Id$
@@ -110,8 +107,8 @@ public class MostProbableTopology {
         }
 
         // add one more
-        public void add(double x) {
-            hSum += x;
+        public void add(double v) {
+            hSum += v;
             ++count;
         }
 
@@ -153,7 +150,7 @@ public class MostProbableTopology {
             traverse(call, t.getAdjacencies(tip).get(0), tip );
         }
 
-        // Traverse all edges in partition containingn n when edge (n, root) is removed.
+        // Traverse all edges in partition containing n when edge (n, root) is removed.
 
         private FixedBitSet traverse(EdgeCallback call, Node n, Node root) {
             final FixedBitSet tipSet = new FixedBitSet(taxa.size());
@@ -172,6 +169,7 @@ public class MostProbableTopology {
             if( needComplement )  {
                 tipSet.complement();
             }
+
             try {
                 call.visit( t.getEdge(n, root), tipSet);
             } catch (Graph.NoEdgeException e) {
@@ -179,7 +177,7 @@ public class MostProbableTopology {
             }
 
             // we can't simply flip back because map does not copy it's key.
-            // second time I made the same mistake
+            // second time I forget this
             if( needComplement ) {
                 final FixedBitSet b = new FixedBitSet(tipSet);
                 b.complement();
@@ -316,15 +314,13 @@ public class MostProbableTopology {
                 }
             } );
         }
-
-
     }
 
     /**
      * Get the most probable tree(s)
      *
-     * @param max At most this number of trees
-     * @param threshold (in [01]) Do not include topologies whose frequencey is less than that.
+     * @param max At most this number of trees (max <= 0 is ignored)
+     * @param threshold (in [01]) return first K topologies whose total frequencey is greater that threshold.
      * @return probable trees
      */
     public List<Tree> get(final int max, final double threshold) {
@@ -365,31 +361,27 @@ public class MostProbableTopology {
         // collect candidates
         final List<Info> candidates = new ArrayList<Info>();
 
-        final int th = threshold > 0 ? (int)(threshold * nTrees) : 1;
+        //final int th = threshold > 0 ? (int)(threshold * nTrees) : 1;
+        final int th = (int)(threshold * nTrees);
 
-        while (queue.peek() != null) {
+        while (queue.peek() != null && candidates.size() < th && !(max > 0 && candidates.size() >= max) ) {
             Map.Entry<String, TopologyEntry> e = queue.poll();
             final MostProbableTopology.TopologyEntry info = e.getValue();
-            if( info.count >= th ) {
-                // make a copy
-                final Tree tree = trees.get(info.representativeIndex);
 
-                Info candidate;
-                if( rootedSet ) {
-                    SimpleRootedTree r = new SimpleRootedTree((RootedTree) tree);
-                    candidate = new TreeInfo(r);
-                } else {
-                    SimpleTree t = new SimpleTree(tree);
-                    candidate = new UnrootedTreeInfo(t);
-                }
+            // make a copy
+            final Tree tree = trees.get(info.representativeIndex);
 
-                candidates.add(candidate);
-                candidate.getTree().setAttribute(consAttributeName, (100.0 * info.count) / nTrees);
+            Info candidate;
+            if( rootedSet ) {
+                SimpleRootedTree r = new SimpleRootedTree((RootedTree) tree);
+                candidate = new TreeInfo(r);
+            } else {
+                SimpleTree t = new SimpleTree(tree);
+                candidate = new UnrootedTreeInfo(t);
             }
 
-            if( max > 0 && candidates.size() >= max ) {
-                break;
-            }
+            candidates.add(candidate);
+            candidate.getTree().setAttribute("Frequency", (100.0 * info.count) / nTrees);
         }
 
         // Now go over the set of trees, and for each node/edge record the value in all
@@ -445,7 +437,7 @@ public class MostProbableTopology {
             return standardTop(r, r.getRootNode());
         }
 
-       // unrooted tree. Root at internal node near first taxa, call rooted method
+        // unrooted tree. Root at internal node near first taxa, call rooted method
         final List<Node> adj = t.getAdjacencies(t.getNode(taxa.get(0)));           assert( adj.size() == 1 );
         final RootedTree r = new RootedFromUnrooted(t, adj.get(0), true);
         return standardTop(r, r.getRootNode());

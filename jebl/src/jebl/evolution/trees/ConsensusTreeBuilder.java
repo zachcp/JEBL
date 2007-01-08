@@ -24,7 +24,7 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
 	private String supportAttributeName;
 	private boolean supportAsPercent;
 
-	/**
+    /**
      * Supported consesus methods.
      */
     public enum Method { GREEDY("Greedy"), MRCAC("MRCA Clustering");
@@ -84,7 +84,20 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
         }
     }
 
-	public String getSupportAttributeName() {
+    abstract public String getMethodDescription(); 
+    protected String getSupportDescription(double supportThreshold) {
+        String supporDescription;
+        if( supportThreshold == 1.0 ) {
+           supporDescription = "strict";
+        } else if( supportThreshold == .5 ) {
+           supporDescription = "majority";
+        } else {
+            supporDescription = "above " + (100*supportThreshold) + "% support";
+        }
+        return supporDescription;
+    }
+
+    public String getSupportAttributeName() {
 		return supportAttributeName;
 	}
 

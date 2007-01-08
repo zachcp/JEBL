@@ -78,6 +78,9 @@ public class TreeBuilderFactory {
     }
 
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold, ConsensusMethod method) {
+        if( ! (supportThreshold >= 0 && supportThreshold <= 1) ) {
+             throw new IllegalArgumentException("support not in [01]");
+        }
         switch( method ) {
             case GREEDY: {
                 return new GreedyUnrootedConsensusTreeBuilder(trees, outGroup, supportThreshold);
@@ -88,6 +91,10 @@ public class TreeBuilderFactory {
     }
 
     static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold, ConsensusMethod method) {
+        if( ! (supportThreshold >= 0 && supportThreshold <= 1) ) {
+             throw new IllegalArgumentException("support not in [01]");
+        }
+
         switch( method ) {
             case GREEDY: {
                 return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
@@ -104,7 +111,7 @@ public class TreeBuilderFactory {
      * convenience method. Convert arrays of trees, guaranteed to be rooted to the array of the appropriate
      * type.
      * @param trees trees - all must be rooted
-     * @param supportThreshold minimum required consensus support
+     * @param supportThreshold minimum required consensus support (in [01])
      * @param method which consensus method to use
      * @return consensus tree builder
      */

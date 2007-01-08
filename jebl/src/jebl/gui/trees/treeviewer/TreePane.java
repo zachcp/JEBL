@@ -1532,7 +1532,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     }
 
                     final TreeDrawableElementNodeLabel e =
-                        new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 9,
+                        new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 8,
                                                           null, ((BasicLabelPainter) branchLabelPainter), "branch");
 
                     treeElements.add(e);

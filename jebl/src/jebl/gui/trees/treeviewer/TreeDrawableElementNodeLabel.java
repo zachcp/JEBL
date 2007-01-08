@@ -94,7 +94,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
             name = tree.getTaxon(node).getName();
 
         } else {
-            name =Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node);
+            name = Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node);
         }
         return name + (dtype != null ? "(" + dtype + ")" : "");
     }

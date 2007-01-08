@@ -64,6 +64,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
         }
 
         final Node mainSelectedNode = selectedNode[0];
+
         final boolean alreadySelected = treePane.getSelectedNodes().contains(mainSelectedNode);
         switch (mode) {
             case NODE:

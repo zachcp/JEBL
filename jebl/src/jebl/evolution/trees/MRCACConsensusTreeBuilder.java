@@ -47,6 +47,10 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
         return earliestCommonAncestorClustering(supportThreshold);
     }
 
+    public String getMethodDescription() {
+        return "MRCA " + getSupportDescription(supportThreshold);
+    }
+
 
     class TreeInfo {
         // for each tree, establish a postorder order, and in each internal node the subsets of decendentants

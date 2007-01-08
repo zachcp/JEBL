@@ -100,8 +100,8 @@ public abstract class TreeDrawableElement {
     enum ElementSortMethod {SORTO, SORTX, SORTY}
 
     // debugging
-    static boolean expensiveAssert = true;
-    static boolean smallAsserts = true;
+    static boolean expensiveAssert = false;
+    static boolean smallAsserts = false;
     static boolean prints = false;
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
@@ -264,11 +264,15 @@ public abstract class TreeDrawableElement {
         Comparator<? super TreeDrawableElement> comparator = new Comparator<TreeDrawableElement>() {
             public int compare(TreeDrawableElement o1, TreeDrawableElement o2) {
                 final int dp = o2.getPriority() - o1.getPriority();
-                if( dp == 0 ) {
-                    // enforce arbitrary order on node with equal priority for repeatability
-                    return o2.getNode().hashCode() - o1.getNode().hashCode();
+                if( dp != 0 ) {
+                    return dp;
                 }
-                return dp;
+                // enforce arbitrary order on element with equal priority for repeatability
+
+                //return o1.hashCode() - o2.hashCode();
+                int dn = o1.getNode().hashCode() - o2.getNode().hashCode();
+
+                return dn;
             }
         };
         
@@ -349,7 +353,7 @@ public abstract class TreeDrawableElement {
                 --size;
             }
 
-            assert size >= e.getMinSize() : "for " + e.getDebugName();
+            assert size >= e.getMinSize() : "for " + e.getDebugName() + " (" + size + " >= " + e.getMinSize();
 
             // try to get elements with same priority to the same size if possible
             int priority = e.getPriority();

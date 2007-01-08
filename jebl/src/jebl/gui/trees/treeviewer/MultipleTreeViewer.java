@@ -83,17 +83,17 @@ public class MultipleTreeViewer extends TreeViewer {
                 if( useNames ) {
                     final List<String> names = new ArrayList<String>();
                     for( Tree t : trees ) {
-                        Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
-                        if( name == null || names.contains(name.toString())) {
-                            name = trees.indexOf(t);
-                        }
-                        names.add(name.toString());
+                        final Object oname = t.getAttribute(NexusExporter.treeNameAttributeKey);
+                        final String i = "" + (1+trees.indexOf(t)) + "/" + trees.size();
+                        final String name = oname == null ? i : oname.toString() + " (" + i + ")";
+
+                        names.add(name);
                     }
                     final JSpinner spinner1 = new JSpinner(new SpinnerListModel(names));
 
                     spinner1.addChangeListener(new ChangeListener() {
                         public void stateChanged(ChangeEvent changeEvent) {
-                            setCurrentTree(trees.get( names.indexOf( spinner1.getValue()) ) );
+                            setCurrentTree(trees.get( names.indexOf( (String)spinner1.getValue()) ) );
                         }
                     });
                     optionsPanel.addComponentWithLabel("Tree:", spinner1);

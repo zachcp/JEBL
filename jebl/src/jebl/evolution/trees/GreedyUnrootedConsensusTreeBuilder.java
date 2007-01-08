@@ -75,6 +75,10 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
         this.supportThreshold = supportThreshold;
     }
 
+    public String getMethodDescription() {
+        return "Greedy " + getSupportDescription(supportThreshold);
+    }
+
     /**
      * One clade support.
      */

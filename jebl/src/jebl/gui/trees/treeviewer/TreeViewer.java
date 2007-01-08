@@ -10,6 +10,7 @@
 package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.io.NexusExporter;
 import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
@@ -24,6 +25,7 @@ import jebl.gui.trees.treeviewer.treelayouts.PolarTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RadialTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
+import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.*;
 import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.util.IconUtils;
@@ -202,6 +204,22 @@ public class TreeViewer extends JPanel implements Printable {
 
         // load appropriate tree layout from preferences and set it
         setTreeLayoutType(getDefaultTreeLayoutType());
+
+        infoArea.setText("");
+        // make this settable?
+        NumberFormatter formatter = new NumberFormatter(4);
+        for( String an : inTree.getAttributeNames() ) {
+            if( ! an.startsWith("&") && !an.equals(NexusExporter.treeNameAttributeKey) ) {
+                Object o = inTree.getAttribute(an);
+                String v;
+                if( o instanceof Double ) {
+                    v = formatter.getFormattedValue((Double) o);
+                } else {
+                    v = o.toString();
+                }
+                infoArea.append(an + ": " + v + "\n");
+            }
+        }
     }
 
     public void setTree(Tree tree) {
@@ -214,6 +232,7 @@ public class TreeViewer extends JPanel implements Printable {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
 
+    private JTextArea infoArea = null;
 
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
@@ -236,9 +255,10 @@ public class TreeViewer extends JPanel implements Printable {
 
                 JPanel treeViewPanel = new JPanel();
                 treeViewPanel.setLayout(new BoxLayout(treeViewPanel, BoxLayout.LINE_AXIS));
-                Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/rectangularTree.png");
-                Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/polarTree.png");
-                Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), "/jebl/gui/trees/treeviewer/images/radialTree.png");
+                final String imagePath = "/jebl/gui/trees/treeviewer/images/";
+                Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "rectangularTree.png");
+                Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "polarTree.png");
+                Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "radialTree.png");
                 final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
                 final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
                 final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
@@ -362,6 +382,12 @@ public class TreeViewer extends JPanel implements Printable {
 
             controlsList.add(controls);
 
+            JPanel jPanel = new JPanel();
+            infoArea = new JTextArea();
+            jPanel.add(infoArea);
+            controlsList.add(new Controls("Info", jPanel, true));
+            infoArea.setText("info");
+            
             return controlsList;
         }
 
@@ -380,6 +406,7 @@ public class TreeViewer extends JPanel implements Printable {
         private JLabel verticalExpansionLabel;
 
         private Controls controls = null;
+
     };
 
     public void setTreeLayoutType(TreeLayoutType treeLayoutType) {

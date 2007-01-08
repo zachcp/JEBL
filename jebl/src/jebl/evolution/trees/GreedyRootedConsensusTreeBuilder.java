@@ -39,6 +39,11 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
 	    this.supportThreshold = supportThreshold;
 	}
 
+    public String getMethodDescription() {
+        String supporDescription = getSupportDescription(supportThreshold);
+        return "Greedy " + supporDescription;
+    }
+
     /**
      * One clade support.
      */
