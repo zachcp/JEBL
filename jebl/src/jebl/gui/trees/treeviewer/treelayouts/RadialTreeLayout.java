@@ -327,7 +327,18 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
                 final Point2D childPoint = constructNode(child, a1, a2, x, y, childLength);
 
-                Line2D branchPath = new Line2D.Double(x, y, childPoint.getX(), childPoint.getY());
+                double toY = childPoint.getY();
+                double toX = childPoint.getX();
+                if( childLength == 0 ) {
+                   final double a = (a1 + a2) / 2.0;
+                    double epsilon = 1e-9;
+                    final double dx = Math.cos(a);
+                    final double dy = Math.sin(a);
+                    toX = x + epsilon * dx;
+                    toY = y + epsilon * dy;
+                }
+
+                Line2D branchPath = new Line2D.Double(x, y, toX, toY);
 
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
