@@ -35,12 +35,15 @@ public class ImportException extends Exception {
 	public static class ShortSequenceException extends ImportException {
 		public ShortSequenceException() { super(); }
 		public ShortSequenceException(String message) { super(message); }
-	}
+        public String userMessage() { return "Sequence is too short: " + getMessage(); }
+    }
 
 	public static class TooFewTaxaException extends ImportException {
 		public TooFewTaxaException() { super(); }
 		public TooFewTaxaException(String message) { super(message); }
-	}
+        public String userMessage() { return "Number of taxa is less than expected: " +
+                (getMessage() != null ? getMessage() : ""); }
+    }
 
     public static class DuplicateTaxaException extends ImportException {
 		public DuplicateTaxaException() { super(); }
