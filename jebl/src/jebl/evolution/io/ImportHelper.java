@@ -322,6 +322,8 @@ public class ImportHelper {
                     if (ch == startComment) {
                         skipComments(ch);
                         ch = read();
+                        // ch may be eol!!
+                        continue;
                     }
                 }
 
