@@ -97,7 +97,11 @@ public class ScoresFactory {
                // new NucleotideScores("93% similarity, Transition/Transversion", 5*1, 5*-1, 5*-5, 0),
 
               //  new NucleotideScores("88% similarity", 5.0f, -7.2810419984342278f),
-                new NucleotideScores("93% similarity", 5.0f, -9.0261674571825044f), 
+                new NucleotideScores("93% similarity", 5.0f, -9.0261674571825044f),
+
+
+//                new NucleotideScores("Assembly", 10.0f, -9.0f),
+
 /*                new NucleotideScores("Identity",1,0, 0, 0),*/
 
                 /*,new Hamming()*/};
