@@ -41,7 +41,7 @@ public class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<Roote
 
     public String getMethodDescription() {
         String supporDescription = getSupportDescription(supportThreshold);
-        return "Greedy " + supporDescription;
+        return supporDescription + " greedy clustering";
     }
 
     /**

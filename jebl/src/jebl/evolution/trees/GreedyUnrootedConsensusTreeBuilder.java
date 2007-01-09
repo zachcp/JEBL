@@ -76,7 +76,7 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
     }
 
     public String getMethodDescription() {
-        return "Greedy " + getSupportDescription(supportThreshold);
+        return getSupportDescription(supportThreshold) + " greedy clustering";
     }
 
     /**

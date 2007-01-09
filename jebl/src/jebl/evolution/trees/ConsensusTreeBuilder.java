@@ -85,14 +85,15 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
     }
 
     abstract public String getMethodDescription(); 
+
     protected String getSupportDescription(double supportThreshold) {
         String supporDescription;
         if( supportThreshold == 1.0 ) {
-           supporDescription = "strict";
+           supporDescription = "Strict";
         } else if( supportThreshold == .5 ) {
-           supporDescription = "majority";
+           supporDescription = "Majority";
         } else {
-            supporDescription = "above " + (100*supportThreshold) + "% support";
+            supporDescription = "Above " + (100*supportThreshold) + "% support";
         }
         return supporDescription;
     }

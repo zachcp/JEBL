@@ -48,7 +48,7 @@ public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
     }
 
     public String getMethodDescription() {
-        return "MRCA " + getSupportDescription(supportThreshold);
+        return getSupportDescription(supportThreshold) + " MRCACC";
     }
 
 

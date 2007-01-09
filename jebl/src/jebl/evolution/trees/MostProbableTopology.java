@@ -3,6 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.io.NexusExporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.FixedBitSet;
 
@@ -373,15 +374,17 @@ public class MostProbableTopology {
 
             Info candidate;
             if( rootedSet ) {
-                SimpleRootedTree r = new SimpleRootedTree((RootedTree) tree);
+                final SimpleRootedTree r = new SimpleRootedTree((RootedTree) tree);
                 candidate = new TreeInfo(r);
             } else {
-                SimpleTree t = new SimpleTree(tree);
+                final SimpleTree t = new SimpleTree(tree);
                 candidate = new UnrootedTreeInfo(t);
             }
 
             candidates.add(candidate);
-            candidate.getTree().setAttribute("Frequency", (100.0 * info.count) / nTrees);
+            final Tree tree1 = candidate.getTree();
+            tree1.setAttribute("Frequency", (100.0 * info.count) / nTrees);
+            tree1.setAttribute(NexusExporter.treeNameAttributeKey, "topology_" + candidates.size());
         }
 
         // Now go over the set of trees, and for each node/edge record the value in all

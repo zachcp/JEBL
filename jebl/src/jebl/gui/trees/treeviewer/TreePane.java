@@ -1392,11 +1392,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         }
-//
-//        {
-//          double dx = treeBounds.getX() - transform.getTranslateX();
-//          double dy =  treeBounds.getWidth() - (xh-xl);
-//        }
         
         // Clear previous values of taxon label bounds and transforms
         taxonLabelBounds.clear();
@@ -1441,8 +1436,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                 final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, 10,
-                                                          nodeWithLongestTaxon, (BasicLabelPainter) taxonLabelPainter
-                        ,null);
+                                                         nodeWithLongestTaxon, (BasicLabelPainter) taxonLabelPainter,
+                        null);
 
                 treeElements.add(e);
             }

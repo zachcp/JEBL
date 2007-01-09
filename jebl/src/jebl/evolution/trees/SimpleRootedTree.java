@@ -93,10 +93,12 @@ final public class SimpleRootedTree implements RootedTree {
 
         if( nodeMapping != null ) nodeMapping.put(node, newNode);
 
-        final Map<String, Object> map = node.getAttributeMap();
-        if( map.size() > 0 ) {
-            newNode.getAttributeMap().putAll(map);
+//        final Map<String, Object> map = node.getAttributeMap();
+//        if( ! map.isEmpty() ) {
+        for( Map.Entry<String, Object> e : node.getAttributeMap().entrySet() ) {
+            newNode.setAttribute(e.getKey(), e.getValue());
         }
+        // }
         setHeight(newNode, tree.getHeight(node));
 
         return newNode;
