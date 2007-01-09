@@ -365,7 +365,7 @@ public class MostProbableTopology {
         //final int th = threshold > 0 ? (int)(threshold * nTrees) : 1;
         final int th = (int)(threshold * nTrees);
 
-        while (queue.peek() != null && candidates.size() < th && !(max > 0 && candidates.size() >= max) ) {
+        while (queue.peek() != null && candidates.size() <= th && !(max > 0 && candidates.size() >= max) ) {
             Map.Entry<String, TopologyEntry> e = queue.poll();
             final MostProbableTopology.TopologyEntry info = e.getValue();
 
