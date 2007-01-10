@@ -387,7 +387,7 @@ public class TreeViewer extends JPanel implements Printable {
             infoArea = new JTextArea();
             jPanel.add(infoArea);
             controlsList.add(new Controls("Info", jPanel, true));
-            infoArea.setText("info");
+            //infoArea.setText("info");
             
             return controlsList;
         }
