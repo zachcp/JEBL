@@ -116,6 +116,7 @@ public class TreeViewer extends JPanel implements Printable {
 
         JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setMinimumSize(new Dimension(150, 150));
+        treePane.setViewPort(scrollPane.getViewport());
 
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();

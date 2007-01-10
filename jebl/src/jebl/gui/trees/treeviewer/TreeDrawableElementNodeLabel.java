@@ -75,6 +75,8 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
                 painter.calibrate(g2);
             }        
 
+            if(prints>1) System.out.println("before " + getDebugName() + " at " + curSize + " to " + size  + " transorm " + transform);
+
             final double dx = newBounds.getWidth() - bounds.getWidth();
             final double dy = newBounds.getHeight() - bounds.getHeight();
 
@@ -82,8 +84,9 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
             if( taxonLabelJustification != Painter.Justification.CENTER ) {
                 transform.translate(taxonLabelJustification == Painter.Justification.RIGHT ? -dx : 0 , -dy/2);
             } else {
-                transform.translate(-dx/2, -dy/2);
+                transform.translate(-dx/2, -dy);
             }
+            if(prints>1) System.out.println("change size of " + getDebugName() + " to " + size  + " transorm " + transform);
             curSize = size;
         }
     }

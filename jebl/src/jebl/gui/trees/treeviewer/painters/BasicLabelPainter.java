@@ -291,7 +291,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 case CENTER:
                     //xOffset = (float)(-rect.getWidth()/2.0);
                     //y = yOffset + (float) rect.getY();
-                    y = (float)bounds.getHeight()/2;
+                   // y = (float)bounds.getHeight()/2;
                     //xOffset = (float) (bounds.getX() + (bounds.getWidth() - rect.getWidth()) / 2.0);
                     break;
                 case FLUSH:

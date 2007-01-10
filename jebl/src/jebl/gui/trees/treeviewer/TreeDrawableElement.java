@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -65,11 +66,22 @@ public abstract class TreeDrawableElement {
 
     protected abstract void drawIt(Graphics2D g2);
 
-    public final void draw(Graphics2D g2) {
+    public final void draw(Graphics2D g2, JViewport vp) {
         if( ! visible ) {
             return;
         }
-        drawIt(g2);
+
+        boolean doit = true;
+        if( vp != null ) {
+            final Rectangle2D d = getBounds();
+//            final Point viewPosition = vp.getViewPosition();
+//            final Rectangle rectangle = vp.getBounds();
+//            rectangle.translate(viewPosition.x, viewPosition.y);
+            doit = vp.getViewRect().intersects(d);
+        }
+        if( doit ) {
+            drawIt(g2);
+        }
     }
 
     abstract public int getMinSize();
@@ -102,7 +114,7 @@ public abstract class TreeDrawableElement {
     // debugging
     static boolean expensiveAssert = false;
     static boolean smallAsserts = false;
-    static boolean prints = false;
+    static int prints = 0;
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
@@ -202,7 +214,7 @@ public abstract class TreeDrawableElement {
                     }
                 }
             }
-            if(prints) System.out.println("checking " + k + " " + ek.getDebugName() + "(" + ek.getCurrentSize() + ")");
+            if(prints>0) System.out.println("checking " + k + " " + ek.getDebugName() + "(" + ek.getCurrentSize() + ")");
 
             for(int j = last; j < k; ++j) {
                 final TreeDrawableElement ej = list.get(j);
@@ -215,7 +227,7 @@ public abstract class TreeDrawableElement {
                 }
 
                 ++nChecks;
-                if(prints) System.out.print("  against " + j +  ej.getDebugName() + "(" + ej.getCurrentSize() + ")");
+                if(prints>0) System.out.print("  against " + j +  ej.getDebugName() + "(" + ej.getCurrentSize() + ")");
 
                 if( intersects(ek, ej) ) {
                     // add ej on ek conflict list and vice versa
@@ -229,14 +241,14 @@ public abstract class TreeDrawableElement {
                     }
                     conflicts.get(ej).add(ek);
 
-                    if(prints) System.out.println(" - overlapps " );
+                    if(prints>0) System.out.println(" - overlapps " );
                 }  else {
-                    if(prints) System.out.println(" - non overlapp");
+                    if(prints>0) System.out.println(" - non overlapp");
                 }
             }
         }
 
-        if (prints)
+        if (prints>0)
             System.out.println("using " + s.toString() + " did " + nChecks + " intersect checks for "
                     + list.size() +" elemens " + (nChecks*100.0) / (list.size()*(list.size()-1)/2));
 
@@ -250,7 +262,7 @@ public abstract class TreeDrawableElement {
 
         final Set<TreeDrawableElement> clashingElements = conflicts.keySet();
 
-        if( prints ) {
+        if( prints>0 ) {
              for (TreeDrawableElement e : clashingElements) {
                  System.out.print(e.getDebugName() + " clashes:");
                  for( TreeDrawableElement c : conflicts.get(e) ) {
@@ -328,7 +340,7 @@ public abstract class TreeDrawableElement {
             int size = e.getMaxSize();
             e.setSize(size, g2);
 
-            if(prints) System.out.println("** Start for " + e.getDebugName() + " (" + e.getCurrentSize() + ")");
+            if(prints>0) System.out.println("** Start for " + e.getDebugName() + " (" + e.getCurrentSize() + ")");
 
             // loop until finding a size where no overlaps. this must be the case
             // for the min size
@@ -337,12 +349,12 @@ public abstract class TreeDrawableElement {
                 int nc = 0;
                 for(; nc < overlapping.size(); ++nc) {
                    if( intersects(e, overlapping.get(nc) ) ) {
-                        if(prints) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                        if(prints>0) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
                          + " overlaps " + overlapping.get(nc).getDebugName() +
                          " (" + overlapping.get(nc).getCurrentSize() + ")" );
                        break;
                    }
-                   if(prints) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                   if(prints>0) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
                          + " is ok with " + overlapping.get(nc).getDebugName() +
                          " (" + overlapping.get(nc).getCurrentSize() + ")" );
                 }
@@ -353,7 +365,7 @@ public abstract class TreeDrawableElement {
                 --size;
             }
 
-            assert size >= e.getMinSize() : "for " + e.getDebugName() + " (" + size + " >= " + e.getMinSize();
+            if(smallAsserts) assert size >= e.getMinSize() : "for " + e.getDebugName() + " (" + size + " >= " + e.getMinSize();
 
             // try to get elements with same priority to the same size if possible
             int priority = e.getPriority();
@@ -373,7 +385,7 @@ public abstract class TreeDrawableElement {
                     // size for overlapping element
                     int ecSize = ecs;
                     
-                    if(prints) System.out.println("resolve conflict of " + e.getDebugName() + " with " + ec.getDebugName() + " - " + ecs);
+                    if(prints>0) System.out.println("resolve conflict of " + e.getDebugName() + " with " + ec.getDebugName() + " - " + ecs);
                     if( smallAsserts  ) {
                         assert !intersects(e, ec);
                     }
@@ -446,7 +458,7 @@ public abstract class TreeDrawableElement {
                                 System.out.println(ek.getDebugName() + " (" + ek.getCurrentSize() + ") & "
                                         + ej.getDebugName() + " (" + ej.getCurrentSize() + ")");
                             }
-                           // assert !b;
+                            assert !b;
                         }
                     }
                 }

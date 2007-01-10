@@ -1077,7 +1077,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
-                e.draw(g2);
+                e.draw(g2, viewport);
             }
         }
 
@@ -1488,8 +1488,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
+
+           // float sss = ((BasicLabelPainter)branchLabelPainter).getFontSize();
+       //     for(int k = 0; k < 2; ++k) {
+//                if(k == 0)  ((BasicLabelPainter)branchLabelPainter).setFontSize(((BasicLabelPainter)branchLabelPainter).getFontMinSize(), false) ;
+//                if(k == 1)  ((BasicLabelPainter)branchLabelPainter).setFontSize(sss, false) ;
+
             branchLabelPainter.calibrate(g2);
             final double labelHeight = branchLabelPainter.getPreferredHeight();
+
+            //System.out.println("transform " + transform);
 
             for( Node node : tree.getNodes() ) {
                 if( hideNode(node) || !isNodeVisible(node) ) continue;
@@ -1509,10 +1517,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     // Work out how it is rotated and create a transform that matches that
                     AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, false);
 
+//                    System.out.print( Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node)
+//                            + " " + labelWidth + "x" + labelHeight + " " +
+//                            ((BasicLabelPainter)branchLabelPainter).getFontSize() + " " + labelTransform);
+
                     // move to middle of branch - since the move is before the rotation
                     // and center label by moving an extra half width of label
                     final double direction = just == Painter.Justification.RIGHT ? 1 : -1;
-                    labelTransform.translate(-labelWidth/2 + -direction * xScale * branchLength / 2, -5);
+                    labelTransform.translate(-labelWidth/2 + -direction * xScale * branchLength / 2, -5 - labelHeight/2);
 
                     if( preElementDrawCode ) {
                         // Store the transformed bounds in the map for use when selecting  (not anymore JH)
@@ -1525,12 +1537,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         // Store the alignment in the map for use when drawing
                         //branchLabelJustifications.put(node, just);
                     }
-
+                  //  System.out.println(" -> " + labelTransform);
+                  //  if( k == 0 ) continue;
+                    
                     final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 8,
                                                           null, ((BasicLabelPainter) branchLabelPainter), "branch");
 
                     treeElements.add(e);
+                //}
                 }
             }
         }
@@ -1591,13 +1606,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         // to shift it by the entire width of the string.
         final double ty = origin.getY() - (height / 2.0);
         double tx = origin.getX();
-        if (!just || line.getX2() > line.getX1()) {
-            tx += labelXOffset;
-        } else {
-            tx -= (labelXOffset + width);
+        if( just) {
+            if (!just || line.getX2() > line.getX1()) {
+                tx += labelXOffset;
+            } else {
+                tx -= (labelXOffset + width);
+            }
         }
         lineTransform.translate(tx, ty);
         return lineTransform;
+    }
+
+    public void setViewPort(JViewport viewport) {
+        this.viewport = viewport;
     }
 
     private class TreeBoundsHelper {
@@ -1608,10 +1629,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         double availableH;
         Rectangle2D treeBounds;
 
-        public TreeBoundsHelper(int n, double availableW, double availableH, Rectangle2D treeBounds) {
-            n = 3 * (n + 2);
-            xbounds = new double[n];
-            ybounds = new double[n];
+        public TreeBoundsHelper(int nValues, double availableW, double availableH, Rectangle2D treeBounds) {
+            // each value imposes a constraints (3 numbers) + 2 for raw height and width
+            nValues = 3 * (nValues + 2);
+            xbounds = new double[nValues];
+            ybounds = new double[nValues];
             nv = 0;
             this.availableH = availableH;
             this.availableW = availableW;
@@ -1793,6 +1815,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         super.setSize(width, height);
     }
+
+    private JViewport viewport = null;
 
     // Tree passed in
     private RootedTree originalTree = null;

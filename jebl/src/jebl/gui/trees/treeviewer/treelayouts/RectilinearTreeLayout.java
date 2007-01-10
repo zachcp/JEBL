@@ -82,11 +82,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
         final List<Node> nodes = tree.getChildren(node);
         final int nNodes = nodes.size();
+        final double ratio = 0.10;
         if( nNodes >= 2 ) {
             final Point2D c1 = getNodePoint(nodes.get(0));
             final Point2D cn = getNodePoint(nodes.get(nodes.size()-1));
 
-            final double d = 0.33 * (cn.getY() - c1.getY()) * transform.getScaleY();
+            final double d = ratio * (cn.getY() - c1.getY()) * transform.getScaleY();
             lim = Math.min(lim, d);
         } else if( nNodes == 0 ) {
             final Node[] rnode = {Utils.rightNb(tree, node), Utils.leftNb(tree, node)};
@@ -97,12 +98,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             for( Node nb : rnode ) {
                 if( nb != null ) {
                     final Point2D pt = getNodePoint(nb);
-                    final double dy = 0.33 * Math.abs((pt.getY() - n.getY())) * transform.getScaleY();
+                    final double dy = ratio * Math.abs((pt.getY() - n.getY())) * transform.getScaleY();
                     double d;
                     if( pt.getX() > n.getX() ) {
                         d = dy;
                     } else {
-                        final double dx = 0.33 * Math.abs((pt.getX() - n.getX())) * transform.getScaleX();
+                        final double dx = ratio * Math.abs((pt.getX() - n.getX())) * transform.getScaleX();
                         d = Math.sqrt(dx*dx + dy*dy);
                     }
 
