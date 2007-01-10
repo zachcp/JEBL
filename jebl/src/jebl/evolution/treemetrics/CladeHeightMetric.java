@@ -5,6 +5,62 @@ import jebl.evolution.graphs.Node;
 import java.util.*;
 
 /**
+ * For each clade_j in treeB, find the MRCA_j of the taxa in clade_j in treeA.
+ *
+ * obviously, if clade_i exists in treeB then clade_i == MRCA_i.
+ *
+ * Then find the sum of squares of the differences in height:
+ *
+ * d = sqrt( sum across i[ (height(clade_i) - height(MRCA_i))^2 ] +
+ * 		sum across j[ (height(clade_j) - height(MRCA_j))^2 ] )
+ *
+ * The rationale is that if a clade moves then this includes the size of movement
+ * across the MRCA node and down again. I.e., a clade that moves from one side
+ * of the tree to the other scores the difference between the height of that node
+ * and the root and back down to the height of the node in the other tree.
+ *
+ *   +---------A               +---------A
+ * +-+                       +-+
+ * | +---------B             | |+--------B
+ * +                 ====>   + ++
+ * | +---------C             |  +--------C
+ * +-+                       |
+ *   +---------D             +-----------D
+ *
+ * 	height(tree1)	tmrca(tree2)	diff
+ * AB 	10		10		0
+ * CD	10		12		2
+ * ABCD	12		12		0
+ *
+ * 	height(tree1)	tmrca(tree2)	diff
+ * BC 	9		12		3
+ * ABC	10		10		0
+ * ABCD	12		12		0
+ *
+ * So the score is sqrt(2^2 + 3^2) = sqrt(13)
+ *
+ * Scores much less than this:
+ *
+ *   +----------A               +----------A
+ * + +                        +-+
+ * | +----------B             | |        +-B
+ * +                 ====>    + +--------+
+ * |        +---C             |          +-C
+ * +--------+                 |
+ *          +---D             +------------D
+ *
+ * 	height(tree1)	tmrca(tree2)	diff
+ * AB 	10		10		0
+ * CD	4		12		8
+ * ABCD	12		12		0
+ *
+ * 	height(tree1)	tmrca(tree2)	diff
+ * BC 	2		12		10
+ * ABC	10		10		0
+ * ABCD	12		12		0
+ *
+ * So the score is sqrt(8^2 + 10^2) = sqrt(164)
+ *
  * @author Andrew Rambaut
  * @version $Id$
  */
