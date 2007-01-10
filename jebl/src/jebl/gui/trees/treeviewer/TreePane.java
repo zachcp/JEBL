@@ -1797,7 +1797,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     // Overridden methods to recalibrate tree when bounds change
     public void setBounds(int x, int y, int width, int height) {
-        calibrated = false;
+        // when moving the viewport x/y change
+        final Rectangle rectangle = getBounds();
+        calibrated = width == rectangle.width && height == rectangle.height;
         super.setBounds(x, y, width, height);
     }
 
