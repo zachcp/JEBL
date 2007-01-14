@@ -989,7 +989,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				String token2 = helper.readToken(",;");
 
 				if (helper.getLastDelimiter() == ',' || helper.getLastDelimiter() == ';') {
-					throw new ImportException.BadFormatException("Missing taxon label in TRANSLATE command of TREES block");
+                    if( token2.length() == 0 && (char)helper.getLastDelimiter() == ';') {
+                        //assume an extra comma at end of list
+                        break;
+
+                    }
+                    throw new ImportException.BadFormatException("Missing taxon label in TRANSLATE command of TREES block");
 				}
 
 				String token3 = helper.readToken(",;");

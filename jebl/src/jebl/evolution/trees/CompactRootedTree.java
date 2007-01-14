@@ -334,6 +334,10 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return conceptuallyUnrooted;
     }
 
+    public void setConceptuallyUnrooted(boolean conceptuallyUnrooted) {
+        this.conceptuallyUnrooted = conceptuallyUnrooted;
+    }
+
     public boolean isRoot(Node node) {
         return ((SimpleRootedNode)node).index == 0;
     }

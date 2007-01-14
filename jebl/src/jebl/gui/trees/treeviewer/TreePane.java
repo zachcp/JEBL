@@ -1763,8 +1763,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     origin = Math.max(origin, l);
                 }
             }
-            assert scale > 0 : scale;
-            assert origin >= 0.0 : origin;
+            assert scale > 0 : scale + " " + nit;
+            assert origin >= 0.0 : origin + " " + nit;
             double[] r = {origin, scale};
             return r;
         }

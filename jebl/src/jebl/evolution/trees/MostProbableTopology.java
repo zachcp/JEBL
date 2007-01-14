@@ -40,9 +40,10 @@ public class MostProbableTopology {
      * @param trees
      */
     public MostProbableTopology(Collection<? extends Tree> trees) {
-       this.trees = new ArrayList<Tree>(trees);
-       rootedSet = this.trees.get(0) instanceof RootedTree;
-       taxa = new ArrayList<Taxon>(trees.iterator().next().getTaxa());
+        this.trees = new ArrayList<Tree>(trees);
+        Tree tree0 = this.trees.get(0);
+        rootedSet = tree0 instanceof RootedTree && !((RootedTree)tree0).conceptuallyUnrooted();
+        taxa = new ArrayList<Taxon>(trees.iterator().next().getTaxa());
     }
 
     /**
