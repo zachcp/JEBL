@@ -1,7 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
 import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.List;
@@ -123,7 +123,11 @@ public abstract class FilteredRootedTree implements RootedTree {
 		return source.isRoot(node);
 	}
 
-	// Attributable IMPLEMENTATION
+    public void renameTaxa(Taxon from, Taxon to) {
+        source.renameTaxa(from, to);
+    }
+
+    // Attributable IMPLEMENTATION
 
 	public void setAttribute(String name, Object value) {
 		source.setAttribute(name, value);

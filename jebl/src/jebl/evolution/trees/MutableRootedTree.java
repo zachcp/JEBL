@@ -395,6 +395,11 @@ public class MutableRootedTree implements RootedTree {
         return externalNodes.get(taxon);
     }
 
+    public void renameTaxa(Taxon from, Taxon to) {
+        MutableRootedNode node = (MutableRootedNode)externalNodes.get(from);
+        node.setTaxa(to);
+    }
+
     /**
      * Returns a list of edges connected to this node
      *
@@ -773,13 +778,18 @@ public class MutableRootedTree implements RootedTree {
             return taxon;
         }
 
+        public void setTaxa(Taxon to) {
+            taxon = to;
+        }
+
         private List<Node> children;
-        private final Taxon taxon;
+        private Taxon taxon;
 
         private Node parent;
         private double height;
         private double length;
 
         private Edge edge = null;
-    };
+
+    }
 }

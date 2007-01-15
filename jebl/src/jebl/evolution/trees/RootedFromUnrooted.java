@@ -195,6 +195,10 @@ public class RootedFromUnrooted implements RootedTree {
         return source.getNode(taxon);
     }
 
+    public void renameTaxa(Taxon from, Taxon to) {
+        source.renameTaxa(from, to);
+    }
+
     /**
      * Returns a list of edges connected to this node
      *

@@ -8,7 +8,9 @@
  */
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.*;
+import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Graph;
+import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
 import java.util.Set;
@@ -78,4 +80,5 @@ public interface Tree extends Graph {
      */
     Node getNode(Taxon taxon);
 
+    void renameTaxa(Taxon from, Taxon to);
 }

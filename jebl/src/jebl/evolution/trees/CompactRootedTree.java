@@ -409,6 +409,15 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return null;
     }
 
+    public void renameTaxa(Taxon from, Taxon to) {
+        for(int n = 0; n < taxa.length; ++n) {
+            if( from.equals(taxa[n]) ) {
+                taxa[n] = to;
+                break;
+            }
+        }
+    }
+
     public List<Edge> getEdges(Node node) {
         List<Edge> e = new ArrayList<Edge>();
         final short index = ((SimpleRootedNode) node).index;

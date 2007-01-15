@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class SortedRootedTree extends FilteredRootedTree {
 
-	public enum BranchOrdering {
+    public enum BranchOrdering {
 		INCREASING_NODE_DENSITY("increasing"),
 		DECREASING_NODE_DENSITY("decreasing");
 

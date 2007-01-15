@@ -65,6 +65,7 @@ final public class SimpleRootedTree implements RootedTree {
      * Clones the entire tree structure from the given RootedTree.
      * @param tree
      * @param node
+     * @return created node
      */
     public Node createNodes(RootedTree tree, Node node) {
         return createNodes(tree, node, (Map<Node, Node>)null);
@@ -325,6 +326,11 @@ final public class SimpleRootedTree implements RootedTree {
      */
     public Node getNode(Taxon taxon) {
         return externalNodes.get(taxon);
+    }
+
+    public void renameTaxa(Taxon from, Taxon to) {
+        SimpleRootedNode node = (SimpleRootedNode)externalNodes.get(from);
+        node.setTaxa(to);
     }
 
     /**
@@ -682,6 +688,10 @@ final public class SimpleRootedTree implements RootedTree {
             return children.size() + 1;
         }
 
+        public void setTaxa(Taxon to) {
+            taxon = to;
+        }
+        
         /**
          * returns the edge connecting this node to the parent node
          * @return the edge
@@ -715,7 +725,7 @@ final public class SimpleRootedTree implements RootedTree {
         }
 
         private List<Node> children;
-        private final Taxon taxon;
+        private Taxon taxon;
 
         private Node parent;
         private double height;

@@ -230,6 +230,11 @@ public final class SimpleTree implements Tree {
         return externalNodes.get(taxon);
     }
 
+    public void renameTaxa(Taxon from, Taxon to) {
+        SimpleNode node = (SimpleNode)externalNodes.get(from);
+        node.setTaxa(to);
+    }
+
     /**
      * @param node1
      * @param node2
@@ -395,10 +400,15 @@ public final class SimpleTree implements Tree {
         public List<Node> getAdjacencies() {
             return adjacencies;
         }
+      
+        public void setTaxa(Taxon to) {
+            taxon = to;
+        }
 
         // PRIVATE members
         private List<Node> adjacencies;
-        private final Taxon taxon;
+        private Taxon taxon;
+
     }
 
 	final class SimpleEdge extends BaseEdge {
