@@ -104,13 +104,11 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
         final SequenceType seqtypeForGapsAndMissing = sequenceType != null ? sequenceType : SequenceType.NUCLEOTIDE;
         final AtomicReference<IllegalCharacterPolicy> illegalCharacterPolicyForThisImport
                 = new AtomicReference<IllegalCharacterPolicy>(illegalCharacterPolicy);
-
         try {
             // find fasta line start
             while (helper.read() != fastaFirstChar) {
             }
 
-            boolean importAborted;
             do {
                 final String line = helper.readLine();
                 final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
@@ -128,10 +126,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
 
 //                s_runtime.gc();
-//                System.out.println("after readSeeuqnece " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
+//                System.out.println("after reading sequence " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
-                importAborted = progressListener.setProgress(helper.getProgress());
-                if(importAborted) break;
+                if (progressListener.isCanceled()) break;
 
                 final Taxon taxon = Taxon.getTaxon(name);
                 if (description != null && description.length() > 0) {
@@ -139,6 +136,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 }
 
                 // fixed guessSequenceType so it does not allocate anything
+                // note: guessSequenceType can take a fair while if the sequence is long, but doesn't report
+                // progress; ImportHelper has already reported all progress for this sequence complete when it
+                // finished reading it, although really there is still some work to do...
                 SequenceType type = ( sequenceType != null ) ? sequenceType : Utils.guessSequenceType(seq);
 
                 // todo: We don't normally want to pop up dialogs in an importer, but I don't see
@@ -195,8 +195,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                 }
                 // helper.getProgress currently assumes each character to be
                 // one byte long, but this should be ok for fasta files.
-                importAborted = progressListener.setProgress(helper.getProgress());
-            } while (!importAborted && (helper.getLastDelimiter() == fastaFirstChar));
+            } while (!progressListener.isCanceled() && (helper.getLastDelimiter() == fastaFirstChar));
         } catch (EOFException e) {
             // catch end of file the ugly way.
         } catch (NoSuchElementException e) {
