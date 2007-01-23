@@ -172,7 +172,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
         boolean gapCostProduction = true;
 //        int n = this.n, m = this.m;
-        float[][] score = sub.score;
+//        float[][] score = sub.score;
         float[][] M = F[0], Ix = F[1], Iy = F[2];
         int[][] cm = C[0], cx = C[1], cy = C[2];
         int[][] cmtype = Ctype[0], cxtype = Ctype[1], cytype = Ctype[2];
@@ -287,6 +287,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
             for (int j = 1; j <= m; j++) {
                 if (cancelled) return 0;
                 s = ProfileCharacter.score(profile1.profile[offset1 + i - 1], profile2.profile[offset2 + j - 1], sub);
+                if (debug) {
+                    System.out.println("loc=" + j + "," + i + " p1=" + profile1.profile[offset1 + i - 1] +
+                            " p2=" + profile2.profile[offset2 + j - 1] + " score=" + s);
+                }
                 /* char c1= s1[i - 1];
               char c2= s2[j - 1];
 
@@ -456,6 +460,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
             System.out.println("bestk=" + bestk + " v=" + v + " vtype =" + vtype);
         }
         float finalScore = F[bestk][1][m];
+
 
         if (freeEndGap && n == 0) finalScore = 0;
         if (freeStartGap && n == 0) finalScore = 0;

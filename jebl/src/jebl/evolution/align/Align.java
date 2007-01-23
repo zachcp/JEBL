@@ -5,6 +5,7 @@ import jebl.evolution.align.scores.Scores;
 public abstract class Align {
 
     Scores sub;                     // scores matrix
+    Scores freeGapsSub;                     // scores matrix when free end gaps
     float d;                          // gap cost
     String seq1 = null;
     String seq2 = null;               // the sequences
@@ -39,6 +40,11 @@ public abstract class Align {
 
     public void setScores(Scores sub) {
         this.sub = sub;
+        freeGapsSub = Scores.duplicate(sub);
+        for (int i = 0; i < 127; i++) {
+            freeGapsSub.score['-'][i] = 0;
+            freeGapsSub.score[i]['-'] = 0;
+        }
     }
 
     /**
