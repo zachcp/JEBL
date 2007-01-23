@@ -1,6 +1,9 @@
+package jebl.evolution.treemetrics;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.treemetrics.RootedTreeMetric;
 
 import java.util.*;
 

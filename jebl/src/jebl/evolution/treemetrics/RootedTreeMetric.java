@@ -1,3 +1,5 @@
+package jebl.evolution.treemetrics;
+
 import jebl.evolution.trees.RootedTree;
 
 /**
