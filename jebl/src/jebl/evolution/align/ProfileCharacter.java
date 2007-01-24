@@ -15,10 +15,10 @@ public class ProfileCharacter {
     contains the length of these to parallel arrays. 'totalCharacters' is the sum of
     all entries in the array 'count'
     */
-    public char characters[];
-    public int count[];
-    public int numberOfUniqueCharacters;
-    public int totalCharacters;
+    private char characters[];
+    private int count[];
+    private int numberOfUniqueCharacters;
+    private int totalCharacters;
 
     public ProfileCharacter(int alphabetSize) {
         characters = new char[alphabetSize +1];
@@ -38,7 +38,7 @@ public class ProfileCharacter {
 
     }
 
-    public void removeCharacter(char character, int increment) {
+    private void removeCharacter(char character, int increment) {
         totalCharacters -= increment;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
             if (characters[i] == character) {

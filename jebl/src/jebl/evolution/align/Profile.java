@@ -16,7 +16,7 @@ import java.util.Map;
  */
 class Profile {
     ProfileCharacter[] profile;
-    int alphabetSize;
+    private int alphabetSize;
 //    int length;
     int sequenceCount;
     Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
@@ -46,7 +46,7 @@ class Profile {
         return profile.length;
     }
 
-    public static ProfileCharacter[] createProfile(String sequence, int alphabetSize) {
+    private static ProfileCharacter[] createProfile(String sequence, int alphabetSize) {
         int length = sequence.length();
         ProfileCharacter results[] = new ProfileCharacter[length];
         for (int i = 0; i < length; i++) {
