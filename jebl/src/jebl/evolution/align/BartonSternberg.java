@@ -145,8 +145,8 @@ public class BartonSternberg implements MultipleAligner {
                 sequencesWithGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), true);
 
             }
-            profile = new Profile(0,sequencesWithGaps [0]);
-            for (int i = 1; i < count; i++) {
+            profile = new Profile(Profile.calculateAlphabetSize(sequencesWithGaps));
+            for (int i = 0; i < count; i++) {
                 assert(sequencesWithGaps[i].length() == sequencesWithGaps [0].length ());
                 profile.addSequence(i, sequencesWithGaps[i]);
             }
@@ -211,7 +211,7 @@ public class BartonSternberg implements MultipleAligner {
 //                Profile sequenceProfile = sequenceProfiles[i];
                 boolean display = false;
 
-                String sequence = profile.paddedSequences.get(i);
+                String sequence = profile.getSequence(i);
                 if(j>= 0 && i== 8) {
 //                    display = true;
                 }
@@ -241,7 +241,7 @@ public class BartonSternberg implements MultipleAligner {
 
         String[] results = new String[count];
         for (int i = 0; i < count; i++) {
-            results[i]= profile.paddedSequences.get(i);
+            results[i]= profile.getSequence(i);
         }
         return results;
     }
@@ -292,7 +292,7 @@ public class BartonSternberg implements MultipleAligner {
 
         List<Sequence> aSeqs = new ArrayList<Sequence>(count);
         for (int i = 0; i < count; i++) {
-            String seq = profile.paddedSequences.get(i);
+            String seq = profile.getSequence(i);
             final Sequence s = seqs.get(i);
             aSeqs.add(new BasicSequence(s.getSequenceType(), s.getTaxon(), seq));
         }
@@ -316,7 +316,7 @@ public class BartonSternberg implements MultipleAligner {
         final int count = size1 + size2;
         List<Sequence> aSeqs = new ArrayList<Sequence>(count);
         for (int i = 0; i < count; i++) {
-            final String seq = profile.paddedSequences.get(i);
+            final String seq = profile.getSequence(i);
             final Sequence s = (i < size1) ? seqs1.get(i) : seqs2.get(i - size1);
             aSeqs.add(new BasicSequence(s.getSequenceType(), s.getTaxon(), seq));
         }
@@ -348,7 +348,7 @@ public class BartonSternberg implements MultipleAligner {
         final int count = size1 + size2;
         List<Sequence> aSeqs = new ArrayList<Sequence>(count);
         for (int i = 0; i < count; i++) {
-            final String seq = profile.paddedSequences.get(i);
+            final String seq = profile.getSequence(i);
             final Sequence s = (i < count-1) ? seqs1.get(i) : seqs2.get(0);
             aSeqs.add(new BasicSequence(s.getSequenceType(), s.getTaxon(), seq));
         }

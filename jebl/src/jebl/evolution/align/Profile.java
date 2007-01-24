@@ -19,15 +19,33 @@ class Profile {
     private int alphabetSize;
 //    int length;
     int sequenceCount;
-    Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
+    private boolean automaticallyCalculatedAlphabetSize = false;
+    private Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
+    private boolean supportsFreeEndGaps=false;
+
+    public String getSequence( int sequenceNumber) {
+        return paddedSequences.get(sequenceNumber);
+    }
+
 
     public Profile(int alphabetSize) {
         this.alphabetSize = alphabetSize;
     }
 
+    /**
+     * Should only be used for constructing a profile that will not
+     * have other sequences added.
+     *
+     * Correct usage in other cases is to do
+     * new Profile( calculateAlphabetSize(sequences));
+     *
+     * @param sequenceNumber
+     * @param sequence
+     */
     public Profile(int sequenceNumber,String sequence) {
         this(calculateAlphabetSize(new String[] {sequence}));
         addSequence(sequenceNumber,sequence);
+        automaticallyCalculatedAlphabetSize = true;
     }
 
     public Profile(Alignment alignment, int alphabetSize) {
@@ -57,7 +75,9 @@ class Profile {
         return results;
     }
 
-    public void addSequence(int sequenceNumber,String sequence) {
+    void addSequence(int sequenceNumber,String sequence) {
+        if (automaticallyCalculatedAlphabetSize)
+            throw new IllegalStateException("if the constructor 'public Profile(int sequenceNumber,String sequence)'  is used, it's not safe to add new sequences");
         sequenceCount++;
         if (sequenceCount == 1) {
             profile = createProfile(sequence, alphabetSize);
@@ -248,5 +268,43 @@ class Profile {
             result.append(character.toString());
         }
         return result.toString();
+    }
+
+    static String supportFreeEndGaps( String sequence) {
+        char[] characters =sequence.toCharArray();
+        int count = characters.length;
+        int highestNonGapIndex = 0;
+        int lowestNonGapIndex = count;
+        for (int i = 0; i<count;i++) {
+            if ( characters [i] !='-') {
+                highestNonGapIndex=i;
+            }
+        }
+        for (int i = count-1; i >=0 ; i--) {
+            if (characters[i] != '-') {
+                lowestNonGapIndex = i;
+            }
+        }
+        StringBuilder result =new StringBuilder(count);
+        for (int i = 0; i < count; i++) {
+            if (i<lowestNonGapIndex || i>highestNonGapIndex)
+                result.append('_');
+            else
+                result.append (characters[i]);
+        }
+         return result.toString();
+    }
+
+    public Profile supportFreeEndGaps(boolean freeGapsAtEnds) {
+        if (!freeGapsAtEnds) return this;
+        if (sequenceCount<2) return this;
+        if (supportsFreeEndGaps) return this;
+        Profile result =new Profile(alphabetSize+1);
+        result.supportsFreeEndGaps=true;
+        for (Map.Entry<Integer, String> entry : paddedSequences.entrySet()) {
+             String sequence =entry.getValue();
+             result.addSequence(entry.getKey(), supportFreeEndGaps(sequence));
+        }
+        return result;
     }
 }

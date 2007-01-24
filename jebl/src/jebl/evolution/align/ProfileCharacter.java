@@ -19,6 +19,8 @@ public class ProfileCharacter {
     private int count[];
     private int numberOfUniqueCharacters;
     private int totalCharacters;
+     private boolean calculatedGapFraction=false;
+    private  float gapFraction;
 
     public ProfileCharacter(int alphabetSize) {
         characters = new char[alphabetSize +1];
@@ -26,6 +28,7 @@ public class ProfileCharacter {
     }
 
     public void addCharacter(char character, int increment) {
+        calculatedGapFraction = false;
         totalCharacters += increment;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
             if(characters[i]== character) {
@@ -35,10 +38,10 @@ public class ProfileCharacter {
         }
         characters [ numberOfUniqueCharacters ] = character;
         count [ numberOfUniqueCharacters ++ ] = increment;
-
     }
 
     private void removeCharacter(char character, int increment) {
+        calculatedGapFraction = false;
         totalCharacters -= increment;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
             if (characters[i] == character) {
@@ -132,8 +135,10 @@ public class ProfileCharacter {
     }
 
     public boolean isAllGaps() {
-        if(numberOfUniqueCharacters != 1) return false;
-        if(characters[0]!='-') return false;
+        if(numberOfUniqueCharacters > 2) return false;
+        if(characters[0]!='-' && characters[0]!='_') return false;
+        if (numberOfUniqueCharacters==1) return true;
+        if (characters[1] != '-' && characters[1] != '_') return false;
         return true;
 
     }
@@ -148,15 +153,17 @@ public class ProfileCharacter {
      * @return the fraction of characters that are gap Characters in this profile
      */
     public float gapFraction () {
+        if (totalCharacters==0) return 0;
+        if (calculatedGapFraction) return gapFraction;
+        int gapCount=0;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
-            if(characters[i]=='-') {
-                float result = ((float) count[i]) / totalCharacters;
-                assert result>= 0;
-                assert result < 1;//should not be calling this function on a profile that contains all gap Characters at one location.
-
-                return result;
+            if(characters[i]=='-' || characters[i]=='_') {
+                gapCount+=count[i];
             }
         }
-        return 0;
+        gapFraction = ((float) gapCount) / totalCharacters;
+        assert gapFraction >= 0;
+        assert gapFraction < 1;//should not be calling this function on a profile that contains all gap Characters at one location.
+        return gapFraction;
     }
 }

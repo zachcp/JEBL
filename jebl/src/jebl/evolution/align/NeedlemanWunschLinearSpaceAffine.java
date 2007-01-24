@@ -27,8 +27,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
     
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds) {
-        super(sub, d, e);
-        this.freeGapsAtEnds = freeGapsAtEnds;
+        this(sub, d, e,freeGapsAtEnds,false);
 //        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
 
@@ -49,7 +48,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
      * @param freeGapsAtEnds
      */
     public NeedlemanWunschLinearSpaceAffine(Scores sub, float d, float e, boolean freeGapsAtEnds, boolean applyGapExtendCostToFirstGapResidue) {
-        super(sub, d+ (applyGapExtendCostToFirstGapResidue?e:0), e);
+        super(Scores.includeAdditionalCharacters(sub,"_"), d+ (applyGapExtendCostToFirstGapResidue?e:0), e);
         this.freeGapsAtEnds = freeGapsAtEnds;
 //        quadraticAlign = new NeedlemanWunschAffine(sub, d, e);
     }
@@ -113,7 +112,6 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     public void doAlignment(String sq1, String sq2, ProgressListener progress, boolean scoreOnly) {
         this.progress = progress;
 
-
         sq1 = strip(sq1);
         sq2 = strip(sq2);
 //        prepareAlignment (sq1,sq2);
@@ -135,6 +133,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     public AlignmentResult[] doAlignment(Profile profile1, Profile profile2,
                                          ProgressListener progress, boolean scoreOnly) {
         this.progress = progress;
+        profile1 = profile1.supportFreeEndGaps(freeGapsAtEnds);
+        profile2 = profile2.supportFreeEndGaps(freeGapsAtEnds);
         this.n = profile1.length();
         this.m = profile2.length();
 //        System.out.println("aligning " + n + "," + m);

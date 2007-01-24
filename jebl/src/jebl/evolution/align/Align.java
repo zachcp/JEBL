@@ -227,10 +227,13 @@ public abstract class Align {
         boolean[] valid = new boolean[127];
         for (int i = 0; i < residues.length(); i++) {
             char c = residues.charAt(i);
-            if (c < 96) {
+            if (c>='A' && c<='Z') {
                 valid[c] = valid[c + 32] = true;
-            } else {
+            } else if (c>='a' && c<='z') {
                 valid[c - 32] = valid[c] = true;
+            }
+            else {
+                valid[c]=true;
             }
         }
         if (allowGaps) {
