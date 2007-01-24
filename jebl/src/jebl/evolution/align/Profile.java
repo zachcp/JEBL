@@ -60,6 +60,17 @@ class Profile {
         }
     }
 
+    /**
+     * Get the number of sequences in this profile.
+     * @return the number of sequences in this profile.
+     */
+    public int getNumberOfSequences() {
+        return sequenceCount;
+    }
+    /**
+     * Get the number of residues in each sequence in the profile
+     * @return the number of residues in each sequence in the profile
+     */
     public int length () {
         return profile.length;
     }
@@ -78,6 +89,7 @@ class Profile {
     void addSequence(int sequenceNumber,String sequence) {
         if (automaticallyCalculatedAlphabetSize)
             throw new IllegalStateException("if the constructor 'public Profile(int sequenceNumber,String sequence)'  is used, it's not safe to add new sequences");
+        if (supportsFreeEndGaps) sequence=supportFreeEndGaps( sequence);
         sequenceCount++;
         if (sequenceCount == 1) {
             profile = createProfile(sequence, alphabetSize);
@@ -295,15 +307,21 @@ class Profile {
          return result.toString();
     }
 
-    public Profile supportFreeEndGaps(boolean freeGapsAtEnds) {
-        if (!freeGapsAtEnds) return this;
-        if (sequenceCount<2) return this;
+    /**
+     * Return a copy of this profile that supports free end gaps.
+     * This means that gaps at either end of the sequence are represented as "_" instead of "-".
+     * The score matrix used should have 0 cost for anything compared to "_".
+     * @return a copy of this profile that supports free end gaps or
+     * this  profile of that already supports free end gaps.
+     */
+    public Profile supportFreeEndGaps() {
         if (supportsFreeEndGaps) return this;
+        if (sequenceCount<2) return this;
         Profile result =new Profile(alphabetSize+1);
         result.supportsFreeEndGaps=true;
         for (Map.Entry<Integer, String> entry : paddedSequences.entrySet()) {
              String sequence =entry.getValue();
-             result.addSequence(entry.getKey(), supportFreeEndGaps(sequence));
+             result.addSequence(entry.getKey(), sequence);
         }
         return result;
     }

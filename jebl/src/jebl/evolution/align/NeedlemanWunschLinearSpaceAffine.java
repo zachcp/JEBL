@@ -133,8 +133,10 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     public AlignmentResult[] doAlignment(Profile profile1, Profile profile2,
                                          ProgressListener progress, boolean scoreOnly) {
         this.progress = progress;
-        profile1 = profile1.supportFreeEndGaps(freeGapsAtEnds);
-        profile2 = profile2.supportFreeEndGaps(freeGapsAtEnds);
+        if (freeGapsAtEnds && (profile1.getNumberOfSequences()>1 || profile2.getNumberOfSequences()>1)) {
+            profile1 = profile1.supportFreeEndGaps();
+            profile2 = profile2.supportFreeEndGaps();
+        }
         this.n = profile1.length();
         this.m = profile2.length();
 //        System.out.println("aligning " + n + "," + m);
