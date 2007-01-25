@@ -18,8 +18,8 @@ import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.evolution.trees.Utils;
 import jebl.util.ProgressListener;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -353,5 +353,9 @@ public class BartonSternberg implements MultipleAligner {
             aSeqs.add(new BasicSequence(s.getSequenceType(), s.getTaxon(), seq));
         }
         return new BasicAlignment(aSeqs);
+    }
+
+    public double getScore() {
+        return aligner.getScore();
     }
 }
