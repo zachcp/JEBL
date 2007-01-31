@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class SimpleListenerManager {
 
-    List<SimpleListener> listeners = new ArrayList<SimpleListener>();
+    private List<SimpleListener> listeners = new ArrayList<SimpleListener>();
 
     public SimpleListenerManager(SimpleListenerManager manager) {
         this.listeners = new ArrayList<SimpleListener>(manager.listeners);
@@ -26,9 +26,22 @@ public class SimpleListenerManager {
         listeners.remove(listener);
     }
 
+
+    /**
+     * calls {@link org.virion.jam.util.SimpleListener#objectChanged()}  on all listeners added using
+     * {@link #add(SimpleListener)} .
+     */
     public synchronized void fire() {
         for (SimpleListener simpleListener : listeners) {
             simpleListener.objectChanged();
         }
+    }
+
+    /**
+     * Get the number of listeners (those added, but not yet removed)
+     * @return
+     */
+    public synchronized int size () {
+        return listeners.size ();
     }
 }
