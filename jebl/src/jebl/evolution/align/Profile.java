@@ -289,12 +289,14 @@ class Profile {
         int lowestNonGapIndex = count;
         for (int i = 0; i<count;i++) {
             if ( characters [i] !='-') {
-                highestNonGapIndex=i;
+                lowestNonGapIndex=i;
+                break;
             }
         }
         for (int i = count-1; i >=0 ; i--) {
             if (characters[i] != '-') {
-                lowestNonGapIndex = i;
+                highestNonGapIndex = i;
+                break;
             }
         }
         StringBuilder result =new StringBuilder(count);
