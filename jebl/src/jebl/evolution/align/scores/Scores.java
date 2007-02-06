@@ -163,7 +163,7 @@ public abstract class Scores implements ScoreMatrix {
         for (char character : characters.toCharArray()) {
             if(states.indexOf(character)< 0) unique[index++ ]= character;
         }
-        result.extraResidues = new String(unique, 0, index);
+        result.extraResidues =result.extraResidues+ new String(unique, 0, index);
         // don't need to modify any of the "scores" values, since they all default to zero anyway.
         return result;
     }
