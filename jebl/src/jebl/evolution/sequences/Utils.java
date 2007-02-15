@@ -239,4 +239,33 @@ public class Utils {
         }
         return result;
     }
+
+	/**
+	 * Produce a clean sequence filtered of spaces and digits.
+	 * @param seq the sequence
+	 * @param type the sequence type
+	 * @return An array of valid states of SequenceType (may be shorter than the original sequence)
+	 */
+	public static State[] cleanSequence(final CharSequence seq, final SequenceType type) {
+		int count = 0;
+		for (int i = 0; i < seq.length(); i++) {
+			final char c = seq.charAt(i);
+		    if (type.getState(c) != null) {
+		        count++;
+		    }
+		}
+
+		State[] cleaned = new State[count];
+		int index = 0;
+		for (int i = 0; i < seq.length(); i++) {
+			final char c = seq.charAt(i);
+			State state = type.getState(c);
+		    if (state != null) {
+			    cleaned[index] = state;
+			    index += 1;
+		    }
+		}
+
+		return cleaned;
+	}
 }

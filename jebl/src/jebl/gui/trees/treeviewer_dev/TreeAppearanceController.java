@@ -93,7 +93,13 @@ public class TreeAppearanceController extends AbstractController {
 
                             treeViewer.setBranchColouringDecorator(attribute.substring(0, attribute.length() - 2), decorator);
                             treeViewer.setBranchDecorator(null);
+                        } else if (DiscreteColorDecorator.isDiscrete(attribute, nodes)) {
+	                        Decorator decorator = new DiscreteColorDecorator(attribute, nodes);
+
+	                        treeViewer.setBranchColouringDecorator(null, null);
+	                        treeViewer.setBranchDecorator(decorator);
                         } else {
+
                             Decorator decorator = new ContinuousColorDecorator(
                                     attribute, nodes,
                                     new Color(192, 16, 0), new Color(0, 16, 192));

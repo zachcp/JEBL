@@ -29,46 +29,57 @@ public class DiscreteColorDecorator implements Decorator {
 			Color.DARK_GRAY
 	};
 
-    public DiscreteColorDecorator() {
-        this(DEFAULT_PAINTS);
-    }
+	public DiscreteColorDecorator() {
+		this(DEFAULT_PAINTS);
+	}
 
-    public DiscreteColorDecorator(Color[] paints) {
-        this.paints = paints;
-    }
+	public DiscreteColorDecorator(Color[] paints) {
+		this.paints = paints;
+	}
 
-    public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items) {
+	public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items) {
 		this(attributeName, items, DEFAULT_PAINTS);
 	}
 
-    public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items, Color[] paints) {
+	public DiscreteColorDecorator(String attributeName, Set<? extends Attributable> items, Color[] paints) {
 		this.attributeName = attributeName;
 
 		// First collect the set of all attribute values
-		Set<Object> values = new TreeSet<Object>();
+		Set<Object> sortedValues = new TreeSet<Object>();
+		Set<Object> unsortedValues = new HashSet<Object>();
+
 		for (Attributable item : items) {
 			Object value = item.getAttribute(attributeName);
 			if (value != null) {
-				values.add(value);
+				if (value instanceof Comparable) {
+					sortedValues.add(value);
+				} else {
+					unsortedValues.add(value);
+				}
 			}
 		}
 
-		setValues(values, paints);
+		if (unsortedValues.size() > 0) {
+			unsortedValues.addAll(sortedValues);
+			setValues(unsortedValues, paints);
+		} else {
+			setValues(sortedValues, paints);
+		}
 
 	}
 
-    public void setValues(Collection<? extends Object> values, Color[] paints) {
-        colourMap = new HashMap<Object, Paint>();
-        this.paints = paints;
+	public void setValues(Collection<? extends Object> values, Color[] paints) {
+		colourMap = new HashMap<Object, Paint>();
+		this.paints = paints;
 
-        // now create a paint map for these values
-        int i = 0;
-        for (Object value : values) {
-            colourMap.put(value, paints[i]);
-            i = (i + 1) % paints.length;
-        }
+		// now create a paint map for these values
+		int i = 0;
+		for (Object value : values) {
+			colourMap.put(value, paints[i]);
+			i = (i + 1) % paints.length;
+		}
 
-    }
+	}
 
 	// Decorator INTERFACE
 	public Paint getPaint(Paint paint) {
@@ -76,11 +87,11 @@ public class DiscreteColorDecorator implements Decorator {
 		return this.paint;
 	}
 
-    public String getAttributeName() {
-        return attributeName;
-    }
+	public String getAttributeName() {
+		return attributeName;
+	}
 
-    public Paint getFillPaint(Paint paint) {
+	public Paint getFillPaint(Paint paint) {
 		return paint;
 	}
 
@@ -96,8 +107,36 @@ public class DiscreteColorDecorator implements Decorator {
 		if (item instanceof Attributable) {
 			setAttributableItem((Attributable)item);
 		} else {
-            setValue(item);
-        }
+			setValue(item);
+		}
+	}
+
+	public static boolean isDiscrete(String attributeName, Set<? extends Attributable> items) {
+		// First collect the set of all attribute values
+		Set<Object> values = new HashSet<Object>();
+		for (Attributable item : items) {
+			Object value = item.getAttribute(attributeName);
+			if (value != null) {
+				values.add(value);
+			}
+		}
+
+		boolean isNumber = true;
+		boolean isInteger = true;
+
+		for (Object value : values) {
+			if (value instanceof Number) {
+				if (((Number)value).doubleValue() != ((Number)value).intValue()) {
+					isInteger = false;
+				}
+			} else {
+				isNumber = false;
+			}
+		}
+
+		if (isNumber && !isInteger) return false;
+
+		return true;
 	}
 
 	// Private methods
@@ -109,18 +148,18 @@ public class DiscreteColorDecorator implements Decorator {
 		}
 	}
 
-    private void setValue(Object value) {
-        if (colourMap != null) {
-            paint = colourMap.get(value);
-        } else if (value instanceof Number) {
-            int index = ((Number)value).intValue() % paints.length;
-            paint = paints[index];
-        }
-    }
+	private void setValue(Object value) {
+		if (colourMap != null) {
+			paint = colourMap.get(value);
+		} else if (value instanceof Number) {
+			int index = ((Number)value).intValue() % paints.length;
+			paint = paints[index];
+		}
+	}
 
 	private String attributeName = null;
 
 	private Map<Object, Paint> colourMap = null;
-    private Paint[] paints = null;
+	private Paint[] paints = null;
 	private Paint paint = null;
 }
