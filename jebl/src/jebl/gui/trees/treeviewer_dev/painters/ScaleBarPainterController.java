@@ -112,31 +112,33 @@ public class ScaleBarPainterController extends AbstractController {
         });
         final JLabel label4 = optionsPanel.addComponentWithLabel("Line Weight:", lineWeightSpinner);
 
-        final boolean isSelected = titleCheckBox.isSelected();
-        label1.setEnabled(isSelected);
-        scaleRangeText.setEnabled(isSelected);
-        label2.setEnabled(isSelected);
-        fontSizeSpinner.setEnabled(isSelected);
-        label3.setEnabled(isSelected);
-        digitsSpinner.setEnabled(isSelected);
-        label4.setEnabled(isSelected);
-        lineWeightSpinner.setEnabled(isSelected);
+        final boolean isSelected1 = titleCheckBox.isSelected();
+        final boolean isSelected2 = autoScaleCheck.isSelected();
+        label1.setEnabled(isSelected1 && !isSelected2);
+        scaleRangeText.setEnabled(isSelected1 && !isSelected2);
+        label2.setEnabled(isSelected1);
+        fontSizeSpinner.setEnabled(isSelected1);
+        label3.setEnabled(isSelected1);
+        digitsSpinner.setEnabled(isSelected1);
+        label4.setEnabled(isSelected1);
+        lineWeightSpinner.setEnabled(isSelected1);
 
         titleCheckBox.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                final boolean isSelected = titleCheckBox.isSelected();
+                final boolean isSelected1 = titleCheckBox.isSelected();
+                final boolean isSelected2 = autoScaleCheck.isSelected();
 
-                autoScaleCheck.setEnabled(isSelected);
-                label1.setEnabled(isSelected);
-                scaleRangeText.setEnabled(isSelected);
-                label2.setEnabled(isSelected);
-                fontSizeSpinner.setEnabled(isSelected);
-                label3.setEnabled(isSelected);
-                digitsSpinner.setEnabled(isSelected);
-                label4.setEnabled(isSelected);
-                lineWeightSpinner.setEnabled(isSelected);
+                autoScaleCheck.setEnabled(isSelected1);
+                label1.setEnabled(isSelected1 && !isSelected2);
+                scaleRangeText.setEnabled(isSelected1 && !isSelected2);
+                label2.setEnabled(isSelected1);
+                fontSizeSpinner.setEnabled(isSelected1);
+                label3.setEnabled(isSelected1);
+                digitsSpinner.setEnabled(isSelected1);
+                label4.setEnabled(isSelected1);
+                lineWeightSpinner.setEnabled(isSelected1);
 
-                scaleBarPainter.setVisible(isSelected);
+                scaleBarPainter.setVisible(isSelected1);
             }
         });
 

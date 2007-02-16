@@ -64,13 +64,6 @@ public class LabelPainterController extends AbstractController {
 
         titleCheckBox.setSelected(labelPainter.isVisible());
 
-        titleCheckBox.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                final boolean selected = titleCheckBox.isSelected();
-                labelPainter.setVisible(selected);
-            }
-        });
-
         String[] attributes = labelPainter.getAttributes();
         displayAttributeCombo = new JComboBox(attributes);
         displayAttributeCombo.addItemListener(new ItemListener() {
@@ -80,12 +73,12 @@ public class LabelPainterController extends AbstractController {
             }
         });
 
-        optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
+        final JLabel label1 = optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
 
         Font font = labelPainter.getFont();
         fontSizeSpinner = new JSpinner(new SpinnerNumberModel(font.getSize(), 0.01, 48, 1));
 
-        optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
+        final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
 
         fontSizeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -115,11 +108,11 @@ public class LabelPainterController extends AbstractController {
             }
         });
 
-        optionsPanel.addComponentWithLabel("Format:", numericalFormatCombo);
+        final JLabel label3 = optionsPanel.addComponentWithLabel("Format:", numericalFormatCombo);
 
         digitsSpinner = new JSpinner(new SpinnerNumberModel(digits, 2, 14, 1));
 
-        optionsPanel.addComponentWithLabel("Sig. Digits:", digitsSpinner);
+        final JLabel label4 = optionsPanel.addComponentWithLabel("Sig. Digits:", digitsSpinner);
 
         digitsSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -144,6 +137,32 @@ public class LabelPainterController extends AbstractController {
                 optionsPanel.repaint();
             }
         });
+
+        final boolean isSelected = titleCheckBox.isSelected();
+        label1.setEnabled(isSelected);
+        displayAttributeCombo.setEnabled(isSelected);
+        label2.setEnabled(isSelected);
+        fontSizeSpinner.setEnabled(isSelected);
+        label3.setEnabled(isSelected);
+        numericalFormatCombo.setEnabled(isSelected);
+        label4.setEnabled(isSelected);
+        digitsSpinner.setEnabled(isSelected);
+
+        titleCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                final boolean isSelected = titleCheckBox.isSelected();
+                label1.setEnabled(isSelected);
+                displayAttributeCombo.setEnabled(isSelected);
+                label2.setEnabled(isSelected);
+                fontSizeSpinner.setEnabled(isSelected);
+                label3.setEnabled(isSelected);
+                numericalFormatCombo.setEnabled(isSelected);
+                label4.setEnabled(isSelected);
+                digitsSpinner.setEnabled(isSelected);
+                labelPainter.setVisible(isSelected);
+            }
+        });
+
     }
 
     public JComponent getTitleComponent() {

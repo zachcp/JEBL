@@ -38,13 +38,6 @@ public class NodeBarController extends AbstractController {
 
         titleCheckBox.setSelected(this.nodeBarPainter.isVisible());
 
-        titleCheckBox.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                final boolean selected = titleCheckBox.isSelected();
-                nodeBarPainter.setVisible(selected);
-            }
-        });
-
         String[] attributeNames = this.nodeBarPainter.getAttributeNames();
 
         displayAttributeCombo = new JComboBox(attributeNames);
@@ -55,7 +48,7 @@ public class NodeBarController extends AbstractController {
             }
         });
 
-        optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
+        final JLabel label1 = optionsPanel.addComponentWithLabel("Display:", displayAttributeCombo);
 
         this.nodeBarPainter.addPainterListener(new PainterListener() {
             public void painterChanged() {
@@ -79,10 +72,26 @@ public class NodeBarController extends AbstractController {
                 nodeBarPainter.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
             }
         });
-        optionsPanel.addComponentWithLabel("Bar Width:", barWidthSpinner);
+        final JLabel label2 = optionsPanel.addComponentWithLabel("Bar Width:", barWidthSpinner);
 
         nodeBarPainter.setStroke(new BasicStroke(defaultBarWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
 
+        final boolean isSelected = titleCheckBox.isSelected();
+        label1.setEnabled(isSelected);
+        displayAttributeCombo.setEnabled(isSelected);
+        label2.setEnabled(isSelected);
+        barWidthSpinner.setEnabled(isSelected);
+
+        titleCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                final boolean isSelected = titleCheckBox.isSelected();
+                label1.setEnabled(isSelected);
+                displayAttributeCombo.setEnabled(isSelected);
+                label2.setEnabled(isSelected);
+                barWidthSpinner.setEnabled(isSelected);
+                nodeBarPainter.setVisible(isSelected);
+            }
+        });
     }
 
     public JComponent getTitleComponent() {

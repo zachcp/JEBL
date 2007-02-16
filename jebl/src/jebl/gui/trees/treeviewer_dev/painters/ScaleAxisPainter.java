@@ -1,34 +1,29 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer_dev.TreePane;
-import org.virion.jam.controlpalettes.ControlPalette;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
 
-import java.awt.*;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Line2D;
+import java.awt.*;
 import java.util.Collection;
+
+import org.virion.jam.controlpalettes.ControlPalette;
 
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
+ * @version $Id: ScaleBarPainter.java,v 1.7 2006/11/21 16:10:24 rambaut Exp $
  */
-public class ScaleBarPainter extends LabelPainter<TreePane> {
+public class ScaleAxisPainter extends LabelPainter<TreePane> {
 
-    public enum ScaleBarType {
-        BAR,
-        AXIS
-    }
-
-    public ScaleBarPainter() {
+    public ScaleAxisPainter() {
         this(0.0);
     }
 
-    public ScaleBarPainter(double scaleRange) {
+    public ScaleAxisPainter(double scaleRange) {
         this.scaleRange = scaleRange;
-        type = ScaleBarType.BAR;
     }
 
     public void setTreePane(TreePane treePane) {
@@ -109,6 +104,114 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
         g2.setPaint(oldPaint);
         g2.setStroke(oldStroke);
     }
+    /**
+    *	Get the maximum width of the labels of an axis
+    */
+    protected double getMaxTickLabelWidth(Graphics2D g2)
+    {
+        String label;
+        double width;
+        double maxWidth = 0;
+
+        if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
+            label = axis.getFormatter().format(axis.getMinorTickValue(0, -1));
+            width = g2.getFontMetrics().stringWidth(label);
+            if (maxWidth < width)
+                maxWidth = width;
+        }
+        int n = axis.getMajorTickCount();
+        for (int i = 0; i < n; i++) {
+            label = axis.getFormatter().format(axis.getMajorTickValue(i));
+            width = g2.getFontMetrics().stringWidth(label);
+            if (maxWidth < width)
+                maxWidth = width;
+        }
+        if (axis.getLabelLast()) { // Draw first minor tick as a major one (with a label)
+            label = axis.getFormatter().format(axis.getMinorTickValue(0, n - 1));
+            width = g2.getFontMetrics().stringWidth(label);
+            if (maxWidth < width)
+                maxWidth = width;
+        }
+
+        return maxWidth;
+    }
+
+//    protected void paintAxis(Graphics2D g2)
+//    {
+//        int n1 = axis.getMajorTickCount();
+//        int n2, i, j;
+//
+//        n2 = axis.getMinorTickCount(-1);
+//        if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
+//
+//            paintMajorTick(g2, axis.getMinorTickValue(0, -1));
+//
+//            for (j = 1; j < n2; j++) {
+//                paintMinorTick(g2, axis.getMinorTickValue(j, -1));
+//            }
+//        } else {
+//
+//            for (j = 0; j < n2; j++) {
+//                paintMinorTick(g2, axis.getMinorTickValue(j, -1));
+//            }
+//        }
+//
+//        for (i = 0; i < n1; i++) {
+//
+//            paintMajorTick(g2, axis.getMajorTickValue(i));
+//            n2 = axis.getMinorTickCount(i);
+//
+//            if (i == (n1-1) && axis.getLabelLast()) { // Draw last minor tick as a major one
+//
+//                paintMajorTick(g2, axis.getMinorTickValue(0, i));
+//
+//                for (j = 1; j < n2; j++) {
+//                    paintMinorTick(g2, axis.getMinorTickValue(j, i));
+//                }
+//            } else {
+//
+//                for (j = 0; j <  n2; j++) {
+//                    paintMinorTick(g2, axis.getMinorTickValue(j, i));
+//                }
+//            }
+//        }
+//    }
+//
+//    protected void paintMajorTick(Graphics2D g2, double value)
+//    {
+//        g2.setPaint(getForeground());
+//        g2.setStroke(getScaleBarStroke());
+//
+//            String label = axis.getFormatter().format(value);
+//            double pos = transformX(value);
+//
+//            Line2D line = new Line2D.Double(pos, plotBounds.getMaxY(), pos, plotBounds.getMaxY() + majorTickSize);
+//            g2.draw(line);
+//
+//            g2.setPaint(getForeground());
+//            double width = g2.getFontMetrics().stringWidth(label);
+//            g2.drawString(label, (float)(pos - (width / 2)), (float)(plotBounds.getMaxY() + (majorTickSize * 1.25) + xTickLabelOffset));
+//    }
+//
+//    protected void paintMinorTick(Graphics2D g2, double value)
+//    {
+//
+//        g2.setPaint(getForeground());
+//        g2.setStroke(getScaleBarStroke());
+//
+//            double pos = transformX(value);
+//
+//            Line2D line = new Line2D.Double(pos, plotBounds.getMaxY(), pos, plotBounds.getMaxY() + minorTickSize);
+//            g2.draw(line);
+//    }
+//
+//    /**
+//    *	Transform a chart co-ordinates into a drawing co-ordinates
+//    */
+//    protected double transformX(double value) {
+//        return ((axis.transform(value) - axis.transform(axis.getMinAxis())) * xScale) + xOffset;
+//    }
+//
 
     public double getPreferredWidth() {
         return preferredWidth;
@@ -120,16 +223,6 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 
     public double getHeightBound() {
         return preferredHeight + yOffset;
-    }
-
-    public ScaleBarType getType() {
-        return type;
-    }
-
-    public void setType(ScaleBarType type) {
-        this.type = type;
-        firePainterChanged();
-
     }
 
     public BasicStroke getScaleBarStroke() {
@@ -203,7 +296,6 @@ public class ScaleBarPainter extends LabelPainter<TreePane> {
 
     private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
-    private ScaleBarType type = ScaleBarType.BAR;
     private ScaleBarAxis axis = new ScaleBarAxis(ScaleBarAxis.AT_DATA, ScaleBarAxis.AT_DATA);
 
     private double scaleRange;
