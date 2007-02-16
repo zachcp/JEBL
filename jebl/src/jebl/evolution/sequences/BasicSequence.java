@@ -147,6 +147,10 @@ public class BasicSequence implements Sequence {
         return taxon.compareTo(((Sequence) o).getTaxon());
     }
 
+    public String toString() {
+        return getString();
+    }
+    
     // Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {

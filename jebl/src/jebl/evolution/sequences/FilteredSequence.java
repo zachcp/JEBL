@@ -101,6 +101,10 @@ public abstract class FilteredSequence implements Sequence {
         return source.compareTo(o);
     }
 
+    public String toString() {
+        return getString();
+    }
+
     // Attributable implementation
 
     public void setAttribute(String name, Object value) {
