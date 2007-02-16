@@ -149,10 +149,46 @@ public final class GeneticCode {
 	 * @return '?' if codon unknown
 	 */
 	public AminoAcidState getTranslation(CodonState codonState) {
-		return translationMap.get(codonState);
+        //System.out.println(codonState.getCode());
+        return translationMap.get(codonState);
 	}
 
-	/**
+    /**
+	 * Returns the state associated with AminoAcid represented by the three nucleotides.
+	 * If one or more of the nucleotides are ambiguous, and all combinations translate to the
+     * same protein, then this method will return that protein
+	 * @see AminoAcids
+	 * @see Codons
+	 * @return '?' if codon unknown
+	 */
+    public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3){
+        CodonState translateState = null;
+        if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
+			translateState = Codons.GAP_STATE;
+		}
+
+		if (nucleotide1.isAmbiguous() || nucleotide2.isAmbiguous() || nucleotide3.isAmbiguous()) {
+            for(State a : nucleotide1.getCanonicalStates()){
+                for(State b : nucleotide2.getCanonicalStates()){
+                    for(State c : nucleotide3.getCanonicalStates()){
+                        //initial setup
+                        if(translateState == null)
+                            translateState = Codons.getState(a.getCode() + b.getCode() + c.getCode());
+                        if(!translationMap.get(translateState).equals(translationMap.get(Codons.getState(a.getCode() + b.getCode() + c.getCode()))))
+                            return translationMap.get(Codons.UNKNOWN_STATE);
+                    }
+                }
+            }
+            return translationMap.get(translateState);
+        }
+
+	    String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
+	    translateState = Codons.getState(code);
+
+        return translationMap.get(translateState);
+    }
+
+    /**
 	 * Note that the state is the canonical state (generated combinatorially)
      * @return whether the codonState is a stop codon
 	 */
