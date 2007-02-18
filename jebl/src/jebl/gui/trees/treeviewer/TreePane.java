@@ -1799,7 +1799,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     public void setBounds(int x, int y, int width, int height) {
         // when moving the viewport x/y change
         final Rectangle rectangle = getBounds();
-        calibrated = width == rectangle.width && height == rectangle.height;
+        calibrated = calibrated && width == rectangle.width && height == rectangle.height;
         super.setBounds(x, y, width, height);
     }
 
