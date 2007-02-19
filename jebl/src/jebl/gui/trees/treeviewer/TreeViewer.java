@@ -31,6 +31,7 @@ import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -207,6 +208,7 @@ public class TreeViewer extends JPanel implements Printable {
         setTreeLayoutType(getDefaultTreeLayoutType());
 
         infoArea.setText("");
+        infoIsVisible = false;
         // make this settable?
         NumberFormatter formatter = new NumberFormatter(4);
         for( String an : inTree.getAttributeNames() ) {
@@ -219,6 +221,8 @@ public class TreeViewer extends JPanel implements Printable {
                     v = o.toString();
                 }
                 infoArea.append(an + ": " + v + "\n");
+                infoText += an + ": " + v + "\n";
+                infoIsVisible = true;
             }
         }
     }
@@ -234,6 +238,8 @@ public class TreeViewer extends JPanel implements Printable {
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
 
     private JTextArea infoArea = null;
+    private boolean infoIsVisible = false;
+    private String infoText = "";
 
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
@@ -383,10 +389,18 @@ public class TreeViewer extends JPanel implements Printable {
 
             controlsList.add(controls);
 
-            JPanel jPanel = new JPanel();
-            infoArea = new JTextArea();
-            jPanel.add(infoArea);
-            controlsList.add(new Controls("Info", jPanel, true));
+            JPanel jPanel = new JPanel(new BorderLayout());
+            jPanel.setBorder(new EmptyBorder(5,5,5,5));
+            infoArea = new JTextArea(infoText);
+            infoArea.setOpaque(false);
+            infoArea.setFont(new JLabel().getFont());
+            infoArea.setWrapStyleWord(true);
+            infoArea.setLineWrap(true);
+            infoArea.setEditable(false);
+            jPanel.add(infoArea, BorderLayout.CENTER);
+            Controls infoControls = new Controls("Info", jPanel, true);
+            infoControls.setVisible(infoIsVisible);
+            controlsList.add(infoControls);
             //infoArea.setText("info");
             
             return controlsList;
