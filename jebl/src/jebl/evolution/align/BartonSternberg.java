@@ -311,6 +311,9 @@ public class BartonSternberg implements MultipleAligner {
         final Profile profile2 = new Profile(a2, scores.getAlphabet().length(), size1);
 
         AlignmentResult results[] = aligner.doAlignment(profile1, profile2, progress, false);
+        if (progress.isCanceled()) {
+            return null;
+        }
         Profile profile = Profile.combine(profile1, profile2, results[0], results[1]);
 
         final int count = size1 + size2;
