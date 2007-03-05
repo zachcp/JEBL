@@ -474,7 +474,8 @@ public class ImportHelper {
                     quoteChar = ch;
                     first = false;
                     space = 0;
-                } else if ( ch == startComment || ch == lineComment ) {
+                } else if (!quoted && (ch == startComment || ch == lineComment) ) {
+                    // comment markers don't count if we are quoted
                     skipComments(ch, startComment!= '\"' && startComment != '\'');
                     lastDelimiter = ' ';
                     done = true;
