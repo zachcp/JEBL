@@ -1,6 +1,10 @@
 package jebl.evolution.io;
 
 /**
+ * Similar to a StringBuilder, but its internal buffer is a byte[] with
+ * one entry for each character, so it can only correctly append single-byte
+ * characters.
+ * 
  * @author Joseph Heled
  * @version $Id$
  */
