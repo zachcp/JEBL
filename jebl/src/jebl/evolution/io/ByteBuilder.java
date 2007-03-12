@@ -27,6 +27,11 @@ public class ByteBuilder implements CharSequence {
        }
     }
 
+    /**
+     * Constructs a ByteBuilder that will never grow beyond <code>maxCapacity</code>
+     * bytes in length.
+     * @param maxCapacity
+     */
     public ByteBuilder(int maxCapacity) {
         this.maxCapacity = maxCapacity;
         current = 0;
@@ -38,6 +43,7 @@ public class ByteBuilder implements CharSequence {
         if( current + 1 > data.length ) {
             ensureCapacity(current + 1);
         }
+        // will throw an exception if insufficient capacity (maxCapacity reached) 
         data[current] = (byte)c;
         ++current;
         return this;
