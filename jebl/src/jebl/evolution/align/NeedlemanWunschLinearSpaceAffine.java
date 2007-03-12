@@ -158,13 +158,17 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         AlignmentResult result2 = new AlignmentResult(maximumResultLength);
         resultScore = doAlignment(profile1, profile2, 0, 0, n, m, TYPE_ANY, TYPE_ANY, result1, result2, scoreOnly, freeGapsAtEnds, freeGapsAtEnds);
         return new AlignmentResult[]{result1, result2};
-
     }
 
     public String[] getMatch() {
         return matchResult;
     }
 
+    private static float gapFraction(ProfileCharacter character) {
+        float result = character.gapFraction();
+        assert result < 1.0; //should not be calling this function on a profile that contains all gap Characters at one location.
+        return result;
+    }
 
     private float doAlignment(Profile profile1, Profile profile2,
                               int offset1, int offset2, int n, int m, int startType, int endType,
@@ -336,8 +340,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                     xd = 0;
                     xe = 0;
                 }
-                float gapFraction = profile1.profile[offset1 + i - 1].gapFraction();
-                float ownGapFraction = profile2.profile[offset2 + j - 1].gapFraction();
+                float gapFraction = gapFraction(profile1.profile[offset1 + i - 1]);
+                float ownGapFraction = gapFraction(profile2.profile[offset2 + j - 1]);
                 if (gapCostProduction && gapFraction > 0) {
                     // if the other sequence that we are aligning a gap to
                     // already had some gaps in it, proportionally reduce the gap cost.
@@ -390,8 +394,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                     yd = 0;
                     ye = 0;
                 }
-                ownGapFraction = profile1.profile[offset1 + i - 1].gapFraction();
-                gapFraction = profile2.profile[offset2 + j - 1].gapFraction();
+                ownGapFraction = gapFraction(profile1.profile[offset1 + i - 1]);
+                gapFraction = gapFraction(profile2.profile[offset2 + j - 1]);
                 if (gapCostProduction && gapFraction > 0) {
                     // if the other sequence that we are aligning a gap to
                     // already had some gaps in it, proportionally reduce the gap cost.

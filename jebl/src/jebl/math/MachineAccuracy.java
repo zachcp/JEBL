@@ -43,7 +43,27 @@ public class MachineAccuracy
 		return eps;
 	}
 
-	/**
+    /*
+
+     // Convenience methods proposed by Tobias:
+    public static boolean strictlySmaller(double a, double b) {
+        return (a < b) && !same(a,b);
+    }
+
+    public static boolean strictlyLarger(double a, double b) {
+        return strictlySmaller(b,a);
+    }
+
+    public static boolean smallerOrEqual(double a, double b) {
+        // same as  !strictlyLarger(a,b)
+        return (a < b) || MachineAccuracy.same(a,b);
+    }
+
+    public static boolean largerOrEqual(double a, double b) {
+        return !smallerOrEqual(b,a);
+    } */
+
+    /**
 	 * @return true if the relative difference between the two parameters
 	 * is no larger than SQRT_EPSILON.
      *

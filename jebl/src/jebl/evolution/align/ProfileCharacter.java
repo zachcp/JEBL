@@ -163,7 +163,6 @@ public class ProfileCharacter {
         }
         gapFraction = ((float) gapCount) / totalCharacters;
         assert gapFraction >= 0;
-        assert gapFraction < 1;//should not be calling this function on a profile that contains all gap Characters at one location.
         return gapFraction;
     }
 }

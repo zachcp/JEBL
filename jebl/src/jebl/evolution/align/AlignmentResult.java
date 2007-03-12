@@ -18,6 +18,7 @@ class AlignmentResult {
 
     public AlignmentResult(int size) {
         this.size = 0;
+        // TT: Wouldn't a BitSet be better?
         values =new boolean[size];
     }
 
