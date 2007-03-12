@@ -123,6 +123,12 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
 //                s_runtime.gc();
 //                System.out.println("before read " + (s_runtime.totalMemory() - s_runtime.freeMemory())/1000 + " / " + s_runtime.totalMemory()/1000);
 
+                /*
+                 * We pass the StringBuilder in here instead of returning a string so
+                 * that we need to hold the sequence string in memory only once. So
+                 * althought this code seems a little unintuitive at first, please leave
+                 * it that way :)
+                 */
                 helper.readSequence(seq, seqtypeForGapsAndMissing, fasta1stCharAsString, Integer.MAX_VALUE, "-", "?", "", null, progressListener);
 
 //                s_runtime.gc();
