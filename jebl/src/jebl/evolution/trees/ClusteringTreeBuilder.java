@@ -29,7 +29,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         double progress = 0.0;
 
         while (true) {
-            findNextPair();
+            findNextPair(); // calculates besti, bestj
 
             abi = alias[besti];
             abj = alias[bestj];
