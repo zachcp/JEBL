@@ -481,17 +481,7 @@ public class ImportHelper {
                     done = true;
                 } else {
                     if (quoted) {
-                        // compress multiple spaces into one
-                        if (isSpace) {
-                            space++;
-                            ch = ' ';
-                        } else {
-                            space = 0;
-                        }
-
-                        if (space < 2) {
-                            token.append(ch);
-                        }
+                        token.append(ch);
                     } else if (isSpace) {
                         lastDelimiter = ' ';
                         done = true;
