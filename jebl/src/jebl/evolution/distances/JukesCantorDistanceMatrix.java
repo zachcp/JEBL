@@ -35,6 +35,10 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         double sumDistance = 0.0;
         double sumWeight = 0.0;
 
+        // If both sequences are of zero length then the substitution ratio is zero because they are identical
+        if(alignment.getPatterns().size() == 0)
+            return 0.0;
+
         for( Pattern pattern : alignment.getPatterns() ) {
             State state1 = pattern.getState(taxon1);
             State state2 = pattern.getState(taxon2);
