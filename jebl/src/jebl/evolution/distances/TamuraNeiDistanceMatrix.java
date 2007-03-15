@@ -83,7 +83,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             while( true ) {
                 if( sumWeight <= 0 ) {
                     throw new IllegalArgumentException("It is not possible to compute the Tamura Nei genetic distance " +
-                            "for those sequences. (probably because they are too short)");
+                            "for these sequences because at least one pair of sequences do not overlap in the alignment.");
                 }
 
                 double P1 = sumTsAG / sumWeight;
