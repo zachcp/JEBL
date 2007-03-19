@@ -721,6 +721,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             optionsPanel.addComponentWithLabel("Line Weight:", spinner);
 
             autoEx = new JCheckBox("Auto subtree contract");
+            autoEx.setToolTipText("Automatically contract subtrees when there is not enough space on-screen");
             optionsPanel.addComponent(autoEx);
 
             autoExpantion = PREFS.getBoolean(autoExPREFSkey, false);
@@ -735,7 +736,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             });
 
-            final JCheckBox subTreeShowJB = new JCheckBox("Selected subtree only");
+            final JCheckBox subTreeShowJB = new JCheckBox("Show selected subtree only");
+            subTreeShowJB.setToolTipText("Only the selected part of the tree is shown");
             viewSubtree = false;
             subTreeShowJB.setSelected(viewSubtree);
             subTreeShowJB.addChangeListener(new ChangeListener() {

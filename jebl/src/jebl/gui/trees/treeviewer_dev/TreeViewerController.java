@@ -79,6 +79,9 @@ public class TreeViewerController extends AbstractController {
         rectangularTreeToggle = new JToggleButton(rectangularTreeIcon);
         polarTreeToggle = new JToggleButton(polarTreeIcon);
         radialTreeToggle = new JToggleButton(radialTreeIcon);
+        rectangularTreeToggle.setToolTipText("Rectangular tree layout");
+        polarTreeToggle.setToolTipText("Polar tree layout");
+        radialTreeToggle.setToolTipText("Radial tree layout");
         rectangularTreeToggle.putClientProperty("Quaqua.Button.style", "toggleWest");
         polarTreeToggle.putClientProperty("Quaqua.Button.style", "toggleCenter");
         radialTreeToggle.putClientProperty("Quaqua.Button.style", "toggleEast");
