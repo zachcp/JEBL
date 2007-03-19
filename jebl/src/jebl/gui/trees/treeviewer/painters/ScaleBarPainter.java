@@ -299,7 +299,6 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             });
 
             controls = new Controls("Scale Bar", optionsPanel, false, false, detachPrimaryCheckbox ? showScaleBarCB : null);
-            controls.setAdvanced(true);
         }
 
         controlsList.add(controls);
