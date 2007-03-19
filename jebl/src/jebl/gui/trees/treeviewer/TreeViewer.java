@@ -184,6 +184,25 @@ public class TreeViewer extends JPanel implements Printable {
         } else {
             tree = Utils.rootTheTree(inTree);
         }
+//        infoArea.setText("");
+        infoIsVisible = false;
+        // make this settable?
+        infoText = "";
+        NumberFormatter formatter = new NumberFormatter(4);
+        for( String an : inTree.getAttributeNames() ) {
+            if( ! an.startsWith("&") && !an.equals(NexusExporter.treeNameAttributeKey) ) {
+                Object o = inTree.getAttribute(an);
+                String v;
+                if( o instanceof Double ) {
+                    v = formatter.getFormattedValue((Double) o);
+                } else {
+                    v = o.toString();
+                }
+//                infoArea.append(an + ": " + v + "\n");
+                infoText += an + ": " + v + "\n";
+                infoIsVisible = true;
+            }
+        }
 
         treePane.setTree(tree, null);
 
@@ -206,25 +225,6 @@ public class TreeViewer extends JPanel implements Printable {
 
         // load appropriate tree layout from preferences and set it
         setTreeLayoutType(getDefaultTreeLayoutType());
-
-        infoArea.setText("");
-        infoIsVisible = false;
-        // make this settable?
-        NumberFormatter formatter = new NumberFormatter(4);
-        for( String an : inTree.getAttributeNames() ) {
-            if( ! an.startsWith("&") && !an.equals(NexusExporter.treeNameAttributeKey) ) {
-                Object o = inTree.getAttribute(an);
-                String v;
-                if( o instanceof Double ) {
-                    v = formatter.getFormattedValue((Double) o);
-                } else {
-                    v = o.toString();
-                }
-                infoArea.append(an + ": " + v + "\n");
-                infoText += an + ": " + v + "\n";
-                infoIsVisible = true;
-            }
-        }
     }
 
     public void setTree(Tree tree) {
@@ -237,7 +237,7 @@ public class TreeViewer extends JPanel implements Printable {
 
     private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
 
-    private JTextArea infoArea = null;
+//    private JTextArea infoArea = null;
     private boolean infoIsVisible = false;
     private String infoText = "";
 
@@ -392,18 +392,20 @@ public class TreeViewer extends JPanel implements Printable {
 
             controlsList.add(controls);
 
-            JPanel jPanel = new JPanel(new BorderLayout());
-            jPanel.setBorder(new EmptyBorder(5,5,5,5));
-            infoArea = new JTextArea(infoText);
-            infoArea.setOpaque(false);
-            infoArea.setFont(new JLabel().getFont());
-            infoArea.setWrapStyleWord(true);
-            infoArea.setLineWrap(true);
-            infoArea.setEditable(false);
-            jPanel.add(infoArea, BorderLayout.CENTER);
-            Controls infoControls = new Controls("Info", jPanel, true);
-            infoControls.setVisible(infoIsVisible);
-            controlsList.add(infoControls);
+            if (infoIsVisible) {
+                JPanel jPanel = new JPanel(new BorderLayout());
+                jPanel.setBorder(new EmptyBorder(5,5,5,5));
+                JTextArea infoArea = new JTextArea(infoText);
+                infoArea.setOpaque(false);
+                infoArea.setFont(new JLabel().getFont());
+                infoArea.setWrapStyleWord(true);
+                infoArea.setLineWrap(true);
+                infoArea.setEditable(false);
+                jPanel.add(infoArea, BorderLayout.CENTER);
+                Controls infoControls = new Controls("Info", jPanel, true);
+                infoControls.setVisible(infoIsVisible);
+                controlsList.add(infoControls);
+            }
             //infoArea.setText("info");
             
             return controlsList;
