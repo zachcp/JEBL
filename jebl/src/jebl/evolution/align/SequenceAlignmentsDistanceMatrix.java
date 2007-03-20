@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * Builds a distance matrix by performing a series of pairwise alignments between the
+ * specified sequences (unlike the methods in jebl.evolution.distances, which
+ * extract the pairwise distances from a multiple sequence alignment).
+ *
  * @author Joseph Heled
  * @version $Id$
  *
