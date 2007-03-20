@@ -38,11 +38,20 @@ public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
     // Non public part
     //
 
-    private double[] r;
+    private double[] r; // r[i] = sum of distances from node i to all other nodes
     private double scale;
-    // Find next two clusters to join. set shared best{i,j} and ab{i,j}
-    protected void findNextPair() {
 
+    /** Find next two clusters to join. set shared best{i,j}
+     *
+     * TT: Until 2007-03-20, the comment above also claimed that this method
+     * also sets the fields <code>abi</code> and <code>abj</code>. However,
+     * this is not true and also isn't required by the contract inherited
+     * from {@link ClusteringTreeBuilder#findNextPair}.
+     *
+     * Besides, it is pretty dirty that this method's side effect is
+     * to set fields rather than return a value.
+     */
+    protected void findNextPair() {
         for (int i = 0; i < numClusters; i++) {
             r[i] = 0;
             for (int j = 0; j < numClusters; j++) {

@@ -25,6 +25,8 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
     public T build() {
         init(distanceMatrix);
 
+        // TT: This should probably be ints, and instead we should write
+        // (double) progress / totalPairs to get a non-integer division below.
         double totalPairs = numClusters;
         double progress = 0.0;
 
