@@ -1,21 +1,17 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
-import jebl.evolution.sequences.State;
 import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.State;
 import jebl.util.ProgressListener;
-
-import java.util.Collection;
 
 /**
 
  * @author Joseph Heled
  * @version $Id$
  *
- * See the detailed comment in HKYDistanceMatrix on the model and the formula used for estimating the distance.
+ * See the detailed comment in {@link HKYDistanceMatrix} on the model and the formula used for estimating the distance.
  */
 
 

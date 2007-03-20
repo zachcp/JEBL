@@ -90,12 +90,13 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         static private double constA, constB, constC;
 
         /**
-         * Calculate a pairwise distance
+         * Calculate the distance between two of the sequences from the alignment.
          */
         static private double calculatePairwiseDistance(int taxon1, int taxon2) {
-            double sumTs = 0.0;
-            double sumTv = 0.0;
-            double sumWeight = 0.0;
+            double sumTs = 0.0; // total weight of all columns that have a transition for these taxa
+            double sumTv = 0.0; // total weight of all columns that have a transversion for these taxa
+            double sumWeight = 0.0; // total weight of all columns (ignoring those with ambiguities, but
+                                    // including identical columns (which have neither a transition nor a transversion) )
 
             for( Pattern pattern : alignment.getPatterns() ) {
                 State state1 = pattern.getState(taxon1);
@@ -117,12 +118,12 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                         sumTv += weight;
                     }
                 }
-                sumWeight += weight;
+                sumWeight += weight; // this also includes the columns with state1 == state2
             }
 
-           if( sumWeight <= 0.0 ) {
-              return MAX_DISTANCE;
-           }
+            if( sumWeight <= 0.0 ) {
+                return MAX_DISTANCE;
+            }
             
             while( true ) {
 
@@ -181,6 +182,9 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             int dimension = alignment.getTaxa().size();
             double[][] distances = new double[dimension][dimension];
 
+            // TT: Whys is this a float? It's always a whole number! If the purpose
+            // is to avoid integer division, we should rather cast to float or double
+            // in the division below
             float tot = (dimension * (dimension - 1)) / 2;
             int done = 0;
 

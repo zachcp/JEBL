@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An interface representing a list of states for a list of taxa.
+ * An interface representing a list of states for a list of taxa
+ * (e.g. an alignment column).
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
