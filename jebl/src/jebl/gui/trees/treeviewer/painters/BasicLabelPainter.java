@@ -405,7 +405,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             setFontMinSize(size, false);
 
             final JSpinner fontMinSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultMinFontSize, 0.01, 48, 1));
-            optionsPanel.addComponentWithLabel("Minumum Size:", fontMinSizeSpinner);
+            optionsPanel.addComponentWithLabel("Minimum Size:", fontMinSizeSpinner);
             //fontMinSizeSpinner.setValue(size);
 
             fontMinSizeSpinner.addChangeListener(new ChangeListener() {
