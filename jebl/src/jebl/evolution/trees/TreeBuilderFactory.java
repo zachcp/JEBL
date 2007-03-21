@@ -53,6 +53,11 @@ public class TreeBuilderFactory {
         }
     }
 
+    // TT: This method should probably have been called createBuilder() because it
+    // creates a new builder every time instead of reusing an existing one. This
+    // makes a difference because it means that progress listeners added to a
+    // builder don't need to be removed afterwards if the builder is discarded.
+
     /**
      *
      * @param method build method to use.

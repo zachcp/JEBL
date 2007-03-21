@@ -62,6 +62,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         }
     }
 
+    // must be a type of list that supports the remove() operation
     private final List<ProgressListener> listeners = new ArrayList<ProgressListener>();
 
     /**

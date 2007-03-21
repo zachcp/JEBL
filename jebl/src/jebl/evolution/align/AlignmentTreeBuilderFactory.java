@@ -60,7 +60,9 @@ public class AlignmentTreeBuilderFactory {
         progressListener.beginSubtask("Building tree");
         TreeBuilder treeBuilder = TreeBuilderFactory.getBuilder(method, distanceMatrix);
         treeBuilder.addProgressListener(progressListener);
-        return new Result(treeBuilder.build(), distanceMatrix);
+        Result result = new Result(treeBuilder.build(), distanceMatrix);
+        treeBuilder.removeProgressListener(progressListener);
+        return result;
     }
 
     /**
