@@ -130,6 +130,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         doAlignment(sq1, sq2, progress, false);
     }
 
+    // todo: return null when progress canceled, and document and handle this behaviour
     public AlignmentResult[] doAlignment(Profile profile1, Profile profile2,
                                          ProgressListener progress, boolean scoreOnly) {
         this.progress = progress;
