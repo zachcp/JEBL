@@ -18,6 +18,19 @@ import jebl.evolution.taxa.Taxon;
  */
 public class Utils {
 
+    /**
+     * Translates each of a given sequence of {@link NucleotideState}s or {@link CodonState}s
+     * to the {@link AminoAcidState} corresponding to it under the given genetic code.
+     *
+     * Translation doesn't stop at stop codons; these are translated to {@link AminoAcids#STOP_STATE}.
+     * If translating from {@link jebl.evolution.sequences.NucleotideState} and the number
+     * of states is not a multiple of 3, then the excess states at the end are silently dropped.
+     *
+     * @param states States to translate; must all be of the same type, either NucleotideState
+     *        or CodonState.
+     * @param geneticCode
+     * @return
+     */
     public static AminoAcidState[] translate(final State[] states, GeneticCode geneticCode) {
         if (states == null) throw new NullPointerException("States array is null");
         if (states.length == 0) return new AminoAcidState[0];
@@ -66,7 +79,24 @@ public class Utils {
         return reverseComplement(nucleotideSequence, false);
     }
 
-
+    /**
+     * Translates the given nucleotideSequence into an amino acid sequence string,
+     * using the given geneticCode. The translation is done triplet by triplet,
+     * starting with the triplet that is at index 0..2 in nucleotideSequence,
+     * then the one at index 3..5 etc. until there are less than 3 nucleotides
+     * left.
+     *
+     * This method uses {@link #translate(State[], GeneticCode)} to do the
+     * translation, hence it shares some properties with that method:
+     * 1.) Any excess nucleotides at the end will be silently discarded,
+     * 2.) Translation doesn't stop at stop codons; instead, they are
+     *     translated to "*", which is {@link jebl.evolution.sequences.AminoAcids#STOP_STATE}'s code.
+     * @param nucleotideSequence nucleotide sequence string to translate
+     * @param geneticCode genetic code to use for the translation
+     * @return A string with length nucleotideSequence.length() / 3 (rounded down),
+     *         the translation of <code>nucleotideSequence</code> with the given
+     *         genetic code.
+     */
     public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         seq = new GaplessSequence(seq);
