@@ -127,9 +127,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             final RootedTree rtree = (RootedTree) tree;
 
             if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
-                return formatter.getFormattedValue(rtree.getHeight(node));
+                return getFormattedValue(rtree.getHeight(node));
             } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-                return formatter.getFormattedValue(rtree.getLength(node));
+                return getFormattedValue(rtree.getLength(node));
             }
         }
 
@@ -141,6 +141,12 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             return value.toString();
         }
         return null;
+    }
+
+    private String getFormattedValue(double d){
+        if(d == 0)
+            return "0";
+        return formatter.getFormattedValue(d);
     }
 
     public float getFontSize() {
