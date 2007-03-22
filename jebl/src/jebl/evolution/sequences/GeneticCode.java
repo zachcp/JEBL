@@ -25,6 +25,9 @@ public final class GeneticCode {
 	 * Standard genetic code tables from GENBANK
 	 * Nucleotides go A, C, G, T - Note: this is not the order used by the Genbank web site
 	 * With the first codon position most significant (i.e. AAA, AAC, AAG, AAT, ACA, etc.).
+     *
+     * The codes for the individual amino acids can be found in AminoAcids.java;
+     * For example, "*" stands for a stop codon (AminoAcids.STOP_STATE)
 	 */
 	private static final String[] GENETIC_CODE_TABLES = {
 	    // Universal
