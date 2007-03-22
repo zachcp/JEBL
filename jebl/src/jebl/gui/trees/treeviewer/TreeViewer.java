@@ -231,6 +231,10 @@ public class TreeViewer extends JPanel implements Printable {
         setTree(tree, 6);
     }
 
+    public TreePane getTreePane(){
+        return treePane;
+    }
+
     public ControlPalette getControlPalette() {
         return controlPalette;
     }

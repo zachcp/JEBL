@@ -952,7 +952,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     boolean preElementDrawCode = false;
 
-    protected void drawTree(Graphics2D g2, double width, double height) {
+    public void drawTree(Graphics2D g2, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
