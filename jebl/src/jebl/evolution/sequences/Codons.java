@@ -72,6 +72,7 @@ public final class Codons {
      * @return the state
      */
     public static CodonState getState(String code) {
+        code=code.toUpperCase().replace('U','T');
         return statesByCode.get(code);
 	}
 
