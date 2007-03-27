@@ -26,7 +26,7 @@ public class NucleotideScores extends Scores {
             Nucleotides.CANONICAL_STATES[0].getCode() +
                     Nucleotides.CANONICAL_STATES[1].getCode() +
                     Nucleotides.CANONICAL_STATES[2].getCode() +
-                    Nucleotides.CANONICAL_STATES[3].getCode();
+                    Nucleotides.CANONICAL_STATES[3].getCode() +"U";
 
     public static final NucleotideScores IUB = new NucleotideScores(1.0f, -0.9f);
     public static final NucleotideScores CLUSTALW = new NucleotideScores(1.0f, 0.0f);
@@ -97,7 +97,10 @@ public class NucleotideScores extends Scores {
             states.add (state);
             builder.append (state.getCode ());
         }
-        alphabet = builder.toString();
+        // Add RNA "U" and the corresponding canonical state which is T_STATE to the list:
+        alphabet = builder.toString() + "U";
+        states.add(Nucleotides.T_STATE);
+
         int statesCount = states.size();
         float[][] scores = new float[statesCount][statesCount];
         for (int i = 0; i < statesCount; i++) {
