@@ -497,6 +497,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     final private int circDiameter = 9;
 
+    //this method is for figuring out which node the user clicked on (if any)
     // result[0] is the selected node
     // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
     // direction, null otherwise
@@ -506,7 +507,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
-        for( TreeDrawableElement e : treeElements ) {
+        //todo: this allows clicking on node/branch labels to select nodes.  At this point this behaviour is considered undesirable
+        /*for( TreeDrawableElement e : treeElements ) {
             Node node = e.getNode();
             if( node != null ) {
                 if( e.hit(g2, rect) ) {
@@ -514,7 +516,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                    return result;
                 }
             }
-        }
+        }*/
 //
 //        for (Node node : tree.getExternalNodes()) {
 //            final Shape taxonLabelBound = taxonLabelBounds.get(tree.getTaxon(node));
@@ -535,7 +537,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        for( Node node : nodes ) {
+        //todo: this allows clicking on branches to select nodes.  At this point this behaviour is considered undesirable      
+        /*for( Node node : nodes ) {
             final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
             if( branchPath != null && g2.hit(rect, branchPath, true) ) {
                 result[0] = node;
@@ -552,23 +555,31 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
                 return result;
             }
-        }
+        }*/
 
         return result;
     }
 
+    /**
+     * This is used for calculating which nodes are selected by dragging
+     * (with a selection rectangle)
+     * @param g2
+     * @param rect
+     * @return
+     */
     Set<Node> getNodesAt(Graphics2D g2, Rectangle rect) {
 
         Set<Node> nodes = new HashSet<Node>();
 
-        for( TreeDrawableElement e : treeElements ) {
+        //todo: this allows clicking on node/branch labels to select nodes.  At this point this behaviour is considered undesirable
+        /*for( TreeDrawableElement e : treeElements ) {
             Node node = e.getNode();
             if( node != null ) {
                 if( e.hit(g2, rect) ) {
                     nodes.add(node);
                 }
             }
-        }
+        }*/
 
 //        for (Node node : tree.getExternalNodes()) {
 //            //  incorrect - some lables may have been reduced in size
@@ -582,7 +593,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         for (Node node : tree.getNodes()) {
             Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
             if (branchPath != null && g2.hit(rect, branchPath, true)) {
-                nodes.add(node);
+                //nodes.add(node);
             }
             else if(rect.contains(transform.transform(treeLayout.getNodePoint(node),null))){
                 nodes.add(node);
