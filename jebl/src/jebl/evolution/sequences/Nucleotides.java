@@ -28,7 +28,12 @@ public final class Nucleotides {
     public static final NucleotideState C_STATE = new NucleotideState("C", "C", 1);
     public static final NucleotideState G_STATE = new NucleotideState("G", "G", 2);
     public static final NucleotideState T_STATE = new NucleotideState("T", "T", 3);
-    public static final NucleotideState U_STATE = new NucleotideState("U", "U", 3);
+
+    // The following line has been removed since it's never used and if it
+    // was used would cause all sorts of bugs with various analysis code.
+    // T_STATE  represents either a U or a T depending on the context.
+    //public static final NucleotideState U_STATE = new NucleotideState("U", "U", 3);
+
     public static final NucleotideState R_STATE = new NucleotideState("R", "R", 4, new NucleotideState[] {A_STATE, G_STATE});
     public static final NucleotideState Y_STATE = new NucleotideState("Y", "Y", 5, new NucleotideState[] {C_STATE, T_STATE});
     public static final NucleotideState M_STATE = new NucleotideState("M", "M", 6, new NucleotideState[] {A_STATE, C_STATE});

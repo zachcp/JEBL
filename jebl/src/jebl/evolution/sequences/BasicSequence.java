@@ -45,16 +45,19 @@ public class BasicSequence implements Sequence {
         this.sequenceType = sequenceType;
         this.taxon = taxon;
         final int len = sequenceString.length();
-        this.sequence = new byte[len];
+        this.sequenceCharacters = new byte[len];
 
         for (int i = 0; i < len; i++) {
-            State state = sequenceType.getState(sequenceString.charAt(i));
+            char c = sequenceString.charAt(i);
+            State state = sequenceType.getState(c);
 
             if (state == null) {
                 // Something is wrong. Keep original length by inserting an unknown state
-                state = sequenceType.getUnknownState();
+                sequenceCharacters[i] ='?';
             }
-            sequence[i] = (byte)state.getIndex();
+            else {
+                sequenceCharacters[i] = (byte)c;
+            }
         }
     }
 
@@ -69,9 +72,9 @@ public class BasicSequence implements Sequence {
 
         this.sequenceType = sequenceType;
         this.taxon = taxon;
-        this.sequence = new byte[states.length];
-        for (int i = 0; i < sequence.length; i++) {
-            sequence[i] = (byte)states[i].getIndex();
+        this.sequenceCharacters = new byte[states.length];
+        for (int i = 0; i < sequenceCharacters.length; i++) {
+            sequenceCharacters[i] = (byte)states[i].getCode().charAt(0);
         }
     }
 
@@ -86,17 +89,17 @@ public class BasicSequence implements Sequence {
      * @return a string representing the sequence of symbols.
      */
     public String getString() {
-        StringBuilder buffer = new StringBuilder(sequence.length);
-        for (int i : sequence) {
-            buffer.append(sequenceType.getState(i).getCode());
+        StringBuilder buffer = new StringBuilder(sequenceCharacters.length);
+        for (int i : sequenceCharacters) {
+            buffer.append((char) i);
         }
         return buffer.toString();
     }
 
     public String getCleanString() {
-        StringBuilder buffer = new StringBuilder(sequence.length);
-        for (int i : sequence) {
-            State state = sequenceType.getState(i);
+        StringBuilder buffer = new StringBuilder(sequenceCharacters.length);
+        for (int i : sequenceCharacters) {
+            State state = sequenceType.getState((char)i);
             if (state.isAmbiguous() || state.isGap()) continue;
             buffer.append(sequenceType.getState(i).getCode());
         }
@@ -107,18 +110,34 @@ public class BasicSequence implements Sequence {
      * @return an array of state objects.
      */
     public State[] getStates() {
-        return sequenceType.toStateArray(sequence);
+        return sequenceType.toStateArray(getStateIndices());
     }
 
     public byte[] getStateIndices() {
-        return sequence;
+        byte results[]=new byte[sequenceCharacters.length];
+        for (int i = 0; i < sequenceCharacters.length; i++) {
+             results [i] = (byte) getState(i).getIndex();
+        }
+        return results;
+    }
+
+
+    /**
+     * Get the sequence characters representing the sequence.
+     * This return is a byte[] rather than a char[]
+     * to avoid using twice as much memory as necessary.
+     * The individual elements of the returned array can be cast to chars.
+     * @return the sequence characters as an array of characters.
+     */
+    public byte[] getSequenceCharacters() {
+        return sequenceCharacters;
     }
 
     /**
      * @return the state at site.
      */
     public State getState(int site) {
-        return sequenceType.getState(sequence[site]);
+        return sequenceType.getState((char)sequenceCharacters[site]);
     }
 
     /**
@@ -127,7 +146,7 @@ public class BasicSequence implements Sequence {
      * @return the length
      */
     public int getLength() {
-        return sequence.length;
+        return sequenceCharacters.length;
     }
 
     /**
@@ -193,7 +212,7 @@ public class BasicSequence implements Sequence {
 
     private final Taxon taxon;
     private final SequenceType sequenceType;
-    private final byte[] sequence;
+    private final byte[] sequenceCharacters; // this is really an array of characters, but using bytes since we don't store high-ascii characters
 
    // private Map<String, Object> attributeMap = null;
 }
