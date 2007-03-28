@@ -1039,7 +1039,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     g2.setPaint(paint);
 
-                    g2.draw(branchPath);
+                    if(branchPath != null)
+                        g2.draw(branchPath);
 
                     nodeMarker(g2, node);
 
