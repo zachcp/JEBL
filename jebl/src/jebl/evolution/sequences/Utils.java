@@ -55,11 +55,47 @@ public class Utils {
         }
     }
 
-     private static String reverseComplement(final String nucleotideSequence, boolean removeGaps) {
+    /**
+     * Is the given NucleotideSequence predominantly RNA?
+     * (i.e the more occurrences of "U" than "T")
+     * @param sequenceString the sequence string to inspect to determine if it's RNA
+     * @param maximumNonGapsToLookAt for performance reasons, only look at a maximum of this many non-gap residues in deciding if the sequence is predominantly RNA. Can be -1 or Integer.MAX_VALUE to look at the entire sequence.
+     * @return true if the given NucleotideSequence predominantly RNA
+     */
+    public static boolean isPredominantlyRNA(final CharSequence sequenceString, int maximumNonGapsToLookAt) {
+        int length = sequenceString.length();
+        int tCount = 0;
+        int uCount = 0;
+        if (maximumNonGapsToLookAt==-1) maximumNonGapsToLookAt=Integer.MAX_VALUE;
+        for (int i = 0; i < length && maximumNonGapsToLookAt > 0; i++) {
+            char c = sequenceString.charAt(i);
+            if (c != '-') maximumNonGapsToLookAt--;
+            if (c == 'T' || c == 't') tCount++;
+            if (c == 'U' || c == 'u') uCount++;
+        }
+        return uCount > tCount;
+    }
+
+    private static String reverseComplement(final String nucleotideSequence, boolean removeGaps) {
+        boolean predominantlyRNA = isPredominantlyRNA(nucleotideSequence,-1);
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         if( removeGaps ) {
             seq = new GaplessSequence(seq);
         }
+        int length=seq.getLength();
+          StringBuilder results =new StringBuilder();
+         for (int i =  length-1; i >=0; i--) {
+             State state= seq.getState(i);
+             NucleotideState complementaryState = Nucleotides.COMPLEMENTARY_STATES[state.getIndex()];
+             if (predominantlyRNA && complementaryState.equals(Nucleotides.T_STATE)) {
+                 results.append('U');
+             }
+             else {
+                  results.append (complementaryState.getCode());
+             }
+         }
+          return results.toString();
+/*
         State[] states = seq.getStates();
         NucleotideState[] nucleotideStates = new NucleotideState[states.length];
         for (int i = 0; i < states.length; i++) {
@@ -67,7 +103,7 @@ public class Utils {
         }
         nucleotideStates = reverseComplement(nucleotideStates);
         seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideStates);
-        return seq.getString();
+        return seq.getString();*/
     }
 
     /* kills gaps */
