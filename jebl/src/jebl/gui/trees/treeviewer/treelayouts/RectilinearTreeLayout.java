@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Utils;
+import jebl.gui.trees.treeviewer.TreeViewer;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -120,7 +122,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
-
+        final Preferences prefs = Preferences.userNodeForPackage(TreeViewer.class);
         List<Controls> controlsList = new ArrayList<Controls>();
 
         if (controls == null) {
@@ -139,8 +141,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                     public void stateChanged(ChangeEvent changeEvent) {
                         double value = slider1.getValue();
                         setRootLength(value / slider1max);
+                        prefs.putInt("root length",slider1.getValue());
                     }
                 });
+                slider1.setValue(prefs.getInt("root length",0));
                 optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
             }
 
@@ -154,18 +158,23 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 public void stateChanged(ChangeEvent changeEvent) {
                     double value = 1.0 - (((double) slider2.getValue()) / slider2max);
                     setBranchCurveProportion(value, value);
+                    prefs.putInt("tree curvature",slider2.getValue());
                 }
             });
+            slider2.setValue(prefs.getInt("tree curvature",0));
             optionsPanel.addComponentWithLabel("Curvature:", slider2, true);
 
             final JCheckBox checkBox1 = new JCheckBox("Align Taxon Labels");
 
+            setAlignTaxonLabels(prefs.getBoolean("align taxon labels",alignTaxonLabels));
             checkBox1.setSelected(alignTaxonLabels);
             checkBox1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     setAlignTaxonLabels(checkBox1.isSelected());
+                    prefs.putBoolean("align taxon labels",checkBox1.isSelected());
                 }
             });
+
             optionsPanel.addComponent(checkBox1);
 
             controls = new Controls("Layout", optionsPanel, true, false, null);

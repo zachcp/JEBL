@@ -642,12 +642,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
 
             final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
-            combo1.setSelectedItem(branchTransform);
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
+                    PREFS.putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
                     setBranchTransform(true, (TransformedRootedTree.Transform) combo1.getSelectedItem());
                 }
             });
+            combo1.setSelectedIndex(PREFS.getInt(branchTransformTypePREFSkey, 0));
+            branchTransform = (TransformedRootedTree.Transform) combo1.getSelectedItem();           
             final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", combo1);
             label1.setEnabled(transformCheck.isSelected());
             combo1.setEnabled(transformCheck.isSelected());
@@ -670,12 +672,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             checkBox2.setSelected(orderBranches);
 
             final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values());
-            combo2.setSelectedItem(branchOrdering);
             combo2.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
-                    setBranchOrdering(true, (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
+                    if(orderBranches){
+                        setBranchOrdering(true, (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
+                        PREFS.putInt(branchOrderingPREFSkey,combo2.getSelectedIndex());
+                    }
                 }
             });
+            combo2.setSelectedIndex(PREFS.getInt(branchOrderingPREFSkey,0));
 
             final JLabel label2 = optionsPanel.addComponentWithLabel("Ordering:", combo2);
             label2.setEnabled(checkBox2.isSelected());
@@ -688,6 +693,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     setBranchOrdering(checkBox2.isSelected(),
                             (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
+                    PREFS.putBoolean(orderBranchesPREFSkey, orderBranches);
                 }
             });
 
@@ -738,11 +744,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             final JCheckBox subTreeShowJB = new JCheckBox("Show selected subtree only");
             subTreeShowJB.setToolTipText("Only the selected part of the tree is shown");
-            viewSubtree = false;
+            viewSubtree = PREFS.getBoolean(viewSubtreePREFSkey, false);
             subTreeShowJB.setSelected(viewSubtree);
             subTreeShowJB.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     final boolean b = subTreeShowJB.isSelected();
+                    PREFS.putBoolean(viewSubtreePREFSkey, subTreeShowJB.isSelected());
                     if( viewSubtree != b ) {
                         viewSubtree = b;
                         calibrated = false;
@@ -1899,9 +1906,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     // private Map<Taxon, Shape> calloutPaths = new HashMap<Taxon, Shape>();
 
     private String transformBanchesPREFSkey = "transformBranches";
+    private String branchTransformTypePREFSkey = "branchTransformType";
+    private String branchOrderingPREFSkey = "branchOrdering";
     private String orderBranchesPREFSkey = "orderBranches";
     private String showRootPREFSkey = "showRootBranch";
     private String autoExPREFSkey = "autoExpansion";
+    private String viewSubtreePREFSkey = "viewSubtree";
     private String branchWeightPREFSkey = "branchWeight";
     private static Preferences PREFS = Preferences.userNodeForPackage(TreePane.class);
 }
