@@ -584,6 +584,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if (branchPath != null && g2.hit(rect, branchPath, true)) {
                 nodes.add(node);
             }
+            else if(rect.contains(transform.transform(treeLayout.getNodePoint(node),null))){
+                nodes.add(node);
+            }
         }
 
         return nodes;
