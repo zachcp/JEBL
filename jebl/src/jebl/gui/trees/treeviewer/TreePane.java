@@ -1039,8 +1039,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     g2.setPaint(paint);
 
-                    if(branchPath != null)
-                        g2.draw(branchPath);
+                    // todo: although this fix is only an if != null check, this is ok because the missing node is a root node,
+                    // todo: which should not be drawn on an unrooted view anyway
+                    if(branchPath == null)
+                        continue;
+
+                    g2.draw(branchPath);
 
                     nodeMarker(g2, node);
 
