@@ -25,15 +25,15 @@ public abstract class TreeDrawableElement {
        return new Point2D.Double( b.getX() + b.getWidth() / 2,  b.getY() + b.getHeight()/2 );
     }
 
-    public double getRadious2() {
+    public double getRadius2() {
         final Rectangle2D b = getBounds();
         final double width = b.getWidth();
         final double h = b.getHeight();
         return (width*width + h*h)/ 4.0;
     }
 
-    public double getRadious() {
-        return Math.sqrt( getRadious2() );
+    public double getRadius() {
+        return Math.sqrt( getRadius2() );
     }
 
     public static boolean intersects(TreeDrawableElement e1, TreeDrawableElement e2) {
@@ -151,7 +151,7 @@ public abstract class TreeDrawableElement {
                 maxDX = bounds.getWidth();
             }
 
-            final double r = e.getRadious2();
+            final double r = e.getRadius2();
             if( r > maxRadious2 ) {
                 maxRadious2 = r;
             }

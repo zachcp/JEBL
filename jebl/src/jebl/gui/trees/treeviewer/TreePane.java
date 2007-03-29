@@ -941,27 +941,28 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            }
 //            g2.drawPolygon(xp, yp, 3);
 //            }
-        } else {
-
-            final Paint c = isSelected ? selectionPaint : Color.LIGHT_GRAY;
-            g2.setPaint(c);
-
-            final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
-
-            final double x = nodeLocation.getX();
-            final int ix1 = (int) Math.round(x);
-            final double y = nodeLocation.getY();
-            final int iy1 = (int) Math.round(y);
-
-            int d = circDiameter;
-            if( rlimit >= 0 ) {
-                d = Math.min(2*rlimit+1, d);
-            }
-
-            final int r = (d-1)/2;
-
-            g2.fillOval(ix1 - r, iy1 - r, d, d);  
         }
+
+        final Paint c = isSelected ? selectionPaint : Color.LIGHT_GRAY;
+        g2.setPaint(c);
+
+        final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
+
+        final double x = nodeLocation.getX();
+        final int ix1 = (int) Math.round(x);
+        final double y = nodeLocation.getY();
+        final int iy1 = (int) Math.round(y);
+
+        int d = circDiameter;
+        if( rlimit >= 0 ) {
+            d = Math.min(2*rlimit+1, d);
+        }
+
+        final int r = (d-1)/2;
+
+        g2.fillOval(ix1 - r, iy1 - r, d, d);
+        g2.setColor(Color.black);
+        g2.drawOval(ix1 - r, iy1 - r, d, d);
         g2.setPaint(color);
     }
 
