@@ -518,15 +518,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         }*/
-//
-//        for (Node node : tree.getExternalNodes()) {
-//            final Shape taxonLabelBound = taxonLabelBounds.get(tree.getTaxon(node));
-//
-//            if (taxonLabelBound != null && g2.hit(rect, taxonLabelBound, false)) {
-//                result[0] = node;
-//                return result;
-//            }
-//        }
 
         // this piece of code must run in reverse of how the nodes are drawn so that if the user clicks on 
         // overlapping nodes, the top node is selected

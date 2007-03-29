@@ -94,6 +94,9 @@ public class MultipleTreeViewer extends TreeViewer {
                     spinner1.addChangeListener(new ChangeListener() {
                         public void stateChanged(ChangeEvent changeEvent) {
                             setCurrentTree(trees.get( names.indexOf( (String)spinner1.getValue()) ) );
+                            //this is here becasue the selection clears when we change trees, and we
+                            //want to refresh the toolbar
+                            treePane.clearSelection();
                         }
                     });
                     optionsPanel.addComponentWithLabel("Tree:", spinner1);
