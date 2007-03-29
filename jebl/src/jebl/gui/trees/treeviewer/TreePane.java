@@ -39,6 +39,7 @@ import java.util.prefs.Preferences;
  */
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
+    public static boolean goBackwards = false;
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
     }
@@ -527,37 +528,39 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            }
 //        }
 
-        final Set<Node> nodes = tree.getNodes();
-        for (Node node : nodes) {
-            final Point2D.Double coord = nodeCoord(node);
-            final double v = coord.distanceSq(point);
-            if( v < circDiameter * circDiameter) {
-                result[0] = node;
+        // this piece of code must run in reverse of how the nodes are drawn so that if the user clicks on 
+        // overlapping nodes, the top node is selected
+        Node rootNode = tree.getRootNode();
+        if( ! hideNode(rootNode) && checkNodeIntersects(rootNode, point)) {
+            result[0] = rootNode;
+            return result;
+        }
+        List<Node> nodesInOrder = Utils.getNodes(tree, tree.getRootNode());
+        for (int i = 0; i < nodesInOrder.size(); i++) {
+            if( !isNodeVisible(nodesInOrder.get(i)) ) continue;
+            if( hideNode(nodesInOrder.get(i)) ) continue;
+            if( tree.isExternal(nodesInOrder.get(i)) ) continue;
+            if( checkNodeIntersects(nodesInOrder.get(i), point)) {
+                result[0] = nodesInOrder.get(i);
                 return result;
             }
         }
-
-        //todo: this allows clicking on branches to select nodes.  At this point this behaviour is considered undesirable      
-        /*for( Node node : nodes ) {
-            final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-            if( branchPath != null && g2.hit(rect, branchPath, true) ) {
-                result[0] = node;
-                final RootedTree rootedTree = getTree();
-                if( rootedTree.conceptuallyUnrooted() ) {
-                    final Point2D.Double nodeLocation = nodeCoord(node);
-                    final Node parent = rootedTree.getParent(node);
-                    final Point2D.Double parentLocation = nodeCoord(parent);
-                    final double toNode = point.distanceSq(nodeLocation);
-                    final double toParent = point.distanceSq(parentLocation);
-                    if( toParent < toNode ) {
-                        result[1] = parent;
-                    }
-                }
+        Node[] externalNodes = tree.getExternalNodes().toArray(new Node[0]);
+        for(int i = externalNodes.length-1; i >= 0; i--){
+            if( !isNodeVisible(externalNodes[i]) ) continue;
+            if( hideNode(externalNodes[i]) ) continue;
+            if( checkNodeIntersects(externalNodes[i], point)) {
+                result[0] = externalNodes[i];
                 return result;
             }
-        }*/
-
+        }
         return result;
+    }
+
+    private boolean checkNodeIntersects(Node node, Point point){
+        final Point2D.Double coord = nodeCoord(node);
+        final double v = coord.distanceSq(point);
+        return v < circDiameter * circDiameter;
     }
 
     /**
@@ -590,13 +593,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            }
 //        }
 
-        for (Node node : tree.getNodes()) {
-            /*Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-            if (branchPath != null && g2.hit(rect, branchPath, true)) {
-                nodes.add(node);
-            }
-            else */if(rect.contains(transform.transform(treeLayout.getNodePoint(node),null))){
-                nodes.add(node);
+        Node[] allNodes = tree.getNodes().toArray(new Node[0]);
+        for(int i=allNodes.length-1; i >= 0; i--){
+            if(rect.contains(transform.transform(treeLayout.getNodePoint(allNodes[i]),null))){
+                nodes.add(allNodes[i]);
             }
         }
 
