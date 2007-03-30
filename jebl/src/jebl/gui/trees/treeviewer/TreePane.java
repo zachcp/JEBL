@@ -1761,7 +1761,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 double scaleMin = -Double.MAX_VALUE;
                 for(int k = 0; k < nv; k += 3) {
                     if( values[k] != 0.0 ) {
-                        double lim = (values[k+1] - origin) / values[k];
+                        double lim = Math.abs((values[k+1] - origin) / values[k]);
                         scale = Math.min(scale, lim);
                     }
 
