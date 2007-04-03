@@ -29,6 +29,7 @@ import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.*;
 import org.virion.jam.panels.OptionsPanel;
 import org.virion.jam.util.IconUtils;
+import org.virion.jam.util.SimpleListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -44,6 +45,8 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.prefs.Preferences;
 
 /**
@@ -114,6 +117,14 @@ public class TreeViewer extends JPanel implements Printable {
 
         treePane = new TreePane();
         treePane.setAutoscrolls(true); //enable synthetic drag events
+        listeners = new HashSet<SimpleListener>();
+
+        //make sure that the change listeners are fired when the treeSelectionListener fires
+        treePane.addTreeSelectionListener(new TreeSelectionListener(){
+            public void selectionChanged() {
+                fireChangeListeners();
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setMinimumSize(new Dimension(150, 150));
@@ -175,6 +186,30 @@ public class TreeViewer extends JPanel implements Printable {
     protected void setDefaultTreeLayoutType(TreeLayoutType treeLayoutType) {
         String layoutPrefKey = currentTreeLayoutPrefKey();
         PREFS.putInt(layoutPrefKey, treeLayoutType.ordinal());
+    }
+
+    private void fireChangeListeners(){
+        for(SimpleListener listener : listeners){
+            listener.objectChanged();
+        }
+    }
+
+    /**
+     *
+     * @param listener
+     * @return true if the supplied listener is not already attached
+     */
+    public boolean addChangeListener(SimpleListener listener){
+        return listeners.add(listener);
+    }
+
+    /**
+     *
+     * @param listener
+     * @return true if the supplied listener was attached
+     */
+    public boolean removeChangeListener(SimpleListener listener){
+        return listeners.remove(listener);
     }
 
     public void setTree(Tree inTree, int defaultLabelSize) {
@@ -318,6 +353,7 @@ public class TreeViewer extends JPanel implements Printable {
                                 toggle2.setSelected(false);
                                 toggle3.setSelected(true);
                             }
+                            fireChangeListeners();
                         }
                     } );
 
@@ -343,6 +379,7 @@ public class TreeViewer extends JPanel implements Printable {
                         final int value = zoomSlider.getValue();
                         setZoom(((double) value) / 100.0);
                         PREFS.putInt(zoomValuePrefKey, value);
+                        fireChangeListeners();
                     }
                 });
 
@@ -362,6 +399,7 @@ public class TreeViewer extends JPanel implements Printable {
                         final int value = verticalExpansionSlider.getValue();
                         setVerticalExpansion(((double) value) / 100.0);
                         PREFS.putInt(expansionValuePrefKey, value);
+                        fireChangeListeners();
                     }
                 });
 
@@ -374,6 +412,7 @@ public class TreeViewer extends JPanel implements Printable {
                         if (toggle1.isSelected())
                             setAndStoreTreeLayoutType(TreeLayoutType.RECTILINEAR);
                         setExpansion();
+                        fireChangeListeners();
                     }
                 });
                 toggle2.addChangeListener(new ChangeListener() {
@@ -381,6 +420,7 @@ public class TreeViewer extends JPanel implements Printable {
                         if (toggle2.isSelected())
                             setAndStoreTreeLayoutType(TreeLayoutType.POLAR);
                         setExpansion();
+                        fireChangeListeners();
                     }
                 });
                 toggle3.addChangeListener(new ChangeListener() {
@@ -388,6 +428,7 @@ public class TreeViewer extends JPanel implements Printable {
                         if (toggle3.isSelected())
                             setAndStoreTreeLayoutType(TreeLayoutType.RADIAL);
                         setExpansion();
+                        fireChangeListeners();
                     }
                 });
 
@@ -432,6 +473,18 @@ public class TreeViewer extends JPanel implements Printable {
         private Controls controls = null;
 
     };
+
+    public TreeLayoutType getTreeLayoutType(){
+        TreeLayout layout = treePane.getTreeLayout();
+        if(layout instanceof RectilinearTreeLayout)
+            return TreeLayoutType.RECTILINEAR;
+        if(layout instanceof PolarTreeLayout)
+            return TreeLayoutType.POLAR;
+        if(layout instanceof RadialTreeLayout)
+            return TreeLayoutType.RADIAL;
+        //this should never happen
+        throw new RuntimeException("Unknown TreeLayoutType: " + layout);
+    }
 
     public void setTreeLayoutType(TreeLayoutType treeLayoutType) {
         TreeLayout treeLayout;
@@ -621,6 +674,7 @@ public class TreeViewer extends JPanel implements Printable {
     protected JViewport viewport;
     protected JSplitPane splitPane;
     private ControlPalette controlPalette;
+    private Set<SimpleListener> listeners;
 
     static public void main(String[] args) {
 

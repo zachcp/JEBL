@@ -1641,6 +1641,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.viewport = viewport;
     }
 
+    TreeLayout getTreeLayout() {
+        return treeLayout;
+    }
+
     private class TreeBoundsHelper {
         private double[] xbounds;
         private double[] ybounds;
