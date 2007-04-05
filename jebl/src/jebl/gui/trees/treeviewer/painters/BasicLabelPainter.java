@@ -19,6 +19,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * @author Andrew Rambaut
@@ -66,7 +68,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 sources.add(TAXON_NAMES);
                 wantHeightsIfPossible = true;
                 for (Node node : tree.getExternalNodes() ) {
-                    names.addAll(node.getAttributeNames());
+                    for(String s : node.getAttributeNames()){
+                        if(!s.equalsIgnoreCase("size") && !s.equalsIgnoreCase("first residues"))
+                            names.add(s);
+                    }
+                    //names.addAll(node.getAttributeNames());
                 }
                 break;
             }
@@ -138,7 +144,15 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             if (value instanceof Double) {
                 return formatter.getFormattedValue((Double) value);
             }
-            return value.toString();
+            if(value instanceof Date){
+                DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
+                return  format.format((Date)value);
+            }
+            String s = value.toString();
+            //limit node labels to 15 chars (plus ...)
+            //if(s.length() > 15)
+            //    return s.substring(0,15)+"...";
+            return s;
         }
         return null;
     }
