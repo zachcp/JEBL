@@ -1337,7 +1337,17 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     xorigion = tbh.getOrigion(true, yScale);
                     treeScale = yScale;
                 } else {
-                    assert tbh.getRange(false, yorigion, xScale) <= availableH;
+                    double size = 0;
+                    int count = 0;
+                    String oldValues = "";
+                    //count is here to make sure we don't get an infinite loop if there is no scale that will
+                    //allow the tree to be contained in the current view
+                    while((size = tbh.getRange(false, yorigion, xScale)) > availableH && count < 10){
+                        xScale *= availableH/size;
+                        yorigion = yOffset;
+                        count++;
+                    }
+                    //todo: this was removed assert tbh.getRange(false, yorigion, xScale) <= availableH : tbh.getRange(false, yorigion, xScale)+" : "+availableH+" : "+oldValues;
                     //assert yorigion + xScale * treeBounds.getHeight() <= availableH;
                     yorigion = tbh.getOrigion(false, xScale);
                     treeScale  = xScale;
