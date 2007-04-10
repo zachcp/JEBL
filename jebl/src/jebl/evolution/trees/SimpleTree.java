@@ -143,7 +143,16 @@ public final class SimpleTree implements Tree {
      * @return the set of nodes that are attached by edges to the given node.
      */
     public List<Edge> getEdges(Node node) {
-        return null;
+        //return null;
+        List<Node> adjacencies = getAdjacencies(node);
+        List<Edge> edges = new ArrayList<Edge>();
+        for(Node adjNode : adjacencies){
+            try{
+                edges.add(getEdge(node,adjNode));
+            }
+            catch(NoEdgeException ex){/*do nothing*/}
+        }
+        return edges;
     }
 
     /**
