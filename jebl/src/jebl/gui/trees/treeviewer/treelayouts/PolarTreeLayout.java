@@ -120,19 +120,20 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 }
             });
             optionsPanel.addComponentWithLabel("Angle Range:", slider3, true);
-
-            final JComboBox combo1 = new JComboBox();
-            for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
-                if (position != TaxonLabelPosition.HORIZONTAL) // not implemented yet
-                    combo1.addItem(position);
-            }
-            combo1.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent itemEvent) {
-                    setTaxonLabelPosition((TaxonLabelPosition) combo1.getSelectedItem());
-
-                }
-            });
-            optionsPanel.addComponentWithLabel("Label Position:", combo1);
+//in Geneious 2.5.4 this option did nothing, and in 3.0 it caused a crash.  I am therefore removing
+//this option until we can figure out what it does and fix the crash.
+//            final JComboBox combo1 = new JComboBox();
+//            for (TaxonLabelPosition position : TaxonLabelPosition.values()) {
+//                if (position != TaxonLabelPosition.HORIZONTAL) // not implemented yet
+//                    combo1.addItem(position);
+//            }
+//            combo1.addItemListener(new ItemListener() {
+//                public void itemStateChanged(ItemEvent itemEvent) {
+//                    setTaxonLabelPosition((TaxonLabelPosition) combo1.getSelectedItem());
+//
+//                }
+//            });
+            //optionsPanel.addComponentWithLabel("Label Position:", combo1);
 
             controls = new Controls("Layout", optionsPanel, true);
         }
