@@ -167,7 +167,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
     private static float gapFraction(ProfileCharacter character) {
         float result = character.gapFraction();
-        assert result < 1.0; //should not be calling this function on a profile that contains all gap Characters at one location.
+        //assert result < 1.0; //should not be calling this function on a profile that contains all gap Characters at one location.
+        // We do want to support stand-alone sequences with gaps. And it is possible for an extracted alignment to have all gaps. So this assertion has been removed. 
         return result;
     }
 
