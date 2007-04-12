@@ -334,4 +334,13 @@ public class Utils {
 
 		return cleaned;
 	}
+
+	public static String toString(State[] states) {
+		StringBuilder builder = new StringBuilder();
+		for (State state : states) {
+			builder.append(state.getCode());
+		}
+		return builder.toString();
+	}
+
 }
