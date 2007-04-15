@@ -308,9 +308,9 @@ public class TreeViewer extends JPanel implements Printable {
                 final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
                 final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
                 final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
-                toggle1.setToolTipText("Rectangular tree layout");
-                toggle2.setToolTipText("Polar tree layout");
-                toggle3.setToolTipText("Radial tree layout");
+                toggle1.setToolTipText("Rooted tree layout");
+                toggle2.setToolTipText("Circular tree layout");
+                toggle3.setToolTipText("Unrooted tree layout");
                 toggle1.putClientProperty("Quaqua.Button.style", "toggleWest");
                 toggle2.putClientProperty("Quaqua.Button.style", "toggleCenter");
                 toggle3.putClientProperty("Quaqua.Button.style", "toggleEast");
