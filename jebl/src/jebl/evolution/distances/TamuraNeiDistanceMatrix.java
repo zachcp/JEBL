@@ -49,6 +49,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             double sumTsCT = 0.0;
             double sumTv = 0.0;
             double sumWeight = 0.0;
+            boolean noGapsPairFound = false;
 
             for( Pattern pattern : alignment.getPatterns() ) {
                 State state1 = pattern.getState(taxon1);
@@ -59,8 +60,11 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
                 // ignore any ambiguous states or gaps
                 if( state1.isAmbiguous() || state2.isAmbiguous() ) {
-                   continue;
+                    continue;
+                } else {
+                    noGapsPairFound = true;
                 }
+
 
                 if ( state1 != state2 ) {
                     if ( Nucleotides.isTransition(state1, state2) ) {
@@ -78,13 +82,14 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
                 sumWeight += weight;
             }
 
+            if(! noGapsPairFound ) {
+                throw new IllegalArgumentException("It is not possible to compute the Tamura-Nei genetic distance " +
+                        "for these sequences because at least one pair of sequences do not overlap in the alignment.");
+            }
+
             // Unfortuanetly adjusting number of sites for Purine/Pyrimidine may turn the other into negative - so
             // we iterate untile both estimates are consistent
             while( true ) {
-                if( sumWeight <= 0 ) {
-                    throw new IllegalArgumentException("It is not possible to compute the Tamura Nei genetic distance " +
-                            "for these sequences because at least one pair of sequences do not overlap in the alignment.");
-                }
 
                 double P1 = sumTsAG / sumWeight;
                 double P2 = sumTsCT / sumWeight;

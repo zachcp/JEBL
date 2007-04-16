@@ -34,6 +34,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         double distance;
         double sumDistance = 0.0;
         double sumWeight = 0.0;
+        boolean noGapsPairFound = false;
 
         // If both sequences are of zero length then the substitution ratio is zero because they are identical
         if(alignment.getPatterns().size() == 0)
@@ -45,11 +46,19 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
             final double weight = pattern.getWeight();
 
-            if (!state1.isAmbiguous() && !state2.isAmbiguous() && state1 != state2) {
-                sumDistance += weight;
+            if(!state1.isGap() && !state2.isGap())
+                noGapsPairFound = true;
+
+            if (!state1.isAmbiguous() && !state2.isAmbiguous()) {
+                if(state1 != state2)
+                    sumDistance += weight;
             }
             sumWeight += weight;
         }
+
+        if(!noGapsPairFound)
+            throw new IllegalArgumentException("It is not possible to compute the Jukes-Cantor genetic distance" +
+                    "for these sequences because at least one pair of sequences do not overlap in the alignment.");
 
         distance = sumDistance / sumWeight;
 

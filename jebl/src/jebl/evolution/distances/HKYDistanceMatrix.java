@@ -97,6 +97,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             double sumTv = 0.0; // total weight of all columns that have a transversion for these taxa
             double sumWeight = 0.0; // total weight of all columns (ignoring those with ambiguities, but
                                     // including identical columns (which have neither a transition nor a transversion) )
+            boolean noGapsPairFound = false;
 
             for( Pattern pattern : alignment.getPatterns() ) {
                 State state1 = pattern.getState(taxon1);
@@ -105,6 +106,8 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 // ignore any ambiguous or gaps
                 if( state1.isAmbiguous() || state2.isAmbiguous() ) {
                    continue;
+                } else {
+                    noGapsPairFound = true;
                 }
 
                 double weight = pattern.getWeight();
@@ -120,6 +123,10 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 }
                 sumWeight += weight; // this also includes the columns with state1 == state2
             }
+
+            if(!noGapsPairFound)
+                throw new IllegalArgumentException("It is not possible to compute the HKY genetic distance" +
+                    "for these sequences because at least one pair of sequences do not overlap in the alignment.");
 
             if( sumWeight <= 0.0 ) {
                 return MAX_DISTANCE;
