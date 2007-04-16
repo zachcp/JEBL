@@ -57,7 +57,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         }
 
         if(!noGapsPairFound)
-            throw new IllegalArgumentException("It is not possible to compute the Jukes-Cantor genetic distance" +
+            throw new IllegalArgumentException("It is not possible to compute the Jukes-Cantor genetic distance " +
                     "for these sequences because at least one pair of sequences do not overlap in the alignment.");
 
         distance = sumDistance / sumWeight;
