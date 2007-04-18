@@ -125,34 +125,36 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     protected String getLabel(Node node) {
+        String prefix = " ";
+        String suffix = " ";
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
-            return tree.getTaxon(node).getName();
+            return prefix+tree.getTaxon(node).getName()+suffix;
         }
 
         if( tree instanceof RootedTree ) {
             final RootedTree rtree = (RootedTree) tree;
 
             if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
-                return getFormattedValue(rtree.getHeight(node));
+                return prefix+getFormattedValue(rtree.getHeight(node))+suffix;
             } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-                return getFormattedValue(rtree.getLength(node));
+                return prefix+getFormattedValue(rtree.getLength(node))+suffix;
             }
         }
 
         final Object value = node.getAttribute(attribute);
         if (value != null) {
             if (value instanceof Double) {
-                return formatter.getFormattedValue((Double) value);
+                return prefix+formatter.getFormattedValue((Double) value)+suffix;
             }
             if(value instanceof Date){
                 DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
-                return  format.format((Date)value);
+                return  prefix+format.format((Date)value)+suffix;
             }
             String s = value.toString();
             //limit node labels to 15 chars (plus ...)
             //if(s.length() > 15)
             //    return s.substring(0,15)+"...";
-            return s;
+            return prefix+s+suffix;
         }
         return null;
     }
