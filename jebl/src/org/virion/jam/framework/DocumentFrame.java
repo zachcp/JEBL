@@ -77,7 +77,7 @@ public abstract class DocumentFrame extends AbstractFrame {
         return false;
     }
 
-    public final boolean doSave() {
+    public boolean doSave() {
         if (!hasFile()) {
             return doSaveAs();
         } else {
@@ -97,7 +97,7 @@ public abstract class DocumentFrame extends AbstractFrame {
         return false;
     }
 
-    public final boolean doSaveAs() {
+    public boolean doSaveAs() {
         FileDialog dialog = new FileDialog(this,
                 "Save Document As...",
                 FileDialog.SAVE);
