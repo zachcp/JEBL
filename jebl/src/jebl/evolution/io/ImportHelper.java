@@ -214,6 +214,7 @@ public class ImportHelper {
     /**
      *
      * Reads sequence, skipping over any comments and filtering using sequenceType.
+     * Will stop if it encounters two consectutive new line characters.
      * @param sequence a StringBuffer into which the sequence is put
      * @param sequenceType the sequenceType of the sequence
      * @param delimiters list of characters that will stop the reading
@@ -240,8 +241,9 @@ public class ImportHelper {
 
         try {
             int nSites = 0;
+            boolean doubleNewLine = false;
 
-            while (nSites < maxSites && delimiters.indexOf(ch) == -1) {
+            while (!doubleNewLine && nSites < maxSites && delimiters.indexOf(ch) == -1) {
                 if((nSites%1024) == 0 && progress.setProgress(getProgress())) return;
 
                 if (hasComments && (ch == startComment || ch == lineComment)) {
@@ -271,8 +273,10 @@ public class ImportHelper {
                     }
                     nSites++;
                 }
-
+                char previous = ch;
                 ch = read();
+                if(previous == '\n' && ch == '\n')
+                    doubleNewLine = true;
             }
 
             lastDelimiter = ch;

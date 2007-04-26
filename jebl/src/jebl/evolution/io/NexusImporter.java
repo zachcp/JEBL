@@ -612,7 +612,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	 */
 	private List<Sequence> readSequenceData(List<Taxon> taxonList) throws ImportException, IOException
 	{
-		String firstSequence = null;
+        boolean sequencherStyle = false;
+        String firstSequence = null;
 		List<Sequence> sequences = new ArrayList<Sequence>();
 
 		if (isInterleaved) {
@@ -661,7 +662,22 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 							matchCharacters, firstSequence);
 
 					String seqString = buffer.toString();
-					readCount += seqString.length();
+
+                    // We now check if this file is in Sequencher* style NEXUS, this style has the taxon and site counts
+                    // before the sequence data.
+                    try{
+                        if(firstLoop && Integer.parseInt(taxon.toString()) == taxonCount &&
+                                Integer.parseInt(seqString) == siteCount){
+                            i--;
+                            taxons.remove(taxon);
+                            sequencherStyle = true;
+                            continue;
+                        }
+                    } catch(NumberFormatException e) {
+                        // Do nothing, this just means that this is the NEXUS format we usually expect rather than sequencher
+                    }
+
+                    readCount += seqString.length();
 					charsRead[sequenceIndex] += seqString.length();
 
 					sequencesData.set(sequenceIndex, sequencesData.get(sequenceIndex).concat(seqString));
@@ -680,12 +696,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 							}
 						}
 					}
-				}
+                }
 
 				firstLoop = false;
 			}
 
-			if (helper.getLastDelimiter() != ';') {
+            // Sequencher style apparently doesnt use a ';' after the sequence data.
+            if (!sequencherStyle && helper.getLastDelimiter() != ';') {
 				throw new ImportException.BadFormatException("Expecting ';' after sequences data");
 			}
 
@@ -720,7 +737,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					firstSequence = seqString;
 				}
 
-				if (helper.getLastDelimiter() == ';' && i < taxonCount - 1) {
+                if (helper.getLastDelimiter() == ';' && i < taxonCount - 1) {
 					throw new ImportException.TooFewTaxaException();
 				}
 
