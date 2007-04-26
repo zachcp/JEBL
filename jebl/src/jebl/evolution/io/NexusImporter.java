@@ -730,7 +730,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				String seqString = buffer.toString();
 
 				if (seqString.length() != siteCount) {
-					throw new ImportException.ShortSequenceException(taxon.getName());
+					throw new ImportException.ShortSequenceException(taxon.getName()
+                            + " has length " + seqString.length() + ", expecting " + siteCount);
 				}
 
 				if (i == 0) {
