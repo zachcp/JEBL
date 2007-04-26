@@ -203,7 +203,7 @@ public class ImportHelper {
         return line.toString();
     }
 
-    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+   public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
@@ -211,10 +211,29 @@ public class ImportHelper {
                 matchCharacters, matchSequence, ProgressListener.EMPTY);
     }
 
+    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+                             String delimiters, int maxSites,
+                             String gapCharacters, String missingCharacters,
+                             String matchCharacters, String matchSequence,
+                             boolean stopAtDoubleNewLine) throws IOException, ImportException {
+        readSequence(sequence, sequenceType, delimiters, maxSites, gapCharacters, missingCharacters,
+                matchCharacters, matchSequence, ProgressListener.EMPTY, stopAtDoubleNewLine);
+    }
+
+    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+                             String delimiters, int maxSites,
+                             String gapCharacters, String missingCharacters,
+                             String matchCharacters, String matchSequence,
+                             ProgressListener progress)
+            throws IOException, ImportException
+    {
+        readSequence(sequence, sequenceType, delimiters, maxSites, gapCharacters, missingCharacters,
+                matchCharacters, matchSequence, progress, false);
+    }
+
     /**
      *
      * Reads sequence, skipping over any comments and filtering using sequenceType.
-     * Will stop if it encounters two consectutive new line characters.
      * @param sequence a StringBuffer into which the sequence is put
      * @param sequenceType the sequenceType of the sequence
      * @param delimiters list of characters that will stop the reading
@@ -224,12 +243,13 @@ public class ImportHelper {
      * @param matchSequence the sequence string to match match characters to
      * @param maxSites maximum number of sites to read
      * @param progress optional ProgressListener. Must not be null.
+     * @param stopAtDoubleNewLine if true will stop reading if it encounters two consectutive new line characters.
      */
     public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence,
-                             ProgressListener progress)
+                             ProgressListener progress, boolean stopAtDoubleNewLine)
             throws IOException, ImportException
     {
         char ch = read();
