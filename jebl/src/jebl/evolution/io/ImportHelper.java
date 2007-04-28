@@ -263,7 +263,7 @@ public class ImportHelper {
             int nSites = 0;
             boolean doubleNewLine = false;
 
-            while (!doubleNewLine && nSites < maxSites && delimiters.indexOf(ch) == -1) {
+            while (!(stopAtDoubleNewLine && doubleNewLine) && nSites < maxSites && delimiters.indexOf(ch) == -1) {
                 if((nSites%1024) == 0 && progress.setProgress(getProgress())) return;
 
                 if (hasComments && (ch == startComment || ch == lineComment)) {
