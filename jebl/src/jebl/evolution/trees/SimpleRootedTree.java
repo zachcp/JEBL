@@ -648,6 +648,11 @@ final public class SimpleRootedTree implements RootedTree {
 
         void swapChildren(int i0, int i1) {
             ArrayList<Node> nc = new ArrayList<Node>(children);
+            //there was a user reported crash where i0 was > size of the array of children nodes
+            if(i0 >= nc.size() || i1 >= nc.size()){
+                System.err.println("WARNING: SimpleRootedNode.swapChildren() was called with invalid parameters!");
+                return;
+            }
             final Node ni0 = nc.get(i0);
             nc.set(i0, nc.get(i1));
             nc.set(i1, ni0);
