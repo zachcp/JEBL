@@ -846,7 +846,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //        }
 
         long start = System.currentTimeMillis();
-        drawTree(g2, getWidth(), getHeight());
+        drawTree(g2, true, getWidth(), getHeight());
         System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
@@ -872,7 +872,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         setDoubleBuffered(false);
 
-        drawTree(g2, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+        drawTree(g2, false, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 
         setDoubleBuffered(true);
         calibrated = false;
@@ -965,7 +965,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     boolean preElementDrawCode = false;
 
-    public void drawTree(Graphics2D g2, double width, double height) {
+    public void drawTree(Graphics2D g2, boolean drawNodes, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1011,7 +1011,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.setStroke(branchLineStroke);
             g2.draw(branchPath);
 
-            nodeMarker(g2, node);
+            if(drawNodes)
+                nodeMarker(g2, node);
 
             if( preElementDrawCode ) {
                 if (showingTaxonLables) {
@@ -1059,7 +1060,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     g2.draw(branchPath);
 
-                    nodeMarker(g2, node);
+                    if(drawNodes)
+                        nodeMarker(g2, node);
 
                     if (preElementDrawCode && nodesLables) {
                         final AffineTransform nodeTransform = nodeLabelTransforms.get(node);
@@ -1101,7 +1103,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        if( ! hideNode(rootNode) ) {
+        if( ! hideNode(rootNode) && drawNodes ) {
           g2.setStroke(branchLineStroke);
           nodeMarker(g2, rootNode);
         }
