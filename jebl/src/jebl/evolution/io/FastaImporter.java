@@ -177,6 +177,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                         case strip:
                             removeNonAminoAcidOrNucleotideCharacters(seq);
                             type = Utils.guessSequenceType(seq);
+                            if (type==null) {
+                                throw new ImportException("The file contains both residues that are only nucleotides (e.g. U) and residues that are only amino acids (e.g. E). You should import the file using file type 'Fasta (nucleotide)' or 'Fasta (amino acid)' instead of 'Fasta (auto-detect)'.");                                  
+                            }
                             assert(type != null);
                             break;
                         default:
