@@ -87,6 +87,7 @@ class Profile {
     }
 
     void addSequence(int sequenceNumber,String sequence) {
+        sequence=sequence.toUpperCase();
         if (automaticallyCalculatedAlphabetSize)
             throw new IllegalStateException("if the constructor 'public Profile(int sequenceNumber,String sequence)'  is used, it's not safe to add new sequences");
         if (supportsFreeEndGaps) sequence=supportFreeEndGaps( sequence);
@@ -172,7 +173,7 @@ class Profile {
 
     public static Profile combine(Profile profile1, Profile profile2, AlignmentResult result1, AlignmentResult result2) {
         int size = result1.size;
-        int alphabetSize = profile1.alphabetSize;
+        int alphabetSize = Math.max(profile1.alphabetSize,profile2.alphabetSize);
         Profile result = new Profile(alphabetSize);
         result.profile = new ProfileCharacter[size];
         int index1= 0;
