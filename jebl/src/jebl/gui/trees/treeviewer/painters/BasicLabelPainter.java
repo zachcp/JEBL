@@ -52,7 +52,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         this.tree = tree;
 
-        boolean hasNumericAttributs = false;
+        hasNumericAttributes = false;
 
         Set<String> names = new TreeSet<String>();
 
@@ -96,12 +96,12 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         if( wantHeightsIfPossible && tree.hasHeights() && !tree.conceptuallyUnrooted() ) {
             sources.add(NODE_HEIGHTS);
-            hasNumericAttributs = true;
+            hasNumericAttributes = true;
         }
 
         if( wantBranchesIfPossible && tree.hasLengths()) {
             sources.add(BRANCH_LENGTHS);
-            hasNumericAttributs = true;
+            hasNumericAttributes = true;
         }
 
         sources.addAll(names);
@@ -115,9 +115,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         this.attributes = new String[sources.size()];
         sources.toArray(this.attributes);
 
-        if( hasNumericAttributs ) {
-          formatter = new NumberFormatter(4);
-        }
+        formatter = new NumberFormatter(4);
     }
 
     public void setTree(RootedTree tree) {
@@ -440,7 +438,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //-------------------------
             final JSpinner digitsSpinner = new JSpinner(new SpinnerNumberModel(defaultDigits, 2, 14, 1));
 
-            if( formatter != null ) {
+            if( hasNumericAttributes ) {
                 final JLabel label2 = optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
                 // label2.setEnabled(selected);
                 //  digitsSpinner.setEnabled(selected);
@@ -496,6 +494,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private boolean visible = true;
 
     private NumberFormatter formatter = null;
+    private boolean hasNumericAttributes = false;
 
     private Tree tree;
     protected String attribute;
