@@ -1147,6 +1147,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
+        assert treeBounds != null; //the code below is a hack to make this not crash for users
+        if(treeBounds == null){
+            if(calibrated)
+                return;
+            treeBounds = new Rectangle2D.Double(0,0,100,100); //this is here so the treeViewer draws somethihng...
+        }
+
         boolean oldScaleCode = false;
 
         // oldScaleCode too
