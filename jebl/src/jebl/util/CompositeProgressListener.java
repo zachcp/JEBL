@@ -4,11 +4,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author Tobias Thierer
- * @version $Id$
- *          <p/>
- *          created on 17/03/2006 11:15:00
- *          <p/>
  *          This is a progress listener that is suitable for a task that consists of several subtasks.
  *          You specify the relative duration of each subtask, and then the subtasks' setProgress()
  *          calls with values between 0 and 1 are translated to reflect the overall progress on the whole
@@ -22,6 +17,10 @@ import java.util.List;
  *          <p/>
  *          Alternatively, instead of calling {@link #beginNextSubtask()}after each subtask (except the last),
  *          you can instead call {@link #beginSubtask()} before each subtask (including the first)
+ *          <p/>
+ *
+ * @author Tobias Thierer
+ * @version $Id$
  */
 public final class CompositeProgressListener extends ProgressListener {
     protected int numOperations;
