@@ -125,7 +125,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             }
 
             if(!noGapsPairFound)
-                throw new IllegalArgumentException("It is not possible to compute the HKY genetic distance " +
+                throw new CannotBuildDistanceMatrixException("It is not possible to compute the HKY genetic distance " +
                     "for these sequences because at least one pair of sequences do not overlap in the alignment.");
 
             if( sumWeight <= 0.0 ) {
