@@ -1,5 +1,7 @@
 package jebl.util;
 
+import java.awt.*;
+
 /**
  * @author Matt Kearse
  *
@@ -68,6 +70,24 @@ public abstract class ProgressListener {
     public final boolean setMessage(String message) {
         _setMessage(message);
         return isCanceled();
+    }
+
+    /**
+     * Set an image associated with the current progress displayed wherever...
+     * @param image an image
+     * @return true if the user has requested that this operation be canceled.
+     */
+    public final boolean setImage(Image image) {
+        _setImage(image);
+        return isCanceled();
+    }
+
+    /**
+     * Override this to handle setting an image  
+     * @param image the image
+     */
+    protected void _setImage(Image image) {
+
     }
 
     /**
