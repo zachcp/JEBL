@@ -73,7 +73,8 @@ public abstract class ProgressListener {
     }
 
     /**
-     * Set an image associated with the current progress displayed wherever...
+     * Set an image associated with the current progress. A progress listener
+     * may choose to optionally display this image wherever is appropriate.
      * @param image an image
      * @return true if the user has requested that this operation be canceled.
      */
@@ -83,7 +84,10 @@ public abstract class ProgressListener {
     }
 
     /**
-     * Override this to handle setting an image  
+     *
+     * This method is a hook called from {@link #setImage} to allow subclasses a
+     * custom reaction to setImage events
+     *
      * @param image the image
      */
     protected void _setImage(Image image) {
