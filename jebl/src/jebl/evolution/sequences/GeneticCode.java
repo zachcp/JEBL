@@ -192,10 +192,41 @@ public final class GeneticCode {
     }
 
     /**
+	 * Returns the state associated with AminoAcid represented by the three nucleotides.
+	 * If one or more of the nucleotides are ambiguous, and all combinations translate to the
+     * same protein, then this method will return that protein
+     * @param nucleotides a string consisting of exactly 3 residues in any case.
+	 * @see AminoAcids
+	 * @see Codons
+	 * @return '?' if codon unknown
+	 */
+    public AminoAcidState getTranslation(String nucleotides) {
+        if (nucleotides.length()!=3) throw new IllegalArgumentException("getTranslation requires a nucleotide triplet. (given "+nucleotides.length()+" characters)");
+        NucleotideState n1=Nucleotides.getState(nucleotides.charAt(0));
+        NucleotideState n2=Nucleotides.getState(nucleotides.charAt(1));
+        NucleotideState n3=Nucleotides.getState(nucleotides.charAt(2));
+        return getTranslation(n1,n2,n3);
+    }
+
+    /**
+     * Returns true if this is a start codon in this genetic code.
+     * WARNING: I don't know how to implement this. It only returns true
+     * for ATG currently. But according to Wikipedia, about 23% of E.Coli
+     * start codons are not ATG!
+     * @param codonState
+     * @return true if this is a start codon.
+     */
+    public boolean isStartCodon(CodonState codonState) {
+        if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
+        return codonState.getCode().equals("ATG");
+    }
+
+    /**
 	 * Note that the state is the canonical state (generated combinatorially)
      * @return whether the codonState is a stop codon
 	 */
 	public boolean isStopCodon(CodonState codonState) {
+        if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
 		return (translationMap.get(codonState) == AminoAcids.STOP_STATE);
 	}
 
