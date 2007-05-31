@@ -642,6 +642,16 @@ public final class Utils {
 		return '(' + b.toString() + ')';
 	}
 
+
+    /**
+     * This method creates an unattached copy of the given rooted tree
+     * @param treeToCopy the tree to copy
+     * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
+     */
+    public static RootedTree copyTree(RootedTree treeToCopy){
+       return new MutableRootedTree(treeToCopy, treeToCopy.getRootNode());
+    }
+
 	// debug aid - unrooted tree printout - un-comment in emergency
 
 //    private static String nodeName(Tree tree, Node n) {
