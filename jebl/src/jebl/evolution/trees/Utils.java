@@ -644,12 +644,12 @@ public final class Utils {
 
 
     /**
-     * This method creates an unattached copy of the given rooted tree
+     * This method creates an unattached copy of the given rooted tree such that changes to the copied tree do not affect the original tree.
      * @param treeToCopy the tree to copy
      * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
      */
     public static RootedTree copyTree(RootedTree treeToCopy){
-       return new MutableRootedTree(treeToCopy, treeToCopy.getRootNode());
+       return new CompactRootedTree(treeToCopy);
     }
 
 	// debug aid - unrooted tree printout - un-comment in emergency
