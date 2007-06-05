@@ -1,5 +1,7 @@
 package jebl.util;
 
+import org.virion.jam.util.SimpleListener;
+
 import java.awt.*;
 
 /**
@@ -93,6 +95,32 @@ public abstract class ProgressListener {
     protected void _setImage(Image image) {
 
     }
+
+    /**
+     * Adds an action that can choose to provide feedback. For example,
+     * an operation may choose to provide a "Skip to next step" button
+     * alongside the cancel button. There is no requirement that a
+     * ProgressListener actually present this to the user - it may choose
+     * to ignore this method, in which case <code> listener </code> will
+     * never be fired.
+     * @param label a label describing this feedback action. For example, "Skip to next step"
+     * @param listener a listener to be notified when the user chooses to invoke
+     *                 this action
+     */
+    public void addFeedbackAction(String label, SimpleListener listener) {
+
+    }
+
+    /**
+     * Removes a feedback action previously added using
+     * {@link #addFeedbackAction(String, org.virion.jam.util.SimpleListener)}.
+     * @param label The  label used as a parameter to {@link #addFeedbackAction(String, org.virion.jam.util.SimpleListener)}
+     */
+    public void removeFeedbackAction(String label) {
+
+    }
+
+
 
     /**
      * This method is a hook called from {@link #setMessage} to allow subclasses a
