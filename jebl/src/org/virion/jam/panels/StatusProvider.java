@@ -1,7 +1,7 @@
 package org.virion.jam.panels;
 
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author rambaut
@@ -128,6 +128,9 @@ public interface StatusProvider {
             return lastStatusText;
         }
 
+        public synchronized boolean hasOverrideProvider() {
+            return !overrideProviders.isEmpty();
+        }
     }
 
 
