@@ -35,26 +35,37 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         return branchColouringAttribute != null;
     }
 
-    public String getCollapseAttributeName() {
-        return collapseAttributeName;
+    public String getCartoonAttributeName() {
+        return cartoonAttributeName;
     }
 
-    public void setCollapseAttributeName(String collapseAttributeName) {
-        this.collapseAttributeName = collapseAttributeName;
+    public void setCartoonAttributeName(String cartoonAttributeName) {
+        this.cartoonAttributeName = cartoonAttributeName;
         fireTreeLayoutChanged();
     }
 
-    public boolean isShowingCollapsedTipLabels() {
-        return showingCollapsedTipLabels;
+    public boolean isShowingCartoonTipLabels() {
+        return showingCartoonTipLabels;
     }
 
-    public void setShowingCollapsedTipLabels(boolean showingCollapsedTipLabels) {
-        this.showingCollapsedTipLabels = showingCollapsedTipLabels;
+    public void setShowingCartoonTipLabels(boolean showingCartoonTipLabels) {
+        this.showingCartoonTipLabels = showingCartoonTipLabels;
         fireTreeLayoutChanged();
     }
+
+	public String getCollapsedAttributeName() {
+		return collapsedAttributeName;
+	}
+
+	public void setCollapsedAttributeName(String collapsedAttributeName) {
+		this.collapsedAttributeName = collapsedAttributeName;
+		fireTreeLayoutChanged();
+	}
 
     private Set<TreeLayoutListener> listeners = new HashSet<TreeLayoutListener>();
     protected String branchColouringAttribute = null;
-    protected String collapseAttributeName = null;
-    protected boolean showingCollapsedTipLabels = true;
+    protected String cartoonAttributeName = null;
+    protected boolean showingCartoonTipLabels = true;
+
+	protected String collapsedAttributeName = null;
 }

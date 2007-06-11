@@ -112,6 +112,7 @@ public class PreferencesDialog {
 
     public void addSection(PreferencesSection section) {
         sections.add(section);
+	    section.retrievePreferences();
     }
 
     String currentSection = null;

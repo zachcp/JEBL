@@ -276,6 +276,11 @@ public class DefaultTreeViewer extends TreeViewer {
         }
     }
 
+	public void cartoonSelectedNodes() {
+	    treePane.cartoonSelectedNodes();
+	    fireTreeSettingsChanged();
+	}
+
     public void collapseSelectedNodes() {
         treePane.collapseSelectedNodes();
         fireTreeSettingsChanged();

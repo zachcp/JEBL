@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.print.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * @author Andrew Rambaut
@@ -20,6 +19,7 @@ import java.util.List;
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
 
+	public final String CARTOON_ATTRIBUTE_NAME = "!cartoon";
 	public final String COLLAPSE_ATTRIBUTE_NAME = "!collapse";
 
 	public TreePane() {
@@ -72,7 +72,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 		this.treeLayout = treeLayout;
 
-		treeLayout.setCollapseAttributeName(COLLAPSE_ATTRIBUTE_NAME);
+		treeLayout.setCartoonAttributeName(CARTOON_ATTRIBUTE_NAME);
+		treeLayout.setCollapsedAttributeName(COLLAPSE_ATTRIBUTE_NAME);
 		treeLayout.setBranchColouringAttributeName(branchColouringAttribute);
 
 		treeLayout.addTreeLayoutListener(new TreeLayoutListener() {
@@ -327,6 +328,32 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return selectedNodes.size() > 0 || selectedTips.size() > 0;
 	}
 
+	public void cartoonSelectedNodes() {
+		cartoonSelectedNodes(tree.getRootNode());
+	}
+
+	private void cartoonSelectedNodes(Node node) {
+
+		if (!tree.isExternal(node)) {
+			if (selectedNodes.contains(node)) {
+				if (node.getAttribute(CARTOON_ATTRIBUTE_NAME) != null) {
+					node.removeAttribute(CARTOON_ATTRIBUTE_NAME);
+				} else {
+					int tipCount = RootedTreeUtils.getTipCount(tree, node);
+					double height = RootedTreeUtils.getMinTipHeight(tree, node);
+					Object[] values = new Object[] { tipCount, height };
+					node.setAttribute(CARTOON_ATTRIBUTE_NAME, values);
+				}
+				calibrated = false;
+				repaint();
+			} else {
+				for (Node child : tree.getChildren(node)) {
+					cartoonSelectedNodes(child);
+				}
+			}
+		}
+	}
+
 	public void collapseSelectedNodes() {
 		collapseSelectedNodes(tree.getRootNode());
 	}
@@ -338,9 +365,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				if (node.getAttribute(COLLAPSE_ATTRIBUTE_NAME) != null) {
 					node.removeAttribute(COLLAPSE_ATTRIBUTE_NAME);
 				} else {
-					int tipCount = RootedTreeUtils.getTipCount(tree, node);
+					String tipName = "collapsed";
 					double height = RootedTreeUtils.getMinTipHeight(tree, node);
-					Object[] values = new Object[] { tipCount, height };
+					Object[] values = new Object[] { tipName, height };
 					node.setAttribute(COLLAPSE_ATTRIBUTE_NAME, values);
 				}
 				calibrated = false;
@@ -819,7 +846,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private void calibrate(Graphics2D g2, double width, double height) {
 
         treeLayout.layout(tree, treeLayoutCache);
-        
+
         // First of all get the bounds for the unscaled tree
 		treeBounds = null;
 		boolean showingRootBranch = treeLayout.isShowingRootBranch();
@@ -948,7 +975,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 		final double avilableW = width - insets.left - insets.right;
-		final double avaialbeH = height - insets.top - insets.bottom;
+		final double avaiableH = height - insets.top - insets.bottom;
 
 		// get the difference between the tree's bounds and the overall bounds
 
@@ -962,14 +989,14 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
 		}
 
-		if( yDiff >= avaialbeH ) {
-			yDiff = Math.min(avaialbeH, bounds.getHeight()) - treeBounds.getHeight();
+		if( yDiff >= avaiableH ) {
+			yDiff = Math.min(avaiableH, bounds.getHeight()) - treeBounds.getHeight();
 		}
 		// Get the amount of canvas that is going to be taken up by the tree -
 		// The rest is taken up by taxon labels which don't scale
 
 		final double w = avilableW - xDiff;
-		final double h = avaialbeH - yDiff;
+		final double h = avaiableH - yDiff;
 
 		double xScale;
 		double yScale;

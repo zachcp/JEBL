@@ -91,7 +91,11 @@ public interface TreeLayout {
 
     void setBranchColouringAttributeName(String colouringAttributeName);
 
-	String getCollapseAttributeName();
+	String getCartoonAttributeName();
 
-    void setCollapseAttributeName(String collapseAttributeName);
+    void setCartoonAttributeName(String cartoonAttributeName);
+
+	String getCollapsedAttributeName();
+
+    void setCollapsedAttributeName(String collapsedAttributeName);
 }
