@@ -1194,18 +1194,21 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		// read the first child
 		children.add( readBranch(tree) );
 
-		// an internal node must have at least 2 children
 		if (helper.getLastDelimiter() != ',') {
-			throw new ImportException.BadFormatException("Missing ',' in tree");
+			//throw new ImportException.BadFormatException("Missing ',' in tree");
+		}
+        // MK: previously, an internal node must have at least 2 children.
+        // MK: We we now allow trees with a single child so that we can create proper taxonomy
+        // MK: trees with only a single child at a taxonomy level.
+
+        // read subsequent children
+
+        while(helper.getLastDelimiter()==',') {
+			children.add( readBranch(tree) );
 		}
 
-		// read subsequent children
-		do {
-			children.add( readBranch(tree) );
-
-		} while (helper.getLastDelimiter() == ',');
-
-		// should have had a closing ')'
+        //System.out.println("kids="+children.size());
+        // should have had a closing ')'
 		if (helper.getLastDelimiter() != ')') {
 			throw new ImportException.BadFormatException("Missing closing ')' in tree");
 		}
