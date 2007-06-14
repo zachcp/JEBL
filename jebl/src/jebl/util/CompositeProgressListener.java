@@ -34,7 +34,7 @@ public final class CompositeProgressListener extends ProgressListener {
     public CompositeProgressListener(ProgressListener listener, double[] operationDuration) {
         numOperations = operationDuration.length;
         if (numOperations == 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Composite operation must have > 0 subtasks");
         }
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
