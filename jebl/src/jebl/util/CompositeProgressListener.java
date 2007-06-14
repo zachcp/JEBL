@@ -4,20 +4,20 @@ import java.io.File;
 import java.util.List;
 
 /**
- *          This is a progress listener that is suitable for a task that consists of several subtasks.
- *          You specify the relative duration of each subtask, and then the subtasks' setProgress()
- *          calls with values between 0 and 1 are translated to reflect the overall progress on the whole
- *          (combined) task. In other words, each reports progress as if it were the whole task, and the
- *          CompositeProgressListener translates this into overall progress.
- *          <p/>
- *          As the combined progress listener cannot know which subtask it is currently being called from,
- *          you have to explicitely let it know when a new subtask (not the first) starts, by calling
- *          {@link #beginNextSubtask()}. Thus when the constructor is passed an array of N doubles as its second
- *          argument, {@link #beginNextSubtask()} should be called precisely N-1 times.
- *          <p/>
- *          Alternatively, instead of calling {@link #beginNextSubtask()}after each subtask (except the last),
- *          you can instead call {@link #beginSubtask()} before each subtask (including the first)
- *          <p/>
+ * A {@link jebl.util.ProgressListener} that is suitable for a task that consists of several subtasks.
+ * You specify the relative duration of each subtask, and then the subtasks' setProgress()
+ * calls with values between 0 and 1 are translated to reflect the overall progress on the whole
+ * (combined) task. In other words, each subtask reports progress as if it were the whole task,
+ * and the CompositeProgressListener translates this into overall progress.
+ * <p/>
+ * As the combined progress listener cannot know which subtask it is currently being called from,
+ * you have to explicitely let it know when a new subtask (not the first) starts, by calling
+ * {@link #beginNextSubtask()}. Thus when the constructor is passed an array of N doubles as its second
+ * argument, {@link #beginNextSubtask()} should be called precisely N-1 times.
+ * <p/>
+ * Alternatively, instead of calling {@link #beginNextSubtask()}after each subtask (except the last),
+ * you can instead call {@link #beginSubtask()} before each subtask (including the first)
+ * <p/>
  *
  * @author Tobias Thierer
  * @version $Id$
