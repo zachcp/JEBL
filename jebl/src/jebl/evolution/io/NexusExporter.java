@@ -309,7 +309,9 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // Don't write root length. This is ignored elsewhere and the nexus importer fails
             // whet it is present.
             if (parent != null) {
-                builder.append(":").append(tree.getLength(node));
+                if (tree.hasLengths()) {
+                    builder.append(":").append(tree.getLength(node));
+                }
             }
         }
     }
