@@ -27,11 +27,18 @@ public interface StatusProvider {
 
     void fireStatusChanged(int status, String statusText);
 
+    /**
+     * The status bar has been pressed. This method should not really be
+     * here. You should instead call {@link #fireStatusButtonPressed()}
+     */
     void statusButtonPressed();
 
     String getStatusText();
     int getStatus();
 
+    /**
+     * Fire a status bar event to anything interested.
+     */
     void fireStatusButtonPressed();
 
     public void addOverrideProvider(StatusProvider provider);
