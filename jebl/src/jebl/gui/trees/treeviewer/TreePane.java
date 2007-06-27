@@ -1175,7 +1175,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         TreeBoundsHelper tbh =
                 new TreeBoundsHelper(externalNodes.size() + 2*tree.getNodes().size(), availableW, availableH,
                         treeBounds);
-        
+
         if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
 
             taxonLabelWidth = 0.0;
@@ -1713,7 +1713,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         void addBounds(Line2D taxonPath, double labelHeight, double labelWidth, boolean centered)  {
             double[] sincos = {0.0, 1.0};
 
-            int quad = quadrantOf(taxonPath, sincos);
+            int quad = quadrantOf(taxonPath, sincos); // sine and cosine of the inclination of the taxonPath vector
             final double yHigh = labelHeight / 2;
             final double xHigh = centered ? labelWidth / 2 : labelWidth;
             final double xLow =  centered ? -xHigh : 0;
@@ -1721,7 +1721,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             // order is counter-clockwise from upper right corner, which makes the corner number match the quadrant number
             // for max X. other limits are relative to that.
 
-            double[] pts = {xHigh, yHigh, xLow, yHigh, xLow, -yHigh, xHigh, -yHigh};
+            double[] pts = {xHigh, yHigh, xLow, yHigh, xLow, -yHigh, xHigh, -yHigh}; // four corners of bounding box
             int ixmax = 2*quad;
             int ixmin = 2*((quad+2) & 0x3);
             int iymax = 2*((quad+3) & 0x3);
