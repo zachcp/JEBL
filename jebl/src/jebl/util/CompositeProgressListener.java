@@ -31,7 +31,13 @@ public final class CompositeProgressListener extends ProgressListener {
     protected double currentOperationProgress = 0.0;
     private boolean beganFirstSubTask=false;
 
-    public CompositeProgressListener(ProgressListener listener, double[] operationDuration) {
+    /**
+     * construct a new composite ProgressListener.
+     *
+     * @param listener the ProgressListener that all progress reports are forwarded to after adjusting them for the currently active sub-task
+     * @param operationDuration a list of relative weightings to give each sub task.
+     */
+    public CompositeProgressListener(ProgressListener listener, double ... operationDuration) {
         numOperations = operationDuration.length;
         if (numOperations == 0) {
             throw new IllegalArgumentException("Composite operation must have > 0 subtasks");
