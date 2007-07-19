@@ -846,7 +846,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //        }
 
         long start = System.currentTimeMillis();
-        drawTree(g2, true, getWidth(), getHeight());
+        drawTree(g2, true, true, getWidth(), getHeight());
         System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
@@ -872,7 +872,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         setDoubleBuffered(false);
 
-        drawTree(g2, false, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+        drawTree(g2, false, false, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 
         setDoubleBuffered(true);
         calibrated = false;
@@ -965,7 +965,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     boolean preElementDrawCode = false;
 
-    public void drawTree(Graphics2D g2, boolean drawNodes, double width, double height) {
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOfscreenShapes, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1099,7 +1099,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
-                e.draw(g2, viewport);
+                if(e.isVisible())
+                    e.draw(g2, clipOfscreenShapes ? viewport : null);
             }
         }
 

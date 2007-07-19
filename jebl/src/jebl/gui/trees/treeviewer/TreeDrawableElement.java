@@ -67,10 +67,6 @@ public abstract class TreeDrawableElement {
     protected abstract void drawIt(Graphics2D g2);
 
     public final void draw(Graphics2D g2, JViewport vp) {
-        if( ! visible ) {
-            return;
-        }
-
         boolean doit = true;
         if( vp != null ) {
             final Rectangle2D d = getBounds();
