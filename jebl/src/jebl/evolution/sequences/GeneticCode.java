@@ -221,6 +221,10 @@ public final class GeneticCode {
      * @return true if this is a start codon.
      */
     public boolean isStartCodon(CodonState codonState) {
+        // TT: Regarding the following comment, doesn't this mean we need to fix the
+        // places that CALL this method without checking for null first, rather than
+        // silently returning false? I think we should throw a NullPointerException
+        // if null is passed in here!
         if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
         return codonState.getCode().equals("ATG");
     }
