@@ -175,21 +175,22 @@ public final class GeneticCode {
             for(State a : nucleotide1.getCanonicalStates()){
                 for(State b : nucleotide2.getCanonicalStates()){
                     for(State c : nucleotide3.getCanonicalStates()){
+                        CodonState thisDisambiguation = Codons.getState(a.getCode() + b.getCode() + c.getCode());
                         //initial setup
                         if(translateState == null)
-                            translateState = Codons.getState(a.getCode() + b.getCode() + c.getCode());
-                        if(!translationMap.get(translateState).equals(translationMap.get(Codons.getState(a.getCode() + b.getCode() + c.getCode()))))
+                            translateState = thisDisambiguation;
+                        // If different nucleotide disambiguations yield different amino acids, translation is unknown
+                        if(!translationMap.get(translateState).equals(translationMap.get(thisDisambiguation)))
                             return translationMap.get(Codons.UNKNOWN_STATE);
                     }
                 }
             }
             return translationMap.get(translateState);
+        } else {
+            String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
+            translateState = Codons.getState(code);
+            return translationMap.get(translateState);
         }
-
-	    String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
-	    translateState = Codons.getState(code);
-
-        return translationMap.get(translateState);
     }
 
     /**
