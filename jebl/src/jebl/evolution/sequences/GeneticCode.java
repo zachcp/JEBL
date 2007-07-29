@@ -215,6 +215,8 @@ public final class GeneticCode {
      * WARNING: I don't know how to implement this. It only returns true
      * for ATG currently. But according to Wikipedia, about 23% of E.Coli
      * start codons are not ATG!
+     * See also http://www.biomatters.com/userforum/comments.php?DiscussionID=177
+     *
      * @param codonState
      * @return true if this is a start codon.
      */
