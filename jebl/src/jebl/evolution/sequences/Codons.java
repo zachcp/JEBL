@@ -114,6 +114,7 @@ public final class Codons {
 	    return seq;
 	}
 
+    // Contains 64 mappings, one for each triplet of non-ambiguous amino acids
     private static final Map<String, CodonState> statesByCode;
 
     // now create the complete codon state array
