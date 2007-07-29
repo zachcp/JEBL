@@ -138,7 +138,8 @@ public final class GeneticCode {
 	}
 
     /**
-     * Returns the description of the genetic code
+     * Returns a length-64 string that for each nucleotide triplet contains the single-character
+     * amino acid code (see {@link AminoAcids} to which that triplet is translated in this genetic code.
      */
     public String getCodeTable() {
         return GENETIC_CODE_TABLES[geneticCodeId];
