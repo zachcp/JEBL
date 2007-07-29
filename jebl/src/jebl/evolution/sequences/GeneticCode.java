@@ -292,9 +292,11 @@ public final class GeneticCode {
     private static final int FLATWORM_MT_ID = 12;
     private static final int BLEPHARISMA_NUC_ID = 13;
 
+    /**
+     * Same as getDescription() (so that GeneticCode objects can be used e.g. in a JComboBox).
+     * @return the description of this genetic code
+     */
     public String toString() {
         return getDescription();
     }
-
-
 }
