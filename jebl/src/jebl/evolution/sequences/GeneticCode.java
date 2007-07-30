@@ -83,8 +83,9 @@ public final class GeneticCode {
      *        each character representing the translation of one triplet, with the triplet translations being in the order
      *        AAA, AAC, AAG, AAT, ACA etc. (i.e. first codon position is most significant, and nucleotides come in the
      *        order A, C, G, T) (Note: This is not the order used by the Genbank website).
-     * @param startCodons Set of start codons (defaults to ATG only). 23% of E.Coli are not ATG. See also
-     *        http://www.biomatters.com/userforum/comments.php?DiscussionID=177
+     * @param startCodons Set of start codons (defaults to ATG only).
+     *        Note that 23% of E.Coli are not ATG (see http://en.wikipedia.org/wiki/Start_codon).
+     *        See also http://www.biomatters.com/userforum/comments.php?DiscussionID=177
      */
     private GeneticCode(final String name, final String description, final String codeTable, Set<CodonState> startCodons) {
         this.name = name;
