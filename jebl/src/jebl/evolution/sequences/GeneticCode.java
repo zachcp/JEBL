@@ -9,6 +9,8 @@
 
 package jebl.evolution.sequences;
 
+import jebl.util.MaybeBoolean;
+
 import java.util.*;
 
 /**
@@ -21,91 +23,75 @@ import java.util.*;
  */
 
 public final class GeneticCode {
-	/**
-	 * Standard genetic code tables from GENBANK
-	 * Nucleotides go A, C, G, T - Note: this is not the order used by the Genbank web site
-	 * With the first codon position most significant (i.e. AAA, AAC, AAG, AAT, ACA, etc.).
-     *
-     * The codes for the individual amino acids can be found in AminoAcids.java;
-     * For example, "*" stands for a stop codon (AminoAcids.STOP_STATE)
-	 */
-	private static final String[] GENETIC_CODE_TABLES = {
-	    // Universal
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-	    // Vertebrate Mitochondrial
-	    "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Yeast
-	    "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Mold Protozoan Mitochondrial
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Mycoplasma
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Invertebrate Mitochondrial
-	    "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Ciliate
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF",
-	    // Echinoderm Mitochondrial
-	    "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Euplotid Nuclear
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF",
-	    // Bacterial
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-	    // Alternative Yeast
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF",
-	    // Ascidian Mitochondrial
-	    "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",
-	    // Flatworm Mitochondrial
-	    "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF",
-	    // Blepharisma Nuclear
-	    "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF"
-	};
+    private final Map<CodonState, AminoAcidState> translationMap;
 
-	/**
-	 * Names of the standard genetic code tables from GENBANK
-	 */
-	private static final String[] GENETIC_CODE_NAMES = {
-	    "universal", "vertebrateMitochondrial", "yeast", "moldProtozoanMitochondrial",
-	    "mycoplasma", "invertebrateMitochondrial", "ciliate", "echinodermMitochondrial",
-	    "euplotidNuclear", "bacterial", "alternativeYeast", "ascidianMitochondrial",
-	    "flatwormMitochondrial", "blepharismaNuclear"
-	};
+    private static final CodonState DEFAULT_START_CODON = Codons.getState("ATG");
+    private static final Set<CodonState> DEFAULT_START_CODONS = Collections.singleton(DEFAULT_START_CODON);
 
-	/**
-	 * Descriptions of the standard genetic code tables from GENBANK
-	 */
-	private static final String[] GENETIC_CODE_DESCRIPTIONS = {
-	    "Universal", "Vertebrate Mitochondrial", "Yeast", "Mold Protozoan Mitochondrial",
-	    "Mycoplasma", "Invertebrate Mitochondrial", "Ciliate", "Echinoderm Mitochondrial",
-	    "Euplotid Nuclear", "Bacterial", "Alternative Yeast", "Ascidian Mitochondrial",
-	    "Flatworm Mitochondrial", "Blepharisma Nuclear"
-	};
+    public static final GeneticCode
+            UNIVERSAL = new GeneticCode("universal", "Universal", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
+            VERTEBRATE_MT = new GeneticCode("vertebrateMitochondrial", "Vertebrate Mitochondrial", "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            YEAST = new GeneticCode("yeast", "Yeast", "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            MOLD_PROTOZOAN_MT = new GeneticCode("moldProtozoanMitochondrial", "Mold Protozoan Mitochondrial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            MYCOPLASMA = new GeneticCode("mycoplasma", "Mycoplasma", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            INVERTEBRATE_MT = new GeneticCode("invertebrateMitochondrial", "Invertebrate Mitochondrial", "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            CILIATE = new GeneticCode("ciliate", "Ciliate", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF"),
+            ECHINODERM_MT = new GeneticCode("echinodermMitochondrial", "Echinoderm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            EUPLOTID_NUC = new GeneticCode("euplotidNuclear", "Euplotid Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF"),
+            BACTERIAL = new GeneticCode("bacterial", "Bacterial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
+            ALT_YEAST = new GeneticCode("alternativeYeast", "Alternative Yeast", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
+            ASCIDIAN_MT = new GeneticCode("ascidianMitochondrial", "Ascidian Mitochondrial", "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            FLATWORM_MT = new GeneticCode("flatwormMitochondrial", "Flatworm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF"),
+            BLEPHARISMA_NUC = new GeneticCode("blepharismaNuclear", "Blepharisma Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF");
 
+    private static final List<GeneticCode> GENETIC_CODES_LIST = Collections.unmodifiableList(Arrays.asList(
+            UNIVERSAL, VERTEBRATE_MT, YEAST, MOLD_PROTOZOAN_MT, MYCOPLASMA, INVERTEBRATE_MT,
+            CILIATE, ECHINODERM_MT, EUPLOTID_NUC, BACTERIAL, ALT_YEAST, ASCIDIAN_MT,
+            FLATWORM_MT, BLEPHARISMA_NUC
+    ));
 
-    public static final GeneticCode UNIVERSAL = new GeneticCode(GeneticCode.UNIVERSAL_ID);
-    public static final GeneticCode VERTEBRATE_MT = new GeneticCode(GeneticCode.VERTEBRATE_MT_ID);
-    public static final GeneticCode YEAST = new GeneticCode(GeneticCode.YEAST_ID);
-    public static final GeneticCode MOLD_PROTOZOAN_MT = new GeneticCode(GeneticCode.MOLD_PROTOZOAN_MT_ID);
-    public static final GeneticCode MYCOPLASMA = new GeneticCode(GeneticCode.MYCOPLASMA_ID);
-    public static final GeneticCode INVERTEBRATE_MT = new GeneticCode(GeneticCode.INVERTEBRATE_MT_ID);
-    public static final GeneticCode CILIATE = new GeneticCode(GeneticCode.CILIATE_ID);
-    public static final GeneticCode ECHINODERM_MT = new GeneticCode(GeneticCode.ECHINODERM_MT_ID);
-    public static final GeneticCode EUPLOTID_NUC = new GeneticCode(GeneticCode.EUPLOTID_NUC_ID);
-    public static final GeneticCode BACTERIAL = new GeneticCode(GeneticCode.BACTERIAL_ID);
-    public static final GeneticCode ALT_YEAST = new GeneticCode(GeneticCode.ALT_YEAST_ID);
-    public static final GeneticCode ASCIDIAN_MT = new GeneticCode(GeneticCode.ASCIDIAN_MT_ID);
-    public static final GeneticCode FLATWORM_MT = new GeneticCode(GeneticCode.FLATWORM_MT_ID);
-    public static final GeneticCode BLEPHARISMA_NUC = new GeneticCode(GeneticCode.BLEPHARISMA_NUC_ID);
+    /**
+     * Returns an iterable that allows you to iterate over all the standard genetic codes
+     * @return An iterable over the genetic codes
+     */
+    public static Iterable<GeneticCode> getGeneticCodes() {
+        return GENETIC_CODES_LIST;
+    }
 
-    public static final GeneticCode[] GENETIC_CODES = {
-        UNIVERSAL, VERTEBRATE_MT, YEAST, MOLD_PROTOZOAN_MT, MYCOPLASMA, INVERTEBRATE_MT,
-        CILIATE, ECHINODERM_MT, EUPLOTID_NUC, BACTERIAL, ALT_YEAST, ASCIDIAN_MT,
-        FLATWORM_MT, BLEPHARISMA_NUC
-    };
+    /**
+     * Use of this field is deprecated because being an array it is mutable, i.e. an attacker could
+     * potentially replace values in this array.
+     */
+    @Deprecated
+    public static final GeneticCode[] GENETIC_CODES = GENETIC_CODES_LIST.toArray(new GeneticCode[0]);
 
-	private GeneticCode(int geneticCodeId) {
+    private final Set<CodonState> startCodons;
+    private final String name, description, codeTable;
 
-		this.geneticCodeId = geneticCodeId;
-		String codeTable = GENETIC_CODE_TABLES[geneticCodeId];
+    /**
+     * Same as {@link #GeneticCode(String, String, String, java.util.Set)}(name, description, codeTable, DEFAULT_START_CODONS.
+     */
+    private GeneticCode(String name, String description, String codeTable) {
+        this(name, description, codeTable, DEFAULT_START_CODONS);
+    }
+
+    /**
+     * Constructs a new GeneticCode.
+     * @param name Name of the genetic code (from GENBANK)
+     * @param description Description of the genetic code (from GENBANK)
+     * @param codeTable A length-64 string of uppercase amino acid characters (see {@link jebl.evolution.sequences.AminoAcids#getState(char)}),
+     *        each character representing the translation of one triplet, with the triplet translations being in the order
+     *        AAA, AAC, AAG, AAT, ACA etc. (i.e. first codon position is most significant, and nucleotides come in the
+     *        order A, C, G, T) (Note: This is not the order used by the Genbank website).
+     * @param startCodons Set of start codons (defaults to ATG only). 23% of E.Coli are not ATG. See also
+     *        http://www.biomatters.com/userforum/comments.php?DiscussionID=177
+     */
+    private GeneticCode(final String name, final String description, final String codeTable, Set<CodonState> startCodons) {
+        this.name = name;
+        this.description = description;
+        this.codeTable = codeTable;
+        this.startCodons = startCodons;
+
         Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
 
         if (codeTable.length() != 64) {
@@ -117,32 +103,35 @@ public final class GeneticCode {
             AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i+1));
             translationMap.put(codonState, aminoAcidState);
         }
-		translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
-		translationMap.put(Codons.getUnknownState(), AminoAcids.getUnknownState());
+        translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
+        translationMap.put(Codons.getUnknownState(), AminoAcids.getUnknownState());
 
         this.translationMap = Collections.unmodifiableMap(translationMap);
-	}
+    }
 
-	/**
+    /**
 	 * Returns the name of the genetic code
+     * @return the name of this genetic code
 	 */
 	public String getName() {
-		return GENETIC_CODE_NAMES[geneticCodeId];
+		return name;
 	}
 
 	/**
 	 * Returns the description of the genetic code
+     * @return the description of this genetic code
 	 */
 	public String getDescription() {
-		return GENETIC_CODE_DESCRIPTIONS[geneticCodeId];
+		return description;
 	}
 
     /**
      * Returns a length-64 string that for each nucleotide triplet contains the single-character
      * amino acid code (see {@link AminoAcids} to which that triplet is translated in this genetic code.
+     * @return the string passed to the constructor as the <code>codeTable</code> argument.
      */
     public String getCodeTable() {
-        return GENETIC_CODE_TABLES[geneticCodeId];
+        return codeTable;
     }
 
 	/**
@@ -211,40 +200,124 @@ public final class GeneticCode {
     }
 
     /**
-     * Returns true if this is a start codon in this genetic code.
-     * WARNING: I don't know how to implement this. It only returns true
-     * for ATG currently. But according to Wikipedia, about 23% of E.Coli
-     * start codons are not ATG!
-     * See also http://www.biomatters.com/userforum/comments.php?DiscussionID=177
-     *
-     * @param codonState
-     * @return true if this is a start codon.
-     * @throws NullPointerException if codonState is null
+     * Extracts the three nucleotide or ambiguity states from a nucleotide triplet string
+     * @param tripletString The string to be checked
+     * @return an array containing the three NucleotideStates corresponding to the tripletString
+     * @throws IllegalArgumentException if tripletString doesn't consist of 3 nucleotide or ambiguity symbols
+     * @throws NullPointerException if tripletString is null
      */
-    public boolean isStartCodon(CodonState codonState) {
-        // Instead of the following workaround we should rather fix the places that CALL
-        // this method without checking for null first, rather than silently returning false.
-        // I think we should throw a NullPointerException if null is passed in here!
-        // Otherwise, we won't be able to differentiate between places where codonState
-        // is expected to be able to take the value null and places where it isn't.
-        //if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
-        return codonState.getCode().equals("ATG");
+    private State[] getTripletStates(String tripletString) throws IllegalArgumentException {
+        boolean isValidTriplet = (tripletString.length() == 3);
+        State[] states = new State[3];
+        for (int i = 0; i < 3; i++) {
+            states[i] = Nucleotides.getState(tripletString.charAt(i));
+            isValidTriplet &= (states[i] != null);
+        }
+        if (!isValidTriplet) {
+            throw new IllegalArgumentException("Expected valid nucleotide triplet, got '" + tripletString + "'");
+        } else {
+            return states;
+        }
     }
 
     /**
-	 * Checks whether a given codonState represents a stop codon.
-     * @param codonState the codonState (representing a triplet of canonical nucleotides)
-     * @return whether the codonState is a stop codon
-     * @throws NullPointerException if codonState is null
-	 */
-	public boolean isStopCodon(CodonState codonState) {
-        // Same comment applies here as in {@link isStartCodon}
-        //if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
-        if (codonState == null) {
-            throw new NullPointerException("codonState must not be null");
-        } else {
-            return (translationMap.get(codonState) == AminoAcids.STOP_STATE);
+     * @param tripletString A string consisting of exactly 3 nucleotide or ambiguity symbols
+     * @return The list of all disambiguations
+     * @throws IllegalArgumentException if tripletString is not of the required form
+     */
+    private static Iterable<CodonState> getAllDisambiguations(String tripletString) {
+        if (tripletString.length() != 3) {
+            throw new IllegalArgumentException("Expected triplet string of length 3, got " + tripletString);
         }
+
+        CodonState nonAmbiguousState = Codons.getState(tripletString);
+        if (nonAmbiguousState != null) {
+            return Collections.singletonList(nonAmbiguousState);
+        } else {
+            List<CodonState> result = new LinkedList<CodonState>();
+            NucleotideState a = Nucleotides.getState(tripletString.charAt(0));
+            NucleotideState b = Nucleotides.getState(tripletString.charAt(1));
+            NucleotideState c = Nucleotides.getState(tripletString.charAt(2));
+            if (a == null || b == null || c == null) {
+                throw new IllegalArgumentException("Expected triplet string of length 3, got " + tripletString);
+            }
+            for (State ca : a.getCanonicalStates()) {
+                for (State cb : b.getCanonicalStates()) {
+                    for (State cc : c.getCanonicalStates()) {
+                        String disambiguation = ca.getCode() + cb.getCode() + cc.getCode();
+                        result.add(Codons.getState(disambiguation));
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Checks whether all possible disambiguations of a given nucleotide triplet
+     * string represents a start codon.
+     *
+     * @param tripletString A string of length 3, with each character representing one nucleotide or ambiguity symbol
+     * @return Whether all possible disambiguations of tripletString represent a start codon.
+     * @throws IllegalArgumentException if tripletString doesn't consist of 3 nucleotide or ambiguity symbols
+     * @throws NullPointerException if tripletString is null
+     */
+    public MaybeBoolean isStartCodonString(String tripletString) throws IllegalArgumentException{
+        State[] states = getTripletStates(tripletString);
+        boolean startFound = false, nonStartFound = false;
+        for (State a : states[0].getCanonicalStates()) {
+            for (State b : states[1].getCanonicalStates()) {
+                for (State c : states[2].getCanonicalStates()) {
+                    CodonState codonState = Codons.getState(a.getCode() + b.getCode() + c.getCode());
+                    boolean isStart = startCodons.contains(codonState);
+                    startFound = (startFound || isStart);
+                    nonStartFound = (nonStartFound || !isStart);
+                    // IntelliJ 6.0.5 claims the following expression is always false, but this is not true.
+                    if (startFound && nonStartFound) {
+                        return MaybeBoolean.Maybe;
+                    }
+                }
+            }
+        }
+        return startFound ? MaybeBoolean.True : MaybeBoolean.False;
+    }
+
+    @Deprecated
+    public boolean isStartCodon(CodonState codonState) {
+        return isStartCodonString(codonState.getCode()) == MaybeBoolean.True;
+    }
+
+    @Deprecated
+    public boolean isStopCodon(CodonState codonState) {
+        return isStopCodonString(codonState.getCode()) == MaybeBoolean.True;
+    }
+
+    /**
+	 * Checks whether a given String represents a stop codon.
+     * @param tripletString A string of length 3, with each character representing one nucleotide or ambiguity symbol
+     * @return true if tripletString represents a stop codon.
+     * @throws IllegalArgumentException if tripletString doesn't consist of 3 nucleotide or ambiguity symbols
+     * @throws NullPointerException if tripletString is null
+	 */
+	public MaybeBoolean isStopCodonString(String tripletString) throws IllegalArgumentException {
+        State[] states = getTripletStates(tripletString);
+        boolean stopFound = false, nonStopFound = false;
+        // For non-ambiguous states, each of these loops will be over a single element
+        for (State a : states[0].getCanonicalStates()) {
+            for (State b : states[1].getCanonicalStates()) {
+                for (State c : states[2].getCanonicalStates()) {
+                    CodonState codonState = Codons.getState(a.getCode() + b.getCode() + c.getCode());
+                    boolean isStop = translationMap.get(codonState).equals(AminoAcids.STOP_STATE);
+                    stopFound = (stopFound || isStop);
+                    nonStopFound = (nonStopFound || !isStop);
+                    // IntelliJ 6.0.5 claims the following expression is always false, but this is not true.
+                    if (stopFound && nonStopFound) {
+                        return MaybeBoolean.Maybe;
+                    }
+                }
+            }
+        }
+        return stopFound ? MaybeBoolean.True : MaybeBoolean.False;
     }
 
 	/**
@@ -266,7 +339,7 @@ public final class GeneticCode {
 	public Set<CodonState> getStopCodons() {
         Set<CodonState> stopSet = new HashSet<CodonState>();
         for (CodonState state : translationMap.keySet()) {
-            if (isStopCodon(state)) {
+            if (isStopCodonString(state.getCode()) == MaybeBoolean.True) {
                 stopSet.add(state);
             }
         }
@@ -286,26 +359,7 @@ public final class GeneticCode {
 		return count;
 	}
 
-    private final int geneticCodeId;
-	private final Map<CodonState, AminoAcidState> translationMap;
 
-    /**
-     * Constants used to refer to the built in code tables
-     */
-    private static final int UNIVERSAL_ID = 0;
-    private static final int VERTEBRATE_MT_ID = 1;
-    private static final int YEAST_ID = 2;
-    private static final int MOLD_PROTOZOAN_MT_ID = 3;
-    private static final int MYCOPLASMA_ID = 4;
-    private static final int INVERTEBRATE_MT_ID = 5;
-    private static final int CILIATE_ID = 6;
-    private static final int ECHINODERM_MT_ID = 7;
-    private static final int EUPLOTID_NUC_ID = 8;
-    private static final int BACTERIAL_ID = 9;
-    private static final int ALT_YEAST_ID = 10;
-    private static final int ASCIDIAN_MT_ID = 11;
-    private static final int FLATWORM_MT_ID = 12;
-    private static final int BLEPHARISMA_NUC_ID = 13;
 
     /**
      * Same as getDescription() (so that GeneticCode objects can be used e.g. in a JComboBox).

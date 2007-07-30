@@ -9,6 +9,9 @@
 package jebl.evolution.sequences;
 
 /**
+ * As of 2007-07-30, instances of this class are only constructed for non-ambigous
+ * nucleotide triplets - see {@link jebl.evolution.sequences.Codons}.
+ * 
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *

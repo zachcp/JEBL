@@ -67,8 +67,9 @@ public final class Codons {
 	}
 
     /**
-     * Gets the state object for the given code. Returns null if the code is illegal.
-     * @param code a three-character string of nucleotides in uppercase
+     * Gets the state object for the given code. Returns null if the code is illegal
+     * or contains ambiguous nucleotides.
+     * @param code a three-character string of non-ambiguous nucleotides in uppercase
      * @return the state
      */
     public static CodonState getState(String code) {
