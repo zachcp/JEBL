@@ -283,11 +283,27 @@ public final class GeneticCode {
         return startFound ? MaybeBoolean.True : MaybeBoolean.False;
     }
 
+    /**
+     * As of 2007-07-30, {@link jebl.evolution.sequences.CodonState}s exist only
+     * for nonambiguous nucleotide triplets. Therefore, this method cannot be
+     * used to check if an ambiguous triplet of nucleotides codes for a transcription,
+     * start and therefore this method is deprecated.
+     * @param codonState
+     * @return True if the specified codonState codes for a transcription start under this genetic code.
+     */
     @Deprecated
     public boolean isStartCodon(CodonState codonState) {
         return isStartCodonString(codonState.getCode()) == MaybeBoolean.True;
     }
 
+    /**
+     * As of 2007-07-30, {@link jebl.evolution.sequences.CodonState}s exist only
+     * for nonambiguous nucleotide triplets. Therefore, this method cannot be
+     * used to check if an ambiguous triplet of nucleotides codes for a stop,
+     * and therefore this method is deprecated.
+     * @param codonState
+     * @return True if the specified codonState codes for a stop under this genetic code.
+     */
     @Deprecated
     public boolean isStopCodon(CodonState codonState) {
         return isStopCodonString(codonState.getCode()) == MaybeBoolean.True;
