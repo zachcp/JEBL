@@ -222,39 +222,6 @@ public final class GeneticCode {
     }
 
     /**
-     * @param tripletString A string consisting of exactly 3 nucleotide or ambiguity symbols
-     * @return The list of all disambiguations
-     * @throws IllegalArgumentException if tripletString is not of the required form
-     */
-    private static Iterable<CodonState> getAllDisambiguations(String tripletString) {
-        if (tripletString.length() != 3) {
-            throw new IllegalArgumentException("Expected triplet string of length 3, got " + tripletString);
-        }
-
-        CodonState nonAmbiguousState = Codons.getState(tripletString);
-        if (nonAmbiguousState != null) {
-            return Collections.singletonList(nonAmbiguousState);
-        } else {
-            List<CodonState> result = new LinkedList<CodonState>();
-            NucleotideState a = Nucleotides.getState(tripletString.charAt(0));
-            NucleotideState b = Nucleotides.getState(tripletString.charAt(1));
-            NucleotideState c = Nucleotides.getState(tripletString.charAt(2));
-            if (a == null || b == null || c == null) {
-                throw new IllegalArgumentException("Expected triplet string of length 3, got " + tripletString);
-            }
-            for (State ca : a.getCanonicalStates()) {
-                for (State cb : b.getCanonicalStates()) {
-                    for (State cc : c.getCanonicalStates()) {
-                        String disambiguation = ca.getCode() + cb.getCode() + cc.getCode();
-                        result.add(Codons.getState(disambiguation));
-                    }
-                }
-            }
-            return result;
-        }
-    }
-
-    /**
      * Checks whether all possible disambiguations of a given nucleotide triplet
      * string represents a start codon.
      *
