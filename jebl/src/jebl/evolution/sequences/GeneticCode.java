@@ -219,24 +219,33 @@ public final class GeneticCode {
      *
      * @param codonState
      * @return true if this is a start codon.
+     * @throws NullPointerException if codonState is null
      */
     public boolean isStartCodon(CodonState codonState) {
-        // TT: Regarding the following comment, doesn't this mean we need to fix the
-        // places that CALL this method without checking for null first, rather than
-        // silently returning false? I think we should throw a NullPointerException
-        // if null is passed in here!
-        if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
+        // Instead of the following workaround we should rather fix the places that CALL
+        // this method without checking for null first, rather than silently returning false.
+        // I think we should throw a NullPointerException if null is passed in here!
+        // Otherwise, we won't be able to differentiate between places where codonState
+        // is expected to be able to take the value null and places where it isn't.
+        //if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
         return codonState.getCode().equals("ATG");
     }
 
     /**
-	 * Note that the state is the canonical state (generated combinatorially)
+	 * Checks whether a given codonState represents a stop codon.
+     * @param codonState the codonState (representing a triplet of canonical nucleotides)
      * @return whether the codonState is a stop codon
+     * @throws NullPointerException if codonState is null
 	 */
 	public boolean isStopCodon(CodonState codonState) {
-        if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
-		return (translationMap.get(codonState) == AminoAcids.STOP_STATE);
-	}
+        // Same comment applies here as in {@link isStartCodon}
+        //if (codonState==null) return false; // to handle codons generated from ambiguous residues where it returns null from Codons.getState()
+        if (codonState == null) {
+            throw new NullPointerException("codonState must not be null");
+        } else {
+            return (translationMap.get(codonState) == AminoAcids.STOP_STATE);
+        }
+    }
 
 	/**
 	 * @return all the possible codons for a given amino acid
