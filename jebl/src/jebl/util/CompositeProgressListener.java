@@ -118,6 +118,11 @@ public final class CompositeProgressListener extends ProgressListener {
         return setProgress(currentOperationProgress + fractionCompletedDiff);
     }
 
+    /**
+     * Marks the current subtask (not the entire task!) as completed -- same
+     * as setProgress(1.0).
+     * @return true if the user has requested that this operation be canceled.
+     */
     public boolean setComplete() {
         return setProgress(1.0);
     }
