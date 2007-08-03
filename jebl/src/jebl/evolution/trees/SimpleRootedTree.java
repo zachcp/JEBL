@@ -682,7 +682,7 @@ final public class SimpleRootedTree implements RootedTree {
 
         // length of branch to parent
         public double getLength() {
-            return length >= 0 ? length : 1.0;
+            return length;
         }
 
         public void setLength(double length) {
