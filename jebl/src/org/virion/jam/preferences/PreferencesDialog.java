@@ -1,11 +1,3 @@
-/*
- * DemographicDialog.java
- *
- * (c) 2002-2005 BEAST Development Core Team
- *
- * This package may be distributed under the
- * Lesser Gnu Public Licence (LGPL)
- */
 package org.virion.jam.preferences;
 
 import org.virion.jam.toolbar.*;
@@ -18,12 +10,9 @@ import java.util.*;
 import java.util.List;
 
 /**
- * DemographicDialog.java
+ * PreferencesDialog.java
  *
- * Title:			Tracer
- * Description:		An application for analysing MCMC trace files.
  * @author			Andrew Rambaut
- * @author			Alexei Drummond
  * @version			$Id$
  */
 public class PreferencesDialog {
@@ -87,12 +76,13 @@ public class PreferencesDialog {
 
         showSection(currentSection);
 
+	    for (PreferencesSection section : sections) {
+	        section.retrievePreferences();
+	    }
+
         dialog.pack();
         dialog.setVisible(true);
-
-        for (PreferencesSection section : sections) {
-            section.storePreferences();
-        }
+	   
     }
 
     public void showSection(String title) {
@@ -112,7 +102,6 @@ public class PreferencesDialog {
 
     public void addSection(PreferencesSection section) {
         sections.add(section);
-	    section.retrievePreferences();
     }
 
     String currentSection = null;
