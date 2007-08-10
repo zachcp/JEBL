@@ -23,7 +23,7 @@ import java.awt.*;
  * Any object may exhibit undefined behaviour when dealing with a ProgressListener 
  * that is not fulfilling this contract.
  */
-public abstract class ProgressListener {
+public abstract class ProgressListener { // TT: Should we let ProgressListener implement Cancelable or shouldn't we?
     /**
      * @param fractionCompleted a number between 0 and 1 inclusive
      * representing the fraction of the operation completed.
@@ -140,6 +140,22 @@ public abstract class ProgressListener {
      */
     public abstract boolean isCanceled();
 
+    /**
+     * Returns a Cancelable wrapper around this ProgressListener that can be used
+     * only to test whether this task has been canceled, but not to report any
+     * progress (its concrete class is not ProgressListener, so it cannot be cast
+     * back to ProgressListener). This is useful to keep exclusive responsibility for
+     * progress report even if several different objects or threads may be
+     * interested in finding out when the task is canceled.
+     * @return A Cancelable wrapper around this ProgressListener from which this ProgressListener cannot be extracted.
+     */
+    public final Cancelable asCancelable() {
+        return new Cancelable() {
+            public boolean isCanceled() {
+                return ProgressListener.this.isCanceled();
+            }
+        };
+    }
 
     /**
      * A ProgressListener that ignores all events and always returns false from
