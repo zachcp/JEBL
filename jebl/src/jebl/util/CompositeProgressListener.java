@@ -41,6 +41,11 @@ public final class CompositeProgressListener extends ProgressListener {
      */
     public CompositeProgressListener(ProgressListener listener, double ... operationDuration) {
         numOperations = operationDuration.length;
+        if (numOperations == 0) {
+            // Give a slightly more helpful message in this special case (would
+            // otherwise be caught by the totalTime != 0.0 test below as well)
+            throw new IllegalArgumentException("Composite operation must have > 0 subtasks");
+        }
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
         } else {
