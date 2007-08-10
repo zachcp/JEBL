@@ -17,7 +17,7 @@ import java.util.List;
  * {@link #beginNextSubtask()}. Thus when the constructor is passed an array of N doubles as its second
  * argument, {@link #beginNextSubtask()} should be called precisely N-1 times.
  * <p/>
- * Alternatively, instead of calling {@link #beginNextSubtask()}after each subtask (except the last),
+ * Alternatively, instead of calling {@link #beginNextSubtask()} after each subtask (except the last),
  * you can instead call {@link #beginSubtask()} before each subtask (including the first)
  * <p/>
  *
