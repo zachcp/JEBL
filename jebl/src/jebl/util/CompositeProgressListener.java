@@ -1,5 +1,7 @@
 package jebl.util;
 
+import jebl.math.MachineAccuracy;
+
 import java.io.File;
 import java.util.List;
 
@@ -39,9 +41,6 @@ public final class CompositeProgressListener extends ProgressListener {
      */
     public CompositeProgressListener(ProgressListener listener, double ... operationDuration) {
         numOperations = operationDuration.length;
-        if (numOperations == 0) {
-            throw new IllegalArgumentException("Composite operation must have > 0 subtasks");
-        }
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
         } else {
@@ -57,8 +56,12 @@ public final class CompositeProgressListener extends ProgressListener {
             }
             totalTime += d;
         }
-        for (int i = 0; i < numOperations; i++)
+        if (MachineAccuracy.same(totalTime, 0.0)) { // will always be the case if numOperations == 0
+            throw new IllegalArgumentException("There must be at least one subtask that takes > 0 time");
+        }
+        for (int i = 0; i < numOperations; i++) {
             this.time[i] = (operationDuration[i] / totalTime);
+        }
     }
 
     public static CompositeProgressListener forFiles(ProgressListener listener, List<File> files) {
