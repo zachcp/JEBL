@@ -61,6 +61,7 @@ public final class GeneticCode {
     /**
      * Use of this field is deprecated because being an array it is mutable, i.e. an attacker could
      * potentially replace values in this array.
+     * @deprecated use {@link #getGeneticCodes()} instead
      */
     @Deprecated
     public static final GeneticCode[] GENETIC_CODES = GENETIC_CODES_LIST.toArray(new GeneticCode[0]);
