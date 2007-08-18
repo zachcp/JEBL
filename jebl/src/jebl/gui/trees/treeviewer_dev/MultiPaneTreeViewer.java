@@ -3,9 +3,7 @@ package jebl.gui.trees.treeviewer_dev;
 import jebl.evolution.trees.*;
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
-import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
-import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
-import jebl.gui.trees.treeviewer_dev.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 
 import javax.swing.*;
@@ -413,9 +411,9 @@ public class MultiPaneTreeViewer extends TreeViewer {
         fireTreeSettingsChanged();
     }
 
-    public void setScaleBarPainter(ScaleBarPainter scaleBarPainter) {
+    public void setScalePainter(ScalePainter scalePainter) {
         for (TreePane treePane : treePanes) {
-            treePane.setScaleBarPainter(scaleBarPainter);
+            treePane.setScalePainter(scalePainter);
         }
         fireTreeSettingsChanged();
     }

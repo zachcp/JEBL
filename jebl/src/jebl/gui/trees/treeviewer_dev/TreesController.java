@@ -36,7 +36,7 @@ public class TreesController extends AbstractController {
 
         titleLabel = new JLabel(CONTROLLER_TITLE);
 
-        optionsPanel = new OptionsPanel();
+	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
 
         transformCheck = new JCheckBox("Transform branches");
         transformCheck.setOpaque(false);

@@ -473,21 +473,21 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return nodeBarPainter;
 	}
 
-	public void setScaleBarPainter(Painter<TreePane> scaleBarPainter) {
-		scaleBarPainter.setTreePane(this);
-		if (this.scaleBarPainter != null) {
-			this.scaleBarPainter.removePainterListener(this);
+	public void setScalePainter(ScalePainter scalePainter) {
+		scalePainter.setTreePane(this);
+		if (this.scalePainter != null) {
+			this.scalePainter.removePainterListener(this);
 		}
-		this.scaleBarPainter = scaleBarPainter;
-		if (this.scaleBarPainter != null) {
-			this.scaleBarPainter.addPainterListener(this);
+		this.scalePainter = scalePainter;
+		if (this.scalePainter != null) {
+			this.scalePainter.addPainterListener(this);
 		}
 		calibrated = false;
 		repaint();
 	}
 
-	public Painter<TreePane> getScaleBarPainter() {
-		return scaleBarPainter;
+	public Painter<TreePane> getScalePainter() {
+		return scalePainter;
 	}
 
 	public void setPreferredSize(Dimension dimension) {
@@ -834,8 +834,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 		// Paint scale bar
-		if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
-			scaleBarPainter.paint(g2, this, Painter.Justification.CENTER, scaleBarBounds);
+		if (scalePainter != null && scalePainter.isVisible()) {
+			scalePainter.paint(g2, this, Painter.Justification.CENTER, scaleBarBounds);
 		}
 
 		g2.setStroke(oldStroke);
@@ -967,10 +967,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
-		if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
-			scaleBarPainter.calibrate(g2, this);
+		if (scalePainter != null && scalePainter.isVisible()) {
+			scalePainter.calibrate(g2, this);
 			scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), treeBounds.getY(),
-					treeBounds.getWidth(), scaleBarPainter.getPreferredHeight());
+					treeBounds.getWidth(), scalePainter.getPreferredHeight());
 			bounds.add(scaleBarBounds);
 		}
 
@@ -1159,9 +1159,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
-		if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
-			scaleBarPainter.calibrate(g2, this);
-			final double h1 = scaleBarPainter.getPreferredHeight();
+		if (scalePainter != null && scalePainter.isVisible()) {
+			scalePainter.calibrate(g2, this);
+			final double h1 = scalePainter.getPreferredHeight();
 			scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), height - h1, treeBounds.getWidth(), h1);
 		}
 
@@ -1251,7 +1251,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private NodeBarPainter nodeBarPainter = null;
 
-	private Painter<TreePane> scaleBarPainter = null;
+	private Painter<TreePane> scalePainter = null;
 	private Rectangle2D scaleBarBounds = null;
 
 	private BasicStroke branchLineStroke = new BasicStroke(1.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);

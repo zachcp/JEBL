@@ -14,9 +14,7 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
-import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
-import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
-import jebl.gui.trees.treeviewer_dev.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer_dev.painters.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -359,8 +357,8 @@ public class DefaultTreeViewer extends TreeViewer {
         branchLabelPainter.setupAttributes(trees);
     }
 
-    public void setScaleBarPainter(ScaleBarPainter scaleBarPainter) {
-        treePane.setScaleBarPainter(scaleBarPainter);
+    public void setScalePainter(ScalePainter scalePainter) {
+        treePane.setScalePainter(scalePainter);
     }
 
     public void setBranchDecorator(Decorator branchDecorator) {

@@ -1,22 +1,21 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
-import jebl.gui.trees.treeviewer_dev.TreePane;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
-
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Line2D;
-import java.awt.*;
-import java.util.Collection;
-
+import jebl.gui.trees.treeviewer_dev.TreePane;
 import org.virion.jam.controlpalettes.ControlPalette;
+
+import java.awt.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
  * @version $Id: ScaleBarPainter.java,v 1.7 2006/11/21 16:10:24 rambaut Exp $
  */
-public class ScaleAxisPainter extends LabelPainter<TreePane> {
+public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePainter {
 
     public ScaleAxisPainter() {
         this(0.0);
@@ -238,8 +237,14 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> {
         return scaleRange;
     }
 
-    public void setScaleRange(double scaleRange) {
-        this.userScaleRange = scaleRange;
+	public void setScaleMinimum(double scaleMinimum) {
+	    this.userScaleMinimum = scaleMinimum;
+	    calculateScaleRange();
+	    firePainterChanged();
+	}
+
+    public void setScaleMaximum(double scaleMaximum) {
+        this.userScaleMaximum = scaleMaximum;
         calculateScaleRange();
         firePainterChanged();
     }
@@ -255,8 +260,11 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> {
     }
 
     public void calculateScaleRange() {
-        if( !automaticScale && userScaleRange != 0.0 ) {
-            scaleRange = userScaleRange;
+	    if (treePane == null) {
+		    return;
+	    }
+        if( !automaticScale && userScaleMaximum != 0.0 ) {
+            scaleRange = userScaleMaximum;
         } else {
             RootedTree tree = treePane.getTree();
             if (tree != null) {
@@ -301,7 +309,8 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> {
     private double scaleRange;
     private double topMargin = 4.0;
     private double bottomMargin = 4.0;
-    private double userScaleRange = 0.0;
+	private double userScaleMinimum = 0.0;
+    private double userScaleMaximum = 1.0;
     private boolean automaticScale = true;
 
     private double preferredHeight;

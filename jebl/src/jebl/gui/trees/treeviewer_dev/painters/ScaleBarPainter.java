@@ -15,7 +15,7 @@ import java.util.Collection;
  * @author Alexei Drummond
  * @version $Id$
  */
-public class ScaleBarPainter extends LabelPainter<TreePane> {
+public class ScaleBarPainter extends LabelPainter<TreePane> implements ScalePainter {
 
     public enum ScaleBarType {
         BAR,

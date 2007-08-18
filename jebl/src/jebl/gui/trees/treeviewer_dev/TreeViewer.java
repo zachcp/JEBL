@@ -1,20 +1,14 @@
 package jebl.gui.trees.treeviewer_dev;
 
-import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
-import jebl.gui.trees.treeviewer_dev.painters.BasicLabelPainter;
-import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
-import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
-import jebl.gui.trees.treeviewer_dev.painters.ScaleBarPainter;
-import jebl.gui.trees.treeviewer_dev.decorators.AttributableDecorator;
-import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.TransformedRootedTree;
-import jebl.evolution.trees.SortedRootedTree;
+import jebl.evolution.trees.*;
+import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
+import jebl.gui.trees.treeviewer_dev.painters.*;
+import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
 
 import javax.swing.*;
-import java.awt.print.Printable;
 import java.awt.*;
+import java.awt.print.Printable;
 import java.util.Collection;
 
 /**
@@ -77,7 +71,7 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
     public abstract void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter);
 
-    public abstract void setScaleBarPainter(ScaleBarPainter scaleBarPainter);
+    public abstract void setScalePainter(ScalePainter scalePainter);
 
     public abstract void setBranchDecorator(Decorator branchDecorator);
 

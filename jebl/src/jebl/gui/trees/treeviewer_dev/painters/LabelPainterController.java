@@ -9,13 +9,10 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.prefs.Preferences;
-
-import jebl.evolution.trees.TransformedRootedTree;
-import jebl.evolution.trees.SortedRootedTree;
 
 /**
  * @author Andrew Rambaut
@@ -58,10 +55,9 @@ public class LabelPainterController extends AbstractController {
         labelPainter.setFont(new Font(defaultFontName, defaultFontStyle, defaultFontSize));
         labelPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
 
-        optionsPanel = new OptionsPanel();
+        optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
-
         titleCheckBox.setSelected(labelPainter.isVisible());
 
         String[] attributes = labelPainter.getAttributes();

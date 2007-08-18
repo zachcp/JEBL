@@ -32,7 +32,7 @@ public class NodeBarController extends AbstractController {
 
         final float defaultBarWidth = PREFS.getFloat(BAR_WIDTH_KEY, DEFAULT_BAR_WIDTH);
 
-        optionsPanel = new OptionsPanel();
+	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
 

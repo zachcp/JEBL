@@ -39,7 +39,7 @@ public class NodeShapeController extends AbstractController {
         this.title = title;
         this.nodeShapePainter = nodeShapePainter;
 
-        optionsPanel = new OptionsPanel();
+	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
         titleCheckBox.setSelected(this.nodeShapePainter.isVisible());

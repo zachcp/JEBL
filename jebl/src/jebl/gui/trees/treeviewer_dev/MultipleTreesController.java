@@ -18,7 +18,7 @@ public class MultipleTreesController extends AbstractController {
 	public MultipleTreesController(final TreeViewer treeViewer) {
 
 		titleLabel = new JLabel("Current Tree");
-		optionsPanel = new OptionsPanel();
+		optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
 
 		final JLabel treeNameLabel = new JLabel("Tree 1");
 		final SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, 1, 1);
