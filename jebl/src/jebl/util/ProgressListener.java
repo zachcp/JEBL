@@ -66,11 +66,11 @@ public abstract class ProgressListener { // TT: Should we let ProgressListener i
 
     /**
      * Set visible user message.
-     * @param message
+     * @param message a user visible message. If this is null, it will be automatically replaced with an empty string.
      * @return true if the user has requested that this operation be canceled.
      */
     public final boolean setMessage(String message) {
-        _setMessage(message);
+        _setMessage(message == null ? "" : message);
         return isCanceled();
     }
 
@@ -128,6 +128,7 @@ public abstract class ProgressListener { // TT: Should we let ProgressListener i
      * implement this method, but in the future it may get an empty default
      * implementation to make it optional for subclasses to subscribe to setMessage
      * events.
+     * @param message a user visible message. Will not be null but may be an empty string.
      */
     protected abstract void _setMessage(String message);
 
