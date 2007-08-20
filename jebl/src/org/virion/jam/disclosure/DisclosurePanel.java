@@ -66,7 +66,7 @@ public class DisclosurePanel extends JPanel {
 
         componentPanel.add(button, BorderLayout.WEST);
 		componentPanel.add(titleComponent, BorderLayout.CENTER);
-        panel1.add(componentPanel, BorderLayout.WEST);
+        panel1.add(componentPanel, BorderLayout.CENTER);
 
         add(panel1, BorderLayout.NORTH);
 
