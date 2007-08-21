@@ -158,7 +158,11 @@ public class DefaultTreeViewer extends TreeViewer {
         return !treePane.maintainAspectRatio();
     }
 
-    private void refreshZoom() {
+	public void setTimeScale(TimeScale timeScale) {
+		treePane.setTimeScale(timeScale);
+	}
+
+	private void refreshZoom() {
         setZoom(zoom, zoom + verticalExpansion);
     }
 

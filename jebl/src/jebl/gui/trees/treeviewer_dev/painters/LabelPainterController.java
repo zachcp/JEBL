@@ -55,7 +55,7 @@ public class LabelPainterController extends AbstractController {
         labelPainter.setFont(new Font(defaultFontName, defaultFontStyle, defaultFontSize));
         labelPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
 
-        optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
+        optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
         titleCheckBox.setSelected(labelPainter.isVisible());

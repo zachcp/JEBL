@@ -19,225 +19,231 @@ import java.util.Collection;
  */
 public class MultiPaneTreeViewer extends TreeViewer {
 
-    private final static double MAX_ZOOM = 20;
-    private final static double MAX_VERTICAL_EXPANSION = 20;
+	private final static double MAX_ZOOM = 20;
+	private final static double MAX_VERTICAL_EXPANSION = 20;
 
-    /**
-     * Creates new TreeViewer
-     */
-    public MultiPaneTreeViewer() {
-        treePanes.add(new TreePane());
+	/**
+	 * Creates new TreeViewer
+	 */
+	public MultiPaneTreeViewer() {
+		treePanes.add(new TreePane());
 
-        setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 
-        treePanePanel = new MultiPaneTreePanel();
-        treePanePanel.setLayout(new BoxLayout(treePanePanel, BoxLayout.PAGE_AXIS));
+		treePanePanel = new MultiPaneTreePanel();
+		treePanePanel.setLayout(new BoxLayout(treePanePanel, BoxLayout.PAGE_AXIS));
 
-        JScrollPane scrollPane = new JScrollPane(treePanePanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setMinimumSize(new Dimension(150, 150));
+		JScrollPane scrollPane = new JScrollPane(treePanePanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setMinimumSize(new Dimension(150, 150));
 
-        scrollPane.setBorder(null);
-        viewport = scrollPane.getViewport();
+		scrollPane.setBorder(null);
+		viewport = scrollPane.getViewport();
 
-        add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 
-    }
+	}
 
-    public void setTree(Tree tree) {
-        trees.clear();
-        addTree(tree);
-        showTree(0);
-    }
+	public void setTree(Tree tree) {
+		trees.clear();
+		addTree(tree);
+		showTree(0);
+	}
 
-    public void setTrees(Collection<? extends Tree> trees) {
-        this.trees.clear();
-        for (Tree tree : trees) {
-            addTree(tree);
-        }
-        showTree(0);
-    }
+	public void setTrees(Collection<? extends Tree> trees) {
+		this.trees.clear();
+		for (Tree tree : trees) {
+			addTree(tree);
+		}
+		showTree(0);
+	}
 
-    protected void addTree(Tree tree) {
-        this.trees.add(tree);
-        showTree(trees.size() - 1);
+	protected void addTree(Tree tree) {
+		this.trees.add(tree);
+		showTree(trees.size() - 1);
 
-        TreePane treePane = treePanes.get(0);
-        if (treePane.getTipLabelPainter() != null) {
-            treePane.getTipLabelPainter().setupAttributes(trees);
-        }
+		TreePane treePane = treePanes.get(0);
+		if (treePane.getTipLabelPainter() != null) {
+			treePane.getTipLabelPainter().setupAttributes(trees);
+		}
 
-        if (treePane.getBranchLabelPainter() != null) {
-            treePane.getBranchLabelPainter().setupAttributes(trees);
-        }
+		if (treePane.getBranchLabelPainter() != null) {
+			treePane.getBranchLabelPainter().setupAttributes(trees);
+		}
 
-        if (treePane.getNodeLabelPainter() != null) {
-            treePane.getNodeLabelPainter().setupAttributes(trees);
-        }
+		if (treePane.getNodeLabelPainter() != null) {
+			treePane.getNodeLabelPainter().setupAttributes(trees);
+		}
 
-        if (treePane.getNodeBarPainter() != null) {
-            treePane.getNodeBarPainter().setupAttributes(trees);
-        }
-    }
+		if (treePane.getNodeBarPainter() != null) {
+			treePane.getNodeBarPainter().setupAttributes(trees);
+		}
+	}
 
-    public void addTrees(Collection<? extends Tree> trees) {
-        int count = getTreeCount();
-        for (Tree tree : trees) {
-            addTree(tree);
-        }
-        showTree(count);
-    }
+	public void addTrees(Collection<? extends Tree> trees) {
+		int count = getTreeCount();
+		for (Tree tree : trees) {
+			addTree(tree);
+		}
+		showTree(count);
+	}
 
-    public Tree getTree() {
-        return trees.get(0);
-    }
+	public Tree getTree() {
+		return trees.get(0);
+	}
 
-    public java.util.List<Tree> getTrees() {
-        return trees;
-    }
+	public java.util.List<Tree> getTrees() {
+		return trees;
+	}
 
-    public int getTreesPerPage() {
-        return treesPerPage;
-    }
+	public int getTreesPerPage() {
+		return treesPerPage;
+	}
 
-    public void setTreesPerPage(int treesPerPage) {
-        this.treesPerPage = treesPerPage;
-        if (treePanes.size() < treesPerPage) {
-            while (treePanes.size() < treesPerPage) {
-                treePanes.add(new TreePane());
-            }
-        } else if (treePanes.size() > treesPerPage) {
-            while (treePanes.size() > treesPerPage) {
-                treePanes.remove(treePanes.size() - 1);
-            }
-        }
-        showTree(currentTreeIndex);
-    }
+	public void setTreesPerPage(int treesPerPage) {
+		this.treesPerPage = treesPerPage;
+		if (treePanes.size() < treesPerPage) {
+			while (treePanes.size() < treesPerPage) {
+				treePanes.add(new TreePane());
+			}
+		} else if (treePanes.size() > treesPerPage) {
+			while (treePanes.size() > treesPerPage) {
+				treePanes.remove(treePanes.size() - 1);
+			}
+		}
+		showTree(currentTreeIndex);
+	}
 
-    private void setupTreePane(TreePane treePane) {
-        treePane.setAutoscrolls(true); //enable synthetic drag events
+	private void setupTreePane(TreePane treePane) {
+		treePane.setAutoscrolls(true); //enable synthetic drag events
 
-        // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
-        // It installs itself within the constructor.
-        treePaneSelector = new TreePaneSelector(treePane);
-    }
+		// This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
+		// It installs itself within the constructor.
+		treePaneSelector = new TreePaneSelector(treePane);
+	}
 
-    public Tree getCurrentTree() {
-        return trees.get(currentTreeIndex);
-    }
+	public Tree getCurrentTree() {
+		return trees.get(currentTreeIndex);
+	}
 
 
-    public int getCurrentTreeIndex() {
-        return currentTreeIndex;
-    }
+	public int getCurrentTreeIndex() {
+		return currentTreeIndex;
+	}
 
-    public int getTreeCount() {
-        if (trees == null) return 0;
-        return trees.size();
-    }
+	public int getTreeCount() {
+		if (trees == null) return 0;
+		return trees.size();
+	}
 
-    public void showTree(int index) {
-        int i = index;
-        for (TreePane treePane : treePanes) {
-            if (i < trees.size()) {
-                Tree tree = trees.get(i);
+	public void showTree(int index) {
+		int i = index;
+		for (TreePane treePane : treePanes) {
+			if (i < trees.size()) {
+				Tree tree = trees.get(i);
 
-                if (tree instanceof RootedTree) {
-                    treePane.setTree((RootedTree)tree);
-                } else {
-                    treePane.setTree(Utils.rootTheTree(tree));
-                }
-            } else {
-                treePane.setTree(null);
-            }
-            i++;
-        }
-        currentTreeIndex = index;
+				if (tree instanceof RootedTree) {
+					treePane.setTree((RootedTree)tree);
+				} else {
+					treePane.setTree(Utils.rootTheTree(tree));
+				}
+			} else {
+				treePane.setTree(null);
+			}
+			i++;
+		}
+		currentTreeIndex = index;
 
-	    treePanePanel.removeAll();
-	    setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-	    for (TreePane treePane : treePanes) {
-	        treePanePanel.add(treePane);
-	        setupTreePane(treePane);
-	    }
+		treePanePanel.removeAll();
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		for (TreePane treePane : treePanes) {
+			treePanePanel.add(treePane);
+			setupTreePane(treePane);
+		}
 
-        fireTreeChanged();
-    }
+		fireTreeChanged();
+	}
 
-    public void showNextTree() {
-        if (currentTreeIndex < trees.size() - 1) {
-            showTree(currentTreeIndex + 1);
-        }
-    }
+	public void showNextTree() {
+		if (currentTreeIndex < trees.size() - 1) {
+			showTree(currentTreeIndex + 1);
+		}
+	}
 
-    public void showPreviousTree() {
-        if (currentTreeIndex > 0) {
-            showTree(currentTreeIndex - 1);
-        }
-    }
+	public void showPreviousTree() {
+		if (currentTreeIndex > 0) {
+			showTree(currentTreeIndex - 1);
+		}
+	}
 
-    public void setTreeLayout(TreeLayout treeLayout) {
-        for (TreePane treePane : treePanes) {
-            treePane.setTreeLayout(treeLayout);
-        }
-    }
+	public void setTreeLayout(TreeLayout treeLayout) {
+		for (TreePane treePane : treePanes) {
+			treePane.setTreeLayout(treeLayout);
+		}
+	}
 
-    private boolean zoomPending = false;
-    private double zoom = 0.0, verticalExpansion = 0.0;
+	private boolean zoomPending = false;
+	private double zoom = 0.0, verticalExpansion = 0.0;
 
-    public void setZoom(double zoom) {
-        this.zoom = zoom * MAX_ZOOM;
-        refreshZoom();
-    }
+	public void setZoom(double zoom) {
+		this.zoom = zoom * MAX_ZOOM;
+		refreshZoom();
+	}
 
-    public void setVerticalExpansion(double verticalExpansion) {
-        this.verticalExpansion = verticalExpansion * MAX_VERTICAL_EXPANSION;
-        refreshZoom();
-    }
+	public void setVerticalExpansion(double verticalExpansion) {
+		this.verticalExpansion = verticalExpansion * MAX_VERTICAL_EXPANSION;
+		refreshZoom();
+	}
 
-    public boolean verticalExpansionAllowed() {
-        return !treePanes.get(0).maintainAspectRatio();
-    }
+	public boolean verticalExpansionAllowed() {
+		return !treePanes.get(0).maintainAspectRatio();
+	}
 
-    private void refreshZoom() {
-        setZoom(zoom, zoom + verticalExpansion);
-    }
+	public void setTimeScale(TimeScale timeScale) {
+		for (TreePane treePane : treePanes) {
+			treePane.setTimeScale(timeScale);
+		}
+	}
 
-    private void setZoom(double xZoom, double yZoom) {
+	private void refreshZoom() {
+		setZoom(zoom, zoom + verticalExpansion);
+	}
 
-        Dimension viewportSize = viewport.getViewSize();
-        Point position = viewport.getViewPosition();
+	private void setZoom(double xZoom, double yZoom) {
 
-        Dimension extentSize = viewport.getExtentSize();
-        double w = extentSize.getWidth() * (1.0 + xZoom);
-        double h = extentSize.getHeight() * (1.0 + yZoom);
+		Dimension viewportSize = viewport.getViewSize();
+		Point position = viewport.getViewPosition();
 
-        Dimension newSize = new Dimension((int) w, (int) h / treesPerPage);
-        for (TreePane treePane : treePanes) {
-            treePane.setPreferredSize(newSize);
-            treePane.revalidate();
-        }
+		Dimension extentSize = viewport.getExtentSize();
+		double w = extentSize.getWidth() * (1.0 + xZoom);
+		double h = extentSize.getHeight() * (1.0 + yZoom);
 
-        double cx = position.getX() + (0.5 * extentSize.getWidth());
-        double cy = position.getY() + (0.5 * extentSize.getHeight());
+		Dimension newSize = new Dimension((int) w, (int) h / treesPerPage);
+		for (TreePane treePane : treePanes) {
+			treePane.setPreferredSize(newSize);
+			treePane.revalidate();
+		}
 
-        double rx = ((double) newSize.getWidth()) / viewportSize.getWidth();
-        double ry = ((double) newSize.getHeight()) / viewportSize.getHeight();
+		double cx = position.getX() + (0.5 * extentSize.getWidth());
+		double cy = position.getY() + (0.5 * extentSize.getHeight());
 
-        double px = (cx * rx) - (extentSize.getWidth() / 2.0);
-        double py = (cy * ry) - (extentSize.getHeight() / 2.0);
+		double rx = ((double) newSize.getWidth()) / viewportSize.getWidth();
+		double ry = ((double) newSize.getHeight()) / viewportSize.getHeight();
 
-        Point newPosition = new Point((int) px, (int) py);
-        viewport.setViewPosition(newPosition);
-    }
+		double px = (cx * rx) - (extentSize.getWidth() / 2.0);
+		double py = (cy * ry) - (extentSize.getHeight() / 2.0);
 
-    public boolean hasSelection() {
-        for (TreePane treePane : treePanes) {
-            if (treePane.hasSelection()) return true;
-        }
-        return false;
-    }
+		Point newPosition = new Point((int) px, (int) py);
+		viewport.setViewPosition(newPosition);
+	}
 
-    public void selectTaxa(MultiPaneTreeViewer.SearchType searchType, String searchString, boolean caseSensitive) {
+	public boolean hasSelection() {
+		for (TreePane treePane : treePanes) {
+			if (treePane.hasSelection()) return true;
+		}
+		return false;
+	}
+
+	public void selectTaxa(MultiPaneTreeViewer.SearchType searchType, String searchString, boolean caseSensitive) {
 //        treePane.clearSelection();
 //
 //        if (searchType == MultiPaneTreeViewer.SearchType.MATCHES && !caseSensitive) {
@@ -274,9 +280,9 @@ public class MultiPaneTreeViewer extends TreeViewer {
 //                    break;
 //            }
 //        }
-    }
+	}
 
-    public void selectNodes(String attribute, MultiPaneTreeViewer.SearchType searchType, String searchString, boolean caseSensitive) {
+	public void selectNodes(String attribute, MultiPaneTreeViewer.SearchType searchType, String searchString, boolean caseSensitive) {
 //        treePane.clearSelection();
 //
 //        if (searchType == MultiPaneTreeViewer.SearchType.MATCHES && !caseSensitive) {
@@ -317,47 +323,47 @@ public class MultiPaneTreeViewer extends TreeViewer {
 //                }
 //            }
 //        }
-    }
+	}
 
-    public void collapseSelectedNodes() {
+	public void collapseSelectedNodes() {
 //         treePane.collapseSelectedNodes();
-    }
+	}
 
-    public void annotateSelectedNodes(String name, Object value) {
+	public void annotateSelectedNodes(String name, Object value) {
 //        treePane.annotateSelectedNodes(name, value);
-        fireTreeSettingsChanged();
-    }
+		fireTreeSettingsChanged();
+	}
 
-    public void annotateSelectedTips(String name, Object value) {
-        //       treePane.annotateSelectedTips(name, value);
-        fireTreeSettingsChanged();
-    }
+	public void annotateSelectedTips(String name, Object value) {
+		//       treePane.annotateSelectedTips(name, value);
+		fireTreeSettingsChanged();
+	}
 
-    public void selectAll() {
+	public void selectAll() {
 //        if (treePaneSelector.getSelectionMode() == TreePaneSelector.SelectionMode.TAXA) {
 //            treePane.selectAllTaxa();
 //        } else {
 //            treePane.selectAllNodes();
 //        }
-    }
+	}
 
-    public void clearSelectedTaxa() {
+	public void clearSelectedTaxa() {
 //        treePane.clearSelection();
-    }
+	}
 
-    public void addTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
-        for (TreePane treePane : treePanes) {
-            treePane.addTreeSelectionListener(treeSelectionListener);
-        }
-    }
+	public void addTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
+		for (TreePane treePane : treePanes) {
+			treePane.addTreeSelectionListener(treeSelectionListener);
+		}
+	}
 
-    public void removeTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
-        for (TreePane treePane : treePanes) {
-            treePane.removeTreeSelectionListener(treeSelectionListener);
-        }
-    }
+	public void removeTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
+		for (TreePane treePane : treePanes) {
+			treePane.removeTreeSelectionListener(treeSelectionListener);
+		}
+	}
 
-    public void setSelectionMode(TreePaneSelector.SelectionMode selectionMode) {
+	public void setSelectionMode(TreePaneSelector.SelectionMode selectionMode) {
 //        TreePaneSelector.SelectionMode oldSelectionMode = treePaneSelector.getSelectionMode();
 //
 //        if (selectionMode == oldSelectionMode) {
@@ -372,179 +378,179 @@ public class MultiPaneTreeViewer extends TreeViewer {
 //            treePane.selectCladesFromSelectedNodes();
 //        }
 //        treePaneSelector.setSelectionMode(selectionMode);
-    }
+	}
 
-    public void setDragMode(TreePaneSelector.DragMode dragMode) {
-        treePaneSelector.setDragMode(dragMode);
-    }
+	public void setDragMode(TreePaneSelector.DragMode dragMode) {
+		treePaneSelector.setDragMode(dragMode);
+	}
 
-    // A load of deligated method calls through to treePane (which is now hidden outside the package).
-    public void setTipLabelPainter(LabelPainter<Node> tipLabelPainter) {
-        for (TreePane treePane : treePanes) {
-            treePane.setTipLabelPainter(tipLabelPainter);
-        }
-        tipLabelPainter.setupAttributes(trees);
-        fireTreeSettingsChanged();
-    }
+	// A load of deligated method calls through to treePane (which is now hidden outside the package).
+	public void setTipLabelPainter(LabelPainter<Node> tipLabelPainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.setTipLabelPainter(tipLabelPainter);
+		}
+		tipLabelPainter.setupAttributes(trees);
+		fireTreeSettingsChanged();
+	}
 
-    public void setNodeLabelPainter(LabelPainter<Node> nodeLabelPainter) {
-        for (TreePane treePane : treePanes) {
-            treePane.setNodeLabelPainter(nodeLabelPainter);
-        }
-        nodeLabelPainter.setupAttributes(trees);
-        fireTreeSettingsChanged();
-    }
+	public void setNodeLabelPainter(LabelPainter<Node> nodeLabelPainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.setNodeLabelPainter(nodeLabelPainter);
+		}
+		nodeLabelPainter.setupAttributes(trees);
+		fireTreeSettingsChanged();
+	}
 
-    public void setNodeBarPainter(NodeBarPainter nodeBarPainter) {
-        for (TreePane treePane : treePanes) {
-            treePane.setNodeBarPainter(nodeBarPainter);
-        }
-        nodeBarPainter.setupAttributes(trees);
-        fireTreeSettingsChanged();
-    }
+	public void setNodeBarPainter(NodeBarPainter nodeBarPainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.setNodeBarPainter(nodeBarPainter);
+		}
+		nodeBarPainter.setupAttributes(trees);
+		fireTreeSettingsChanged();
+	}
 
-    public void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchLabelPainter(branchLabelPainter);
-        }
-        branchLabelPainter.setupAttributes(trees);
-        fireTreeSettingsChanged();
-    }
+	public void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchLabelPainter(branchLabelPainter);
+		}
+		branchLabelPainter.setupAttributes(trees);
+		fireTreeSettingsChanged();
+	}
 
-    public void setScalePainter(ScalePainter scalePainter) {
-        for (TreePane treePane : treePanes) {
-            treePane.setScalePainter(scalePainter);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setScalePainter(ScalePainter scalePainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.setScalePainter(scalePainter);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public void setBranchDecorator(Decorator branchDecorator) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchDecorator(branchDecorator);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setBranchDecorator(Decorator branchDecorator) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchDecorator(branchDecorator);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchColouringDecorator(branchColouringAttribute, branchColouringDecorator);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchColouringDecorator(branchColouringAttribute, branchColouringDecorator);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public void setSelectionPaint(Paint selectionPane) {
-        for (TreePane treePane : treePanes) {
-            treePane.setSelectionPaint(selectionPane);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setSelectionPaint(Paint selectionPane) {
+		for (TreePane treePane : treePanes) {
+			treePane.setSelectionPaint(selectionPane);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public Paint getSelectionPaint() {
-        return treePanes.get(0).getSelectionPaint();
-    }
+	public Paint getSelectionPaint() {
+		return treePanes.get(0).getSelectionPaint();
+	}
 
-    public void setBranchStroke(BasicStroke branchStroke) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchStroke(branchStroke);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setBranchStroke(BasicStroke branchStroke) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchStroke(branchStroke);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public boolean isTransformBranchesOn() {
-        return treePanes.get(0).isTransformBranchesOn();
-    }
+	public boolean isTransformBranchesOn() {
+		return treePanes.get(0).isTransformBranchesOn();
+	}
 
-    public TransformedRootedTree.Transform getBranchTransform() {
-        return treePanes.get(0).getBranchTransform();
-    }
+	public TransformedRootedTree.Transform getBranchTransform() {
+		return treePanes.get(0).getBranchTransform();
+	}
 
-    public void setTransformBranchesOn(boolean transformBranchesOn) {
-        for (TreePane treePane : treePanes) {
-            treePane.setTransformBranchesOn(transformBranchesOn);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setTransformBranchesOn(boolean transformBranchesOn) {
+		for (TreePane treePane : treePanes) {
+			treePane.setTransformBranchesOn(transformBranchesOn);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public void setBranchTransform(TransformedRootedTree.Transform transform) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchTransform(transform);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setBranchTransform(TransformedRootedTree.Transform transform) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchTransform(transform);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public boolean isOrderBranchesOn() {
-        return treePanes.get(0).isOrderBranchesOn();
-    }
+	public boolean isOrderBranchesOn() {
+		return treePanes.get(0).isOrderBranchesOn();
+	}
 
-    public SortedRootedTree.BranchOrdering getBranchOrdering() {
-        return treePanes.get(0).getBranchOrdering();
-    }
+	public SortedRootedTree.BranchOrdering getBranchOrdering() {
+		return treePanes.get(0).getBranchOrdering();
+	}
 
-    public void setOrderBranchesOn(boolean orderBranchesOn) {
-        for (TreePane treePane : treePanes) {
-            treePane.setOrderBranchesOn(orderBranchesOn);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setOrderBranchesOn(boolean orderBranchesOn) {
+		for (TreePane treePane : treePanes) {
+			treePane.setOrderBranchesOn(orderBranchesOn);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering) {
-        for (TreePane treePane : treePanes) {
-            treePane.setBranchOrdering(branchOrdering);
-        }
-        fireTreeSettingsChanged();
-    }
+	public void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering) {
+		for (TreePane treePane : treePanes) {
+			treePane.setBranchOrdering(branchOrdering);
+		}
+		fireTreeSettingsChanged();
+	}
 
-    public JComponent getContentPane() {
-        return treePanePanel;
-    }
+	public JComponent getContentPane() {
+		return treePanePanel;
+	}
 
-    public void paint(Graphics g) {
-        if( zoomPending  ) {
-            refreshZoom();
-            zoomPending = false;
-        }
-        super.paint(g);
-    }
+	public void paint(Graphics g) {
+		if( zoomPending  ) {
+			refreshZoom();
+			zoomPending = false;
+		}
+		super.paint(g);
+	}
 
-    public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        return treePanePanel.print(g, pageFormat, pageIndex);
-    }
+	public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
+		return treePanePanel.print(g, pageFormat, pageIndex);
+	}
 
-    public void addTreeViewerListener(TreeViewerListener listener) {
-        listeners.add(listener);
-    }
+	public void addTreeViewerListener(TreeViewerListener listener) {
+		listeners.add(listener);
+	}
 
-    public void removeTreeViewerListener(TreeViewerListener listener) {
-        listeners.remove(listener);
-    }
+	public void removeTreeViewerListener(TreeViewerListener listener) {
+		listeners.remove(listener);
+	}
 
-    public void fireTreeChanged() {
-        for (TreeViewerListener listener : listeners) {
-            listener.treeChanged();
-        }
-    }
+	public void fireTreeChanged() {
+		for (TreeViewerListener listener : listeners) {
+			listener.treeChanged();
+		}
+	}
 
-    public void fireTreeSettingsChanged() {
-        for (TreeViewerListener listener : listeners) {
-            listener.treeSettingsChanged();
-        }
-    }
+	public void fireTreeSettingsChanged() {
+		for (TreeViewerListener listener : listeners) {
+			listener.treeSettingsChanged();
+		}
+	}
 
-    private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
+	private java.util.List<TreeViewerListener> listeners = new ArrayList<TreeViewerListener>();
 
-    private java.util.List<Tree> trees = new ArrayList<Tree>();
-    private java.util.List<TreePane> treePanes = new ArrayList<TreePane>();
-    private int currentTreeIndex = 0;
-    private int treesPerPage = 1;
+	private java.util.List<Tree> trees = new ArrayList<Tree>();
+	private java.util.List<TreePane> treePanes = new ArrayList<TreePane>();
+	private int currentTreeIndex = 0;
+	private int treesPerPage = 1;
 
-    private MultiPaneTreePanel treePanePanel;
-    protected TreePaneSelector treePaneSelector;
-    protected JViewport viewport;
+	private MultiPaneTreePanel treePanePanel;
+	protected TreePaneSelector treePaneSelector;
+	protected JViewport viewport;
 
-    class MultiPaneTreePanel extends JPanel implements Printable {
+	class MultiPaneTreePanel extends JPanel implements Printable {
 
-        public int print(Graphics graphics, PageFormat pageFormat, int i) throws PrinterException {
-            return 0;
-        }
-    }
+		public int print(Graphics graphics, PageFormat pageFormat, int i) throws PrinterException {
+			return 0;
+		}
+	}
 }

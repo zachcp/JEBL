@@ -58,7 +58,7 @@ public class ScaleBarPainterController extends AbstractController {
         scaleBarPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
         scaleBarPainter.setScaleBarStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
+	    optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
 
@@ -91,7 +91,7 @@ public class ScaleBarPainterController extends AbstractController {
         NumberFormat format = this.scaleBarPainter.getNumberFormat();
         int digits = format.getMaximumFractionDigits();
         digitsSpinner = new JSpinner(new SpinnerNumberModel(digits, 2, 14, 1));
-        final JLabel label3 = optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
+        final JLabel label3 = optionsPanel.addComponentWithLabel("Sig. Digits:", digitsSpinner);
 
         digitsSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {

@@ -63,7 +63,7 @@ public class TreeViewerPanel extends JPanel {
         treeViewer.setBranchLabelPainter(branchLabelPainter);
 
         // Create a scale bar painter and its controller
-        controlPalette.addController(new ScaleController(treeViewer));
+        controlPalette.addController(new TimeScaleController(treeViewer));
 
         setLayout(new BorderLayout());
 

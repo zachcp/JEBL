@@ -59,7 +59,7 @@ public class TreeViewerController extends AbstractController {
 
 
         titleLabel = new JLabel(CONTROLLER_TITLE);
-	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
+	    optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
         rectilinearTreeLayout = new RectilinearTreeLayout();
         rectilinearTreeLayoutController = new RectilinearTreeLayoutController(rectilinearTreeLayout);

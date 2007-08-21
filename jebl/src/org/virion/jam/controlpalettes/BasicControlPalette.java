@@ -146,14 +146,8 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         controller.getTitleComponent().setFont(UIManager.getFont("SmallSystemFont"));
         controller.getTitleComponent().setOpaque(false);
 
-//		JCheckBox pinnedCheck = new JCheckBox();
-//		pinnedCheck.setFocusPainted(false);
-//
-//		pinnedCheck.setSelected(controller.isInitiallyVisible());
-//		titlePanel.add(pinnedCheck, BorderLayout.EAST);
         PinnedButton pinnedButton = new PinnedButton();
 
-        // This tells Quaqua L&F to use a small check box (ignored otherwise)
         pinnedButton.setSelected(controller.isInitiallyVisible());
         titlePanel.add(pinnedButton, BorderLayout.EAST);
 

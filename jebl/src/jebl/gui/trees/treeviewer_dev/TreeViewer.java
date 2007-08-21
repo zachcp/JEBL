@@ -37,6 +37,7 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
 	public abstract boolean verticalExpansionAllowed();
 
+	public abstract void setTimeScale(TimeScale timeScale);
 
     public abstract boolean hasSelection();
 
@@ -109,7 +110,7 @@ public abstract class TreeViewer extends JPanel implements Printable {
 	public abstract void removeTreeViewerListener(TreeViewerListener listener);
 
 
-    public enum SearchType {
+	public enum SearchType {
 	    CONTAINS("Contains"),
 	    STARTS_WITH("Starts with"),
 	    ENDS_WITH("Ends with"),

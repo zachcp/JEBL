@@ -59,7 +59,7 @@ public class ScaleAxisPainterController extends AbstractController {
         scaleAxisPainter.setNumberFormat(new DecimalFormat(defaultNumberFormatting));
         scaleAxisPainter.setScaleBarStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
+        optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
         titleCheckBox = new JCheckBox(getTitle());
 
@@ -72,17 +72,21 @@ public class ScaleAxisPainterController extends AbstractController {
 	    scaleMinimumText = new RealNumberField(0.0, Double.MAX_VALUE);
 	    scaleMinimumText.setValue(0.0);
 
+	    final JLabel label1 = optionsPanel.addComponentWithLabel("Scale Range:", scaleMinimumText, true);
+	    label1.setEnabled(false);
+	    scaleMinimumText.setEnabled(false);
+
         scaleMaximumText = new RealNumberField(0.0, Double.MAX_VALUE);
         scaleMaximumText.setValue(1.0);
 
-        final JLabel label1 = optionsPanel.addComponentWithLabel("Scale Range:", scaleMaximumText, true);
-        label1.setEnabled(false);
-        scaleMaximumText.setEnabled(false);
+	    final JLabel label2 = optionsPanel.addComponentWithLabel("Scale Range:", scaleMaximumText, true);
+	    label2.setEnabled(false);
+	    scaleMaximumText.setEnabled(false);
 
         Font font = scaleAxisPainter.getFont();
         fontSizeSpinner = new JSpinner(new SpinnerNumberModel(font.getSize(), 0.01, 48, 1));
 
-        final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
+        final JLabel label3 = optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
 
         fontSizeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -95,7 +99,7 @@ public class ScaleAxisPainterController extends AbstractController {
         NumberFormat format = this.scaleAxisPainter.getNumberFormat();
         int digits = format.getMaximumFractionDigits();
         digitsSpinner = new JSpinner(new SpinnerNumberModel(digits, 2, 14, 1));
-        final JLabel label3 = optionsPanel.addComponentWithLabel("Significant Digits:", digitsSpinner);
+        final JLabel label4 = optionsPanel.addComponentWithLabel("Sig. Digits:", digitsSpinner);
 
         digitsSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
@@ -114,17 +118,19 @@ public class ScaleAxisPainterController extends AbstractController {
                 scaleAxisPainter.setScaleBarStroke(new BasicStroke(weight, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
             }
         });
-        final JLabel label4 = optionsPanel.addComponentWithLabel("Line Weight:", lineWeightSpinner);
+        final JLabel label5 = optionsPanel.addComponentWithLabel("Line Weight:", lineWeightSpinner);
 
         final boolean isSelected1 = titleCheckBox.isSelected();
         final boolean isSelected2 = autoScaleCheck.isSelected();
         label1.setEnabled(isSelected1 && !isSelected2);
-        scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
-        label2.setEnabled(isSelected1);
-        fontSizeSpinner.setEnabled(isSelected1);
+        scaleMinimumText.setEnabled(isSelected1 && !isSelected2);
+	    label2.setEnabled(isSelected1 && !isSelected2);
+	    scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
         label3.setEnabled(isSelected1);
-        digitsSpinner.setEnabled(isSelected1);
+        fontSizeSpinner.setEnabled(isSelected1);
         label4.setEnabled(isSelected1);
+        digitsSpinner.setEnabled(isSelected1);
+        label5.setEnabled(isSelected1);
         lineWeightSpinner.setEnabled(isSelected1);
 
         titleCheckBox.addChangeListener(new ChangeListener() {
@@ -134,12 +140,14 @@ public class ScaleAxisPainterController extends AbstractController {
 
                 autoScaleCheck.setEnabled(isSelected1);
                 label1.setEnabled(isSelected1 && !isSelected2);
-                scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
-                label2.setEnabled(isSelected1);
-                fontSizeSpinner.setEnabled(isSelected1);
+                scaleMinimumText.setEnabled(isSelected1 && !isSelected2);
+	            label2.setEnabled(isSelected1 && !isSelected2);
+	            scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
                 label3.setEnabled(isSelected1);
-                digitsSpinner.setEnabled(isSelected1);
+                fontSizeSpinner.setEnabled(isSelected1);
                 label4.setEnabled(isSelected1);
+                digitsSpinner.setEnabled(isSelected1);
+                label5.setEnabled(isSelected1);
                 lineWeightSpinner.setEnabled(isSelected1);
 
                 scaleAxisPainter.setVisible(isSelected1);
@@ -150,13 +158,17 @@ public class ScaleAxisPainterController extends AbstractController {
             public void stateChanged(ChangeEvent changeEvent) {
                 if (autoScaleCheck.isSelected()) {
                     scaleAxisPainter.setAutomaticScale(true);
-                    double range = scaleAxisPainter.getScaleRange();
-                    scaleMaximumText.setValue(range);
+	                scaleMinimumText.setValue(scaleAxisPainter.getScaleMinimum());
+                    scaleMaximumText.setValue(scaleAxisPainter.getScaleMaximum());
                     label1.setEnabled(false);
-                    scaleMaximumText.setEnabled(false);
+                    scaleMinimumText.setEnabled(false);
+	                label2.setEnabled(false);
+	                scaleMaximumText.setEnabled(false);
                 } else {
                     label1.setEnabled(true);
-                    scaleMaximumText.setEnabled(true);
+                    scaleMinimumText.setEnabled(true);
+	                label2.setEnabled(true);
+	                scaleMaximumText.setEnabled(true);
                     scaleAxisPainter.setAutomaticScale(false);
                 }
             }

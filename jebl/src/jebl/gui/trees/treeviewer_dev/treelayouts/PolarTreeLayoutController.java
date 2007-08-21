@@ -26,7 +26,7 @@ public class PolarTreeLayoutController extends AbstractController {
         this.treeLayout = treeLayout;
 
         titleLabel = new JLabel("Polar Layout");
-	    optionsPanel = new OptionsPanel(0, 0, "SmallSystemFont");
+	    optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
         rootAngleSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 360000, 0);
         rootAngleSlider.setOpaque(false);

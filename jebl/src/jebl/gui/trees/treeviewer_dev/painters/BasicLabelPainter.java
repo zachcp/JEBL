@@ -5,6 +5,7 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.taxa.Taxon;
 import jebl.gui.trees.treeviewer_dev.TreePane;
+import jebl.gui.trees.treeviewer_dev.TimeScale;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 
 import java.awt.*;
@@ -22,9 +23,11 @@ import java.util.List;
  */
 public class BasicLabelPainter extends LabelPainter<Node> {
 
-	public static final String TAXON_NAMES = "Taxon Names";
-	public static final String NODE_HEIGHTS = "Node Heights";
-	public static final String BRANCH_LENGTHS = "Branch Lengths";
+	public static final String TAXON_NAMES = "Taxon names";
+	public static final String NODE_AGES = "Node ages";
+	public static final String NODE_HEIGHTS = "Node heights (raw)";
+	public static final String BRANCH_TIMES = "Branch times";
+	public static final String BRANCH_LENGTHS = "Branch lengths (raw)";
 
 	public enum PainterIntent {
 		NODE,
@@ -51,17 +54,23 @@ public class BasicLabelPainter extends LabelPainter<Node> {
 		switch( intent ) {
 			case TIP: {
 				attributeNames.add(TAXON_NAMES);
+				attributeNames.add(NODE_AGES);
 				attributeNames.add(NODE_HEIGHTS);
+				attributeNames.add(BRANCH_TIMES);
 				attributeNames.add(BRANCH_LENGTHS);
 				break;
 			}
 			case NODE: {
+				attributeNames.add(NODE_AGES);
 				attributeNames.add(NODE_HEIGHTS);
+				attributeNames.add(BRANCH_TIMES);
 				attributeNames.add(BRANCH_LENGTHS);
 				break;
 			}
 			case BRANCH: {
+				attributeNames.add(BRANCH_TIMES);
 				attributeNames.add(BRANCH_LENGTHS);
+				attributeNames.add(NODE_AGES);
 				attributeNames.add(NODE_HEIGHTS);
 				break;
 			}
@@ -141,8 +150,16 @@ public class BasicLabelPainter extends LabelPainter<Node> {
 				textDecorator.setItem(node);
 			}
 
-			if (displayAttribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
+			if (displayAttribute.equalsIgnoreCase(NODE_AGES) ) {
+				TimeScale timeScale = treePane.getTimeScale();
+				double age = timeScale.getAge(rtree.getHeight(node), rtree);
+				return getNumberFormat().format(age);
+			} else if (displayAttribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
 				return getNumberFormat().format(rtree.getHeight(node));
+			} else if (displayAttribute.equalsIgnoreCase(BRANCH_TIMES) ) {
+				TimeScale timeScale = treePane.getTimeScale();
+				double time = timeScale.getTime(rtree.getLength(node), rtree);
+				return getNumberFormat().format(time);
 			} else if (displayAttribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
 				return getNumberFormat().format(rtree.getLength(node));
 			}

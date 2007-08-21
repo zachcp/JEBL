@@ -87,6 +87,16 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
+	public TimeScale getTimeScale() {
+		return timeScale;
+	}
+
+	public void setTimeScale(TimeScale timeScale) {
+		this.timeScale = timeScale;
+		calibrated = false;
+		repaint();
+	}
+
 	public void setBranchDecorator(Decorator branchDecorator) {
 		this.branchDecorator = branchDecorator;
 		repaint();
@@ -1229,6 +1239,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private Rectangle2D treeBounds = new Rectangle2D.Double();
 	private double treeScale;
+
+	private TimeScale timeScale = new TimeScale(1.0, 0.0);
 
 	//private Insets margins = new Insets(6, 6, 6, 6);
 	private Insets insets = new Insets(6, 6, 6, 6);
