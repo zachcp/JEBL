@@ -19,13 +19,7 @@ import java.util.Collection;
 public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePainter {
 
     public ScaleAxisPainter() {
-        this(0.0, 1.0);
     }
-
-	public ScaleAxisPainter(double userScaleMinimum, double userScaleMaximum) {
-		this.userScaleMinimum = userScaleMinimum;
-		this.userScaleMaximum = userScaleMaximum;
-	}
 
 	public void setTreePane(TreePane treePane) {
         this.treePane = treePane;
@@ -44,14 +38,14 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
         preferredWidth = treePane.getTreeBounds().getWidth();
         preferredHeight = labelHeight + topMargin + bottomMargin + scaleBarStroke.getLineWidth() + majorTickSize;
 
-        yOffset = (float) (fm.getAscent() + topMargin + bottomMargin + majorTickSize) + scaleBarStroke.getLineWidth();
+        tickLabelOffset = (float) (fm.getAscent() + topMargin + bottomMargin + majorTickSize) + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
 
 	    TimeScale timeScale = treePane.getTimeScale();
 	    RootedTree tree = treePane.getTree();
 
-	    axis.setManualRange(timeScale.getAge(tree.getHeight(tree.getRootNode()), tree), timeScale.getAge(0.0, tree));
+	    axis.setRange(timeScale.getAge(tree.getHeight(tree.getRootNode()), tree), timeScale.getAge(0.0, tree));
 
 	    return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
     }
@@ -83,6 +77,7 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
         g2.setPaint(oldPaint);
         g2.setStroke(oldStroke);
     }
+
     /**
     *	Get the maximum width of the labels of an axis
     */
@@ -164,12 +159,12 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
             String label = axis.getFormatter().format(value);
             double pos = transformX(value);
 
-            Line2D line = new Line2D.Double(pos, axisBounds.getMaxY(), pos, axisBounds.getMaxY() + majorTickSize);
+            Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + majorTickSize);
             g2.draw(line);
 
             g2.setPaint(getForeground());
             double width = g2.getFontMetrics().stringWidth(label);
-            g2.drawString(label, (float)(pos - (width / 2)), (float)(axisBounds.getMaxY() + (majorTickSize * 1.25) + tickLabelOffset));
+            g2.drawString(label, (float)(pos - (width / 2)), (float)(axisBounds.getMinY() + tickLabelOffset));
     }
 
     protected void paintMinorTick(Graphics2D g2, Rectangle2D axisBounds, double value)
@@ -180,7 +175,7 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
 
             double pos = transformX(value);
 
-            Line2D line = new Line2D.Double(pos, axisBounds.getMaxY(), pos, axisBounds.getMaxY() + minorTickSize);
+            Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + minorTickSize);
             g2.draw(line);
     }
 
@@ -201,7 +196,7 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
     }
 
     public double getHeightBound() {
-        return preferredHeight + yOffset;
+        return preferredHeight + tickLabelOffset;
     }
 
     public BasicStroke getScaleBarStroke() {
@@ -213,28 +208,20 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
         firePainterChanged();
     }
 
-	public void setScaleMinimum(double scaleMinimum) {
-	    this.userScaleMinimum = scaleMinimum;
-	    axis.setRange(userScaleMinimum, userScaleMaximum);
-	    firePainterChanged();
-	}
+    public double getMajorTickSpacing() {
+        return axis.getMajorTickSpacing();
+    }
 
-    public void setScaleMaximum(double scaleMaximum) {
-        this.userScaleMaximum = scaleMaximum;
-	    axis.setRange(userScaleMinimum, userScaleMaximum);
+    public double getMinorTickSpacing() {
+        return axis.getMinorTickSpacing();
+    }
+
+    public void setTickSpacing(double userMajorTickSpacing, double userMinorTickSpacing) {
+        axis.setManualAxis(userMajorTickSpacing, userMinorTickSpacing);
         firePainterChanged();
     }
 
-	public double getScaleMinimum() {
-		return axis.getMinAxis();
-	}
-
-	public double getScaleMaximum() {
-		return axis.getMaxAxis();
-	}
-
 	public void setAutomaticScale(boolean automaticScale) {
-        this.automaticScale = automaticScale;
 	    axis.setAutomatic();
         firePainterChanged();
     }
@@ -262,9 +249,6 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
 	private double offset;
     private double topMargin = 4.0;
     private double bottomMargin = 4.0;
-	private double userScaleMinimum = 0.0;
-    private double userScaleMaximum = 1.0;
-    private boolean automaticScale = true;
 
 	private double majorTickSize = 5.0;
 	private double minorTickSize = 2.0;
@@ -272,8 +256,6 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
 
     private double preferredHeight;
     private double preferredWidth;
-
-    private float yOffset;
 
     protected TreePane treePane;
 }

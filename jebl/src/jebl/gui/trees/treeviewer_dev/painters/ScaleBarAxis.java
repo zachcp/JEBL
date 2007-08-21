@@ -36,7 +36,8 @@ public class ScaleBarAxis {
     protected double maxAxis;// User defined axis range
     protected double minValue;
     protected double maxValue;// Flags to give automatic scaling and integer division
-    protected boolean isAutomatic=true;
+    protected boolean isAutomatic = true;
+    protected boolean isAutomaticTickSpacing = true;
     protected boolean isDiscrete=false;// Flags to specify that the first tick and last tick should have labels.
     // It is up to the AxisPanel to do something about this.
     protected boolean labelFirst=false;
@@ -158,6 +159,19 @@ public class ScaleBarAxis {
     /**
      *	Manually set the axis ticks
      */
+    public void setManualAxis(double majorTick, double minorTick) {
+        this.majorTick = majorTick;
+        this.minorTick = minorTick;
+
+        isAutomatic = true;
+        isAutomaticTickSpacing = false;
+
+        isCalibrated = false;
+    }
+
+    /**
+     *	Manually set the axis ticks
+     */
     public void setManualAxis(double minTick, double maxTick,
                               double majorTick, double minorTick) {
         this.minTick = minTick;
@@ -169,6 +183,8 @@ public class ScaleBarAxis {
         majorTickCount = (int)((maxTick-minTick)/majorTick)+1; // Add 1 to include the last tick
         minorTickCount = (int)(majorTick/minorTick)-1;	// Sub 1 to exclude the major tick
         isAutomatic=false;
+        isAutomaticTickSpacing = false;
+
         isCalibrated = false;
     }
 
@@ -185,6 +201,8 @@ public class ScaleBarAxis {
     public void setAutomatic(int minAxisFlag, int maxAxisFlag) {
         setAxisFlags(minAxisFlag, maxAxisFlag);
         isAutomatic = true;
+        isAutomaticTickSpacing = true;
+
         isCalibrated = false;
     }
 
@@ -260,32 +278,44 @@ public class ScaleBarAxis {
 
             if (range < 1.0E-30) {
                 if (minData < 0.0) {
-                    majorTick = Math.pow(10.0, Math.floor(log10(Math.abs(minData))));
+                    if (isAutomaticTickSpacing) {
+                        majorTick = Math.pow(10.0, Math.floor(log10(Math.abs(minData))));
+                    }
                     minTick = Math.floor(minData / majorTick) * majorTick;
                     maxTick = 0.0;
                 } else if (minData > 0.0) {
-                    majorTick = Math.pow(10.0, Math.floor(log10(Math.abs(minData))));
+                    if (isAutomaticTickSpacing) {
+                        majorTick = Math.pow(10.0, Math.floor(log10(Math.abs(minData))));
+                    }
                     minTick = 0.0;
                     maxTick = Math.ceil(maxData / majorTick) * majorTick;
                 } else {
+                    if (isAutomaticTickSpacing) {
+                        majorTick = 1.0;
+                    }
                     minTick = -1.0;
                     maxTick = 1.0;
-                    majorTick = 1.0;
                 }
 
-                minorTick = majorTick;
+                if (isAutomaticTickSpacing) {
+                    minorTick = majorTick;
+                }
                 majorTickCount = 1;
                 minorTickCount = 0;
 
             } else {
-                // First find order of magnitude below the data range...
-                majorTick = Math.pow(10.0, Math.floor(log10(range)));
+                if (isAutomaticTickSpacing) {
+                    // First find order of magnitude below the data range...
+                    majorTick = Math.pow(10.0, Math.floor(log10(range)));
+                }
 
                 calcMinTick();
                 calcMaxTick();
 
-                calcMajorTick();
-                calcMinorTick();
+                if (isAutomaticTickSpacing) {
+                    calcMajorTick();
+                    calcMinorTick();
+                }
             }
         }
 

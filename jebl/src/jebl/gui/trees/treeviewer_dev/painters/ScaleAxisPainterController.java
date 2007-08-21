@@ -29,10 +29,9 @@ public class ScaleAxisPainterController extends AbstractController {
 
     private static final String NUMBER_FORMATTING_KEY = "numberFormatting";
 
-
     private static final String AUTOMATIC_SCALE_KEY = "automaticScale";
-    private static final String SCALE_MINIMUM_KEY = "scaleMinimum";
-	private static final String SCALE_MAXIMUM_KEY = "scaleMaximum";
+    private static final String MINOR_TICKS_KEY = "minorTicks";
+    private static final String MAJOR_TICKS_KEY = "majorTicks";
     private static final String LINE_WIDTH_KEY = "lineWidth";
 
     private static final String SIGNIFICANT_DIGITS_KEY = "significantDigits";
@@ -69,19 +68,19 @@ public class ScaleAxisPainterController extends AbstractController {
         autoScaleCheck.setSelected(true);
         optionsPanel.addComponent(autoScaleCheck, true);
 
-	    scaleMinimumText = new RealNumberField(0.0, Double.MAX_VALUE);
-	    scaleMinimumText.setValue(0.0);
+        majorTicksText = new RealNumberField();
+        majorTicksText.setValue(1.0);
 
-	    final JLabel label1 = optionsPanel.addComponentWithLabel("Scale Range:", scaleMinimumText, true);
-	    label1.setEnabled(false);
-	    scaleMinimumText.setEnabled(false);
+        final JLabel label1 = optionsPanel.addComponentWithLabel("Label spacing:", majorTicksText, true);
+        label1.setEnabled(false);
+        majorTicksText.setEnabled(false);
 
-        scaleMaximumText = new RealNumberField(0.0, Double.MAX_VALUE);
-        scaleMaximumText.setValue(1.0);
+        minorTicksText = new RealNumberField();
+        minorTicksText.setValue(0.5);
 
-	    final JLabel label2 = optionsPanel.addComponentWithLabel("Scale Range:", scaleMaximumText, true);
-	    label2.setEnabled(false);
-	    scaleMaximumText.setEnabled(false);
+        final JLabel label2 = optionsPanel.addComponentWithLabel("Tick spacing:", minorTicksText, true);
+        label2.setEnabled(false);
+        minorTicksText.setEnabled(false);
 
         Font font = scaleAxisPainter.getFont();
         fontSizeSpinner = new JSpinner(new SpinnerNumberModel(font.getSize(), 0.01, 48, 1));
@@ -123,9 +122,9 @@ public class ScaleAxisPainterController extends AbstractController {
         final boolean isSelected1 = titleCheckBox.isSelected();
         final boolean isSelected2 = autoScaleCheck.isSelected();
         label1.setEnabled(isSelected1 && !isSelected2);
-        scaleMinimumText.setEnabled(isSelected1 && !isSelected2);
-	    label2.setEnabled(isSelected1 && !isSelected2);
-	    scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
+        majorTicksText.setEnabled(isSelected1 && !isSelected2);
+        label2.setEnabled(isSelected1 && !isSelected2);
+        minorTicksText.setEnabled(isSelected1 && !isSelected2);
         label3.setEnabled(isSelected1);
         fontSizeSpinner.setEnabled(isSelected1);
         label4.setEnabled(isSelected1);
@@ -140,9 +139,9 @@ public class ScaleAxisPainterController extends AbstractController {
 
                 autoScaleCheck.setEnabled(isSelected1);
                 label1.setEnabled(isSelected1 && !isSelected2);
-                scaleMinimumText.setEnabled(isSelected1 && !isSelected2);
-	            label2.setEnabled(isSelected1 && !isSelected2);
-	            scaleMaximumText.setEnabled(isSelected1 && !isSelected2);
+                majorTicksText.setEnabled(isSelected1 && !isSelected2);
+                label2.setEnabled(isSelected1 && !isSelected2);
+                minorTicksText.setEnabled(isSelected1 && !isSelected2);
                 label3.setEnabled(isSelected1);
                 fontSizeSpinner.setEnabled(isSelected1);
                 label4.setEnabled(isSelected1);
@@ -158,39 +157,38 @@ public class ScaleAxisPainterController extends AbstractController {
             public void stateChanged(ChangeEvent changeEvent) {
                 if (autoScaleCheck.isSelected()) {
                     scaleAxisPainter.setAutomaticScale(true);
-	                scaleMinimumText.setValue(scaleAxisPainter.getScaleMinimum());
-                    scaleMaximumText.setValue(scaleAxisPainter.getScaleMaximum());
+                    majorTicksText.setValue(scaleAxisPainter.getMajorTickSpacing());
+                    minorTicksText.setValue(scaleAxisPainter.getMinorTickSpacing());
                     label1.setEnabled(false);
-                    scaleMinimumText.setEnabled(false);
-	                label2.setEnabled(false);
-	                scaleMaximumText.setEnabled(false);
+                    majorTicksText.setEnabled(false);
+                    label2.setEnabled(false);
+                    minorTicksText.setEnabled(false);
                 } else {
                     label1.setEnabled(true);
-                    scaleMinimumText.setEnabled(true);
-	                label2.setEnabled(true);
-	                scaleMaximumText.setEnabled(true);
+                    minorTicksText.setEnabled(true);
+                    label2.setEnabled(true);
+                    majorTicksText.setEnabled(true);
                     scaleAxisPainter.setAutomaticScale(false);
                 }
             }
         });
 
-	    scaleMinimumText.addChangeListener(new ChangeListener() {
-	        public void stateChanged(ChangeEvent changeEvent) {
-	            Double value = scaleMinimumText.getValue();
-	            if (value != null) {
-	                scaleAxisPainter.setScaleMinimum(value);
-	            }
-	        }
-	    });
-
-        scaleMaximumText.addChangeListener(new ChangeListener() {
+        ChangeListener listener = new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                Double value = scaleMaximumText.getValue();
-                if (value != null) {
-                    scaleAxisPainter.setScaleMaximum(value);
-                }
+                double majorTickSpacing = getValue(majorTicksText, 1.0);
+                double minorTickSpacing = getValue(minorTicksText, 0.5);
+                scaleAxisPainter.setTickSpacing(majorTickSpacing, minorTickSpacing);
             }
-        });
+        };
+
+        minorTicksText.addChangeListener(listener);
+
+        majorTicksText.addChangeListener(listener);
+    }
+
+    private double getValue(RealNumberField field, double defaultValue) {
+        Double value = field.getValue();
+        return (value != null ? value : defaultValue);
     }
 
     public JComponent getTitleComponent() {
@@ -212,9 +210,10 @@ public class ScaleAxisPainterController extends AbstractController {
     }
 
     public void setSettings(Map<String,Object> settings) {
+        minorTicksText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + MINOR_TICKS_KEY));
+        majorTicksText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + MAJOR_TICKS_KEY));
         autoScaleCheck.setSelected((Boolean)settings.get(SCALE_AXIS_KEY + "." + AUTOMATIC_SCALE_KEY));
-	    scaleMinimumText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + SCALE_MINIMUM_KEY));
-	    scaleMaximumText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + SCALE_MAXIMUM_KEY));
+        scaleAxisPainter.setAutomaticScale(autoScaleCheck.isSelected());
         fontSizeSpinner.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + FONT_SIZE_KEY));
         digitsSpinner.setValue((Integer)settings.get(SCALE_AXIS_KEY + "." + SIGNIFICANT_DIGITS_KEY));
         lineWeightSpinner.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + LINE_WIDTH_KEY));
@@ -222,8 +221,8 @@ public class ScaleAxisPainterController extends AbstractController {
 
     public void getSettings(Map<String, Object> settings) {
         settings.put(SCALE_AXIS_KEY + "." + AUTOMATIC_SCALE_KEY, autoScaleCheck.isSelected());
-        settings.put(SCALE_AXIS_KEY + "." + SCALE_MINIMUM_KEY, scaleMinimumText.getValue());
-	    settings.put(SCALE_AXIS_KEY + "." + SCALE_MAXIMUM_KEY, scaleMaximumText.getValue());
+        settings.put(SCALE_AXIS_KEY + "." + MINOR_TICKS_KEY, minorTicksText.getValue());
+        settings.put(SCALE_AXIS_KEY + "." + MAJOR_TICKS_KEY, majorTicksText.getValue());
         settings.put(SCALE_AXIS_KEY + "." + FONT_SIZE_KEY, fontSizeSpinner.getValue());
         settings.put(SCALE_AXIS_KEY + "." + SIGNIFICANT_DIGITS_KEY, digitsSpinner.getValue());
         settings.put(SCALE_AXIS_KEY + "." + LINE_WIDTH_KEY, lineWeightSpinner.getValue());
@@ -233,14 +232,14 @@ public class ScaleAxisPainterController extends AbstractController {
     private final OptionsPanel optionsPanel;
 
     private final JCheckBox autoScaleCheck;
-	private final RealNumberField scaleMinimumText;
-    private final RealNumberField scaleMaximumText;
+    private final RealNumberField minorTicksText;
+    private final RealNumberField majorTicksText;
     private final JSpinner fontSizeSpinner;
     private final JSpinner digitsSpinner;
     private final JSpinner lineWeightSpinner;
 
     public String getTitle() {
-        return "Scale Bar";
+        return "Scale Axis";
     }
 
     private final ScaleAxisPainter scaleAxisPainter;
