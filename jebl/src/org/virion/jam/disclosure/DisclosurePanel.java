@@ -7,8 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Andrew Rambaut
@@ -110,32 +109,28 @@ public class DisclosurePanel extends JPanel {
 	}
 
 	private void fireOpening() {
-		Iterator iter = listeners.iterator();
-		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).opening(this);
-		}
-	}
+        for (DisclosureListener listener : listeners) {
+            (listener).opening(this);
+        }
+    }
 
 	private void fireOpened() {
-		Iterator iter = listeners.iterator();
-		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).opened(this);
-		}
-	}
+        for (DisclosureListener listener : listeners) {
+            (listener).opened(this);
+        }
+    }
 
 	private void fireClosing() {
-		Iterator iter = listeners.iterator();
-		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).closing(this);
-		}
-	}
+        for (DisclosureListener listener : listeners) {
+            (listener).closing(this);
+        }
+    }
 
 	private void fireClosed() {
-		Iterator iter = listeners.iterator();
-		while (iter.hasNext()) {
-			((DisclosureListener)iter.next()).closed(this);
-		}
-	}
+        for (DisclosureListener listener : listeners) {
+            (listener).closed(this);
+        }
+    }
 
 	public DisclosureButton getDisclosureButton() {
 		return button;
@@ -152,7 +147,7 @@ public class DisclosurePanel extends JPanel {
 	private final DisclosureButton button;
     private final Component titleComponent;
     private final JPanel panel;
-	private final java.util.List listeners = new ArrayList();
+	private final java.util.List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();
 
 	private static BufferedImage backgroundImage = null;
 
