@@ -1,7 +1,9 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer_dev.TreePane;
+import jebl.gui.trees.treeviewer_dev.TimeScale;
 import org.virion.jam.controlpalettes.ControlPalette;
 
 import java.awt.*;
@@ -40,13 +42,18 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
 		offset = 0.0;
 
         preferredWidth = treePane.getTreeBounds().getWidth();
-        preferredHeight = labelHeight + topMargin + bottomMargin + scaleBarStroke.getLineWidth();
+        preferredHeight = labelHeight + topMargin + bottomMargin + scaleBarStroke.getLineWidth() + majorTickSize;
 
-        yOffset = (float) (fm.getAscent() + topMargin + bottomMargin) + scaleBarStroke.getLineWidth();
+        yOffset = (float) (fm.getAscent() + topMargin + bottomMargin + majorTickSize) + scaleBarStroke.getLineWidth();
 
         g2.setFont(oldFont);
 
-        return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
+	    TimeScale timeScale = treePane.getTimeScale();
+	    RootedTree tree = treePane.getTree();
+
+	    axis.setManualRange(timeScale.getAge(tree.getHeight(tree.getRootNode()), tree), timeScale.getAge(0.0, tree));
+
+	    return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
     }
 
     public void paint(Graphics2D g2, TreePane treePane, Justification justification, Rectangle2D bounds) {
