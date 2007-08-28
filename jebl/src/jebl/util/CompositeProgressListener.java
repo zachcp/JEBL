@@ -4,6 +4,7 @@ import jebl.math.MachineAccuracy;
 
 import java.io.File;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * A {@link jebl.util.ProgressListener} that is suitable for a task that consists of several subtasks.
@@ -32,6 +33,7 @@ public final class CompositeProgressListener extends ProgressListener {
     protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
     protected double currentOperationProgress = 0.0;
     private boolean beganFirstSubTask=false;
+    private String currentSubTaskMessage="";
 
     /**
      * construct a new composite ProgressListener.
@@ -69,6 +71,22 @@ public final class CompositeProgressListener extends ProgressListener {
         }
     }
 
+    private static double[] getWeights(int numberOfEvenlyWeightedSubTasks) {
+        double[] results=new double[numberOfEvenlyWeightedSubTasks];
+        Arrays.fill(results,1);
+        return results;
+    }
+
+    /**
+     * Construct a CompositeProgressListener with a number of evenly weighted subtasks.
+     * @param listener the ProgressListener that all progress reports are forwarded to after adjusting them for the currently active sub-task
+     * @param numberOfEvenlyWeightedSubTasks the number of evenly weighted sub-tasks.
+     */
+    public CompositeProgressListener(ProgressListener listener, int numberOfEvenlyWeightedSubTasks) {
+        //noinspection PrimitiveArrayArgumentToVariableArgMethod
+        this(listener,getWeights(numberOfEvenlyWeightedSubTasks));
+    }
+
     public static CompositeProgressListener forFiles(ProgressListener listener, List<File> files) {
         int n = files.size();
         double[] lengths = new double[n];
@@ -86,6 +104,7 @@ public final class CompositeProgressListener extends ProgressListener {
      * of every subtask including the first.
      */
     public void beginSubtask() {
+        currentSubTaskMessage = "";
         if (!beganFirstSubTask) {
             beganFirstSubTask = true;
         } else {
@@ -103,6 +122,7 @@ public final class CompositeProgressListener extends ProgressListener {
     public void beginSubtask(String message) {
         setMessage(message);
         beginSubtask();
+        currentSubTaskMessage = message;
     }
 
     protected void _setProgress(double fractionCompleted) {
@@ -115,6 +135,11 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     protected void _setMessage(String message) {
+        if (currentSubTaskMessage.length()>0) {
+            message=currentSubTaskMessage+": "+message;
+            // concatentate the parent message and the sub-task messages. Previous behaviour was
+            // just to overwrite the parent sub-task message, but I think this is just wrong.
+        }
         listener._setMessage(message);
     }
 
@@ -160,6 +185,7 @@ public final class CompositeProgressListener extends ProgressListener {
     public void beginNextSubtask(String message) {
         beginNextSubtask();
         setMessage(message);
+        currentSubTaskMessage=message;
     }
 
     /**
@@ -168,6 +194,7 @@ public final class CompositeProgressListener extends ProgressListener {
      * for each task including the first, use {@link #beginSubtask()} instead.
      */
     public void beginNextSubtask() {
+        currentSubTaskMessage = "";
         setComplete();
         if (!hasNextSubtask()) {
             throw new IllegalStateException(currentOperationNum + " " + numOperations);
