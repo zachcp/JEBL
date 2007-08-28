@@ -55,6 +55,11 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
 
+	    if (TreePane.DEBUG_OUTLINE) {
+		    g2.setPaint(Color.red);
+		    g2.draw(bounds);
+	    }
+
         if (getBackground() != null) {
             g2.setPaint(getBackground());
             g2.fill(bounds);

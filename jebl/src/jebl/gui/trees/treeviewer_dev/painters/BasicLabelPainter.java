@@ -235,6 +235,11 @@ public class BasicLabelPainter extends LabelPainter<Node> {
 	public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
 		Tree tree = treePane.getTree();
 
+		if (TreePane.DEBUG_OUTLINE) {
+			g2.setPaint(Color.red);
+			g2.draw(bounds);
+		}
+
 		String label = getLabel(tree, item);
 
 		Font oldFont = g2.getFont();

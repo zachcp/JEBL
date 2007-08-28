@@ -19,6 +19,8 @@ import java.util.*;
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
 
+	public final static boolean DEBUG_OUTLINE = true;
+
 	public final String CARTOON_ATTRIBUTE_NAME = "!cartoon";
 	public final String COLLAPSE_ATTRIBUTE_NAME = "!collapse";
 
@@ -64,9 +66,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		return treeLayout;
 	}
 
-    public TreeLayoutCache getTreeLayoutCache() {
-        return treeLayoutCache;
-    }
+	public TreeLayoutCache getTreeLayoutCache() {
+		return treeLayoutCache;
+	}
 
 	public void setTreeLayout(TreeLayout treeLayout) {
 
@@ -683,14 +685,27 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	public void drawTree(Graphics2D g2, double width, double height) {
 
+		final RenderingHints rhints = g2.getRenderingHints();
+		final boolean antialiasOn = rhints.containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
+		if( ! antialiasOn ) {
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		}
+
 		if (!calibrated) calibrate(g2, width, height);
 
-		AffineTransform oldTransform = g2.getTransform();
-		Paint oldPaint = g2.getPaint();
-		Stroke oldStroke = g2.getStroke();
-		Font oldFont = g2.getFont();
+		// save graphics state which draw changes so that upon exit it can be restored
+
+		final AffineTransform oldTransform = g2.getTransform();
+		final Paint oldPaint = g2.getPaint();
+		final Stroke oldStroke = g2.getStroke();
+		final Font oldFont = g2.getFont();
 
 		g2.setStroke(branchLineStroke);
+
+		if (DEBUG_OUTLINE) {
+			g2.setPaint(Color.red);
+			g2.draw(treeBounds);
+		}
 
 		// Paint collapsed nodes
 		for (Node node : treeLayoutCache.getCollapsedShapeMap().keySet() ) {
@@ -855,13 +870,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private void calibrate(Graphics2D g2, double width, double height) {
 
-        treeLayout.layout(tree, treeLayoutCache);
+		treeLayout.layout(tree, treeLayoutCache);
 
-        // First of all get the bounds for the unscaled tree
+		// First of all get the bounds for the unscaled tree
 		treeBounds = null;
-		boolean showingRootBranch = treeLayout.isShowingRootBranch();
-
-		Node rootNode = tree.getRootNode();
 
 		// There are two sets of bounds here. The treeBounds are the bounds of the elements
 		// that make up the actual tree. These are scaled from branch length space
@@ -906,7 +918,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		//treeBounds = new Rectangle2D.Double(0.0, 0.0, treeBounds.getWidth(), treeBounds.getHeight());
 
 		// add the tree bounds
-		final Rectangle2D bounds = treeBounds.getBounds2D(); // (YH) same as (Rectangle2D) treeBounds.clone();
+		final Rectangle2D totalTreeBounds = treeBounds.getBounds2D(); // (YH) same as (Rectangle2D) treeBounds.clone();
 
 		final Set<Node> externalNodes = tree.getExternalNodes();
 
@@ -934,7 +946,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				AffineTransform taxonTransform = calculateTransform(null, taxonPath, tipLabelWidth, tipLabelHeight, true);
 
 				// and add the translated bounds to the overall bounds
-				bounds.add(taxonTransform.createTransformedShape(labelBounds).getBounds2D());
+				totalTreeBounds.add(taxonTransform.createTransformedShape(labelBounds).getBounds2D());
 			}
 		}
 
@@ -953,7 +965,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				AffineTransform labelTransform = calculateTransform(null, labelPath, labelWidth, labelHeight, true);
 
 				// and add the translated bounds to the overall bounds
-				bounds.add(labelTransform.createTransformedShape(labelBounds).getBounds2D());
+				totalTreeBounds.add(labelTransform.createTransformedShape(labelBounds).getBounds2D());
 			}
 		}
 
@@ -973,40 +985,60 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				AffineTransform labelTransform = calculateTransform(null, labelPath, labelWidth, labelHeight, false);
 
 				// and add the translated bounds to the overall bounds
-				bounds.add(labelTransform.createTransformedShape(labelBounds).getBounds2D());
+				totalTreeBounds.add(labelTransform.createTransformedShape(labelBounds).getBounds2D());
 			}
 		}
 
 		if (scalePainter != null && scalePainter.isVisible()) {
 			scalePainter.calibrate(g2, this);
-			scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), treeBounds.getY(),
+			scaleBarBounds = new Rectangle2D.Double(
+					treeBounds.getX(), totalTreeBounds.getY() + totalTreeBounds.getHeight(),
 					treeBounds.getWidth(), scalePainter.getPreferredHeight());
-			bounds.add(scaleBarBounds);
+			totalTreeBounds.add(scaleBarBounds);
 		}
 
-		final double avilableW = width - insets.left - insets.right;
-		final double avaiableH = height - insets.top - insets.bottom;
+		final double availableW = width - insets.left - insets.right;
+		final double availableH = height - insets.top - insets.bottom;
 
 		// get the difference between the tree's bounds and the overall bounds
+		boolean maintainAspectRatio = treeLayout.maintainAspectRatio();
 
-		double xDiff = bounds.getWidth() - treeBounds.getWidth();
-		double yDiff = bounds.getHeight() - treeBounds.getHeight();
-		assert xDiff >= 0 && yDiff >= 0;
+		double xDiff;
+		double yDiff;
+
+		if (maintainAspectRatio) {
+			double topDiff = treeBounds.getY() - totalTreeBounds.getY();
+			double leftDiff = treeBounds.getX() - totalTreeBounds.getX();
+			double bottomDiff = (totalTreeBounds.getHeight() + totalTreeBounds.getY()) -
+					(treeBounds.getHeight() + treeBounds.getY());
+			double rightDiff = (totalTreeBounds.getWidth() + totalTreeBounds.getX()) -
+					(treeBounds.getWidth() + treeBounds.getX());
+			assert topDiff >= 0 && leftDiff >= 0 && bottomDiff >= 0 && rightDiff >= 0;
+
+			xDiff = 2.0 * (leftDiff > rightDiff ? leftDiff : rightDiff);
+			yDiff = 2.0 * (topDiff > bottomDiff ? topDiff : bottomDiff);
+		} else {
+			xDiff = totalTreeBounds.getWidth() - treeBounds.getWidth();
+			yDiff = totalTreeBounds.getHeight() - treeBounds.getHeight();
+			assert xDiff >= 0 && yDiff >= 0;
+		}
+
 
 		// small tree, long labels, label bounds may get larger that window, protect against that
 
-		if( xDiff >= avilableW ) {
-			xDiff = Math.min(avilableW, bounds.getWidth()) - treeBounds.getWidth();
+		if( xDiff >= availableW ) {
+			xDiff = Math.min(availableW, totalTreeBounds.getWidth()) - treeBounds.getWidth();
 		}
 
-		if( yDiff >= avaiableH ) {
-			yDiff = Math.min(avaiableH, bounds.getHeight()) - treeBounds.getHeight();
+		if( yDiff >= availableH ) {
+			yDiff = Math.min(availableH, totalTreeBounds.getHeight()) - treeBounds.getHeight();
 		}
+
 		// Get the amount of canvas that is going to be taken up by the tree -
 		// The rest is taken up by taxon labels which don't scale
 
-		final double w = avilableW - xDiff;
-		final double h = avaiableH - yDiff;
+		final double w = availableW - xDiff;
+		final double h = availableH - yDiff;
 
 		double xScale;
 		double yScale;
@@ -1014,10 +1046,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		double xOffset = 0.0;
 		double yOffset = 0.0;
 
-		if (treeLayout.maintainAspectRatio()) {
+		if (maintainAspectRatio) {
 			// If the tree is layed out in both dimensions then we
 			// need to find out which axis has the least space and scale
 			// the tree to that (to keep the aspect ratio.
+
 			if ((w / treeBounds.getWidth()) < (h / treeBounds.getHeight())) {
 				xScale = w / treeBounds.getWidth();
 				yScale = xScale;
@@ -1040,10 +1073,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 			// and set the origin in the top left corner
 			xOffset = - (treeBounds.getX() * xScale);
-			yOffset = - bounds.getY();
+			yOffset = - totalTreeBounds.getY();
 
-			treeScale = xScale;   assert treeScale > 0;
+			treeScale = xScale;
 		}
+
+		assert treeScale > 0;
 
 		// Create the overall transform
 		transform = new AffineTransform();
@@ -1180,28 +1215,36 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		calibrated = true;
 	}
 
-	private AffineTransform calculateTransform(AffineTransform globalTransform, Line2D line, double width, double height, boolean just) {
-		// Work out how it is rotated and create a transform that matches that
-		AffineTransform lineTransform = new AffineTransform();
-
+	private AffineTransform calculateTransform(AffineTransform globalTransform, Line2D line,
+	                                           double width, double height, boolean just) {
 		final Point2D origin = line.getP1();
 		if (globalTransform != null) {
 			globalTransform.transform(origin, origin);
 		}
 
-		final double dx = line.getX2() - line.getX1();
-		final double angle = dx != 0.0 ? Math.atan((line.getY2() - line.getY1()) / dx) : 0.0;
-		lineTransform.rotate(angle, origin.getX(), origin.getY());
+		// Work out how it is rotated and create a transform that matches that
+		AffineTransform lineTransform = new AffineTransform();
+
+		final double dy = line.getY2() - line.getY1();
+		// efficency
+		if( dy != 0.0 ) {
+			final double dx = line.getX2() - line.getX1();
+			final double angle = dx != 0.0 ? Math.atan(dy / dx) : 0.0;
+			lineTransform.rotate(angle, origin.getX(), origin.getY());
+		}
 
 		// Now add a translate to the transform - if it is on the left then we need
 		// to shift it by the entire width of the string.
 		final double ty = origin.getY() - (height / 2.0);
-		if (!just || line.getX2() > line.getX1()) {
-			lineTransform.translate(origin.getX() + labelXOffset, ty);
-		} else {
-			lineTransform.translate(origin.getX() - (labelXOffset + width), ty);
+		double tx = origin.getX();
+		if( just) {
+			if (line.getX2() > line.getX1()) {
+				tx += labelXOffset;
+			} else {
+				tx -= (labelXOffset + width);
+			}
 		}
-
+		lineTransform.translate(tx, ty);
 		return lineTransform;
 	}
 
@@ -1242,7 +1285,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private TimeScale timeScale = new TimeScale(1.0, 0.0);
 
-	//private Insets margins = new Insets(6, 6, 6, 6);
+	//private Insets insets = new Insets(0, 0, 0, 0);
 	private Insets insets = new Insets(6, 6, 6, 6);
 
 	private Set<Node> selectedNodes = new HashSet<Node>();
