@@ -109,7 +109,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 		yPosition = 0.0;
 		tipCount = tree.getExternalNodes().size();
-		yIncrement = 1.0 / (tipCount + 1);
+		yIncrement = 1.0 / (tipCount - 1);
 
 		Node root = tree.getRootNode();
 		double rl = rootLength * tree.getHeight(root);
@@ -120,7 +120,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		Point2D rootPoint = constructNode(tree, root, rl, cache);
 
 		// construct a root branch line
-		Line2D line = new Line2D.Double(0.0, rootPoint.getY(), rootPoint.getX(), rootPoint.getY());
+		double ty = transformY(rootPoint.getY());
+		Line2D line = new Line2D.Double(0.0, ty, rootPoint.getX(), ty);
 
 		// add the line to the map of branch paths
 		cache.branchPaths.put(root, line);
@@ -300,13 +301,13 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 		// start point
 		float x0 = (float)nodePoint.getX();
-		float y0 = (float)nodePoint.getY();
+		float y0 = (float)transformY(nodePoint.getY());
 
 		// end point
 		float x1 = (float)maxXPos;
-		float y1 = (float)minYPos;
+		float y1 = (float)transformY(minYPos);
 
-		float y2 = (float)maxYPos;
+		float y2 = (float)transformY(maxYPos);
 
 		collapsedShape.moveTo(x0, y0);
 		collapsedShape.lineTo(x1, y1);
@@ -317,14 +318,14 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		cache.collapsedShapes.put(node, collapsedShape);
 
 		Line2D nodeLabelPath = new Line2D.Double(
-				nodePoint.getX(), nodePoint.getY(),
-				nodePoint.getX() + 1.0, nodePoint.getY());
+				nodePoint.getX(), y0,
+				nodePoint.getX() + 1.0, y0);
 
 		cache.nodeLabelPaths.put(node, nodeLabelPath);
 
 		Line2D nodeBarPath = new Line2D.Double(
-				nodePoint.getX(), nodePoint.getY(),
-				nodePoint.getX() - 1.0, nodePoint.getY());
+				nodePoint.getX(), y0,
+				nodePoint.getX() - 1.0, y0);
 
 		cache.nodeBarPaths.put(node, nodeBarPath);
 
@@ -346,25 +347,21 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		} else {
 
 			Point2D nodePoint = new Point2D.Double(xPosition, yPosition[0]);
+			double x0 = nodePoint.getX();
+			double y0 = transformY(nodePoint.getY());
 
 			Line2D tipLabelPath;
 
 			if (alignTipLabels) {
 
-				tipLabelPath = new Line2D.Double(
-						maxXPosition, nodePoint.getY(),
-						maxXPosition + 1.0, nodePoint.getY());
+				tipLabelPath = new Line2D.Double(maxXPosition, y0, maxXPosition + 1.0, y0);
 
-				Line2D calloutPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						maxXPosition, nodePoint.getY());
+				Line2D calloutPath = new Line2D.Double(x0, y0, maxXPosition, y0);
 
 				cache.calloutPaths.put(node, calloutPath);
 
 			} else {
-				tipLabelPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						nodePoint.getX() + 1.0, nodePoint.getY());
+				tipLabelPath = new Line2D.Double(x0, y0, x0 + 1.0, y0);
 
 			}
 
@@ -393,18 +390,19 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		double yPos = (maxYPos + minYPos) / 2;
 
 		nodePoint = new Point2D.Double(xPosition, yPos);
+		double ty = transformY(yPos);
 
 		GeneralPath collapsedShape = new GeneralPath();
 
 		// start point
 		float x0 = (float)nodePoint.getX();
-		float y0 = (float)nodePoint.getY();
+		float y0 = (float)ty;
 
 		// end point
 		float x1 = (float)maxXPos;
-		float y1 = (float)minYPos;
+		float y1 = (float)transformY(minYPos);
 
-		float y2 = (float)maxYPos;
+		float y2 = (float)transformY(maxYPos);
 
 		collapsedShape.moveTo(x0, y0);
 		collapsedShape.lineTo(x1, y1);
@@ -414,15 +412,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		// add the collapsedShape to the map of branch paths
 		cache.collapsedShapes.put(node, collapsedShape);
 
-		Line2D nodeLabelPath = new Line2D.Double(
-				nodePoint.getX(), nodePoint.getY(),
-				nodePoint.getX() + 1.0, nodePoint.getY());
+		Line2D nodeLabelPath = new Line2D.Double(xPosition, ty, xPosition + 1.0, ty);
 
 		cache.nodeLabelPaths.put(node, nodeLabelPath);
 
-		Line2D nodeBarPath = new Line2D.Double(
-				nodePoint.getX(), nodePoint.getY(),
-				nodePoint.getX() - 1.0, nodePoint.getY());
+		Line2D nodeBarPath = new Line2D.Double(xPosition, ty, xPosition - 1.0, ty);
 
 		cache.nodeBarPaths.put(node, nodeBarPath);
 
@@ -431,20 +425,17 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		if (alignTipLabels) {
 
 			tipLabelPath = new Line2D.Double(
-					maxXPosition, yPos,
-					maxXPosition + 1.0, yPos);
+					maxXPosition, ty,
+					maxXPosition + 1.0, ty);
 
 			Line2D calloutPath = new Line2D.Double(
-					maxXPos, yPos,
-					maxXPosition, yPos);
+					maxXPos, ty,
+					maxXPosition, ty);
 
 			cache.calloutPaths.put(node, calloutPath);
 
 		} else {
-			tipLabelPath = new Line2D.Double(
-					maxXPos, yPos,
-					maxXPos + 1.0, yPos);
-
+			tipLabelPath = new Line2D.Double(maxXPos, ty, maxXPos + 1.0, ty);
 		}
 
 		cache.tipLabelPaths.put(node, tipLabelPath);
