@@ -39,6 +39,14 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         return true;
     }
 
+	public void setFishEye(double fishEye) {
+		// do nothing
+	}
+
+	public void setPointOfInterest(double pointOfInterest) {
+		// do nothing
+	}
+
     public double getHeightOfPoint(Point2D point) {
         throw new UnsupportedOperationException("Method getHeightOfPoint() is not supported in this TreeLayout");
     }

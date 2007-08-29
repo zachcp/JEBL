@@ -28,7 +28,15 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
-    public boolean maintainAspectRatio() {
+	public void setFishEye(double fishEye) {
+		// do nothing
+	}
+
+	public void setPointOfInterest(double pointOfInterest) {
+		// do nothing
+	}
+
+	public boolean maintainAspectRatio() {
         return true;
     }
 

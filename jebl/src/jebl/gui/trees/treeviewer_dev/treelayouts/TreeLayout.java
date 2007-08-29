@@ -58,6 +58,9 @@ public interface TreeLayout {
      */
     boolean isShowingColouring();
 
+	void setFishEye(double fishEye);
+
+	void setPointOfInterest(double pointOfInterest);
     /**
      * Return whether the two axis scales should be maintained
      * relative to each other

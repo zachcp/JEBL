@@ -17,6 +17,9 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 	private double rootLength = 0.01;
 	private boolean alignTipLabels = false;
 
+	private double fishEye = 0.0;
+	private double pointOfInterest = 0.5;
+
 	public AxisType getXAxisType() {
 		return AxisType.CONTINUOUS;
 	}
@@ -64,6 +67,14 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		return curvature;
 	}
 
+	public double getFishEye() {
+		return fishEye;
+	}
+
+	public double getPointOfInterest() {
+		return pointOfInterest;
+	}
+
 	public void setAlignTipLabels(boolean alignTipLabels) {
 		this.alignTipLabels = alignTipLabels;
 		fireTreeLayoutChanged();
@@ -76,6 +87,16 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	public void setRootLength(double rootLength) {
 		this.rootLength = rootLength;
+		fireTreeLayoutChanged();
+	}
+
+	public void setFishEye(double fishEye) {
+		this.fishEye = fishEye;
+		fireTreeLayoutChanged();
+	}
+
+	public void setPointOfInterest(double pointOfInterest) {
+		this.pointOfInterest = pointOfInterest;
 		fireTreeLayoutChanged();
 	}
 
@@ -129,6 +150,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 				yPos /= children.size();
 
 				nodePoint = new Point2D.Double(xPosition, yPos);
+				double ty = transformY(yPos);
 
 				for (Node child : children) {
 
@@ -138,11 +160,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 					// start point
 					float x0 = (float) nodePoint.getX();
-					float y0 = (float) nodePoint.getY();
+					float y0 = (float) ty;
 
 					// end point
 					float x1 = (float) childPoint.getX();
-					float y1 = (float) childPoint.getY();
+					float y1 = (float) transformY(childPoint.getY());
 
 					if (curvature == 0.0) {
 						Object[] colouring = null;
@@ -196,46 +218,47 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 					double x3 = (nodePoint.getX() + childPoint.getX()) / 2;
 					Line2D branchLabelPath = new Line2D.Double(
-							x3 - 1.0, childPoint.getY(),
-							x3 + 1.0, childPoint.getY());
+							x3 - 1.0, y1,
+							x3 + 1.0, y1);
 
 					cache.branchLabelPaths.put(child, branchLabelPath);
 				}
 
 				Line2D nodeLabelPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						nodePoint.getX() + 1.0, nodePoint.getY());
+						nodePoint.getX(), ty,
+						nodePoint.getX() + 1.0, ty);
 
 				cache.nodeLabelPaths.put(node, nodeLabelPath);
 
 				Line2D nodeBarPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						nodePoint.getX() - 1.0, nodePoint.getY());
+						nodePoint.getX(), ty,
+						nodePoint.getX() - 1.0, ty);
 
 				cache.nodeBarPaths.put(node, nodeBarPath);
 			}
 		} else {
 
 			nodePoint = new Point2D.Double(xPosition, yPosition);
+			double ty = transformY(yPosition);
 
 			Line2D tipLabelPath;
 
 			if (alignTipLabels) {
 
 				tipLabelPath = new Line2D.Double(
-						maxXPosition, nodePoint.getY(),
-						maxXPosition + 1.0, nodePoint.getY());
+						maxXPosition, ty,
+						maxXPosition + 1.0, ty);
 
 				Line2D calloutPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						maxXPosition, nodePoint.getY());
+						nodePoint.getX(), ty,
+						maxXPosition, ty);
 
 				cache.calloutPaths.put(node, calloutPath);
 
 			} else {
 				tipLabelPath = new Line2D.Double(
-						nodePoint.getX(), nodePoint.getY(),
-						nodePoint.getX() + 1.0, nodePoint.getY());
+						nodePoint.getX(), ty,
+						nodePoint.getX() + 1.0, ty);
 
 			}
 
@@ -444,6 +467,22 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 				maxXPosition = xPosition;
 			}
 		}
+	}
+
+	private double transformY(double y) {
+		if (fishEye == 0.0) {
+			return y;
+		}
+		double r = fishEye * 10;
+		double c = 1.0 / (Math.exp(r * pointOfInterest) - 2.0);
+
+		double common = Math.exp(-r);
+		double y0 = ((1.0 + c) * common) / (c + common);
+
+		common = Math.exp(-r * y);
+		double y1 = (((1.0 + c) * common) / (c + common) - y0) / (1.0 - y0);
+
+		return y1;
 	}
 
 	private double yPosition;

@@ -18,7 +18,6 @@ import java.util.*;
  * @version $Id$
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
-
 	public final static boolean DEBUG_OUTLINE = true;
 
 	public final String CARTOON_ATTRIBUTE_NAME = "!cartoon";
