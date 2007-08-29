@@ -137,6 +137,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
     }
 
     public void mouseMoved(MouseEvent mouseEvent) {
+	    treePane.setCursorPosition(mouseEvent.getPoint());
 
     }
 

@@ -18,7 +18,8 @@ import java.util.*;
  * @version $Id$
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
-	public final static boolean DEBUG_OUTLINE = true;
+
+	public final static boolean DEBUG_OUTLINE = false;
 
 	public final String CARTOON_ATTRIBUTE_NAME = "!cartoon";
 	public final String COLLAPSE_ATTRIBUTE_NAME = "!collapse";
@@ -96,6 +97,14 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		this.timeScale = timeScale;
 		calibrated = false;
 		repaint();
+	}
+
+	public void setCursorPosition(Point point) {
+		double xPos = (point.getX() - treeBounds.getX()) / treeBounds.getWidth();
+		xPos = (xPos < 0.0 ? 0.0 : xPos > 1.0 ? 1.0 : xPos);
+		double yPos = (point.getY() - treeBounds.getY()) / treeBounds.getHeight();
+		yPos = (yPos < 0.0 ? 0.0 : yPos > 1.0 ? 1.0 : yPos);
+		treeLayout.setPointOfInterest(yPos);
 	}
 
 	public void setBranchDecorator(Decorator branchDecorator) {

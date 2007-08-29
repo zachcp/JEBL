@@ -19,6 +19,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	private double fishEye = 0.0;
 	private double pointOfInterest = 0.5;
+	private int tipCount = 0;
 
 	public AxisType getXAxisType() {
 		return AxisType.CONTINUOUS;
@@ -107,7 +108,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		maxXPosition = 0.0;
 
 		yPosition = 0.0;
-		yIncrement = 1.0 / (tree.getExternalNodes().size() + 1);
+		tipCount = tree.getExternalNodes().size();
+		yIncrement = 1.0 / (tipCount + 1);
 
 		Node root = tree.getRootNode();
 		double rl = rootLength * tree.getHeight(root);
@@ -473,16 +475,15 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		if (fishEye == 0.0) {
 			return y;
 		}
-		double r = fishEye * 10;
-		double c = 1.0 / (Math.exp(r * pointOfInterest) - 2.0);
 
-		double common = Math.exp(-r);
-		double y0 = ((1.0 + c) * common) / (c + common);
+		double scale = 1.0 / (fishEye * tipCount);
+		double dist = pointOfInterest - y;
+		double min =  1.0 - (pointOfInterest / (scale + pointOfInterest));
+		double max =  1.0 - ((pointOfInterest - 1.0) / (scale - (pointOfInterest - 1.0)));
 
-		common = Math.exp(-r * y);
-		double y1 = (((1.0 + c) * common) / (c + common) - y0) / (1.0 - y0);
+		double c =  1.0 - (dist < 0 ? (dist / (scale - dist)) : (dist / (scale + dist)));
 
-		return y1;
+		return (c - min) / (max - min);
 	}
 
 	private double yPosition;
