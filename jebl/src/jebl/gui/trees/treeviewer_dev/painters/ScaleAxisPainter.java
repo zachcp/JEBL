@@ -1,9 +1,8 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
 import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
+import jebl.gui.trees.treeviewer_dev.ScaleAxis;
 import jebl.gui.trees.treeviewer_dev.TreePane;
-import jebl.gui.trees.treeviewer_dev.TimeScale;
 import org.virion.jam.controlpalettes.ControlPalette;
 
 import java.awt.*;
@@ -18,249 +17,226 @@ import java.util.Collection;
  */
 public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePainter {
 
-    public ScaleAxisPainter() {
-    }
+	public ScaleAxisPainter() {
+	}
 
 	public void setTreePane(TreePane treePane) {
-        this.treePane = treePane;
-    }
+		this.treePane = treePane;
+	}
 
-    public Rectangle2D calibrate(Graphics2D g2, TreePane treePane) {
-        Font oldFont = g2.getFont();
-        g2.setFont(getFont());
+	public Rectangle2D calibrate(Graphics2D g2, TreePane treePane) {
+		Font oldFont = g2.getFont();
+		g2.setFont(getFont());
 
-        FontMetrics fm = g2.getFontMetrics();
-        double labelHeight = fm.getHeight();
+		FontMetrics fm = g2.getFontMetrics();
+		double labelHeight = fm.getHeight();
 
-	    scaleFactor = treePane.getTreeScale();
-		offset = 0.0;
+		preferredWidth = treePane.getTreeBounds().getWidth();
+		preferredHeight = labelHeight + topMargin + bottomMargin + scaleBarStroke.getLineWidth() + majorTickSize;
 
-        preferredWidth = treePane.getTreeBounds().getWidth();
-        preferredHeight = labelHeight + topMargin + bottomMargin + scaleBarStroke.getLineWidth() + majorTickSize;
+		tickLabelOffset = (float) (fm.getAscent() + topMargin + bottomMargin + majorTickSize) + scaleBarStroke.getLineWidth();
 
-        tickLabelOffset = (float) (fm.getAscent() + topMargin + bottomMargin + majorTickSize) + scaleBarStroke.getLineWidth();
+		g2.setFont(oldFont);
 
-        g2.setFont(oldFont);
+		return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
+	}
 
-	    TimeScale timeScale = treePane.getTimeScale();
-	    RootedTree tree = treePane.getTree();
+	public void paint(Graphics2D g2, TreePane treePane, Justification justification, Rectangle2D bounds) {
+		Font oldFont = g2.getFont();
+		Paint oldPaint = g2.getPaint();
+		Stroke oldStroke = g2.getStroke();
 
-	    axis.setRange(timeScale.getAge(tree.getHeight(tree.getRootNode()), tree), timeScale.getAge(0.0, tree));
+		if (TreePane.DEBUG_OUTLINE) {
+			g2.setPaint(Color.red);
+			g2.draw(bounds);
+		}
 
-	    return new Rectangle2D.Double(0.0, 0.0, preferredWidth, preferredHeight);
-    }
+		if (getBackground() != null) {
+			g2.setPaint(getBackground());
+			g2.fill(bounds);
+		}
 
-    public void paint(Graphics2D g2, TreePane treePane, Justification justification, Rectangle2D bounds) {
-        Font oldFont = g2.getFont();
-        Paint oldPaint = g2.getPaint();
-        Stroke oldStroke = g2.getStroke();
+		if (getBorderPaint() != null && getBorderStroke() != null) {
+			g2.setPaint(getBorderPaint());
+			g2.setStroke(getBorderStroke());
+			g2.draw(bounds);
+		}
 
-	    if (TreePane.DEBUG_OUTLINE) {
-		    g2.setPaint(Color.red);
-		    g2.draw(bounds);
-	    }
+		g2.setFont(getFont());
 
-        if (getBackground() != null) {
-            g2.setPaint(getBackground());
-            g2.fill(bounds);
-        }
+		g2.setPaint(getForeground());
+		g2.setStroke(getScaleBarStroke());
 
-        if (getBorderPaint() != null && getBorderStroke() != null) {
-            g2.setPaint(getBorderPaint());
-            g2.setStroke(getBorderStroke());
-            g2.draw(bounds);
-        }
+		paintAxis(g2, bounds);
 
-        g2.setFont(getFont());
+		g2.setFont(oldFont);
+		g2.setPaint(oldPaint);
+		g2.setStroke(oldStroke);
+	}
 
-        g2.setPaint(getForeground());
-        g2.setStroke(getScaleBarStroke());
+	/**
+	 *	Get the maximum width of the labels of an axis
+	 * @param g2
+	 * @return
+	 */
+	protected double getMaxTickLabelWidth(Graphics2D g2)
+	{
+		String label;
+		double width;
+		double maxWidth = 0;
 
-	    paintAxis(g2, bounds);
+		ScaleAxis axis = treePane.getScaleAxis();
 
-        g2.setFont(oldFont);
-        g2.setPaint(oldPaint);
-        g2.setStroke(oldStroke);
-    }
+		if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
+			label = axis.getFormatter().format(axis.getMinorTickValue(0, -1));
+			width = g2.getFontMetrics().stringWidth(label);
+			if (maxWidth < width)
+				maxWidth = width;
+		}
+		int n = axis.getMajorTickCount();
+		for (int i = 0; i < n; i++) {
+			label = axis.getFormatter().format(axis.getMajorTickValue(i));
+			width = g2.getFontMetrics().stringWidth(label);
+			if (maxWidth < width)
+				maxWidth = width;
+		}
+		if (axis.getLabelLast()) { // Draw first minor tick as a major one (with a label)
+			label = axis.getFormatter().format(axis.getMinorTickValue(0, n - 1));
+			width = g2.getFontMetrics().stringWidth(label);
+			if (maxWidth < width)
+				maxWidth = width;
+		}
 
-    /**
-    *	Get the maximum width of the labels of an axis
-    */
-    protected double getMaxTickLabelWidth(Graphics2D g2)
-    {
-        String label;
-        double width;
-        double maxWidth = 0;
+		return maxWidth;
+	}
 
-        if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
-            label = axis.getFormatter().format(axis.getMinorTickValue(0, -1));
-            width = g2.getFontMetrics().stringWidth(label);
-            if (maxWidth < width)
-                maxWidth = width;
-        }
-        int n = axis.getMajorTickCount();
-        for (int i = 0; i < n; i++) {
-            label = axis.getFormatter().format(axis.getMajorTickValue(i));
-            width = g2.getFontMetrics().stringWidth(label);
-            if (maxWidth < width)
-                maxWidth = width;
-        }
-        if (axis.getLabelLast()) { // Draw first minor tick as a major one (with a label)
-            label = axis.getFormatter().format(axis.getMinorTickValue(0, n - 1));
-            width = g2.getFontMetrics().stringWidth(label);
-            if (maxWidth < width)
-                maxWidth = width;
-        }
+	protected void paintAxis(Graphics2D g2, Rectangle2D axisBounds)
+	{
+		ScaleAxis axis = treePane.getScaleAxis();
 
-        return maxWidth;
-    }
+		g2.setPaint(getForeground());
+		g2.setStroke(getScaleBarStroke());
 
-    protected void paintAxis(Graphics2D g2, Rectangle2D axisBounds)
-    {
-        int n1 = axis.getMajorTickCount();
-        int n2, i, j;
+		double minX = treePane.scaleOnAxis(axis.getMinAxis());
+		double maxX = treePane.scaleOnAxis(axis.getMaxAxis());
 
-        n2 = axis.getMinorTickCount(-1);
-        if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
+		Line2D line = new Line2D.Double(minX, axisBounds.getMinY(), maxX, axisBounds.getMinY());
+		g2.draw(line);
 
-            paintMajorTick(g2, axisBounds, axis.getMinorTickValue(0, -1));
+		int n1 = axis.getMajorTickCount();
+		int n2, i, j;
 
-            for (j = 1; j < n2; j++) {
-                paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, -1));
-            }
-        } else {
+		n2 = axis.getMinorTickCount(-1);
+		if (axis.getLabelFirst()) { // Draw first minor tick as a major one (with a label)
 
-            for (j = 0; j < n2; j++) {
-                paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, -1));
-            }
-        }
+			paintMajorTick(g2, axisBounds, axis, axis.getMinorTickValue(0, -1));
 
-        for (i = 0; i < n1; i++) {
+			for (j = 1; j < n2; j++) {
+				paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, -1));
+			}
+		} else {
 
-            paintMajorTick(g2, axisBounds, axis.getMajorTickValue(i));
-            n2 = axis.getMinorTickCount(i);
+			for (j = 0; j < n2; j++) {
+				paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, -1));
+			}
+		}
 
-            if (i == (n1-1) && axis.getLabelLast()) { // Draw last minor tick as a major one
+		for (i = 0; i < n1; i++) {
 
-                paintMajorTick(g2, axisBounds, axis.getMinorTickValue(0, i));
+			paintMajorTick(g2, axisBounds, axis, axis.getMajorTickValue(i));
+			n2 = axis.getMinorTickCount(i);
 
-                for (j = 1; j < n2; j++) {
-                    paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, i));
-                }
-            } else {
+			if (i == (n1-1) && axis.getLabelLast()) { // Draw last minor tick as a major one
 
-                for (j = 0; j <  n2; j++) {
-                    paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, i));
-                }
-            }
-        }
-    }
+				paintMajorTick(g2, axisBounds, axis, axis.getMinorTickValue(0, i));
 
-    protected void paintMajorTick(Graphics2D g2, Rectangle2D axisBounds, double value)
-    {
-        g2.setPaint(getForeground());
-        g2.setStroke(getScaleBarStroke());
+				for (j = 1; j < n2; j++) {
+					paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, i));
+				}
+			} else {
 
-            String label = axis.getFormatter().format(value);
-            double pos = transformX(value);
+				for (j = 0; j <  n2; j++) {
+					paintMinorTick(g2, axisBounds, axis.getMinorTickValue(j, i));
+				}
+			}
+		}
+	}
 
-            Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + majorTickSize);
-            g2.draw(line);
+	protected void paintMajorTick(Graphics2D g2, Rectangle2D axisBounds, ScaleAxis axis, double value)
+	{
+		g2.setPaint(getForeground());
+		g2.setStroke(getScaleBarStroke());
 
-            g2.setPaint(getForeground());
-            double width = g2.getFontMetrics().stringWidth(label);
-            g2.drawString(label, (float)(pos - (width / 2)), (float)(axisBounds.getMinY() + tickLabelOffset));
-    }
+		String label = axis.getFormatter().format(value);
+		double pos = treePane.scaleOnAxis(value);
 
-    protected void paintMinorTick(Graphics2D g2, Rectangle2D axisBounds, double value)
-    {
+		Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + majorTickSize);
+		g2.draw(line);
 
-        g2.setPaint(getForeground());
-        g2.setStroke(getScaleBarStroke());
+		g2.setPaint(getForeground());
+		double width = g2.getFontMetrics().stringWidth(label);
+		g2.drawString(label, (float)(pos - (width / 2)), (float)(axisBounds.getMinY() + tickLabelOffset));
+	}
 
-            double pos = transformX(value);
+	protected void paintMinorTick(Graphics2D g2, Rectangle2D axisBounds, double value)
+	{
 
-            Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + minorTickSize);
-            g2.draw(line);
-    }
+		g2.setPaint(getForeground());
+		g2.setStroke(getScaleBarStroke());
 
-    /**
-    *	Transform a chart co-ordinates into a drawing co-ordinates
-    */
-    protected double transformX(double value) {
-        return ((axis.transform(value) - axis.transform(axis.getMinAxis())) * scaleFactor) + offset;
-    }
+		double pos = treePane.scaleOnAxis(value);
 
+		Line2D line = new Line2D.Double(pos, axisBounds.getMinY(), pos, axisBounds.getMinY() + minorTickSize);
+		g2.draw(line);
+	}
 
-    public double getPreferredWidth() {
-        return preferredWidth;
-    }
+	public double getPreferredWidth() {
+		return preferredWidth;
+	}
 
-    public double getPreferredHeight() {
-        return preferredHeight;
-    }
+	public double getPreferredHeight() {
+		return preferredHeight;
+	}
 
-    public double getHeightBound() {
-        return preferredHeight + tickLabelOffset;
-    }
+	public double getHeightBound() {
+		return preferredHeight + tickLabelOffset;
+	}
 
-    public BasicStroke getScaleBarStroke() {
-        return scaleBarStroke;
-    }
+	public BasicStroke getScaleBarStroke() {
+		return scaleBarStroke;
+	}
 
-    public void setScaleBarStroke(BasicStroke scaleBarStroke) {
-        this.scaleBarStroke = scaleBarStroke;
-        firePainterChanged();
-    }
+	public void setScaleBarStroke(BasicStroke scaleBarStroke) {
+		this.scaleBarStroke = scaleBarStroke;
+		firePainterChanged();
+	}
 
-    public double getMajorTickSpacing() {
-        return axis.getMajorTickSpacing();
-    }
+	public void setControlPalette(ControlPalette controlPalette) {
+		// nothing to do
+	}
 
-    public double getMinorTickSpacing() {
-        return axis.getMinorTickSpacing();
-    }
+	public String[] getAttributes() {
+		return new String[0];
+	}
 
-    public void setTickSpacing(double userMajorTickSpacing, double userMinorTickSpacing) {
-        axis.setManualAxis(userMajorTickSpacing, userMinorTickSpacing);
-        firePainterChanged();
-    }
+	public void setupAttributes(Collection<? extends Tree> trees) {
+		// nothing to do...
+	}
 
-	public void setAutomaticScale(boolean automaticScale) {
-	    axis.setAutomatic();
-        firePainterChanged();
-    }
+	public void setDisplayAttribute(String displayAttribute) {
+	}
 
-    public void setControlPalette(ControlPalette controlPalette) {
-        // nothing to do
-    }
+	private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
-    public String[] getAttributes() {
-        return new String[0];
-    }
-
-    public void setupAttributes(Collection<? extends Tree> trees) {
-        // nothing to do...
-    }
-
-    public void setDisplayAttribute(String displayAttribute) {
-    }
-
-    private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-
-    private ScaleBarAxis axis = new ScaleBarAxis(ScaleBarAxis.AT_DATA, ScaleBarAxis.AT_DATA);
-
-    private double scaleFactor;
-	private double offset;
-    private double topMargin = 4.0;
-    private double bottomMargin = 4.0;
+	private double topMargin = 4.0;
+	private double bottomMargin = 4.0;
 
 	private double majorTickSize = 5.0;
 	private double minorTickSize = 2.0;
 	private double tickLabelOffset = 4.0;
 
-    private double preferredHeight;
-    private double preferredWidth;
+	private double preferredHeight;
+	private double preferredWidth;
 
-    protected TreePane treePane;
+	protected TreePane treePane;
 }

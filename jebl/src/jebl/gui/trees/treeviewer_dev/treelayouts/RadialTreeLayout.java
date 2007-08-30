@@ -28,6 +28,10 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
+	public double getTotalRootLength() {
+		return 0.0;
+	}
+
 	public void setFishEye(double fishEye) {
 		// do nothing
 	}

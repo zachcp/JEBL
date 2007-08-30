@@ -99,12 +99,23 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
+	public boolean isCrosshairShown() {
+		return isCrosshairShown;
+	}
+
+	public void setCrosshairShown(boolean crosshairShown) {
+		isCrosshairShown = crosshairShown;
+	}
+
 	public void setCursorPosition(Point point) {
-		double xPos = (point.getX() - treeBounds.getX()) / treeBounds.getWidth();
-		xPos = (xPos < 0.0 ? 0.0 : xPos > 1.0 ? 1.0 : xPos);
-		double yPos = (point.getY() - treeBounds.getY()) / treeBounds.getHeight();
-		yPos = (yPos < 0.0 ? 0.0 : yPos > 1.0 ? 1.0 : yPos);
-		treeLayout.setPointOfInterest(yPos);
+		cursorPosition = point;
+		if (cursorPosition != null) {
+			double xPos = (point.getX() - treeBounds.getX()) / treeBounds.getWidth();
+			xPos = (xPos < 0.0 ? 0.0 : xPos > 1.0 ? 1.0 : xPos);
+			double yPos = (point.getY() - treeBounds.getY()) / treeBounds.getHeight();
+			yPos = (yPos < 0.0 ? 0.0 : yPos > 1.0 ? 1.0 : yPos);
+			treeLayout.setPointOfInterest(yPos);
+		}
 	}
 
 	public void setBranchDecorator(Decorator branchDecorator) {
@@ -131,6 +142,57 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	 */
 	public double getTreeScale() {
 		return treeScale;
+	}
+
+	/**
+	 *	Transform a chart co-ordinates into a drawing co-ordinates
+	 */
+	public double scaleOnAxis(double value) {
+		if (axisReversed) {
+			return treeBounds.getX() + treeBounds.getWidth() -
+					((scaleAxis.transform(value) - scaleAxis.transform(scaleAxis.getMinAxis())) * treeScale);
+		} else {
+			return treeBounds.getX() +
+					((scaleAxis.transform(value) - scaleAxis.transform(scaleAxis.getMinAxis())) * treeScale);
+		}
+	}
+
+	public ScaleAxis getScaleAxis() {
+		return scaleAxis;
+	}
+
+	private void setupScaleAxis() {
+		double treeHeight = tree.getHeight(tree.getRootNode()) + treeLayout.getTotalRootLength();
+		double minValue = timeScale.getAge(0.0, tree);
+		double maxValue = timeScale.getAge(treeHeight, tree);
+
+		if (minValue < maxValue) {
+			scaleAxis.setRange(minValue, maxValue);
+			axisReversed = true;
+		} else {
+			scaleAxis.setRange(maxValue, minValue);
+			axisReversed = false;
+		}
+	}
+
+	public double getMajorTickSpacing() {
+		return scaleAxis.getMajorTickSpacing();
+	}
+
+	public double getMinorTickSpacing() {
+		return scaleAxis.getMinorTickSpacing();
+	}
+
+	public void setTickSpacing(double userMajorTickSpacing, double userMinorTickSpacing) {
+		scaleAxis.setManualAxis(userMajorTickSpacing, userMinorTickSpacing);
+		calibrated = false;
+		repaint();
+	}
+
+	public void setAutomaticScale(boolean automaticScale) {
+		scaleAxis.setAutomatic();
+		calibrated = false;
+		repaint();
 	}
 
 	public void painterChanged() {
@@ -624,10 +686,29 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		if (tree == null) return;
 
 		final Graphics2D g2 = (Graphics2D) graphics;
-		if (!calibrated) calibrate(g2, getWidth(), getHeight());
+		if (!calibrated) {
+			calibrate(g2, getWidth(), getHeight());
+		}
 
 		Paint oldPaint = g2.getPaint();
 		Stroke oldStroke = g2.getStroke();
+
+		if (isCrosshairShown && cursorPosition != null) {
+			g2.setPaint(cursorPaint);
+			g2.setStroke(cursorStroke);
+			double x = Math.max(treeBounds.getX(),
+					Math.min(cursorPosition.getX(), treeBounds.getX() + treeBounds.getWidth()));
+			double y = Math.max(treeBounds.getY(),
+					Math.min(cursorPosition.getY(), treeBounds.getY() + treeBounds.getHeight()));
+
+			g2.draw(new Line2D.Double(
+					treeBounds.getX(), y,
+					treeBounds.getX() + treeBounds.getWidth(), y));
+			g2.draw(new Line2D.Double(
+					x, treeBounds.getY(),
+					x, scaleBarBounds.getY()));
+
+		}
 
 		for (Node selectedNode : selectedNodes) {
 			Shape branchPath = treeLayoutCache.getBranchPath(selectedNode);
@@ -878,7 +959,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private void calibrate(Graphics2D g2, double width, double height) {
 
+		// First layout the tree
 		treeLayout.layout(tree, treeLayoutCache);
+
+		// Now rescale the scale axis
+		setupScaleAxis();
 
 		// First of all get the bounds for the unscaled tree
 		treeBounds = null;
@@ -1291,6 +1376,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Rectangle2D treeBounds = new Rectangle2D.Double();
 	private double treeScale;
 
+	private ScaleAxis scaleAxis = new ScaleAxis(ScaleAxis.AT_DATA, ScaleAxis.AT_DATA);
+	private boolean axisReversed = false;
 	private TimeScale timeScale = new TimeScale(1.0, 0.0);
 
 	//private Insets insets = new Insets(0, 0, 0, 0);
@@ -1301,6 +1388,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 
 	private double rulerHeight = -1.0;
 	private Rectangle2D dragRectangle = null;
+	private Point2D cursorPosition = null;
+
+	private boolean isCrosshairShown = true;
 
 	private Decorator branchDecorator = null;
 	private Decorator branchColouringDecorator = null;
@@ -1321,6 +1411,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private BasicStroke calloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
 	private Stroke selectionStroke = new BasicStroke(6.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	private Paint selectionPaint;
+	private Stroke cursorStroke = new BasicStroke(0.5F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+	private Paint cursorPaint = Color.DARK_GRAY;
 
 	private boolean calibrated = false;
 	private AffineTransform transform = null;

@@ -14,12 +14,20 @@ import java.util.List;
 public class PolarTreeLayout extends AbstractTreeLayout {
 
 	private double rootAngle = 180.0;
-	private double rootLength = 0.01;
+	private double rootLengthProportion = 0.01;
 	private double angularRange = 360.0;
+
+	private double totalRootLength = 0.0;
 
 	private boolean showingRootBranch = true;
 
 	private TipLabelPosition tipLabelPosition = TipLabelPosition.FLUSH;
+
+
+	private double yPosition;
+	private double yIncrement;
+
+	private double maxXPosition;
 
     public enum TipLabelPosition {
         FLUSH,
@@ -75,8 +83,12 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         return showingRootBranch;
     }
 
-    public double getRootLength() {
-        return rootLength;
+	public double getTotalRootLength() {
+		return totalRootLength;
+	}
+
+    public double getRootLengthProportion() {
+        return rootLengthProportion;
     }
 
     public TipLabelPosition getTipLabelPosition() {
@@ -98,8 +110,8 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         fireTreeLayoutChanged();
     }
 
-    public void setRootLength(double rootLength) {
-        this.rootLength = rootLength;
+    public void setRootLengthProportion(double rootLengthProportion) {
+        this.rootLengthProportion = rootLengthProportion;
         fireTreeLayoutChanged();
     }
 
@@ -112,16 +124,16 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
 	    cache.clear();
 
-        Node root = tree.getRootNode();
-        double rl = (rootLength * tree.getHeight(root)) * 10.0;
+		Node root = tree.getRootNode();
+		double totalRootLength = (rootLengthProportion * tree.getHeight(root)) * 10.0;
 
         maxXPosition = 0.0;
-        getMaxXPosition(tree, root, rl);
+        getMaxXPosition(tree, root, totalRootLength);
 
         yPosition = 0.0;
         yIncrement = 1.0 / tree.getExternalNodes().size();
 
-        final Point2D rootPoint = constructNode(tree, root, rl, cache);
+        final Point2D rootPoint = constructNode(tree, root, totalRootLength, cache);
 
         if (showingRootBranch) {
             // construct a root branch line
@@ -518,10 +530,5 @@ public class PolarTreeLayout extends AbstractTreeLayout {
     private double getAngle(double y) {
         return rootAngle - ((360.0 - angularRange) * 0.5) - (y * angularRange);
     }
-
-    private double yPosition;
-    private double yIncrement;
-
-    private double maxXPosition;
 
 }

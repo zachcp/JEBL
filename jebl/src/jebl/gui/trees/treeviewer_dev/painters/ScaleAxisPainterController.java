@@ -38,7 +38,7 @@ public class ScaleAxisPainterController extends AbstractController {
 
     // The defaults if there is nothing in the preferences
     private static String DEFAULT_FONT_NAME = "sansserif";
-    private static int DEFAULT_FONT_SIZE = 6;
+    private static int DEFAULT_FONT_SIZE = 8;
     private static int DEFAULT_FONT_STYLE = Font.PLAIN;
 
     private static String DEFAULT_NUMBER_FORMATTING = "#.####";
@@ -156,9 +156,9 @@ public class ScaleAxisPainterController extends AbstractController {
         autoScaleCheck.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 if (autoScaleCheck.isSelected()) {
-                    scaleAxisPainter.setAutomaticScale(true);
-                    majorTicksText.setValue(scaleAxisPainter.getMajorTickSpacing());
-                    minorTicksText.setValue(scaleAxisPainter.getMinorTickSpacing());
+//                    scaleAxisPainter.setAutomaticScale(true);
+//                    majorTicksText.setValue(scaleAxisPainter.getMajorTickSpacing());
+//                    minorTicksText.setValue(scaleAxisPainter.getMinorTickSpacing());
                     label1.setEnabled(false);
                     majorTicksText.setEnabled(false);
                     label2.setEnabled(false);
@@ -168,7 +168,7 @@ public class ScaleAxisPainterController extends AbstractController {
                     minorTicksText.setEnabled(true);
                     label2.setEnabled(true);
                     majorTicksText.setEnabled(true);
-                    scaleAxisPainter.setAutomaticScale(false);
+//                    scaleAxisPainter.setAutomaticScale(false);
                 }
             }
         });
@@ -177,7 +177,7 @@ public class ScaleAxisPainterController extends AbstractController {
             public void stateChanged(ChangeEvent changeEvent) {
                 double majorTickSpacing = getValue(majorTicksText, 1.0);
                 double minorTickSpacing = getValue(minorTicksText, 0.5);
-                scaleAxisPainter.setTickSpacing(majorTickSpacing, minorTickSpacing);
+//                scaleAxisPainter.setTickSpacing(majorTickSpacing, minorTickSpacing);
             }
         };
 
@@ -213,7 +213,7 @@ public class ScaleAxisPainterController extends AbstractController {
         minorTicksText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + MINOR_TICKS_KEY));
         majorTicksText.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + MAJOR_TICKS_KEY));
         autoScaleCheck.setSelected((Boolean)settings.get(SCALE_AXIS_KEY + "." + AUTOMATIC_SCALE_KEY));
-        scaleAxisPainter.setAutomaticScale(autoScaleCheck.isSelected());
+//        scaleAxisPainter.setAutomaticScale(autoScaleCheck.isSelected());
         fontSizeSpinner.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + FONT_SIZE_KEY));
         digitsSpinner.setValue((Integer)settings.get(SCALE_AXIS_KEY + "." + SIGNIFICANT_DIGITS_KEY));
         lineWeightSpinner.setValue((Double)settings.get(SCALE_AXIS_KEY + "." + LINE_WIDTH_KEY));

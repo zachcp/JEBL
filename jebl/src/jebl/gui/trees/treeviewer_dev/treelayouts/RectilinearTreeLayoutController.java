@@ -29,14 +29,14 @@ public class RectilinearTreeLayoutController extends AbstractController {
         final int sliderMax = 10000;
         rootLengthSlider = new JSlider(SwingConstants.HORIZONTAL, 0, sliderMax, 0);
         rootLengthSlider.setOpaque(false);
-        rootLengthSlider.setValue((int) (treeLayout.getRootLength() * sliderMax));
+        rootLengthSlider.setValue((int) (treeLayout.getRootLengthProportion() * sliderMax));
         //rootLengthSlider.setMajorTickSpacing(rootLengthSlider.getMaximum() / 5);
 //        rootLengthSlider.setPaintTicks(true);
 
         rootLengthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 double value = rootLengthSlider.getValue();
-                treeLayout.setRootLength(value / sliderMax);
+                treeLayout.setRootLengthProportion(value / sliderMax);
             }
         });
         optionsPanel.addComponentWithLabel("Root Length:", rootLengthSlider, true);

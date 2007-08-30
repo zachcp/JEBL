@@ -14,12 +14,19 @@ import java.util.List;
 public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	private double curvature = 0.0;
-	private double rootLength = 0.01;
+	private double rootLengthProportion = 0.01;
 	private boolean alignTipLabels = false;
+
+	private double totalRootLength = 0.0;
 
 	private double fishEye = 0.0;
 	private double pointOfInterest = 0.5;
 	private int tipCount = 0;
+
+	private double yPosition;
+	private double yIncrement;
+
+	private double maxXPosition;
 
 	public AxisType getXAxisType() {
 		return AxisType.CONTINUOUS;
@@ -31,6 +38,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	public boolean isShowingRootBranch() {
 		return true;
+	}
+
+	public double getTotalRootLength() {
+		return totalRootLength;
 	}
 
 	public boolean maintainAspectRatio() {
@@ -60,8 +71,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		return alignTipLabels;
 	}
 
-	public double getRootLength() {
-		return rootLength;
+	public double getRootLengthProportion() {
+		return rootLengthProportion;
 	}
 
 	public double getCurvature() {
@@ -86,8 +97,8 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		fireTreeLayoutChanged();
 	}
 
-	public void setRootLength(double rootLength) {
-		this.rootLength = rootLength;
+	public void setRootLengthProportion(double rootLengthProportion) {
+		this.rootLengthProportion = rootLengthProportion;
 		fireTreeLayoutChanged();
 	}
 
@@ -112,12 +123,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		yIncrement = 1.0 / (tipCount - 1);
 
 		Node root = tree.getRootNode();
-		double rl = rootLength * tree.getHeight(root);
+		totalRootLength = rootLengthProportion * tree.getHeight(root);
 
 		maxXPosition = 0.0;
-		getMaxXPosition(tree, root, rl);
+		getMaxXPosition(tree, root, totalRootLength);
 
-		Point2D rootPoint = constructNode(tree, root, rl, cache);
+		Point2D rootPoint = constructNode(tree, root, totalRootLength, cache);
 
 		// construct a root branch line
 		double ty = transformY(rootPoint.getY());
@@ -476,11 +487,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 		return (c - min) / (max - min);
 	}
-
-	private double yPosition;
-	private double yIncrement;
-
-	private double maxXPosition;
 
 
 }

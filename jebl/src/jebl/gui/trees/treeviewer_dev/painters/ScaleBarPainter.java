@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer_dev.painters;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer_dev.TreePane;
+import jebl.gui.trees.treeviewer_dev.ScaleAxis;
 import org.virion.jam.controlpalettes.ControlPalette;
 
 import java.awt.*;
@@ -204,7 +205,7 @@ public class ScaleBarPainter extends LabelPainter<TreePane> implements ScalePain
     private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
     private ScaleBarType type = ScaleBarType.BAR;
-    private ScaleBarAxis axis = new ScaleBarAxis(ScaleBarAxis.AT_DATA, ScaleBarAxis.AT_DATA);
+    private ScaleAxis axis = new ScaleAxis(ScaleAxis.AT_DATA, ScaleAxis.AT_DATA);
 
     private double scaleRange;
     private double topMargin = 4.0;

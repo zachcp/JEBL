@@ -52,6 +52,8 @@ public interface TreeLayout {
      */
     boolean isShowingRootBranch();
 
+	double getTotalRootLength(); 
+
     /**
      * Return whether this layout is showing a branch colouring
      * @return showing colouring?
