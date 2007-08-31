@@ -1,13 +1,16 @@
 package org.virion.jam.util;
 
+import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Used for a managing a list of SimpleListeners.
+ * Calling {@link #objectChanged()} calls that method on all internal SimpleListeners.  
  * @author Richard Moir
  * @version $Id$
  */
-public class SimpleListenerManager {
+public class SimpleListenerManager implements SimpleListener {
 
     private List<SimpleListener> listeners = new ArrayList<SimpleListener>();
 
@@ -43,5 +46,10 @@ public class SimpleListenerManager {
      */
     public synchronized int size () {
         return listeners.size ();
+    }
+
+
+    public void objectChanged() {
+        fire();
     }
 }
