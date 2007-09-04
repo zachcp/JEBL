@@ -11,6 +11,8 @@ import java.awt.*;
 import java.awt.print.Printable;
 import java.util.Collection;
 
+import org.virion.jam.panels.StatusProvider;
+
 /**
  * @author Andrew Rambaut
  * @version $Id$
@@ -27,6 +29,8 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
     public abstract int getTreeCount();
 
+    public abstract StatusProvider getStatusProvider();
+    
     public abstract void showTree(int index);
 
 	public abstract void setTreeLayout(TreeLayout treeLayout);

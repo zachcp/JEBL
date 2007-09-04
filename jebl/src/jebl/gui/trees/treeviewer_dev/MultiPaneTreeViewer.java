@@ -12,6 +12,8 @@ import java.awt.print.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.virion.jam.panels.StatusProvider;
+
 
 /**
  * @author Andrew Rambaut
@@ -135,7 +137,11 @@ public class MultiPaneTreeViewer extends TreeViewer {
 		return trees.size();
 	}
 
-	public void showTree(int index) {
+    public StatusProvider getStatusProvider() {
+        return null;
+    }
+
+    public void showTree(int index) {
 		int i = index;
 		for (TreePane treePane : treePanes) {
 			if (i < trees.size()) {

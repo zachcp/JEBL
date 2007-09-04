@@ -13,16 +13,18 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
-import jebl.gui.trees.treeviewer_dev.painters.*;
+import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
+import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
+import jebl.gui.trees.treeviewer_dev.painters.ScalePainter;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
+import org.virion.jam.panels.StatusProvider;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -55,16 +57,10 @@ public class DefaultTreeViewer extends TreeViewer {
         // It installs itself within the constructor.
         treePaneSelector = new TreePaneSelector(treePane);
 
-	    addKeyListener(new KeyAdapter() {
-		    public void keyPressed(KeyEvent event) {
-				if (event.isAltDown()) {
-					treePaneSelector.setCursorMode(TreePaneSelector.CursorMode.CROSS_HAIR);
-				} else {
-					treePaneSelector.setCursorMode(TreePaneSelector.CursorMode.NORMAL);
-				}
-		    }
+        treePaneRollOver = new TreePaneRollOver(treePane);
 
-	    });
+        setFocusable(true);
+        
     }
 
     public void setTree(Tree tree) {
@@ -124,6 +120,10 @@ public class DefaultTreeViewer extends TreeViewer {
     public int getTreeCount() {
         if (trees == null) return 0;
         return trees.size();
+    }
+
+    public StatusProvider getStatusProvider() {
+        return treePaneRollOver;
     }
 
     public void showTree(int index) {
@@ -474,6 +474,7 @@ public class DefaultTreeViewer extends TreeViewer {
 
     protected TreePane treePane;
     protected TreePaneSelector treePaneSelector;
+    protected TreePaneRollOver treePaneRollOver;
 
     protected JViewport viewport;
 

@@ -12,200 +12,235 @@ import java.util.Set;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class TreePaneSelector implements MouseListener, MouseMotionListener {
-	public enum SelectionMode {
-		NODE,
-		CLADE,
-		TAXA
-	};
+public class TreePaneSelector implements MouseListener, MouseMotionListener, KeyListener {
+    public enum SelectionMode {
+        NODE,
+        CLADE,
+        TAXA
+    };
 
-	public enum DragMode {
-		SELECT,
-		SCROLL
-	};
+    public enum DragMode {
+        SELECT,
+        SCROLL
+    };
 
-	public enum CursorMode {
-		NORMAL,
-		DRAG,
-		CROSS_HAIR
-	};
 
-	public TreePaneSelector(TreePane treePane) {
-		this.treePane = treePane;
-		treePane.addMouseListener(this);
-		treePane.addMouseMotionListener(this);
-	}
+    public TreePaneSelector(TreePane treePane) {
+        this.treePane = treePane;
+        treePane.addMouseListener(this);
+        treePane.addMouseMotionListener(this);
+        treePane.addKeyListener(this);
 
-	public SelectionMode getSelectionMode() {
-		return selectionMode;
-	}
+    }
 
-	public DragMode getDragMode() {
-		return dragMode;
-	}
+    public SelectionMode getSelectionMode() {
+        return selectionMode;
+    }
 
-	public CursorMode getCursorMode() {
-		return cursorMode;
-	}
+    public DragMode getDragMode() {
+        return dragMode;
+    }
 
-	public void setSelectionMode(SelectionMode selectionMode) {
-		this.selectionMode = selectionMode;
-	}
+    public void setSelectionMode(SelectionMode selectionMode) {
+        this.selectionMode = selectionMode;
+    }
 
-	public void setDragMode(DragMode dragMode) {
-		this.dragMode = dragMode;
-	}
+    public void setDragMode(DragMode dragMode) {
+        this.dragMode = dragMode;
+    }
 
-	public void setCursorMode(CursorMode cursorMode) {
-		this.cursorMode = cursorMode;
-		switch (cursorMode) {
-			case NORMAL:
-				treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-				treePane.setCrosshairShown(false);
-				break;
-			case DRAG:
-				treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
-				treePane.setCrosshairShown(false);
-				break;
-			case CROSS_HAIR:
-				treePane.setCrosshairShown(true);
-				treePane.setCursor(null);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown cursor mode");
-		}
-	}
+    public boolean isCrossHairCursor() {
+        return crossHairCursor;
+    }
 
-	public void mouseClicked(MouseEvent mouseEvent) {
-		Node selectedNode = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
-		if (!mouseEvent.isShiftDown()) {
-			treePane.clearSelection();
-		}
+    public void setCrossHairCursor(boolean crossHairCursor) {
+        this.crossHairCursor = crossHairCursor;
+    }
 
-		SelectionMode mode = selectionMode;
-		if (mouseEvent.isAltDown()) {
-			if (mode == SelectionMode.NODE) {
-				mode = SelectionMode.CLADE;
-			} else if (mode == SelectionMode.CLADE) {
-				mode = SelectionMode.NODE;
-			}
-		}
+    private void setupCursor() {
+        if (dragMode == DragMode.SELECT) {
+            if (crossHairCursor) {
+                treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.CROSSHAIR_CURSOR));
+                treePane.setCrosshairShown(true);
+            } else {
+                treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+                treePane.setCrosshairShown(false);
+            }
+        } else {
+            treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+            treePane.setCrosshairShown(false);
 
-		switch (mode) {
-			case NODE:
-				treePane.addSelectedNode(selectedNode);
-				break;
-			case CLADE:
-				treePane.addSelectedClade(selectedNode);
-				break;
-			case TAXA:
-				treePane.addSelectedTip(selectedNode);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
-		}
-	}
+        }
+        treePane.repaint();
+    }
 
-	public void mousePressed(MouseEvent mouseEvent) {
-		// This is used for dragging in combination with mouseDragged
-		// in the MouseMotionListener, below.
-		dragPoint = new Point2D.Double(mouseEvent.getPoint().getX(), mouseEvent.getPoint().getY());
-	}
+    public void mouseClicked(MouseEvent mouseEvent) {
+        if (dragMode == DragMode.SELECT) {
+            boolean isCrossHairShown = treePane.isCrosshairShown();
 
-	public void mouseReleased(MouseEvent mouseEvent) {
-		if (treePane.getDragRectangle() != null) {
-			Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
+            treePane.setCrosshairShown(false);
 
-			if (!mouseEvent.isShiftDown()) {
-				treePane.clearSelection();
-			}
+            Node selectedNode = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
+            if (!mouseEvent.isShiftDown()) {
+                treePane.clearSelection();
+            }
 
-			SelectionMode mode = selectionMode;
-			if (mouseEvent.isAltDown()) {
-				if (mode == SelectionMode.NODE) {
-					mode = SelectionMode.CLADE;
-				} else if (mode == SelectionMode.CLADE) {
-					mode = SelectionMode.NODE;
-				}
-			}
+            SelectionMode mode = selectionMode;
+            if (mouseEvent.isAltDown()) {
+                if (mode == SelectionMode.NODE) {
+                    mode = SelectionMode.CLADE;
+                } else if (mode == SelectionMode.CLADE) {
+                    mode = SelectionMode.NODE;
+                }
+            }
 
-			for (Node selectedNode : selectedNodes) {
-				switch (mode) {
-					case NODE:
-						treePane.addSelectedNode(selectedNode);
-						break;
-					case CLADE:
-						treePane.addSelectedClade(selectedNode);
-						break;
-					case TAXA:
-						treePane.addSelectedTip(selectedNode);
-						break;
-					default:
-						throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
-				}
-			}
-		}
-		treePane.setDragRectangle(null);
-	}
+            switch (mode) {
+                case NODE:
+                    treePane.addSelectedNode(selectedNode);
+                    break;
+                case CLADE:
+                    treePane.addSelectedClade(selectedNode);
+                    break;
+                case TAXA:
+                    treePane.addSelectedTip(selectedNode);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
+            }
 
-	public void mouseEntered(MouseEvent mouseEvent) {
-		treePane.setCursorPosition(mouseEvent.getPoint());
-	}
+            treePane.setCrosshairShown(isCrossHairShown);
+        }
+    }
 
-	public void mouseExited(MouseEvent mouseEvent) {
-		treePane.setCursorPosition(mouseEvent.getPoint());
-	}
+    public void mousePressed(MouseEvent mouseEvent) {
+        // This is used for dragging in combination with mouseDragged
+        // in the MouseMotionListener, below.
+        dragPoint = new Point2D.Double(mouseEvent.getPoint().getX(), mouseEvent.getPoint().getY());
+    }
 
-	public void mouseMoved(MouseEvent mouseEvent) {
-		treePane.setCursorPosition(mouseEvent.getPoint());
-	}
+    public void mouseReleased(MouseEvent mouseEvent) {
+        if (dragMode == DragMode.SELECT) {
+            if (treePane.getDragRectangle() != null) {
+                Set<Node> selectedNodes = treePane.getNodesAt((Graphics2D) treePane.getGraphics(), treePane.getDragRectangle().getBounds());
 
-	public void mouseDragged(MouseEvent mouseEvent) {
-		//this situation can happen on MacOS, though very rare
-		if (dragPoint == null) {
-			return;
-		}
-		if (dragMode == DragMode.SCROLL || mouseEvent.isMetaDown()) {
-			// Calculate how far the mouse has been dragged from the point clicked in
-			// mousePressed, above.
-			int deltaX = (int) (mouseEvent.getX() - dragPoint.getX());
-			int deltaY = (int) (mouseEvent.getY() - dragPoint.getY());
+                if (!mouseEvent.isShiftDown()) {
+                    treePane.clearSelection();
+                }
 
-			// Get the currently visible window
-			Rectangle visRect = treePane.getVisibleRect();
+                SelectionMode mode = selectionMode;
+                if (mouseEvent.isAltDown()) {
+                    if (mode == SelectionMode.NODE) {
+                        mode = SelectionMode.CLADE;
+                    } else if (mode == SelectionMode.CLADE) {
+                        mode = SelectionMode.NODE;
+                    }
+                }
 
-			// Calculate how much we need to scroll
-			if (deltaX > 0) {
-				deltaX = visRect.x - deltaX;
-			} else {
-				deltaX = visRect.x + visRect.width - deltaX;
-			}
+                for (Node selectedNode : selectedNodes) {
+                    switch (mode) {
+                        case NODE:
+                            treePane.addSelectedNode(selectedNode);
+                            break;
+                        case CLADE:
+                            treePane.addSelectedClade(selectedNode);
+                            break;
+                        case TAXA:
+                            treePane.addSelectedTip(selectedNode);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
+                    }
+                }
+            }
+        }
+        treePane.setDragRectangle(null);
+    }
 
-			if (deltaY > 0) {
-				deltaY = visRect.y - deltaY;
-			} else {
-				deltaY = visRect.y + visRect.height - deltaY;
-			}
+    public void mouseEntered(MouseEvent mouseEvent) {
+        treePane.requestFocusInWindow();
+        if (mouseEvent.isMetaDown()) {
+            treePane.setCursorPosition(mouseEvent.getPoint());
+        }
+    }
 
-			// Scroll the visible region
-			Rectangle r = new Rectangle(deltaX, deltaY, 1, 1);
-			treePane.scrollRectToVisible(r);
-		} else {
-			double x1 = Math.min(dragPoint.getX(), mouseEvent.getPoint().getX());
-			double y1 = Math.min(dragPoint.getY(), mouseEvent.getPoint().getY());
-			double x2 = Math.max(dragPoint.getX(), mouseEvent.getPoint().getX());
-			double y2 = Math.max(dragPoint.getY(), mouseEvent.getPoint().getY());
-			treePane.setDragRectangle(new Rectangle2D.Double(x1, y1, x2 - x1, y2 - y1));
-			treePane.scrollPointToVisible(mouseEvent.getPoint());
-		}
-	}
+    public void mouseExited(MouseEvent mouseEvent) {
+        if (mouseEvent.isMetaDown()) {
+            treePane.setCursorPosition(mouseEvent.getPoint());
+        }
+    }
 
-	private TreePane treePane;
+    public void mouseMoved(MouseEvent mouseEvent) {
+        if (mouseEvent.isMetaDown()) {
+            treePane.setCursorPosition(mouseEvent.getPoint());
+        }
+    }
 
-	private SelectionMode selectionMode = SelectionMode.NODE;
+    public void mouseDragged(MouseEvent mouseEvent) {
 
-	private DragMode dragMode = DragMode.SELECT;
-	private Point2D dragPoint = null;
+        //this situation can happen on MacOS, though very rare
+        if (dragPoint == null) {
+            return;
+        }
+        if (dragMode == DragMode.SCROLL) {
+            // Calculate how far the mouse has been dragged from the point clicked in
+            // mousePressed, above.
+            int deltaX = (int) (mouseEvent.getX() - dragPoint.getX());
+            int deltaY = (int) (mouseEvent.getY() - dragPoint.getY());
 
-	private CursorMode cursorMode = CursorMode.NORMAL;
+            // Get the currently visible window
+            Rectangle visRect = treePane.getVisibleRect();
+
+            // Calculate how much we need to scroll
+            if (deltaX > 0) {
+                deltaX = visRect.x - deltaX;
+            } else {
+                deltaX = visRect.x + visRect.width - deltaX;
+            }
+
+            if (deltaY > 0) {
+                deltaY = visRect.y - deltaY;
+            } else {
+                deltaY = visRect.y + visRect.height - deltaY;
+            }
+
+            // Scroll the visible region
+            Rectangle r = new Rectangle(deltaX, deltaY, 1, 1);
+            treePane.scrollRectToVisible(r);
+        } else {
+            double x1 = Math.min(dragPoint.getX(), mouseEvent.getPoint().getX());
+            double y1 = Math.min(dragPoint.getY(), mouseEvent.getPoint().getY());
+            double x2 = Math.max(dragPoint.getX(), mouseEvent.getPoint().getX());
+            double y2 = Math.max(dragPoint.getY(), mouseEvent.getPoint().getY());
+            treePane.setDragRectangle(new Rectangle2D.Double(x1, y1, x2 - x1, y2 - y1));
+            treePane.scrollPointToVisible(mouseEvent.getPoint());
+        }
+    }
+
+    public void keyTyped(KeyEvent event) {
+    }
+
+    public void keyPressed(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.VK_SPACE) {
+            dragMode = DragMode.SCROLL;
+        }
+        crossHairCursor = event.isMetaDown();
+        setupCursor();
+    }
+
+    public void keyReleased(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.VK_SPACE) {
+            dragMode = DragMode.SELECT;
+        }
+        crossHairCursor = event.isMetaDown();
+        setupCursor();
+    }
+
+    private TreePane treePane;
+
+    private SelectionMode selectionMode = SelectionMode.NODE;
+
+    private DragMode dragMode = DragMode.SELECT;
+    private Point2D dragPoint = null;
+
+    private boolean crossHairCursor = false;
 }
