@@ -388,7 +388,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		Point2D nodePoint;
 
 		Object[] values = (Object[])node.getAttribute(collapsedAttributeName);
-        String tipName = values[0].toString();
 		double tipHeight = (Double)values[1];
 		double height = tree.getHeight(node);
 		double maxXPos = xPosition + height - tipHeight;

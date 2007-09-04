@@ -9,8 +9,7 @@ import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 import org.virion.jam.panels.StatusProvider;
 
@@ -247,6 +246,20 @@ public class MultiPaneTreeViewer extends TreeViewer {
 			if (treePane.hasSelection()) return true;
 		}
 		return false;
+	}
+
+	public Set<Node> getSelectedNodes() {
+		for (TreePane treePane : treePanes) {
+			if (treePane.hasSelection()) return treePane.getSelectedNodes();
+		}
+		return Collections.emptySet();
+	}
+
+	public Set<Node> getSelectedTips() {
+		for (TreePane treePane : treePanes) {
+			if (treePane.hasSelection()) return treePane.getSelectedTips();
+		}
+		return Collections.emptySet();
 	}
 
 	public void selectTaxa(MultiPaneTreeViewer.SearchType searchType, String searchString, boolean caseSensitive) {

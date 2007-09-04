@@ -33,7 +33,7 @@ public class LabelPainterController extends AbstractController {
 
     // The defaults if there is nothing in the preferences
     private static String DEFAULT_FONT_NAME = "sansserif";
-    private static int DEFAULT_FONT_SIZE = 6;
+    private static int DEFAULT_FONT_SIZE = 8;
     private static int DEFAULT_FONT_STYLE = Font.PLAIN;
 
     private static String DEFAULT_NUMBER_FORMATTING = "#.####";

@@ -139,6 +139,10 @@ public class BasicLabelPainter extends LabelPainter<Node> {
 				}
 				return taxon.getName();
 			} else {
+				String name = (String)node.getAttribute("name");
+				if (name != null) {
+					return name;
+				}
 				return "unlabelled";
 			}
 		}

@@ -13,18 +13,16 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
-import jebl.gui.trees.treeviewer_dev.painters.LabelPainter;
-import jebl.gui.trees.treeviewer_dev.painters.NodeBarPainter;
-import jebl.gui.trees.treeviewer_dev.painters.ScalePainter;
+import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
+import jebl.util.Attributable;
 import org.virion.jam.panels.StatusProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -60,7 +58,7 @@ public class DefaultTreeViewer extends TreeViewer {
         treePaneRollOver = new TreePaneRollOver(treePane);
 
         setFocusable(true);
-        
+
     }
 
     public void setTree(Tree tree) {
@@ -209,6 +207,14 @@ public class DefaultTreeViewer extends TreeViewer {
     public boolean hasSelection() {
         return treePane.hasSelection();
     }
+
+	public Set<Node> getSelectedNodes() {
+	    return treePane.getSelectedNodes();
+	}
+
+	public Set<Node> getSelectedTips() {
+		return treePane.getSelectedTips();
+	}
 
     public void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive) {
         treePane.clearSelection();

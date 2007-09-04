@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.print.Printable;
 import java.util.Collection;
+import java.util.Set;
 
 import org.virion.jam.panels.StatusProvider;
 
@@ -30,7 +31,7 @@ public abstract class TreeViewer extends JPanel implements Printable {
     public abstract int getTreeCount();
 
     public abstract StatusProvider getStatusProvider();
-    
+
     public abstract void showTree(int index);
 
 	public abstract void setTreeLayout(TreeLayout treeLayout);
@@ -44,6 +45,10 @@ public abstract class TreeViewer extends JPanel implements Printable {
 	public abstract void setTimeScale(TimeScale timeScale);
 
     public abstract boolean hasSelection();
+
+	public abstract Set<Node> getSelectedNodes();
+
+	public abstract Set<Node> getSelectedTips();
 
     public abstract void selectTaxa(SearchType searchType, String searchString, boolean caseSensitive);
 
