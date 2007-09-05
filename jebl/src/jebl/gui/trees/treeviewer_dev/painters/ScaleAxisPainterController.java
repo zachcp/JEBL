@@ -44,8 +44,9 @@ public class ScaleAxisPainterController extends AbstractController {
     private static String DEFAULT_NUMBER_FORMATTING = "#.####";
     private static float DEFAULT_LINE_WIDTH = 1.0f;
 
-    public ScaleAxisPainterController(final ScaleAxisPainter scaleAxisPainter) {
+    public ScaleAxisPainterController(final ScaleAxisPainter scaleAxisPainter, final ScaleGridPainter scaleGridPainter) {
         this.scaleAxisPainter = scaleAxisPainter;
+        this.scaleGridPainter = scaleGridPainter;
 
         final String defaultFontName = PREFS.get(FONT_NAME_KEY, DEFAULT_FONT_NAME);
         final int defaultFontStyle = PREFS.getInt(FONT_SIZE_KEY, DEFAULT_FONT_STYLE);
@@ -150,6 +151,7 @@ public class ScaleAxisPainterController extends AbstractController {
                 lineWeightSpinner.setEnabled(isSelected1);
 
                 scaleAxisPainter.setVisible(isSelected1);
+                scaleGridPainter.setVisible(isSelected1);
             }
         });
 
@@ -243,4 +245,5 @@ public class ScaleAxisPainterController extends AbstractController {
     }
 
     private final ScaleAxisPainter scaleAxisPainter;
+    private final ScaleGridPainter scaleGridPainter;
 }

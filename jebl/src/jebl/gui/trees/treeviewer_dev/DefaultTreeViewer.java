@@ -388,6 +388,10 @@ public class DefaultTreeViewer extends TreeViewer {
 	    treePane.removeScalePainter(scalePainter);
 	}
 
+    public void setScaleGridPainter(ScaleGridPainter scaleGridPainter) {
+        treePane.setScaleGridPainter(scaleGridPainter);
+    }
+
     public void setBranchDecorator(Decorator branchDecorator) {
         treePane.setBranchDecorator(branchDecorator);
     }
@@ -438,6 +442,22 @@ public class DefaultTreeViewer extends TreeViewer {
 
     public void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering) {
         treePane.setBranchOrdering(branchOrdering);
+    }
+
+    public boolean isRootingOn() {
+        return treePane.isRootingOn();
+    }
+
+    public ReRootedTree.RootingType getRootingType() {
+        return treePane.getRootingType();
+    }
+
+    public void setRootingOn(boolean rootingOn) {
+        treePane.setRootingOn(rootingOn);
+    }
+
+    public void setRootingType(ReRootedTree.RootingType rootingType) {
+        treePane.setRootingType(rootingType);
     }
 
     public JComponent getContentPane() {

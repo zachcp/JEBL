@@ -85,6 +85,8 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
 	public abstract void removeScalePainter(ScalePainter scalePainter);
 
+    public abstract void setScaleGridPainter(ScaleGridPainter scaleGridPainter);
+
     public abstract void setBranchDecorator(Decorator branchDecorator);
 
     public abstract void setBranchColouringDecorator(String branchColouringAttribute, Decorator branchColouringDecorator);
@@ -112,6 +114,14 @@ public abstract class TreeViewer extends JPanel implements Printable {
     public abstract void setOrderBranchesOn(boolean orderBranchesOn);
 
     public abstract void setBranchOrdering(SortedRootedTree.BranchOrdering branchOrdering);
+
+    public abstract boolean isRootingOn();
+
+    public abstract ReRootedTree.RootingType getRootingType();
+
+    public abstract void setRootingOn(boolean rootingOn);
+
+    public abstract void setRootingType(ReRootedTree.RootingType rootingType);
 
 
     public abstract JComponent getContentPane();

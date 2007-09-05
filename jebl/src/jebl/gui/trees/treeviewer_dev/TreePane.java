@@ -54,6 +54,10 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			tree = new SortedRootedTree(tree, branchOrdering);
 		}
 
+        if (rootingOn) {
+            tree = new ReRootedTree(tree, rootingType);
+        }
+
 		if (transformBranchesOn || !this.tree.hasLengths()) {
 			tree = new TransformedRootedTree(tree, branchTransform);
 		}
@@ -268,6 +272,24 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		this.branchOrdering = branchOrdering;
 		setupTree();
 	}
+
+    public boolean isRootingOn() {
+        return rootingOn;
+    }
+
+    public ReRootedTree.RootingType getRootingType() {
+        return rootingType;
+    }
+
+    public void setRootingOn(boolean rootingOn) {
+        this.rootingOn = rootingOn;
+        setupTree();
+    }
+
+    public void setRootingType(ReRootedTree.RootingType rootingType) {
+        this.rootingType = rootingType;
+        setupTree();
+    }
 
 	public RootedTree getOriginalTree() {
 		return originalTree;
@@ -579,6 +601,19 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		repaint();
 	}
 
+    public void setScaleGridPainter(ScaleGridPainter scaleGridPainter) {
+        scaleGridPainter.setTreePane(this);
+        if (this.scaleGridPainter != null) {
+            this.scaleGridPainter.removePainterListener(this);
+        }
+        this.scaleGridPainter = scaleGridPainter;
+        if (this.scaleGridPainter != null) {
+            this.scaleGridPainter.addPainterListener(this);
+        }
+        calibrated = false;
+        repaint();
+    }
+
 	public void setPreferredSize(Dimension dimension) {
 		if (treeLayout.maintainAspectRatio()) {
 			super.setPreferredSize(new Dimension(dimension.width, dimension.height));
@@ -609,7 +644,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 			}
 		}
 
-		for (Node node : tree.getNodes()) {
+        if (transform == null) return null;
+        
+        for (Node node : tree.getNodes()) {
 			Shape branchPath = transform.createTransformedShape(treeLayoutCache.getBranchPath(node));
 			if (branchPath != null && g2.hit(rect, branchPath, true)) {
 				return node;
@@ -792,11 +829,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				scalePainter.paint(g2, this, Painter.Justification.CENTER, scaleBounds);
 			}
 		}
-		if (gridPainter != null && gridPainter.isVisible()) {
+
+        if (scaleGridPainter != null && scaleGridPainter.isVisible()) {
 			Rectangle2D gridBounds = new Rectangle2D.Double(
-					treeBounds.getX(), treeBounds.getY(),
-					treeBounds.getWidth(), treeBounds.getHeight());
-			gridPainter.paint(g2, this, gridBounds);
+					treeBounds.getX(), 0.0,
+					treeBounds.getWidth(), totalScaleBounds.getY());
+			scaleGridPainter.paint(g2, this, null, gridBounds);
 		}
 
 		g2.setStroke(branchLineStroke);
@@ -1310,7 +1348,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 		}
 
 
-		totalScaleBounds = new Rectangle2D.Double(0.0, 0.0, 0.0, 0.0);
 		y = height;
 		for (ScalePainter scalePainter : scalePainters) {
 			if (scalePainter.isVisible()) {
@@ -1318,6 +1355,8 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 				y -= scalePainter.getPreferredHeight();
 			}
 		}
+
+        totalScaleBounds = new Rectangle2D.Double(treeBounds.getX(), y, treeBounds.getWidth(), 0.0);
 		for (ScalePainter scalePainter : scalePainters) {
 			if (scalePainter.isVisible()) {
 				scalePainter.calibrate(g2, this);
@@ -1399,6 +1438,9 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private boolean transformBranchesOn = false;
 	private TransformedRootedTree.Transform branchTransform = TransformedRootedTree.Transform.CLADOGRAM;
 
+    private boolean rootingOn = false;
+    private ReRootedTree.RootingType rootingType = ReRootedTree.RootingType.MID_POINT;
+
 	private Rectangle2D treeBounds = new Rectangle2D.Double();
 	private double treeScale;
 
@@ -1434,7 +1476,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private Rectangle2D totalScaleBounds = null;
 	private Map<ScalePainter, Rectangle2D> scaleBounds = new HashMap<ScalePainter, Rectangle2D>();
 
-	private boolean showingGridLines = false;
+	private ScaleGridPainter scaleGridPainter = null;
 
 	private BasicStroke branchLineStroke = new BasicStroke(1.0F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 	private BasicStroke calloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);

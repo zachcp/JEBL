@@ -450,6 +450,13 @@ public class MultiPaneTreeViewer extends TreeViewer {
 		fireTreeSettingsChanged();
 	}
 
+    public void setScaleGridPainter(ScaleGridPainter scaleGridPainter) {
+        for (TreePane treePane : treePanes) {
+            treePane.setScaleGridPainter(scaleGridPainter);
+        }
+        fireTreeSettingsChanged();
+    }
+
 	public void setBranchDecorator(Decorator branchDecorator) {
 		for (TreePane treePane : treePanes) {
 			treePane.setBranchDecorator(branchDecorator);
@@ -525,6 +532,28 @@ public class MultiPaneTreeViewer extends TreeViewer {
 		}
 		fireTreeSettingsChanged();
 	}
+
+    public boolean isRootingOn() {
+        return treePanes.get(0).isOrderBranchesOn();
+    }
+
+    public ReRootedTree.RootingType getRootingType() {
+        return treePanes.get(0).getRootingType();
+    }
+
+    public void setRootingOn(boolean rootingOn) {
+        for (TreePane treePane : treePanes) {
+            treePane.setRootingOn(rootingOn);
+        }
+        fireTreeSettingsChanged();
+    }
+
+    public void setRootingType(ReRootedTree.RootingType rootingType) {
+        for (TreePane treePane : treePanes) {
+            treePane.setRootingType(rootingType);
+        }
+        fireTreeSettingsChanged();
+    }
 
 	public JComponent getContentPane() {
 		return treePanePanel;

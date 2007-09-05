@@ -1,5 +1,6 @@
 package jebl.gui.trees.treeviewer_dev;
 
+import jebl.evolution.trees.ReRootedTree;
 import jebl.evolution.trees.SortedRootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import org.virion.jam.controlpalettes.AbstractController;
@@ -29,6 +30,9 @@ public class TreesController extends AbstractController {
     private static final String TRANSFORM_TYPE_KEY = "transformType";
     private static final String ORDER_KEY = "order";
     private static final String ORDER_TYPE_KEY = "orderType";
+    private static final String ROOTING_KEY = "rooting";
+    private static final String ROOTING_TYPE_KEY = "rootingType";
+
 
 
     public TreesController(final TreeViewer treeViewer) {
@@ -36,41 +40,42 @@ public class TreesController extends AbstractController {
 
         titleLabel = new JLabel(CONTROLLER_TITLE);
 
-	    optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
+	    optionsPanel = new OptionsPanel(2, 6, "SmallSystemFont");
 
-        transformCheck = new JCheckBox("Transform branches");
-        transformCheck.setOpaque(false);
-        optionsPanel.addComponent(transformCheck);
+        rootingCheck = new JCheckBox("Root tree");
+        rootingCheck.setOpaque(false);
+        optionsPanel.addSpanningComponent(rootingCheck);
 
-        transformCheck.setSelected(treeViewer.isTransformBranchesOn());
+        rootingCheck.setSelected(treeViewer.isRootingOn());
 
-        transformCombo = new JComboBox(TransformedRootedTree.Transform.values());
-        transformCombo.setOpaque(false);
-        transformCombo.setSelectedItem(treeViewer.getBranchTransform());
-        transformCombo.addItemListener(new ItemListener() {
+        rootingCombo = new JComboBox(ReRootedTree.RootingType.values());
+        rootingCombo.setOpaque(false);
+        rootingCombo.setSelectedItem(treeViewer.getRootingType());
+        rootingCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                treeViewer.setBranchTransform(
-                        (TransformedRootedTree.Transform) transformCombo.getSelectedItem());
-
+                treeViewer.setRootingType(
+                        (ReRootedTree.RootingType) rootingCombo.getSelectedItem());
             }
         });
-        final JLabel label1 = optionsPanel.addComponentWithLabel("Transform:", transformCombo);
-        label1.setEnabled(transformCheck.isSelected());
-        transformCombo.setEnabled(transformCheck.isSelected());
 
-        transformCheck.addChangeListener(new ChangeListener() {
+        final JLabel label1 = optionsPanel.addComponentWithLabel("Rooting:", rootingCombo);
+        label1.setEnabled(rootingCheck.isSelected());
+        rootingCombo.setEnabled(rootingCheck.isSelected());
+
+        rootingCheck.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
-                final boolean selected = transformCheck.isSelected();
-                label1.setEnabled(selected);
-                transformCombo.setEnabled(selected);
+                label1.setEnabled(rootingCheck.isSelected());
+                rootingCombo.setEnabled(rootingCheck.isSelected());
 
-                treeViewer.setTransformBranchesOn(selected);
+                treeViewer.setRootingOn(rootingCheck.isSelected());
             }
         });
 
-        orderCheck = new JCheckBox("Order branches");
+        optionsPanel.addSeparator();
+
+        orderCheck = new JCheckBox("Order nodes");
         orderCheck.setOpaque(false);
-        optionsPanel.addComponent(orderCheck);
+        optionsPanel.addSpanningComponent(orderCheck);
 
         orderCheck.setSelected(treeViewer.isOrderBranchesOn());
 
@@ -94,6 +99,38 @@ public class TreesController extends AbstractController {
                 orderCombo.setEnabled(orderCheck.isSelected());
 
                 treeViewer.setOrderBranchesOn(orderCheck.isSelected());
+            }
+        });
+
+        optionsPanel.addSeparator();
+
+        transformCheck = new JCheckBox("Transform branches");
+        transformCheck.setOpaque(false);
+        optionsPanel.addSpanningComponent(transformCheck);
+
+        transformCheck.setSelected(treeViewer.isTransformBranchesOn());
+
+        transformCombo = new JComboBox(TransformedRootedTree.Transform.values());
+        transformCombo.setOpaque(false);
+        transformCombo.setSelectedItem(treeViewer.getBranchTransform());
+        transformCombo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                treeViewer.setBranchTransform(
+                        (TransformedRootedTree.Transform) transformCombo.getSelectedItem());
+
+            }
+        });
+        final JLabel label3 = optionsPanel.addComponentWithLabel("Transform:", transformCombo);
+         label3.setEnabled(transformCheck.isSelected());
+        transformCombo.setEnabled(transformCheck.isSelected());
+
+        transformCheck.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                final boolean selected = transformCheck.isSelected();
+                 label3.setEnabled(selected);
+                transformCombo.setEnabled(selected);
+
+                treeViewer.setTransformBranchesOn(selected);
             }
         });
 
@@ -134,6 +171,14 @@ public class TreesController extends AbstractController {
                 orderCombo.setSelectedItem(order);
             }
         }
+
+        rootingCheck.setSelected((Boolean) settings.get(CONTROLLER_KEY + "." + ROOTING_KEY));
+        String rootingName = (String)settings.get(CONTROLLER_KEY + "." + ROOTING_TYPE_KEY);
+        for (ReRootedTree.RootingType rooting : ReRootedTree.RootingType.values()) {
+            if (rooting.toString().equalsIgnoreCase(rootingName)) {
+                rootingCombo.setSelectedItem(rooting);
+            }
+        }
     }
 
     public void getSettings(Map<String, Object> settings) {
@@ -141,6 +186,8 @@ public class TreesController extends AbstractController {
         settings.put(CONTROLLER_KEY + "." + TRANSFORM_TYPE_KEY, transformCombo.getSelectedItem().toString());
         settings.put(CONTROLLER_KEY + "." + ORDER_KEY, orderCheck.isSelected());
         settings.put(CONTROLLER_KEY + "." + ORDER_TYPE_KEY, orderCombo.getSelectedItem().toString());
+        settings.put(CONTROLLER_KEY + "." + ROOTING_KEY, rootingCheck.isSelected());
+        settings.put(CONTROLLER_KEY + "." + ROOTING_TYPE_KEY, rootingCombo.getSelectedItem().toString());
     }
 
 
@@ -152,6 +199,9 @@ public class TreesController extends AbstractController {
 
     private final JCheckBox orderCheck;
     private final JComboBox orderCombo;
+
+    private final JCheckBox rootingCheck;
+    private final JComboBox rootingCombo;
 
     private final TreeViewer treeViewer;
 }
