@@ -436,9 +436,16 @@ public class MultiPaneTreeViewer extends TreeViewer {
 		fireTreeSettingsChanged();
 	}
 
-	public void setScalePainter(ScalePainter scalePainter) {
+	public void addScalePainter(ScalePainter scalePainter) {
 		for (TreePane treePane : treePanes) {
-			treePane.setScalePainter(scalePainter);
+			treePane.addScalePainter(scalePainter);
+		}
+		fireTreeSettingsChanged();
+	}
+
+	public void removeScalePainter(ScalePainter scalePainter) {
+		for (TreePane treePane : treePanes) {
+			treePane.removeScalePainter(scalePainter);
 		}
 		fireTreeSettingsChanged();
 	}

@@ -15,7 +15,6 @@ import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer_dev.decorators.Decorator;
 import jebl.gui.trees.treeviewer_dev.painters.*;
 import jebl.gui.trees.treeviewer_dev.treelayouts.TreeLayout;
-import jebl.util.Attributable;
 import org.virion.jam.panels.StatusProvider;
 
 import javax.swing.*;
@@ -381,9 +380,13 @@ public class DefaultTreeViewer extends TreeViewer {
         branchLabelPainter.setupAttributes(trees);
     }
 
-    public void setScalePainter(ScalePainter scalePainter) {
-        treePane.setScalePainter(scalePainter);
+    public void addScalePainter(ScalePainter scalePainter) {
+        treePane.addScalePainter(scalePainter);
     }
+
+	public void removeScalePainter(ScalePainter scalePainter) {
+	    treePane.removeScalePainter(scalePainter);
+	}
 
     public void setBranchDecorator(Decorator branchDecorator) {
         treePane.setBranchDecorator(branchDecorator);

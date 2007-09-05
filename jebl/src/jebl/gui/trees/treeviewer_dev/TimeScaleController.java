@@ -136,7 +136,7 @@ public class TimeScaleController extends AbstractController {
 	}
 
 	public boolean isInitiallyVisible() {
-		return true;
+		return false;
 	}
 
 	public void initialize() {

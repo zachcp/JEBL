@@ -81,7 +81,9 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
     public abstract void setBranchLabelPainter(LabelPainter<Node> branchLabelPainter);
 
-    public abstract void setScalePainter(ScalePainter scalePainter);
+    public abstract void addScalePainter(ScalePainter scalePainter);
+
+	public abstract void removeScalePainter(ScalePainter scalePainter);
 
     public abstract void setBranchDecorator(Decorator branchDecorator);
 
