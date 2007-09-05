@@ -65,7 +65,7 @@ public class TreesController extends AbstractController {
         rootingCheck.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 label1.setEnabled(rootingCheck.isSelected());
-                rootingCombo.setEnabled(rootingCheck.isSelected());
+                //rootingCombo.setEnabled(rootingCheck.isSelected());
 
                 treeViewer.setRootingOn(rootingCheck.isSelected());
             }

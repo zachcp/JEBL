@@ -50,12 +50,12 @@ public class TreePane extends JComponent implements PainterListener, Printable {
 	private void setupTree() {
 		tree = originalTree;
 
-		if (orderBranchesOn) {
-			tree = new SortedRootedTree(tree, branchOrdering);
-		}
-
         if (rootingOn) {
-            tree = new ReRootedTree(tree, rootingType);
+            tree = Utils.rootTreeAtCenter(tree);
+        }
+
+        if (orderBranchesOn) {
+            tree = new SortedRootedTree(tree, branchOrdering);
         }
 
 		if (transformBranchesOn || !this.tree.hasLengths()) {
