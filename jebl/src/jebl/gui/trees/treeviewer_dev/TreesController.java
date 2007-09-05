@@ -1,6 +1,5 @@
 package jebl.gui.trees.treeviewer_dev;
 
-import jebl.evolution.trees.ReRootedTree;
 import jebl.evolution.trees.SortedRootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import org.virion.jam.controlpalettes.AbstractController;
@@ -48,13 +47,13 @@ public class TreesController extends AbstractController {
 
         rootingCheck.setSelected(treeViewer.isRootingOn());
 
-        rootingCombo = new JComboBox(ReRootedTree.RootingType.values());
+        rootingCombo = new JComboBox(TreePane.RootingType.values());
         rootingCombo.setOpaque(false);
         rootingCombo.setSelectedItem(treeViewer.getRootingType());
         rootingCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
                 treeViewer.setRootingType(
-                        (ReRootedTree.RootingType) rootingCombo.getSelectedItem());
+                        (TreePane.RootingType) rootingCombo.getSelectedItem());
             }
         });
 
@@ -65,7 +64,7 @@ public class TreesController extends AbstractController {
         rootingCheck.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 label1.setEnabled(rootingCheck.isSelected());
-                //rootingCombo.setEnabled(rootingCheck.isSelected());
+                rootingCombo.setEnabled(rootingCheck.isSelected());
 
                 treeViewer.setRootingOn(rootingCheck.isSelected());
             }
@@ -149,6 +148,8 @@ public class TreesController extends AbstractController {
     }
 
     public void initialize() {
+        treeViewer.setRootingOn(rootingCheck.isSelected());
+        treeViewer.setRootingType((TreePane.RootingType) rootingCombo.getSelectedItem());
         treeViewer.setTransformBranchesOn(transformCheck.isSelected());
         treeViewer.setBranchTransform((TransformedRootedTree.Transform) transformCombo.getSelectedItem());
         treeViewer.setOrderBranchesOn(orderCheck.isSelected());
@@ -174,7 +175,7 @@ public class TreesController extends AbstractController {
 
         rootingCheck.setSelected((Boolean) settings.get(CONTROLLER_KEY + "." + ROOTING_KEY));
         String rootingName = (String)settings.get(CONTROLLER_KEY + "." + ROOTING_TYPE_KEY);
-        for (ReRootedTree.RootingType rooting : ReRootedTree.RootingType.values()) {
+        for (TreePane.RootingType rooting : TreePane.RootingType.values()) {
             if (rooting.toString().equalsIgnoreCase(rootingName)) {
                 rootingCombo.setSelectedItem(rooting);
             }

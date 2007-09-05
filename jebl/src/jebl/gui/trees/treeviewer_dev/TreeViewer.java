@@ -117,11 +117,11 @@ public abstract class TreeViewer extends JPanel implements Printable {
 
     public abstract boolean isRootingOn();
 
-    public abstract ReRootedTree.RootingType getRootingType();
+    public abstract TreePane.RootingType getRootingType();
 
     public abstract void setRootingOn(boolean rootingOn);
 
-    public abstract void setRootingType(ReRootedTree.RootingType rootingType);
+    public abstract void setRootingType(TreePane.RootingType rootingType);
 
 
     public abstract JComponent getContentPane();

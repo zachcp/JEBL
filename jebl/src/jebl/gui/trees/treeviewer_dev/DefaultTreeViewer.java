@@ -448,7 +448,7 @@ public class DefaultTreeViewer extends TreeViewer {
         return treePane.isRootingOn();
     }
 
-    public ReRootedTree.RootingType getRootingType() {
+    public TreePane.RootingType getRootingType() {
         return treePane.getRootingType();
     }
 
@@ -456,8 +456,12 @@ public class DefaultTreeViewer extends TreeViewer {
         treePane.setRootingOn(rootingOn);
     }
 
-    public void setRootingType(ReRootedTree.RootingType rootingType) {
+    public void setRootingType(TreePane.RootingType rootingType) {
         treePane.setRootingType(rootingType);
+    }
+
+    public void rerootTree(boolean selected) {
+        treePaneSelector.setRootingMode(selected);    
     }
 
     public JComponent getContentPane() {

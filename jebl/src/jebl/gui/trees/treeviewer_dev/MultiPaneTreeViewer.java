@@ -537,7 +537,7 @@ public class MultiPaneTreeViewer extends TreeViewer {
         return treePanes.get(0).isOrderBranchesOn();
     }
 
-    public ReRootedTree.RootingType getRootingType() {
+    public TreePane.RootingType getRootingType() {
         return treePanes.get(0).getRootingType();
     }
 
@@ -548,7 +548,7 @@ public class MultiPaneTreeViewer extends TreeViewer {
         fireTreeSettingsChanged();
     }
 
-    public void setRootingType(ReRootedTree.RootingType rootingType) {
+    public void setRootingType(TreePane.RootingType rootingType) {
         for (TreePane treePane : treePanes) {
             treePane.setRootingType(rootingType);
         }
