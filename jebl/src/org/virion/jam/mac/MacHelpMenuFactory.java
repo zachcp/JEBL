@@ -40,7 +40,8 @@ public class MacHelpMenuFactory implements MenuFactory {
 		}
 
 		if (application.getWebsiteAction() != null) {
-			item = new JMenuItem("Website");
+            item = new JMenuItem(application.getWebsiteAction());
+            menu.add(item);
 		}
 	}
 

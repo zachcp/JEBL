@@ -65,11 +65,11 @@ public abstract class Application {
     }
 
     public Application(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon) {
-    	this(menuBarFactory, nameString, aboutString, icon, null, null);
+        this(menuBarFactory, nameString, aboutString, icon, null, null);
     }
 
     public Application(MenuBarFactory menuBarFactory, String nameString, String aboutString, Icon icon,
-    					String websiteURLString, String helpURLString) {
+                       String websiteURLString, String helpURLString) {
 
         Application.menuBarFactory = menuBarFactory;
         Application.nameString = nameString;
@@ -84,6 +84,16 @@ public abstract class Application {
             }
         };
 
+        if (websiteURLString != null) {
+            websiteAction = new AbstractAction(Application.nameString + " website...") {
+                public void actionPerformed(ActionEvent ae) {
+                    doWebsite();
+                }
+            };
+        } else {
+            websiteAction = null;
+        }
+
         if (application != null) {
             throw new RuntimeException("Only on instance of Application is allowed");
         }
@@ -92,21 +102,21 @@ public abstract class Application {
         preferencesDialog = new PreferencesDialog(getDefaultFrame());
     }
 
-	public abstract void initialize();
+    public abstract void initialize();
 
-	public void addMenuFactory(MenuFactory menuFactory) {
-		getMenuBarFactory().registerMenuFactory(menuFactory);
-	}
+    public void addMenuFactory(MenuFactory menuFactory) {
+        getMenuBarFactory().registerMenuFactory(menuFactory);
+    }
 
-	private final static int MAX_RECENT_FILES = 20;
+    private final static int MAX_RECENT_FILES = 20;
 
     public JMenu getRecentFileMenu() {
         if (recentFileMenu == null) {
             recentFileMenu = new JMenu("Recent Files");
 
-	        // LOAD from preferences here?
+            // LOAD from preferences here?
         }
-	    recentFileMenu.setEnabled(getOpenAction().isEnabled());
+        recentFileMenu.setEnabled(getOpenAction().isEnabled());
         return recentFileMenu;
     }
 
@@ -116,24 +126,24 @@ public abstract class Application {
             if (recentFileMenu.getItemCount() == MAX_RECENT_FILES) {
                 recentFileMenu.remove(MAX_RECENT_FILES - 1);
             }
-	        recentFileMenu.insert(new RecentFileAction(file), 0);
+            recentFileMenu.insert(new RecentFileAction(file), 0);
 
-	        // WRITE to preferences here
+            // WRITE to preferences here
         }
     }
 
-	private class RecentFileAction extends AbstractAction {
-		public RecentFileAction(File recentFile) {
-			super(recentFile.getName());
-			this.recentFile = recentFile;
-		}
+    private class RecentFileAction extends AbstractAction {
+        public RecentFileAction(File recentFile) {
+            super(recentFile.getName());
+            this.recentFile = recentFile;
+        }
 
-		public void actionPerformed(ActionEvent actionEvent) {
-			doOpenFile(recentFile);
-		}
+        public void actionPerformed(ActionEvent actionEvent) {
+            doOpenFile(recentFile);
+        }
 
-		private final File recentFile;
-	}
+        private final File recentFile;
+    }
 
     protected abstract JFrame getDefaultFrame();
 
@@ -144,29 +154,29 @@ public abstract class Application {
     }
 
     public void doHelp() {
-    	if (helpURLString != null) {
-    		displayURL(helpURLString);
-    	} else {
-	        try {
-	            InputStream in = getClass().getResourceAsStream("/help/application.help");
-	            if (in == null) return;
-	            Reader reader = new InputStreamReader(in);
-	            StringWriter writer = new StringWriter();
-	            int c;
-	            while ((c = reader.read()) != -1) writer.write(c);
-	            reader.close();
-	            writer.close();
-	            JFrame frame = new HTMLViewer(getNameString() + " Help", writer.toString());
-	            frame.setVisible(true);
-	        } catch (IOException ignore) {
-	        }
-		}
+        if (helpURLString != null) {
+            displayURL(helpURLString);
+        } else {
+            try {
+                InputStream in = getClass().getResourceAsStream("/help/application.help");
+                if (in == null) return;
+                Reader reader = new InputStreamReader(in);
+                StringWriter writer = new StringWriter();
+                int c;
+                while ((c = reader.read()) != -1) writer.write(c);
+                reader.close();
+                writer.close();
+                JFrame frame = new HTMLViewer(getNameString() + " Help", writer.toString());
+                frame.setVisible(true);
+            } catch (IOException ignore) {
+            }
+        }
     }
 
     public void doWebsite() {
-    	if (websiteURLString != null) {
-    		displayURL(websiteURLString);
-    	}
+        if (websiteURLString != null) {
+            displayURL(websiteURLString);
+        }
     }
 
     public void displayURL(String urlString) {
@@ -201,7 +211,7 @@ public abstract class Application {
         return null;
     }
 
-	public DocumentFrame doOpen(String fileName) {
+    public DocumentFrame doOpen(String fileName) {
         if (fileName != null && fileName.length() > 0) {
             File file = new File(fileName);
             DocumentFrame doc = doOpenFile(file);
@@ -209,7 +219,7 @@ public abstract class Application {
             return doc;
         }
         return null;
-	}
+    }
 
     public abstract DocumentFrame doNew();
 
@@ -295,10 +305,5 @@ public abstract class Application {
         }
     };
 
-    protected AbstractAction websiteAction = new AbstractAction("Website...") {
-        public void actionPerformed(ActionEvent ae) {
-            doWebsite();
-        }
-    };
-
+    protected final AbstractAction websiteAction;
 }
