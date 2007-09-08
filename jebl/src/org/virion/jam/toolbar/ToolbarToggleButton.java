@@ -7,21 +7,22 @@ import javax.swing.*;
  *         Date: Oct 18, 2005
  *         Time: 10:09:21 PM
  */
-public class ToolbarButton extends JButton implements ToolbarItem {
+public class ToolbarToggleButton extends JToggleButton implements ToolbarItem {
 
-	public ToolbarButton(ToolbarAction action) {
+	public ToolbarToggleButton(ToolbarAction action) {
 		super(action);
 
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		setVerticalTextPosition(SwingConstants.BOTTOM);
-		putClientProperty("Quaqua.Button.style", "toolBarRollover");
+		putClientProperty("Quaqua.Button.style", "toolBarTab");
 		putClientProperty("JButton.buttonType", "toolbar");
-		setBorderPainted(false);
+		setBorderPainted(true);
 
 	    setToolTipText(action.getToolTipText());
 
 		setDisabledIcon(action.getDisabledIcon());
 		setPressedIcon(action.getPressedIcon());
+		setSelectedIcon(action.getPressedIcon());
 	}
 
 	public void setToolbarOptions(ToolbarOptions options) {
