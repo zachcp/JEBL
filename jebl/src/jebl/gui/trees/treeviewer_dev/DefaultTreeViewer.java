@@ -42,6 +42,12 @@ public class DefaultTreeViewer extends TreeViewer {
         this.treePane = new TreePane();
         treePane.setAutoscrolls(true); //enable synthetic drag events
 
+	    treePane.addTreePaneListener(new TreePaneListener() {
+		    public void treePaneSettingsChanged() {
+			    fireTreeSettingsChanged();
+		    }
+	    });
+
         JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setMinimumSize(new Dimension(150, 150));
 
@@ -460,8 +466,8 @@ public class DefaultTreeViewer extends TreeViewer {
         treePane.setRootingType(rootingType);
     }
 
-    public void rerootTree(boolean selected) {
-        treePaneSelector.setRootingMode(selected);    
+    public void setToolMode(TreePaneSelector.ToolMode toolMode) {
+        treePaneSelector.setToolMode(toolMode);
     }
 
     public JComponent getContentPane() {

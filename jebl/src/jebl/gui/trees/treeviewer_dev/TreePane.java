@@ -150,10 +150,30 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         rootingNode = node;
         rootingLength = length;
 
+	    rootingOn = true;
+	    rootingType = RootingType.USER_ROOTING;
+
         setupTree();
 
         fireSettingsChanged();
     }
+
+	public void rotateNode(Node node) {
+		if (node != null) {
+			Boolean rotate = (Boolean)node.getAttribute("!rotate");
+			if (rotate != null) {
+				rotate = !rotate;
+			} else {
+				rotate = true;
+			}
+			node.setAttribute("!rotate", rotate);
+
+			calibrated = false;
+			invalidate();
+			repaint();
+		}
+
+	}
 
     public void setBranchDecorator(Decorator branchDecorator) {
         this.branchDecorator = branchDecorator;
@@ -773,6 +793,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             treePaneListener.treePaneSettingsChanged();
         }
     }
+
     public void paint(Graphics graphics) {
         if (tree == null) return;
 
@@ -970,7 +991,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         }
 
         // Paint node bars
-        if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
+        if (!isTransformBranchesOn() && nodeBarPainter != null && nodeBarPainter.isVisible()) {
             for (Node node : nodeBars.keySet() ) {
                 Shape nodeBar = nodeBars.get(node);
                 nodeBar = transform.createTransformedShape(nodeBar);
@@ -1086,7 +1107,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         }
 
         // bounds on nodeShapes
-        if (nodeBarPainter != null && nodeBarPainter.isVisible()) {
+        if (!isTransformBranchesOn() && nodeBarPainter != null && nodeBarPainter.isVisible()) {
             nodeBars.clear();
             // Iterate though the nodes
             for (Node node : tree.getInternalNodes()) {

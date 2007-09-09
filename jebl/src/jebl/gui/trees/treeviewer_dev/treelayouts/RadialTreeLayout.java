@@ -114,12 +114,22 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
             double a2 = angleStart;
 
-            i = 0;
-            for (Node child : children) {
+	        boolean rotate = false;
+	        if (node.getAttribute("!rotate") != null &&
+			        ((Boolean)node.getAttribute("!rotate"))) {
+		        rotate = true;
+	        }
+            for(i = 0; i < children.size(); ++i) {
+	            int index = i;
+	            if (rotate) {
+		            index = children.size() - i - 1;
+	            }
+
+	            Node child = children.get(index);
 
                 final double childLength = tree.getLength(child);
                 double a1 = a2;
-                a2 = a1 + (span * leafCounts[i] / sumLeafCount);
+                a2 = a1 + (span * leafCounts[index] / sumLeafCount);
 
                 Point2D childPoint = constructNode(tree, child, a1, a2,
 		                nodePoint.getX(), nodePoint.getY(), childLength, cache);
@@ -167,7 +177,6 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 	            }
 
                 cache.branchLabelPaths.put(child, (Line2D)branchLine.clone());
-                i++;
             }
 
             Point2D nodeLabelPoint = new Point2D.Double(xPosition + ((length + 1.0) * directionX),

@@ -179,14 +179,24 @@ public class PolarTreeLayout extends AbstractTreeLayout {
 
                 final double start = getAngle(yPos);
 
-                i = 0;
-                for (Node child : children) {
+		        boolean rotate = false;
+		        if (node.getAttribute("!rotate") != null &&
+				        ((Boolean)node.getAttribute("!rotate"))) {
+			        rotate = true;
+		        }
+
+		        for (i = 0; i < children.size(); i++) {
+			        int index = i;
+			        if (rotate) {
+				        index = children.size() - i - 1;
+			        }
+			        Node child = children.get(index);
 
                     GeneralPath branchPath = new GeneralPath();
-                    final Point2D transformedChildPoint = transform(childPoints[i]);
+                    final Point2D transformedChildPoint = transform(childPoints[index]);
 
                     final Point2D transformedShoulderPoint = transform(
-                            nodePoint.getX(), childPoints[i].getY());
+                            nodePoint.getX(), childPoints[index].getY());
 
                     Object[] colouring = null;
                     if (branchColouringAttribute != null) {
@@ -211,7 +221,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                             double height = ((Number)colouring[j+1]).doubleValue();
                             double p = (height - childHeight) / (nodeHeight - childHeight);
                             double x = x1 - ((x1 - x0) * p);
-                            final Point2D transformedPoint = transform(x, childPoints[i].getY());
+                            final Point2D transformedPoint = transform(x, childPoints[index].getY());
                             branchPath.lineTo(
                                     (float) transformedPoint.getX(),
                                     (float) transformedPoint.getY());
@@ -229,7 +239,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                                 (float) transformedShoulderPoint.getY());
                     }
 
-                    final double finish = getAngle(childPoints[i].getY());
+                    final double finish = getAngle(childPoints[index].getY());
 
                     Arc2D arc = new Arc2D.Double();
                     arc.setArcByCenter(0.0, 0.0, nodePoint.getX(), finish, start - finish, Arc2D.OPEN);
@@ -238,15 +248,13 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                     // add the branchPath to the map of branch paths
                     cache.branchPaths.put(child, branchPath);
 
-                    final double x3 = (nodePoint.getX() + childPoints[i].getX()) / 2;
+                    final double x3 = (nodePoint.getX() + childPoints[index].getX()) / 2;
 
                     Line2D branchLabelPath = new Line2D.Double(
-                            transform(x3 - 1.0, childPoints[i].getY()),
-                            transform(x3 + 1.0, childPoints[i].getY()));
+                            transform(x3 - 1.0, childPoints[index].getY()),
+                            transform(x3 + 1.0, childPoints[index].getY()));
 
                     cache.branchLabelPaths.put(child, branchLabelPath);
-
-                    i++;
                 }
 
                 Line2D nodeLabelPath = new Line2D.Double(

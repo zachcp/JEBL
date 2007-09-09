@@ -24,6 +24,12 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         SCROLL
     };
 
+	public enum ToolMode {
+	    SELECT,
+	    ROOTING,
+		ROTATING
+	};
+
 
     public TreePaneSelector(TreePane treePane) {
         this.treePane = treePane;
@@ -49,8 +55,8 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         this.dragMode = dragMode;
     }
 
-    public void setRootingMode(boolean rootingModeOn) {
-        this.rootingModeOn = rootingModeOn;
+    public void setToolMode(ToolMode toolMode) {
+        this.toolMode = toolMode;
         setupCursor();
     }
 
@@ -63,7 +69,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
     }
 
     private void setupCursor() {
-        if (rootingModeOn) {
+        if (toolMode != ToolMode.SELECT) {
             treePane.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.CROSSHAIR_CURSOR));
             treePane.setCrosshairShown(crossHairCursor);
         } else if (dragMode == DragMode.SELECT) {
@@ -82,12 +88,14 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
     }
 
     public void mouseClicked(MouseEvent mouseEvent) {
-        if (rootingModeOn) {
+        if (toolMode == ToolMode.ROOTING) {
             Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
             if (node != null) {
                 treePane.setRootLocation(node, 0.5);
-                setRootingMode(false);
             }
+        } else if (toolMode == ToolMode.ROTATING) {
+	        Node node = treePane.getNodeAt((Graphics2D) treePane.getGraphics(), mouseEvent.getPoint());
+			treePane.rotateNode(node);
         } else if (dragMode == DragMode.SELECT) {
             boolean isCrossHairShown = treePane.isCrosshairShown();
 
@@ -190,10 +198,10 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 
     public void mouseDragged(MouseEvent mouseEvent) {
 
-        if (rootingModeOn || dragPoint == null) {
+        if (toolMode != ToolMode.SELECT || dragPoint == null) {
             return;
         }
-        
+
         if (dragMode == DragMode.SCROLL) {
             // Calculate how far the mouse has been dragged from the point clicked in
             // mousePressed, above.
@@ -252,7 +260,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 
     private SelectionMode selectionMode = SelectionMode.NODE;
 
-    private boolean rootingModeOn = false;
+    private ToolMode toolMode = ToolMode.SELECT;
 
     private DragMode dragMode = DragMode.SELECT;
     private Point2D dragPoint = null;

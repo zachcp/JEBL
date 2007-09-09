@@ -6,5 +6,5 @@ package jebl.gui.trees.treeviewer_dev;
  */
 public interface TreePaneListener {
 
-	    void treePaneSettingsChanged();
+	void treePaneSettingsChanged();
 }

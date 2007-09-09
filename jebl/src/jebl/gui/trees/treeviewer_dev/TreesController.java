@@ -133,6 +133,25 @@ public class TreesController extends AbstractController {
             }
         });
 
+	    treeViewer.addTreeViewerListener(new TreeViewerListener() {
+
+		    public void treeChanged() {
+				// ignore this one
+ 		    }
+
+		    // the settings may have changed programmatically - update the controls to match
+		    public void treeSettingsChanged() {
+			    rootingCheck.setSelected(treeViewer.isRootingOn());
+			    rootingCombo.setSelectedItem(treeViewer.getRootingType());
+
+			    transformCheck.setSelected(treeViewer.isTransformBranchesOn());
+			    transformCombo.setSelectedItem(treeViewer.getBranchTransform());
+
+			    orderCheck.setSelected(treeViewer.isOrderBranchesOn());
+			    orderCombo.setSelectedItem(treeViewer.getBranchOrdering());
+		    }
+	    });
+
     }
 
     public JComponent getTitleComponent() {

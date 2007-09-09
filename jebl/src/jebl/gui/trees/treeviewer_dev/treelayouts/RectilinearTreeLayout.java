@@ -153,8 +153,19 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 				double yPos = 0.0;
 
 				List<Node> children = tree.getChildren(node);
-				for (Node child : children) {
 
+				boolean rotate = false;
+				if (node.getAttribute("!rotate") != null &&
+						((Boolean)node.getAttribute("!rotate"))) {
+					rotate = true;
+				}
+
+				for (int i = 0; i < children.size(); i++) {
+					int index = i;
+					if (rotate) {
+						index = children.size() - i - 1;
+					}
+					Node child = children.get(index);
 					double length = tree.getLength(child);
 					Point2D childPoint = constructNode(tree, child, xPosition + length, cache);
 					yPos += childPoint.getY();
