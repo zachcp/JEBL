@@ -905,8 +905,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             scaleGridPainter.paint(g2, this, null, gridBounds);
         }
 
-        g2.setStroke(branchLineStroke);
-
         if (DEBUG_OUTLINE) {
             g2.setPaint(Color.red);
             g2.draw(treeBounds);
@@ -919,10 +917,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             Shape transShape = transform.createTransformedShape(collapsedShape);
             Paint paint = Color.BLACK;
             Paint fillPaint = null;
+	        Stroke stroke = branchLineStroke;
+
             if (branchDecorator != null) {
                 branchDecorator.setItem(node);
                 paint = branchDecorator.getPaint(paint);
                 fillPaint = branchDecorator.getFillPaint(fillPaint);
+	            stroke = branchDecorator.getStroke(stroke);
             }
 
             if (fillPaint != null) {
@@ -931,11 +932,18 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             }
 
             g2.setPaint(paint);
+	        g2.setStroke(stroke);
             g2.draw(transShape);
         }
 
         // Paint branches
         for (Node node : treeLayoutCache.getBranchPathMap().keySet() ) {
+	        Stroke stroke = branchLineStroke;
+            if (branchDecorator != null) {
+                branchDecorator.setItem(node);
+	            stroke = branchDecorator.getStroke(stroke);
+            }
+	        g2.setStroke(stroke);
 
             Object[] branchColouring = null;
             if (treeLayout.isShowingColouring() && branchColouringAttribute != null) {

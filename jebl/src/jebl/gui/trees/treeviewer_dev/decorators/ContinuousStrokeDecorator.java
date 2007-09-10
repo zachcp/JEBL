@@ -13,30 +13,29 @@ import java.awt.*;
  * @author Andrew Rambaut
  * @version $Id$
  */
-public class ContinuousColorDecorator implements Decorator {
+public class ContinuousStrokeDecorator implements Decorator {
 
-	public ContinuousColorDecorator(ContinousScale continuousScale,
-	                                Color color1, Color color2) throws NumberFormatException {
+	public ContinuousStrokeDecorator(ContinousScale continuousScale,
+	                                float minWidth, float maxWidth) throws NumberFormatException {
 		this.continuousScale = continuousScale;
-		this.color1 = new float[4];
-		color1.getRGBComponents(this.color1);
-		this.color2 = new float[4];
-		color2.getRGBComponents(this.color2);
+		this.minWidth = minWidth;
+		this.maxWidth = maxWidth;
 	}
 
 	// Decorator INTERFACE
 	public Paint getPaint(Paint paint) {
-		if (this.paint == null) return paint;
-		return this.paint;
+		return paint;
 	}
 
 	public Paint getFillPaint(Paint paint) {
-		if (this.fillPaint == null) return paint;
-		return fillPaint;
+		return paint;
 	}
 
 	public Stroke getStroke(Stroke stroke) {
-		return stroke;
+		if (this.stroke == null) {
+			return stroke;
+		}
+		return this.stroke;
 	}
 
 	public Font getFont(Font font) {
@@ -51,30 +50,20 @@ public class ContinuousColorDecorator implements Decorator {
 
 	// Private methods
 	private void setAttributableItem(Attributable item) {
-		paint = null;
 
 		double value = continuousScale.getValue(item);
 
 		if (!Double.isNaN(value)) {
-			float p = (float)value;
-			float q = 1.0F - p;
-
-			paint = new Color(
-					color1[0] * p + color2[0] * q,
-					color1[1] * p + color2[1] * q,
-					color1[2] * p + color2[2] * q,
-					color1[3] * p + color2[3] * q);
-			fillPaint = new Color(paint.getRed(), paint.getGreen(), paint.getBlue(), paint.getAlpha() / 2);
+			stroke = new BasicStroke((float)((value * (maxWidth - minWidth)) + minWidth));
 		} else {
-			paint = fillPaint = null;
+			stroke = null;
 		}
 	}
 
 	private final ContinousScale continuousScale;
 
-	private final float[] color1;
-	private final float[] color2;
+	private final float minWidth;
+	private final float maxWidth;
 
-	private Color paint = null;
-	private Color fillPaint = null;
+	private Stroke stroke = null;
 }

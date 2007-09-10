@@ -110,8 +110,8 @@ public class Toolbar extends JToolBar {
         addItem(component);
     }
 
-    public void addSeperator() {
-        addItem(new Separator());
+    public void addSeparator() {
+        super.addSeparator();
     }
 
     public void addSpace() {
@@ -131,6 +131,7 @@ public class Toolbar extends JToolBar {
         c.gridx = GridBagConstraints.RELATIVE;
         c.gridy = 0;
         c.weightx = 1;
+
         add(new Separator(), c);
     }
 

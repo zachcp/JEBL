@@ -70,6 +70,7 @@ public class SearchPanel extends JPanel {
         findPanel.add(findButton);
 
         searchText = new JTextField(emptyLabel);
+//	    searchText.putClientProperty("Quaqua.TextField.style", "search");
         searchText.setForeground(Color.lightGray);
         searchText.setBorder(null);
 
