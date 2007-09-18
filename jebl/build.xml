@@ -37,7 +37,8 @@
 
         <!-- Utils.class was getting included in jebl.jar    -->
         <!-- twice and Pack200 was having issues.            -->
-        <delete file="${build}/org/virion/jam/mac/Utils.class"/>
+        <!-- Doesn't seem to be the case for me, the class is missing! RM-->
+        <!--<delete file="${build}/org/virion/jam/mac/Utils.class"/>-->
 
         <copy todir="${build}">
             <fileset dir="${src}" includes="org/**/*.png"/>
