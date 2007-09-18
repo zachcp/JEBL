@@ -29,21 +29,24 @@ import jebl.util.ProgressListener;
 
 public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
+    public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+        super(alignment.getTaxa(), new Initializer().getDistances(alignment, progress, useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable));
+    }
     public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress) {
-        super(alignment.getTaxa(), Initializer.getDistances(alignment, progress));
+        this(alignment,progress,false);
     }
 
-    static class Initializer extends ModelBasedDistanceMatrix {
+    static class Initializer extends ModelBasedDistanceMatrix implements PairwiseDistanceCalculator {
 
-        private static Alignment alignment;
+        private Alignment alignment;
 
         // used in correction formula
-        private static double constA1, constA2, constC;
+        private double constA1, constA2, constC;
 
         /**
          * Calculate a pairwise distance
          */
-        static private double calculatePairwiseDistance(int taxon1, int taxon2) {
+        public double calculatePairwiseDistance(int taxon1, int taxon2) {
 
             double sumTsAG = 0.0;
             double sumTsCT = 0.0;
@@ -130,8 +133,8 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
         }
 
 
-        static double[][] getDistances(Alignment alignment, ProgressListener progress) {
-            Initializer.alignment = alignment;
+        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+            this.alignment = alignment;
 
             // ASK Alexei
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
@@ -155,18 +158,8 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             assert(constA1 > 0.0 && constA2 > 0.0 && constC > 0.0);
 
             final int dimension = alignment.getTaxa().size();
-            double[][] distances = new double[dimension][dimension];
-
-            float tot = (dimension * (dimension - 1)) / 2;
-            int done = 0;
-            for(int i = 0; i < dimension; ++i) {
-                for(int j = i+1; j < dimension; ++j) {
-                    distances[i][j] = calculatePairwiseDistance(i, j);
-                    distances[j][i] = distances[i][j];
-                    if( progress != null ) progress.setProgress( ++done / tot);
-                }
-            }
-            return distances;
+            return BasicDistanceMatrix.buildDistancesMatrix(this, dimension, useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable, progress);
         }
+
     }
 }

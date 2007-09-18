@@ -165,7 +165,7 @@ public class BartonSternberg implements MultipleAligner {
             final AlignmentTreeBuilderFactory.Result unrootedGuideTree =
                     fastGuide ?
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
-                                    this, compoundProgress.getMinorProgress()) :
+                                    this, compoundProgress.getMinorProgress(),true) :
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     aligner, compoundProgress.getMinorProgress());
             if (compoundProgress.isCanceled()) return null;

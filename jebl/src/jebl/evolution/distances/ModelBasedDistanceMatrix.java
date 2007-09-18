@@ -16,14 +16,14 @@ import java.util.List;
 public class ModelBasedDistanceMatrix  {
     protected static final double MAX_DISTANCE = 1000.0;
 
-    protected  static double freqR, freqY;
+    protected double freqR, freqY;
 
     /**
      * @param sequences
      * @return array holding the count of each canonical state in the sequences.
      *         E.g. for nucleotide sequences, this array will have length 4.
      */
-    private static int[] countStates(List<Sequence> sequences) {
+    private int[] countStates(List<Sequence> sequences) {
         if (sequences.isEmpty()) {
             throw new IllegalArgumentException("No sequences passed in - unable to determine sequence type");
         }
@@ -51,7 +51,7 @@ public class ModelBasedDistanceMatrix  {
      * @param sequences
      * @return approximation of state counts, each guaranteed to be > 0.
      */
-    private static int[] countStatesSafe(List<Sequence> sequences) {
+    private int[] countStatesSafe(List<Sequence> sequences) {
         int[] counts = countStates(sequences);
         int numSequences = counts.length;
 
@@ -71,7 +71,7 @@ public class ModelBasedDistanceMatrix  {
         return counts;
     }
 
-    private static double[] getFrequenciesMaybeSafe(List<Sequence> sequences, boolean safe) {
+    private double[] getFrequenciesMaybeSafe(List<Sequence> sequences, boolean safe) {
         SequenceType sequenceType = sequences.get(0).getSequenceType();
         int[] counts = (safe ? countStatesSafe(sequences) : countStates(sequences));
         int canonicalStateCount = counts.length;
@@ -105,11 +105,11 @@ public class ModelBasedDistanceMatrix  {
      *         is guaranteed to be > 0 (and therefore it can
      *         only be an approximation).
      */
-    protected static double[] getFrequenciesSafe(List<Sequence> sequences) {
+    protected double[] getFrequenciesSafe(List<Sequence> sequences) {
         return getFrequenciesMaybeSafe(sequences, true);
      }
 
-    protected static double[] getFrequenciesSafe(Alignment alignment) {
+    protected double[] getFrequenciesSafe(Alignment alignment) {
         return getFrequenciesSafe(alignment.getSequenceList());
     }
 
@@ -120,11 +120,11 @@ public class ModelBasedDistanceMatrix  {
      * @param sequences A list of sequences of the same type
      * @return Relative canonical state frequencies in the sequences;
      */
-    protected static double[] getFrequencies(List<Sequence> sequences) {
+    protected double[] getFrequencies(List<Sequence> sequences) {
         return getFrequenciesMaybeSafe(sequences, false);
      }
 
-    protected static double[] getFrequencies(Alignment alignment) {
+    protected double[] getFrequencies(Alignment alignment) {
         return getFrequencies(alignment.getSequenceList());
     }
 }

@@ -76,23 +76,27 @@ import jebl.util.ProgressListener;
 
 public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
-    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) {
-        super(alignment.getTaxa(), Initializer.getDistances(alignment, progress));
+    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+        super(alignment.getTaxa(), new Initializer().getDistances(alignment, progress,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable));
     }
 
-    static class Initializer extends ModelBasedDistanceMatrix {
+    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) {
+        this(alignment,progress,false);
+    }
+
+    static class Initializer extends ModelBasedDistanceMatrix implements PairwiseDistanceCalculator  {
         //
         // Private stuff
         //
         private static Alignment alignment;
 
         //used in correction formula
-        static private double constA, constB, constC;
+        private double constA, constB, constC;
 
         /**
          * Calculate the distance between two of the sequences from the alignment.
          */
-        static private double calculatePairwiseDistance(int taxon1, int taxon2) {
+        public double calculatePairwiseDistance(int taxon1, int taxon2) {
             double sumTs = 0.0; // total weight of all columns that have a transition for these taxa
             double sumTv = 0.0; // total weight of all columns that have a transversion for these taxa
             double sumWeight = 0.0; // total weight of all columns (ignoring those with ambiguities, but
@@ -164,7 +168,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         }
 
 
-        static double[][] getDistances(Alignment alignment, ProgressListener progress) {
+        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
             Initializer.alignment = alignment;
 
             // ASK Alexei
@@ -187,23 +191,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             constC = (freqR * freqY);
 
             int dimension = alignment.getTaxa().size();
-            double[][] distances = new double[dimension][dimension];
-
-            // TT: Whys is this a float? It's always a whole number! If the purpose
-            // is to avoid integer division, we should rather cast to float or double
-            // in the division below
-            float tot = (dimension * (dimension - 1)) / 2;
-            int done = 0;
-
-            for(int i = 0; i < dimension; ++i) {
-                for(int j = i+1; j < dimension; ++j) {
-                    distances[i][j] = calculatePairwiseDistance(i, j);
-                    distances[j][i] = distances[i][j];
-                    if( progress != null ) progress.setProgress( ++done / tot);
-                }
-            }
-
-            return distances;
+            return BasicDistanceMatrix.buildDistancesMatrix(this,dimension,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable,progress);
         }
     }
 }

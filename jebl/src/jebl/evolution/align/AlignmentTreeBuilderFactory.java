@@ -70,25 +70,40 @@ public class AlignmentTreeBuilderFactory {
      * @param method the tree building method to use
      * @param model substitution model for distance matrix: JukesCantor, TamuraNei, HKY or F84.
      * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
+     * @param useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable If the alignment contains pairs of sequences that are not overlapping it is not possible to build
+     *          a tree from the alignment. If this parameter is false, then CannotBuildDistanceMatrixException will be thrown. If this parameter
+     *          is true, then twice the maximum distance between all other pairs will be used non-overlapping pairs.
      * @return A tree building result (containing a tree and a distance matrix)
+     * @throws CannotBuildDistanceMatrixException
      */
-    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener) {
+    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
         DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
             public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) {
                 switch( model ) {
                     case F84:
                         return new F84DistanceMatrix(alignment, progressListener);
                     case HKY:
-                        return new HKYDistanceMatrix(alignment, progressListener);
+                        return new HKYDistanceMatrix(alignment, progressListener,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable);
                     case TamuraNei:
-                        return new TamuraNeiDistanceMatrix(alignment, progressListener);
+                        return new TamuraNeiDistanceMatrix(alignment, progressListener,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable);
                     case JukesCantor:
                     default:
-                        return new JukesCantorDistanceMatrix(alignment, progressListener);
+                        return new JukesCantorDistanceMatrix(alignment, progressListener,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable);
                 }
             }
         };
         return build(matrixBuilder, method, progressListener);
+    }
+
+    /**
+     * @param alignment Alignment to calculate distance matrix from
+     * @param method the tree building method to use
+     * @param model substitution model for distance matrix: JukesCantor, TamuraNei, HKY or F84.
+     * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
+     * @return A tree building result (containing a tree and a distance matrix)
+     */
+    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener) {
+        return build(alignment,method,model,progressListener,false);
     }
 
     /**
@@ -110,7 +125,7 @@ public class AlignmentTreeBuilderFactory {
     }
 
     static public Result build(List<Sequence> seqs, TreeBuilderFactory.Method method, MultipleAligner aligner,
-                                /*boolean needDistances, */ProgressListener progress) {
+                                /*boolean needDistances, */ProgressListener progress, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
        // needDistances = false;
 
         SimpleRootedTree gtree = new SimpleRootedTree();
@@ -156,7 +171,7 @@ public class AlignmentTreeBuilderFactory {
 
         p.setSectionSize(treeWork);
         progress.setMessage("Building guide tree from alignment");
-        final Result result = build(alignment, method, distanceModel, minorProgress);
+        final Result result = build(alignment, method, distanceModel, minorProgress, useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable);
         //final Tree guideTree = result.tree;
         p.incrementSectionsCompleted(treeWork);
         return result;
