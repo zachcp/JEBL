@@ -86,6 +86,7 @@ public class OSXAdapter extends ApplicationAdapter {
         } else {
             throw new IllegalStateException("handleOpenFile: Application instance detached from listener");
         }
-        throw new RuntimeException("handleOpenFile: " + ae.getFilename());
+        System.out.println("handleOpenFile: " + ae.getFilename());
+//        throw new RuntimeException("handleOpenFile: " + ae.getFilename());
     }
 }
