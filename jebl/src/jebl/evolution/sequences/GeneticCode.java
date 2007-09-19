@@ -58,6 +58,10 @@ public final class GeneticCode {
         return GENETIC_CODES_LIST;
     }
 
+    public static GeneticCode[] getGeneticCodesArray() {
+        return GENETIC_CODES_LIST.toArray(new GeneticCode[0]);
+    }
+
     /**
      * Use of this field is deprecated because being an array it is mutable, i.e. an attacker could
      * potentially replace values in this array.
