@@ -117,10 +117,11 @@ public final class CompositeProgressListener extends ProgressListener {
      * Instead of calling {@link #beginNextSubtask()} once after each subtask
      * (except the last), you can instead call beginSubTask at the beginning
      * of every subtask including the first.
-     * @param message a message to be displayed to the user as part of the progress
+     * @param message a message to be displayed to the user as a prefix in the progress message
      */
     public void beginSubtask(String message) {
-        setMessage(message);
+        currentSubTaskMessage = message;
+        setMessage("");
         beginSubtask();
         currentSubTaskMessage = message;
     }
@@ -136,7 +137,7 @@ public final class CompositeProgressListener extends ProgressListener {
 
     protected void _setMessage(String message) {
         if (currentSubTaskMessage.length()>0) {
-            message=currentSubTaskMessage+": "+message;
+             message=currentSubTaskMessage+(message.length()>0?": "+message:"");
             // concatentate the parent message and the sub-task messages. Previous behaviour was
             // just to overwrite the parent sub-task message, but I think this is just wrong.
         }
@@ -184,8 +185,8 @@ public final class CompositeProgressListener extends ProgressListener {
      */
     public void beginNextSubtask(String message) {
         beginNextSubtask();
-        setMessage(message);
         currentSubTaskMessage=message;
+        setMessage("");
     }
 
     /**
