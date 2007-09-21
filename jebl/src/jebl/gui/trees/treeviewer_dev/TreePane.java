@@ -205,12 +205,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
      *	Transform a chart co-ordinates into a drawing co-ordinates
      */
     public double scaleOnAxis(double value) {
+        value = timeScale.getHeight(value, tree);
         if (axisReversed) {
-            return treeBounds.getX() + treeBounds.getWidth() -
-                    ((scaleAxis.transform(value) - scaleAxis.transform(scaleAxis.getMinAxis())) * treeScale);
+            return treeBounds.getX() + treeBounds.getWidth() - ((value - scaleAxis.getMinAxis()) * treeScale);
         } else {
-            return treeBounds.getX() +
-                    ((scaleAxis.transform(value) - scaleAxis.transform(scaleAxis.getMinAxis())) * treeScale);
+            return treeBounds.getX() +  ((value - scaleAxis.getMinAxis()) * treeScale);
         }
     }
 
@@ -246,7 +245,7 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         repaint();
     }
 
-    public void setAutomaticScale(boolean automaticScale) {
+    public void setAutomaticScale() {
         scaleAxis.setAutomatic();
         calibrated = false;
         repaint();

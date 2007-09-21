@@ -36,6 +36,15 @@ public class TimeScale {
 		return (length * getScaleFactor(tree));
 	}
 
+    public double getHeight(double age, RootedTree tree) {
+        return (age - offsetAge) / getScaleFactor(tree);
+    }
+
+    public double getLength(double time, RootedTree tree) {
+
+        return (time / getScaleFactor(tree));
+    }
+
 	private final double rootAge;
 	private final double offsetAge;
 	private final double scaleFactor;

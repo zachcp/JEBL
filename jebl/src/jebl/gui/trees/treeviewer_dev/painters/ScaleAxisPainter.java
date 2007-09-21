@@ -16,15 +16,40 @@ import java.util.Collection;
  * @version $Id: ScaleBarPainter.java,v 1.7 2006/11/21 16:10:24 rambaut Exp $
  */
 public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePainter {
+    private double majorTickSpacing = 1.0;
+    private double minorTickSpacing = 0.5;
 
-	public ScaleAxisPainter() {
+    public ScaleAxisPainter() {
 	}
 
 	public void setTreePane(TreePane treePane) {
 		this.treePane = treePane;
 	}
 
-	public Rectangle2D calibrate(Graphics2D g2, TreePane treePane) {
+    public void setAutomatic(boolean automatic) {
+        if (automatic) {
+            treePane.setAutomaticScale();
+            majorTickSpacing = treePane.getMajorTickSpacing();
+            minorTickSpacing = treePane.getMinorTickSpacing();
+        } else {
+            treePane.setTickSpacing(majorTickSpacing, minorTickSpacing);
+        }
+
+    }
+
+    public void setAxisSpacing(double majorTickSpacing, double minorTickSpacing) {
+        treePane.setTickSpacing(majorTickSpacing, minorTickSpacing);
+    }
+
+    public double getMajorTickSpacing() {
+        return majorTickSpacing;
+    }
+
+    public double getMinorTickSpacing() {
+        return minorTickSpacing;
+    }
+
+    public Rectangle2D calibrate(Graphics2D g2, TreePane treePane) {
 		Font oldFont = g2.getFont();
 		g2.setFont(getFont());
 
@@ -239,4 +264,5 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
 	private double preferredWidth;
 
 	protected TreePane treePane;
+
 }

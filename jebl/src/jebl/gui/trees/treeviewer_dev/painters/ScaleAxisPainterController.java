@@ -1,5 +1,6 @@
 package jebl.gui.trees.treeviewer_dev.painters;
 
+import jebl.gui.trees.treeviewer_dev.ScaleAxis;
 import org.virion.jam.components.RealNumberField;
 import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
@@ -8,8 +9,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -158,9 +159,9 @@ public class ScaleAxisPainterController extends AbstractController {
         autoScaleCheck.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 if (autoScaleCheck.isSelected()) {
-//                    scaleAxisPainter.setAutomaticScale(true);
-//                    majorTicksText.setValue(scaleAxisPainter.getMajorTickSpacing());
-//                    minorTicksText.setValue(scaleAxisPainter.getMinorTickSpacing());
+                    scaleAxisPainter.setAutomatic(true);
+                    majorTicksText.setValue(scaleAxisPainter.getMajorTickSpacing());
+                    minorTicksText.setValue(scaleAxisPainter.getMinorTickSpacing());
                     label1.setEnabled(false);
                     majorTicksText.setEnabled(false);
                     label2.setEnabled(false);
@@ -170,7 +171,10 @@ public class ScaleAxisPainterController extends AbstractController {
                     minorTicksText.setEnabled(true);
                     label2.setEnabled(true);
                     majorTicksText.setEnabled(true);
-//                    scaleAxisPainter.setAutomaticScale(false);
+                    double majorTickSpacing = getValue(majorTicksText, 1.0);
+                    double minorTickSpacing = getValue(minorTicksText, 0.5);
+                    scaleAxisPainter.setAutomatic(false);
+                    scaleAxisPainter.setAxisSpacing(majorTickSpacing, minorTickSpacing);
                 }
             }
         });
@@ -179,7 +183,7 @@ public class ScaleAxisPainterController extends AbstractController {
             public void stateChanged(ChangeEvent changeEvent) {
                 double majorTickSpacing = getValue(majorTicksText, 1.0);
                 double minorTickSpacing = getValue(minorTicksText, 0.5);
-//                scaleAxisPainter.setTickSpacing(majorTickSpacing, minorTickSpacing);
+                scaleAxisPainter.setAxisSpacing(majorTickSpacing, minorTickSpacing);
             }
         };
 
