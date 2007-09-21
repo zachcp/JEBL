@@ -205,7 +205,6 @@ public class TreePane extends JComponent implements PainterListener, Printable {
      *	Transform a chart co-ordinates into a drawing co-ordinates
      */
     public double scaleOnAxis(double value) {
-        value = timeScale.getHeight(value, tree);
         if (axisReversed) {
             return treeBounds.getX() + treeBounds.getWidth() - ((value - scaleAxis.getMinAxis()) * treeScale);
         } else {
