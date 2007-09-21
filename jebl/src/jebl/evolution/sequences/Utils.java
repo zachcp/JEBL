@@ -83,18 +83,18 @@ public class Utils {
             seq = new GaplessSequence(seq);
         }
         int length=seq.getLength();
-          StringBuilder results =new StringBuilder();
-         for (int i =  length-1; i >=0; i--) {
-             State state= seq.getState(i);
-             NucleotideState complementaryState = Nucleotides.COMPLEMENTARY_STATES[state.getIndex()];
-             if (predominantlyRNA && complementaryState.equals(Nucleotides.T_STATE)) {
-                 results.append('U');
-             }
-             else {
-                  results.append (complementaryState.getCode());
-             }
-         }
-          return results.toString();
+        StringBuilder results =new StringBuilder();
+        for (int i =  length-1; i >=0; i--) {
+            State state= seq.getState(i);
+            NucleotideState complementaryState = Nucleotides.COMPLEMENTARY_STATES[state.getIndex()];
+            if (predominantlyRNA && complementaryState.equals(Nucleotides.T_STATE)) {
+                results.append('U');
+            }
+            else {
+                results.append (complementaryState.getCode());
+            }
+        }
+        return results.toString();
 /*
         State[] states = seq.getStates();
         NucleotideState[] nucleotideStates = new NucleotideState[states.length];
