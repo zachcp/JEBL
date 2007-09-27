@@ -107,9 +107,6 @@ public final class Taxon implements Attributable, Comparable {
      * A static method that returns a Taxon object with the given name. If this has
      * already been created then the same instance will be returned.
      *
-     * Due to problems with the singleton model of taxa, this factory method now
-     * creates a new instance.
-     *
      * @param name
      * @return the taxon
      */

@@ -721,7 +721,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				if (taxonList != null && !taxonList.contains(taxon)) {
 					// taxon not found in taxon list...
 					// ...perhaps it is a numerical taxon reference?
-					throw new ImportException.UnknownTaxonException(token);
+                    StringBuilder message = new StringBuilder("Expected: ").append(token).append("\nActual taxa:\n");
+                    for (Taxon taxon1 : taxonList) {
+                        message.append(taxon1).append("\n");
+                    }
+                    throw new ImportException.UnknownTaxonException(message.toString());
 				}
 
 				StringBuilder buffer = new StringBuilder() ;
@@ -910,7 +914,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			if (index < 0) {
 				// taxon not found in taxon list...
 				// ...perhaps it is a numerical taxon reference?
-				throw new ImportException.UnknownTaxonException(token);
+                StringBuilder message = new StringBuilder("Expected: ").append(token).append("\nActual taxa:\n");
+                for (Taxon taxon1 : taxonList) {
+                    message.append(taxon1).append("\n");
+                }
+                throw new ImportException.UnknownTaxonException(message.toString());
 			}
 
 			if (index != i) {
@@ -1026,7 +1034,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				if (taxonList != null && !taxonList.contains(taxon)) {
 					// taxon not found in taxon list...
 					// ...perhaps it is a numerical taxon reference?
-					throw new ImportException.UnknownTaxonException(token3);
+                    StringBuilder message = new StringBuilder("Expected: ").append(token).append("\nActual taxa:\n");
+                    for (Taxon taxon1 : taxonList) {
+                        message.append(taxon1).append("\n");
+                    }
+					throw new ImportException.UnknownTaxonException(message.toString());
 				}
 				translationList.put(token2, taxon);
 
