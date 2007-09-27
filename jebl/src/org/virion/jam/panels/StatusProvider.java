@@ -60,12 +60,21 @@ public interface StatusProvider {
             listeners.remove(statusListener);
         }
 
-        private synchronized void realFireStatusChanged() {
-            int status = lastStatus;
-            String statusText = lastStatusText;
-            int index = overrideProviders.size()- 1;
-            if (index >= 0) {
-                StatusProvider override =(StatusProvider) overrideProviders.get(index);
+        private void realFireStatusChanged() {
+            int status;
+            String statusText;
+            StatusProvider override = null;
+            ArrayList listeners;
+            synchronized (this) {
+                status = lastStatus;
+                statusText = lastStatusText;
+                int index = overrideProviders.size()- 1;
+                if (index >= 0) {
+                    override =(StatusProvider) overrideProviders.get(index);
+                }
+                listeners = new ArrayList(this.listeners);
+            }
+            if (override != null) {
                 status = override.getStatus();
                 statusText = override.getStatusText();
             }
@@ -76,9 +85,11 @@ public interface StatusProvider {
 
         }
 
-        public synchronized void fireStatusChanged(int status, String statusText) {
-            lastStatus = status;
-            lastStatusText = statusText;
+        public void fireStatusChanged(int status, String statusText) {
+            synchronized (this) {
+                lastStatus = status;
+                lastStatusText = statusText;
+            }
             realFireStatusChanged();
         }
 
@@ -113,12 +124,18 @@ public interface StatusProvider {
             }
             realFireStatusChanged();
         }
-        public synchronized void fireStatusButtonPressed(){
-            int index = overrideProviders.size ();
-            if (index > 0) {
-                ((StatusProvider)overrideProviders.get(index - 1)).fireStatusButtonPressed();
+        public void fireStatusButtonPressed(){
+            StatusProvider override = null;
+            synchronized (this) {
+                int index = overrideProviders.size ();
+                if (index > 0) {
+                    override = ((StatusProvider)overrideProviders.get(index - 1));
+                }
             }
-            else {
+
+            if (override != null) {
+                override.fireStatusButtonPressed();
+            } else {
                 statusButtonPressed();
             }
         }
