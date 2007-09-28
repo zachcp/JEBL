@@ -175,7 +175,7 @@ public class TreeViewer extends JPanel implements Printable {
         Font originalFont = statusLabel.getFont();
         statusLabel.setFont(originalFont.deriveFont(originalFont.getSize()-1.0f));
         add(statusLabel, BorderLayout.SOUTH);
-        setStatusMessage("Genetic distances on edges are measured in expected number of substitutions per site.");
+        setStatusMessage("For trees built from sequences, genetic distances on edges usually specify the expected number of substitutions per site.");
     }
 
     private void setStatusMessage(String message) {
