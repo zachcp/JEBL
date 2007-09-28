@@ -2,6 +2,7 @@ package org.virion.jam.panels;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author rambaut
@@ -48,18 +49,28 @@ public interface StatusProvider {
     public class Helper implements StatusProvider {
         private int lastStatus = StatusPanel.NORMAL;
         private String lastStatusText = "";
-        private ArrayList listeners = new ArrayList();
+        // Modifications to this collection are guarded by a lock on this Object,
+        // but the listeners shouldn't be called when holding any lock.
+        private List listeners = new ArrayList();
 
-        public synchronized void addStatusListener(StatusListener statusListener) {
+        public void addStatusListener(StatusListener statusListener) {
+            synchronized (this) {
+                listeners.add(statusListener);
+            }
             statusListener.statusChanged(lastStatus, lastStatusText);
-            listeners.add(statusListener);
         }
 
         public synchronized void removeStatusListener(StatusListener statusListener) {
+            synchronized (this) {
+                listeners.remove(statusListener);
+            }
             statusListener.statusChanged(StatusPanel.NORMAL, "");
-            listeners.remove(statusListener);
         }
 
+        /**
+         * This method should not be called when holding a lock on this Object,
+         * because it invokes listeners which can do arbitrary things.
+         */
         private void realFireStatusChanged() {
             int status;
             String statusText;
@@ -93,37 +104,45 @@ public interface StatusProvider {
             realFireStatusChanged();
         }
 
-        private ArrayList overrideListeners = new ArrayList ();
-        private ArrayList overrideProviders = new ArrayList ();
+        // Modifications to these lists are guarded by a lock on this Object,
+        // but the listeners shouldn't be called when holding any lock.
+        private List overrideListeners = new ArrayList();
+        private List overrideProviders = new ArrayList();
 
-        public synchronized void addOverrideProvider(final StatusProvider provider) {
+        public void addOverrideProvider(final StatusProvider provider) {
             StatusListener listener = new StatusListener(){
-
                 public void statusChanged(int status, String statusText) {
+                    boolean needToFireStatusChange;
                     synchronized(StatusProvider.Helper.this) {
-                        if (overrideProviders.size() > 0 && overrideProviders.get(overrideProviders.size()- 1)== provider) {
-                            realFireStatusChanged();
-                        }
+                        needToFireStatusChange = (overrideProviders.size() > 0 && overrideProviders.get(overrideProviders.size() - 1)== provider);
+                    }
+                    if (needToFireStatusChange) {
+                        realFireStatusChanged();
                     }
                 }
             };
-            provider.addStatusListener(listener);
-            overrideProviders.add(provider);
-            overrideListeners.add(listener);
+            synchronized (this) {
+                provider.addStatusListener(listener);
+                overrideProviders.add(provider);
+                overrideListeners.add(listener);
+            }
         }
 
-        public synchronized void removeOverrideProvider(StatusProvider provider) {
-            for (int i = 0; i < overrideProviders.size(); i++) {
-                if(overrideProviders.get(i) == provider) {
-                    overrideProviders.remove(i);
-                    StatusListener listener =(StatusListener) overrideListeners.get(i);
-                    provider.removeStatusListener(listener);
-                    overrideListeners.remove(i);
-                    break;
+        public void removeOverrideProvider(StatusProvider provider) {
+            synchronized (this) {
+                for (int i = 0; i < overrideProviders.size(); i++) {
+                    if(overrideProviders.get(i) == provider) {
+                        overrideProviders.remove(i);
+                        StatusListener listener =(StatusListener) overrideListeners.get(i);
+                        provider.removeStatusListener(listener);
+                        overrideListeners.remove(i);
+                        break;
+                    }
                 }
             }
             realFireStatusChanged();
         }
+
         public void fireStatusButtonPressed(){
             StatusProvider override = null;
             synchronized (this) {
@@ -156,6 +175,4 @@ public interface StatusProvider {
             return !overrideProviders.isEmpty();
         }
     }
-
-
 }
