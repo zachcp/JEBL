@@ -27,6 +27,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private int defaultFontSize;
     private double scaleRange;
     private double userScaleRange = 0.0;
+    private boolean initializeEnabled = true;
 
     public ScaleBarPainter() {
         this(0.0, 12);
@@ -233,6 +234,28 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         // nothing to do
     }
 
+    /**
+     * Set the enabled state of this painter. When disabled, the painter will be visible false
+     * and all it's controls will be disabled. Painter is enabled by default.
+     *
+     * eg. Disable the scale bar when a transform is in effect because there is no valid scale.
+     *
+     * @param isEnabled
+     */
+    public void setEnabled(boolean enabled) {
+        if (controls == null) {
+            initializeEnabled = enabled;
+            return;
+        }
+        if (enabled) {
+            setVisible(controls.getPrimaryCheckbox().isSelected());
+        } else {
+            setVisible(false);
+        }
+        controls.getPrimaryCheckbox().setEnabled(enabled);
+//            controls.getPrimaryCheckbox().setSelected(enabled);
+    }
+
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
         final Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);       
         List<Controls> controlsList = new ArrayList<Controls>();
@@ -245,7 +268,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                 optionsPanel.addComponent(showScaleBarCB);
             }
 
+            showScaleBarCB.setEnabled(initializeEnabled);
             showScaleBarCB.setSelected(isVisible());
+            if (!initializeEnabled) {
+                setVisible(false);
+            }
 
             final RealNumberField text1 = new RealNumberField(0.0, Double.MAX_VALUE);
             text1.setValue(scaleRange);
@@ -285,16 +312,16 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
 
             final boolean isSelected = showScaleBarCB.isSelected();
-            label1.setEnabled(isSelected);
-            text1.setEnabled(isSelected);
-            label2.setEnabled(isSelected);
-            spinner1.setEnabled(isSelected);
-            label3.setEnabled(isSelected);
-            spinner2.setEnabled(isSelected);
+            label1.setEnabled(isSelected && initializeEnabled);
+            text1.setEnabled(isSelected && initializeEnabled);
+            label2.setEnabled(isSelected && initializeEnabled);
+            spinner1.setEnabled(isSelected && initializeEnabled);
+            label3.setEnabled(isSelected && initializeEnabled);
+            spinner2.setEnabled(isSelected && initializeEnabled);
 
             showScaleBarCB.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    final boolean isSelected = showScaleBarCB.isSelected();
+                    final boolean isSelected = showScaleBarCB.isSelected() && showScaleBarCB.isEnabled();
                     label1.setEnabled(isSelected);
                     text1.setEnabled(isSelected);
                     label2.setEnabled(isSelected);

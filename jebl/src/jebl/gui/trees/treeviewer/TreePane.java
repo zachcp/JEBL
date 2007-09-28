@@ -10,6 +10,7 @@ import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.PainterListener;
+import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -444,6 +445,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.scaleBarPainter = scaleBarPainter;
         if (this.scaleBarPainter != null) {
             this.scaleBarPainter.addPainterListener(this);
+            if (scaleBarPainter instanceof ScaleBarPainter) {
+                ((ScaleBarPainter)scaleBarPainter).setEnabled(!transformCheck.isSelected());
+            }
         }
         controlPalette.fireControlsChanged();
         calibrated = false;
@@ -650,7 +654,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     PREFS.putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
-                    setBranchTransform(true, (TransformedRootedTree.Transform) combo1.getSelectedItem());
+                    setBranchTransform(transformCheck.isSelected(), (TransformedRootedTree.Transform) combo1.getSelectedItem());
                 }
             });
             combo1.setSelectedIndex(PREFS.getInt(branchTransformTypePREFSkey, 0));
@@ -665,6 +669,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     // only on a real change
                     label1.setEnabled(selected);
                     combo1.setEnabled(selected);
+                    if (scaleBarPainter instanceof ScaleBarPainter) {
+                        ((ScaleBarPainter)scaleBarPainter).setEnabled(!selected);
+                    }
 
                     setBranchTransform(selected, (TransformedRootedTree.Transform) combo1.getSelectedItem());
                 }
