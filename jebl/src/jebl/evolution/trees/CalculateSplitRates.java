@@ -30,7 +30,7 @@ public class CalculateSplitRates {
 		treeList = new ArrayList<RootedTree>(100);
 		cladeList = new ArrayList<Clade>(100);
 		intervalList = new ArrayList<List<TimeInterval>>(100);
-		densityMap = new DensityMap(70, 20, 0, 0, 70, 5);
+		densityMap = new DensityMap(70, 20, 0, 0, 70, 0.01);
 	}
 
 //	private int maxTrees = 40;
@@ -61,7 +61,7 @@ public class CalculateSplitRates {
 	private DensityMap createDensityMap(int numRateBoxes, int numTimeBoxes) {
 		double maxTreeHeight = 0;
 		double minRate = 1;
-		double maxRate = 1;
+		double maxRate = 0;
 		for (RootedTree tree : treeList) {
 			double thisHeight = tree.getHeight(tree.getRootNode());
 			if (thisHeight > maxTreeHeight)
@@ -77,6 +77,10 @@ public class CalculateSplitRates {
 				}
 			}
 		}
+		System.err.println("maxTreeHeight = " + maxTreeHeight);
+		System.err.println("minRate = " + minRate);
+		System.err.println("maxRate = " + maxRate);
+
 		maxTreeHeight *= 1.0 + edgeFraction;
 		double rateSpread = maxRate - minRate;
 		minRate -= rateSpread * edgeFraction;
@@ -472,11 +476,11 @@ public class CalculateSplitRates {
 			sb.append("0.0");
 			for (int i = 0; i < binX; i++) {
 				sb.append(SEP);
-				sb.append(String.format("%3.1f", startX + scaleX * i));
+				sb.append(String.format("%7.5f", startX + scaleX * i));
 			}
 			sb.append("\n");
 			for (int i = 0; i < binY; i++) {
-				sb.append(String.format("%3.1f", startY + scaleY * i));
+				sb.append(String.format("%7.5f", startY + scaleY * i));
 				//double dblCounts = (double)counts[i];
 				for (int j = 0; j < binX; j++) {
 					sb.append(SEP);
