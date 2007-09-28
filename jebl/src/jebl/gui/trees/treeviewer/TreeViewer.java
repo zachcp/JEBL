@@ -92,6 +92,7 @@ public class TreeViewer extends JPanel implements Printable {
     static private String rootedTreeLayoutPrefKey = "treelayout_rooted";
     static private String unrootedTreeLayoutPrefKey = "treelayout_unrooted";
     static private String unrootedTreeAllLayoutsAllowedPrefKey = "treelayout_unrooted_allallowed";
+    private final JLabel statusLabel;
 
     /**
      * Creates new TreeViewer
@@ -170,6 +171,15 @@ public class TreeViewer extends JPanel implements Printable {
                 repaint();
             }
         });
+        statusLabel = new JLabel();
+        Font originalFont = statusLabel.getFont();
+        statusLabel.setFont(originalFont.deriveFont(originalFont.getSize()-1.0f));
+        add(statusLabel, BorderLayout.SOUTH);
+        setStatusMessage("Genetic distances on edges are measured in expected number of substitutions per site.");
+    }
+
+    private void setStatusMessage(String message) {
+        statusLabel.setText(message);
     }
 
     private String currentTreeLayoutPrefKey() {
