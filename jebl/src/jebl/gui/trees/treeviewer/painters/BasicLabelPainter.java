@@ -30,7 +30,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     public static final String TAXON_NAMES = "Taxon Names";
     public static final String NODE_HEIGHTS = "Node Heights";
-    public static final String BRANCH_LENGTHS = "Branch Lengths";
+    public static final String BRANCH_LENGTHS = "Substitutions per Site";
 
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent) {
