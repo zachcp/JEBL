@@ -173,6 +173,30 @@ final public class SimpleRootedTree implements RootedTree {
         return node;
     }
 
+    /**
+     * Removes an internal node in this tree. It must not be a child of any other node.
+     * @param node the node to remove.
+     */
+    public void deleteInternalNode(Node node) {
+        if (!(node instanceof SimpleRootedNode)) {
+            throw new IllegalArgumentException("Node must be a node in this tree");
+        }
+        SimpleRootedNode simpleRootedNode= (SimpleRootedNode) node;
+        if (simpleRootedNode.parent!=null) {
+            throw new IllegalArgumentException("Can't remove nodes with a parent");
+        }
+        if (!internalNodes.contains(node)) {
+            throw new IllegalArgumentException("Not an internal node");
+        }
+        if (rootNode == node) {
+            rootNode = (SimpleRootedNode) getChildren(node).get(0);
+        }
+        internalNodes.remove(node);
+        for (Node child : getChildren(node)) {
+            ((SimpleRootedNode) child).setParent(null);
+        }
+    }
+
     public void swapNodes(Node n, int i0, int i1) {
         ((SimpleRootedNode)n).swapChildren(i0, i1);
     }
