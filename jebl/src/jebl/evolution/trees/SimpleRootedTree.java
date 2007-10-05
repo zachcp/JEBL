@@ -141,7 +141,7 @@ final public class SimpleRootedTree implements RootedTree {
      */
     public Node createExternalNode(Taxon taxon) {
         if( getTaxa().contains(taxon) ) {
-            throw new IllegalArgumentException("duplicate taxon");
+            throw new IllegalArgumentException("duplicate taxon "+taxon.getName());
         }
         
         SimpleRootedNode node = new SimpleRootedNode(taxon);
