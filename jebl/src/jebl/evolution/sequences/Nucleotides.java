@@ -49,10 +49,16 @@ public final class Nucleotides {
     public static final NucleotideState UNKNOWN_STATE = new NucleotideState("?", "?", 15, new NucleotideState[] {A_STATE, C_STATE, G_STATE, T_STATE});
     public static final NucleotideState GAP_STATE = new NucleotideState("-", "-", 16, new NucleotideState[] {A_STATE, C_STATE, G_STATE, T_STATE});
 
+    // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
+    // and will become private in the future. Use {@link #getCanonicalStates} instead.
+    @Deprecated
     public static final NucleotideState[] CANONICAL_STATES = new NucleotideState[] {
             A_STATE, C_STATE, G_STATE, T_STATE
     };
 
+    // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
+    // and will become private in the future. Use {@link #getStates} instead.
+    @Deprecated
     public static final NucleotideState[] STATES = new NucleotideState[] {
         A_STATE, C_STATE, G_STATE, T_STATE,
         R_STATE, Y_STATE, M_STATE, W_STATE,
@@ -60,12 +66,20 @@ public final class Nucleotides {
         H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
 
+    // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
+    // and will become private in the future. Use {@link #getComplementaryState} instead.
+    @Deprecated
     public static final NucleotideState[] COMPLEMENTARY_STATES = new NucleotideState[]{
             T_STATE, G_STATE, C_STATE, A_STATE,
             Y_STATE, R_STATE, K_STATE, W_STATE,
             S_STATE, M_STATE, V_STATE, H_STATE,
             D_STATE, B_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
     };
+
+    public static NucleotideState getComplementaryState(NucleotideState state) {
+        return COMPLEMENTARY_STATES[state.getIndex()];
+    }
+
     private static final int STATES_BY_CODE_SIZE = 128;
 
     // Static utility functions
