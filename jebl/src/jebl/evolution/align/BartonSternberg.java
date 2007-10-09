@@ -117,42 +117,41 @@ public class BartonSternberg implements MultipleAligner {
      * @param refineOnly if specified, then the input sequences are assumed to be aligned already,
      * and this function will only refine the alignment.
      */
-    public String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly,
+    public final String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly,
                           boolean estimateMatchMismatchCosts) {
         if( origScores != null ) {
             establishScores(origScores);
         }
 
-        final int count = sourceSequences.size();
+        final int numSequences = sourceSequences.size();
 
-        Profile[] sequenceProfilesWithoutGaps = new Profile[count];
-        String[] sequencesWithoutGaps = new String[count];
-        for (int i = 0; i < count; i++) {
-            sequencesWithoutGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), false);
+        Profile[] sequenceProfilesWithoutGaps = new Profile[numSequences];
+        String[] sequencesWithoutGaps = new String[numSequences];
+        for (int i = 0; i < numSequences; i++) {
+            sequencesWithoutGaps[i] = Align.stripIllegalCharacters(sourceSequences.get(i).getString(), scores.getAlphabet(), false);
             sequenceProfilesWithoutGaps[i] = new Profile(i, sequencesWithoutGaps[i]);
         }
 
-        int treeWork = refineOnly ? 0 : (fastGuide ? count : count*(count - 1)/2);
-        int alignmentWork = refineOnly ? 0 : count - 1;
-        int refinementWork = count * refinementIterations;
+        int treeWork = refineOnly ? 0 : (fastGuide ? numSequences : numSequences*(numSequences - 1)/2);
+        int alignmentWork = refineOnly ? 0 : numSequences - 1;
+        int refinementWork = numSequences * refinementIterations;
 
         compoundProgress = new CompoundAlignmentProgressListener(progress,treeWork + refinementWork + alignmentWork);
 
-        Profile profile = null;
-        if( refineOnly ) {
-            String[] sequencesWithGaps = new String[count];
-            for (int i = 0; i < count; i++) {
-                sequencesWithGaps[i] = Align.strip(sourceSequences.get(i).getString(), scores.getAlphabet(), true);
-
+        Profile profile;
+        if (refineOnly) {
+            String[] sequencesWithGaps = new String[numSequences];
+            for (int i = 0; i < numSequences; i++) {
+                sequencesWithGaps[i] = Align.stripIllegalCharacters(sourceSequences.get(i).getString(), scores.getAlphabet(), true);
             }
             profile = new Profile(Profile.calculateAlphabetSize(sequencesWithGaps));
-            for (int i = 0; i < count; i++) {
-                assert(sequencesWithGaps[i].length() == sequencesWithGaps [0].length ());
+            for (int i = 0; i < numSequences; i++) {
+                assert(sequencesWithGaps[i].length() == sequencesWithGaps[0].length());
                 profile.addSequence(i, sequencesWithGaps[i]);
             }
         } else {
             List<Sequence> sequencesForGuideTree = new ArrayList<Sequence>(sourceSequences.size());
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < numSequences; i++) {
                 Sequence s = sourceSequences.get(i);
                 sequencesForGuideTree.add(new BasicSequence(s.getSequenceType(), Taxon.getTaxon("" + i), sequencesWithoutGaps[i]));
             }
@@ -206,7 +205,7 @@ public class BartonSternberg implements MultipleAligner {
                 message = message + " (iteration " +(j+1) + " of " + refinementIterations+ ")";
             }
             progress.setMessage(message);
-            for (int i = 0; i < count; ++i) {
+            for (int i = 0; i < numSequences; ++i) {
 //                if(j> 0&& i!= 8) continue;
 //                Profile sequenceProfile = sequenceProfiles[i];
                 boolean display = false;
@@ -239,8 +238,8 @@ public class BartonSternberg implements MultipleAligner {
             }
         }
 
-        String[] results = new String[count];
-        for (int i = 0; i < count; i++) {
+        String[] results = new String[numSequences];
+        for (int i = 0; i < numSequences; i++) {
             results[i]= profile.getSequence(i);
         }
         return results;

@@ -7,6 +7,8 @@ import jebl.evolution.align.scores.Scores;
  * @version $Id$
  *
  * Represents a single residue in a multiple alignment profile
+ * It can represent character frequencies inside an alignment column
+ * as a fraction of the total number of characters in that column.
  */
 public class ProfileCharacter {
     /*
@@ -19,7 +21,7 @@ public class ProfileCharacter {
     private int count[];
     private int numberOfUniqueCharacters;
     private int totalCharacters;
-     private boolean calculatedGapFraction=false;
+    private boolean calculatedGapFraction=false;
     private  float gapFraction;
 
     public ProfileCharacter(int alphabetSize) {
@@ -67,7 +69,6 @@ public class ProfileCharacter {
         for (int j = 0; j < character.numberOfUniqueCharacters; j++) {
             removeCharacter(character.characters[j], character.count[j]);
         }
-
     }
 
     public void addGaps(int count) {

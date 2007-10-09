@@ -219,14 +219,21 @@ public abstract class Align {
     }
 
     static String strip(String s, String residues) {
-        return strip(s, residues, false);
+        return stripIllegalCharacters(s, residues, false);
     }
 
-    static String strip(String s, String residues, boolean allowGaps) {
+    /**
+     * Returns s with all characters that don't also occur in allowedCharacters (ignoring case) stripped.
+     * @param s String to sanitise
+     * @param allowedCharacters
+     * @param allowGaps If true, then "-" won't be stripped from s regardless of whether it occurs in allowedCharacters.
+     * @return s with all nonallowed characters removed
+     */
+    static String stripIllegalCharacters(String s, String allowedCharacters, boolean allowGaps) {
 
         boolean[] valid = new boolean[127];
-        for (int i = 0; i < residues.length(); i++) {
-            char c = residues.charAt(i);
+        for (int i = 0; i < allowedCharacters.length(); i++) {
+            char c = allowedCharacters.charAt(i);
             if (c>='A' && c<='Z') {
                 valid[c] = valid[c + 32] = true;
             } else if (c>='a' && c<='z') {
