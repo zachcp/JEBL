@@ -11,6 +11,7 @@ package jebl.evolution.sequences;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Uninstantiable utility class with only static methods.
@@ -102,7 +103,7 @@ public final class Nucleotides {
 
     // index (i,j) is true if getState(i).getCanonicalStates().containsAll(getState(j).getCanonicalStates());
     // Like all "subset" type relations, this is a partial order, and we precalculate it for efficiency.
-    private static boolean[][] IS_CANONICAL_STATES_SUPERSET = null;
+    private static final AtomicReference<boolean[][]> IS_CANONICAL_STATES_SUPERSET = new AtomicReference<boolean[][]>(null);
     /**
      * Checks whether stateA is more ambiguous than stateB, i.e. stateA's canonical states are
      * a superset of (or equal to) those of stateB. Note that this is a partial order
@@ -116,17 +117,19 @@ public final class Nucleotides {
      * @return true if stateA.getCanonicalStates().containsAll(stateB.getCanonicalStates))
      */
     public static boolean doesStateContainAmbiguitiesOfOtherState(NucleotideState stateA, NucleotideState stateB) {
-        // Not thread safe, but it doesn't matter if this is calculated twice
-        if (IS_CANONICAL_STATES_SUPERSET == null) {
-            IS_CANONICAL_STATES_SUPERSET = new boolean[STATE_COUNT][STATE_COUNT];
+        if (IS_CANONICAL_STATES_SUPERSET.get() == null) {
+            // It may occur that another thread is calculating this at the same time,
+            // but this doesn't matter as the result is always the same
+            boolean[][] result = new boolean[STATE_COUNT][STATE_COUNT];
             for (int i = 0; i < STATE_COUNT; i++) {
                 for (int j = 0; j < STATE_COUNT; j++) {
-                    IS_CANONICAL_STATES_SUPERSET[i][j]
+                    result[i][j]
                             = getState(i).getCanonicalStates().containsAll(getState(j).getCanonicalStates());
                 }
             }
+            IS_CANONICAL_STATES_SUPERSET.set(result);
         }
-        return IS_CANONICAL_STATES_SUPERSET[stateA.getIndex()][stateB.getIndex()];
+        return IS_CANONICAL_STATES_SUPERSET.get()[stateA.getIndex()][stateB.getIndex()];
     }
 
     public static NucleotideState getState(char code) {
