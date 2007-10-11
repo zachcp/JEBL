@@ -19,7 +19,7 @@ import java.util.List;
  * @version $Id$
  */
 public final class Nucleotides {
-	public static final String NAME = "nucleotide";
+    public static final String NAME = "nucleotide";
 
     public static final int CANONICAL_STATE_COUNT = 4;
     public static final int STATE_COUNT = 17;
@@ -96,7 +96,36 @@ public final class Nucleotides {
 
 	public static List<NucleotideState> getCanonicalStates() { return Collections.unmodifiableList(Arrays.asList(CANONICAL_STATES)); }
 
-	public static NucleotideState getState(char code) {
+    // index (i,j) is true if getState(i).getCanonicalStates().containsAll(getState(j).getCanonicalStates());
+    // Like all "subset" type relations, this is a partial order, and we precalculate it for efficiency.
+    private static boolean[][] IS_CANONICAL_STATES_SUPERSET = null;
+    /**
+     * Checks whether stateA is more ambiguous than stateB, i.e. stateA's canonical states are
+     * a superset of (or equal to) those of stateB. Note that this is a partial order
+     * (except that doesStateContainAmbiguitiesOfOtherState(a,b) and doesStateContainAmbiguitiesOfOtherState(b,a)
+     * implies only a.getCanonicalStates().equals(b.getCanonicalStates()), rather than a.equals(b)
+     * because e.g. GAP_STATE and N_STATE are declared to have the same canonical states but aren't equal.
+     * @param stateA The nucleotide state whose canonical states are to be checked whether they
+     *               contain all of stateB's canonical states.
+     * @param stateB The nucleotide state whose canonical states are to be checked whether they
+     *               are wholly contained by stateA's canonical states.
+     * @return true if stateA.getCanonicalStates().containsAll(stateB.getCanonicalStates))
+     */
+    public static boolean doesStateContainAmbiguitiesOfOtherState(NucleotideState stateA, NucleotideState stateB) {
+        // Not thread safe, but it doesn't matter if this is calculated twice
+        if (IS_CANONICAL_STATES_SUPERSET == null) {
+            IS_CANONICAL_STATES_SUPERSET = new boolean[STATE_COUNT][STATE_COUNT];
+            for (int i = 0; i < STATE_COUNT; i++) {
+                for (int j = 0; j < STATE_COUNT; j++) {
+                    IS_CANONICAL_STATES_SUPERSET[i][j]
+                            = getState(i).getCanonicalStates().containsAll(getState(j).getCanonicalStates());
+                }
+            }
+        }
+        return IS_CANONICAL_STATES_SUPERSET[stateA.getIndex()][stateB.getIndex()];
+    }
+
+    public static NucleotideState getState(char code) {
         if (code < 0 || code >= STATES_BY_CODE_SIZE) {
             return null;
         }
