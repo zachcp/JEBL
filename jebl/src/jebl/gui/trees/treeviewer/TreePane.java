@@ -853,7 +853,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //        }
 
         long start = System.currentTimeMillis();
-        drawTree(g2, true, true, getWidth(), getHeight());
+        drawTree(g2, true, true, true, getWidth(), getHeight());
         System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
@@ -879,7 +879,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         setDoubleBuffered(false);
 
-        drawTree(g2, false, false, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+        drawTree(g2, false, false, true, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 
         setDoubleBuffered(true);
         calibrated = false;
@@ -972,7 +972,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     boolean preElementDrawCode = false;
 
-    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOfscreenShapes, double width, double height) {
+    /**
+     *
+     * @param g2 the graphics to draw on to
+     * @param drawNodes prints circles at nodes if true
+     * @param clipOfscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
+     * @param drawOnlyVisibleElements tries to stop elements overlapping by not drawing some of them if true
+     * @param width the width of the tree
+     * @param height the height of the tree
+     */
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOfscreenShapes, boolean drawOnlyVisibleElements, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1106,7 +1115,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
-                if(e.isVisible())
+                if(e.isVisible() || !drawOnlyVisibleElements)
                     e.draw(g2, clipOfscreenShapes ? viewport : null);
             }
         }
