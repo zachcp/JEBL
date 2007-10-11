@@ -13,12 +13,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Uninstantiable utility class with only static methods.
+ *
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
  * @version $Id$
  */
 public final class Nucleotides {
+    private Nucleotides() { } // make class uninstantiable
+
     public static final String NAME = "nucleotide";
 
     public static final int CANONICAL_STATE_COUNT = 4;
