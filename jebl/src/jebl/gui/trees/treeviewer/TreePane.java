@@ -725,7 +725,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 showingRootBranch = false;
             }
 
-            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Float(1.0), new Float(0.01), new Float(48), new Float(1.0)));
 
             final float weight = PREFS.getFloat(branchWeightPREFSkey, 1.0F);
             setBranchLineWeightValues(weight);
@@ -733,7 +733,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             spinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    setBranchLineWeight(((Double) spinner.getValue()).floatValue());
+                    setBranchLineWeight((Float)spinner.getValue());
                 }
             });
             optionsPanel.addComponentWithLabel("Line Weight:", spinner);
