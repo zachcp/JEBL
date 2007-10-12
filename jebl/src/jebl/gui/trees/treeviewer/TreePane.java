@@ -977,11 +977,23 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param g2 the graphics to draw on to
      * @param drawNodes prints circles at nodes if true
      * @param clipOfscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
+     * @param width the width of the tree
+     * @param height the height of the tree
+     */
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, double width, double height) {
+        drawTree(g2, drawNodes, clipOffscreenShapes, false, width, height);
+    }
+
+    /**
+     *
+     * @param g2 the graphics to draw on to
+     * @param drawNodes prints circles at nodes and tips if true
+     * @param clipOfscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
      * @param drawOnlyVisibleElements tries to stop elements overlapping by not drawing some of them if true
      * @param width the width of the tree
      * @param height the height of the tree
      */
-    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOfscreenShapes, boolean drawOnlyVisibleElements, double width, double height) {
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1116,7 +1128,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
                 if(e.isVisible() || !drawOnlyVisibleElements)
-                    e.draw(g2, clipOfscreenShapes ? viewport : null);
+                    e.draw(g2, clipOffscreenShapes ? viewport : null);
             }
         }
 
