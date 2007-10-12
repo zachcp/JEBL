@@ -976,7 +976,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      *
      * @param g2 the graphics to draw on to
      * @param drawNodes prints circles at nodes if true
-     * @param clipOfscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
+     * @param clipOffscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
      * @param width the width of the tree
      * @param height the height of the tree
      */
@@ -988,7 +988,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      *
      * @param g2 the graphics to draw on to
      * @param drawNodes prints circles at nodes and tips if true
-     * @param clipOfscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
+     * @param clipOffscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
      * @param drawOnlyVisibleElements tries to stop elements overlapping by not drawing some of them if true
      * @param width the width of the tree
      * @param height the height of the tree
