@@ -15,7 +15,6 @@ package jebl.evolution.sequences;
  * @version $Id$
  */
 public final class AminoAcidState extends State {
-
     AminoAcidState(String name, String stateCode, int index) {
         super(name, stateCode, index);
     }
@@ -24,24 +23,15 @@ public final class AminoAcidState extends State {
         super(name, stateCode, index, ambiguities);
     }
 
+    @Override
     public int compareTo(Object o) {
         // throws ClassCastException on across-class comparison
         AminoAcidState that = (AminoAcidState) o;
         return super.compareTo(that);
     }
 
-    // we do not need to override equals because there is only one
-    // unique instance of each nucleotide state - i.e. we can use ==
-    /*
-    public boolean equals(Object o) {
-        if (!(o instanceof AminoAcidState))
-          return false;
-        return super.equals(o);
-    }*/
-
-    public int hashCode() {
-        return 7 * super.hashCode() + 23;
-    }
+    // we do not need to override equals() and hashCode() because there is only one
+    // unique instance of each state
 
     public boolean isGap() {
 		return this == AminoAcids.GAP_STATE;

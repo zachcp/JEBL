@@ -73,17 +73,9 @@ public abstract class State implements Comparable {
         return index - ((State)o).index;
     }
 
-    public boolean equals(Object o) {
-        return (o instanceof State) && (this.index == ((State) o).index);
-    }
-
-    public int hashCode() {
-        return index;
-    }
-
     public String toString() { return stateCode; }
 
-	public abstract boolean isGap();
+    public abstract boolean isGap();
 
 	private String stateCode;
     private String name;
