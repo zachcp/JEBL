@@ -85,8 +85,11 @@ public class ProfileCharacter {
         }
         for (int i = 0; i < character1.numberOfUniqueCharacters; i++) {
             for (int j = 0; j < character2.numberOfUniqueCharacters; j++) {
-                score += scores.score [character1.characters[i]] [ character2.characters[j]]*
-                        character1.count[i]*character2.count[j];
+                // one of these can be an empty array for some reason (bug 3472) - spreading over multiple lines to see which one, next time the bug occurs.
+                char char1 = character1.characters[i];
+                char char2 = character2.characters[j];
+                int count = (character1.count[i] * character2.count[j]);
+                score += scores.score[char1][char2] * count;
             }
         }
         return score/totalCharacters;
