@@ -25,6 +25,9 @@ public class ProfileCharacter {
     private  float gapFraction;
 
     public ProfileCharacter(int alphabetSize) {
+        if (alphabetSize < 0) { // Arguably we could use <= 0 here?
+            throw new IllegalArgumentException("Expected a nonnegative alphabet size, got " + alphabetSize);
+        }
         characters = new char[alphabetSize +1];
         count = new int[alphabetSize +1];
     }

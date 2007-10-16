@@ -16,20 +16,23 @@ import java.util.Map;
  */
 class Profile {
     ProfileCharacter[] profile;
-    private int alphabetSize;
+    private final int alphabetSize;
 //    int length;
     int sequenceCount;
     private boolean automaticallyCalculatedAlphabetSize = false;
     private Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
     private boolean supportsFreeEndGaps=false;
 
-    public String getSequence( int sequenceNumber) {
+    public String getSequence(int sequenceNumber) {
         return paddedSequences.get(sequenceNumber);
     }
 
 
     public Profile(int alphabetSize) {
         this.alphabetSize = alphabetSize;
+        if (alphabetSize < 0) {
+            throw new IllegalArgumentException("Nonnegative alphabet size expected, got " + alphabetSize);
+        }
     }
 
     /**
