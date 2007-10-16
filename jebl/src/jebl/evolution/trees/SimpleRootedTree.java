@@ -673,14 +673,13 @@ final public class SimpleRootedTree implements RootedTree {
         void swapChildren(int i0, int i1) {
             ArrayList<Node> nc = new ArrayList<Node>(children);
             //there was a user reported crash where i0 was > size of the array of children nodes
-            if(i0 >= nc.size() || i1 >= nc.size()){
-                assert false : "SimpleRootedNode.swapChildren() was called with invalid parameters!";
-                return;
+            if (i0 < 0 || i0 >= nc.size() || i1 < 0 || i1 >= nc.size()) {
+                throw new IllegalArgumentException("Tried to swap children ("+i0+","+i1+") on node with " + nc.size() + " children");
             }
             final Node ni0 = nc.get(i0);
             nc.set(i0, nc.get(i1));
             nc.set(i1, ni0);
-            children = nc;
+            children = Collections.unmodifiableList(nc);
         }
 
         public Node getParent() {
