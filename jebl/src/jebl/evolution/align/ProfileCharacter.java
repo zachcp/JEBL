@@ -89,6 +89,7 @@ public class ProfileCharacter {
                 char char1 = character1.characters[i];
                 char char2 = character2.characters[j];
                 int count = (character1.count[i] * character2.count[j]);
+                // TT: score is a 128x128 array, so we assume the character is ASCII - is this safe?
                 score += scores.score[char1][char2] * count;
             }
         }
