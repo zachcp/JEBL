@@ -17,8 +17,8 @@ public class ProfileCharacter {
     contains the length of these to parallel arrays. 'totalCharacters' is the sum of
     all entries in the array 'count'
     */
-    private char characters[];
-    private int count[];
+    private final char characters[];
+    private final int count[];
     private int numberOfUniqueCharacters;
     private int totalCharacters;
     private boolean calculatedGapFraction=false;
