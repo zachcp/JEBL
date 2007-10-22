@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer_dev;
 
 import jebl.evolution.graphs.Node;
+import org.virion.jam.mac.Utils;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -178,23 +179,32 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
     }
 
     public void mouseEntered(MouseEvent mouseEvent) {
-        treePane.requestFocusInWindow();
-        if (mouseEvent.isMetaDown()) {
+//        treePane.requestFocusInWindow();
+        if (isCommandKeyDown(mouseEvent)) {
             treePane.setCursorPosition(mouseEvent.getPoint());
         }
     }
 
-    public void mouseExited(MouseEvent mouseEvent) {
-        if (mouseEvent.isMetaDown()) {
+	public void mouseExited(MouseEvent mouseEvent) {
+		if (isCommandKeyDown(mouseEvent)) {
             treePane.setCursorPosition(mouseEvent.getPoint());
         }
     }
 
     public void mouseMoved(MouseEvent mouseEvent) {
-        if (mouseEvent.isMetaDown()) {
+	    if (isCommandKeyDown(mouseEvent)) {
             treePane.setCursorPosition(mouseEvent.getPoint());
         }
     }
+
+	/**
+	 * On Mac, check for the 'Command' key, otherwise use the 'Control' key
+	 * @param event
+	 * @return is it pressed
+	 */
+	private boolean isCommandKeyDown(InputEvent event) {
+		return Utils.isMacOSX() ? event.isMetaDown() : event.isControlDown();
+	}
 
     public void mouseDragged(MouseEvent mouseEvent) {
 
@@ -244,7 +254,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         if (event.getKeyCode() == KeyEvent.VK_SPACE) {
             dragMode = DragMode.SCROLL;
         }
-        crossHairCursor = event.isMetaDown();
+        crossHairCursor = isCommandKeyDown(event);
         setupCursor();
     }
 
@@ -252,7 +262,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
         if (event.getKeyCode() == KeyEvent.VK_SPACE) {
             dragMode = DragMode.SELECT;
         }
-        crossHairCursor = event.isMetaDown();
+        crossHairCursor = isCommandKeyDown(event);
         setupCursor();
     }
 

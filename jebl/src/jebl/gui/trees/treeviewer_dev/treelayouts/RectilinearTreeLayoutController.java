@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer_dev.treelayouts;
 
 import org.virion.jam.controlpalettes.AbstractController;
 import org.virion.jam.panels.OptionsPanel;
+import org.virion.jam.components.RealNumberField;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

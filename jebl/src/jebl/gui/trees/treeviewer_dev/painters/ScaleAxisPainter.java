@@ -16,7 +16,7 @@ import java.util.Collection;
  * @version $Id: ScaleBarPainter.java,v 1.7 2006/11/21 16:10:24 rambaut Exp $
  */
 public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePainter {
-    private double majorTickSpacing = 1.0;
+	private double majorTickSpacing = 1.0;
     private double minorTickSpacing = 0.5;
 
     public ScaleAxisPainter() {
@@ -40,6 +40,14 @@ public class ScaleAxisPainter extends LabelPainter<TreePane> implements ScalePai
     public void setAxisSpacing(double majorTickSpacing, double minorTickSpacing) {
         treePane.setTickSpacing(majorTickSpacing, minorTickSpacing);
     }
+
+	public double getAxisOrigin() {
+	    return 0.0;
+	}
+
+	public void setAxisOrigin(double axisOrigin) {
+		//
+	}
 
     public double getMajorTickSpacing() {
         return majorTickSpacing;

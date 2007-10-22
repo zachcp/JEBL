@@ -312,6 +312,9 @@ public class ScaleAxis {
                 calcMinTick();
                 calcMaxTick();
 
+	            majorTickCount=(int)(maxTick-minTick/majorTick);
+	            minorTickCount=(int)(majorTick/minorTick);
+
                 if (isAutomaticTickSpacing) {
                     calcMajorTick();
                     calcMinorTick();

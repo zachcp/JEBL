@@ -19,7 +19,8 @@ import java.util.List;
  * @version $Id$
  */
 public class TreePane extends JComponent implements PainterListener, Printable {
-    public enum RootingType {
+
+	public enum RootingType {
         USER_ROOTING("User Selection"),
         MID_POINT("Midpoint");
 //		LEAST_SQUARES("least squares");
@@ -205,10 +206,11 @@ public class TreePane extends JComponent implements PainterListener, Printable {
      *	Transform a chart co-ordinates into a drawing co-ordinates
      */
     public double scaleOnAxis(double value) {
+	    double height = timeScale.getHeight(value, tree);
         if (axisReversed) {
-            return treeBounds.getX() + treeBounds.getWidth() - ((value - scaleAxis.getMinAxis()) * treeScale);
+            return treeBounds.getX() + treeBounds.getWidth() - (height * treeScale);
         } else {
-            return treeBounds.getX() +  ((value - scaleAxis.getMinAxis()) * treeScale);
+	        return treeBounds.getX() + (height * treeScale);
         }
     }
 
@@ -216,19 +218,45 @@ public class TreePane extends JComponent implements PainterListener, Printable {
         return scaleAxis;
     }
 
-    private void setupScaleAxis() {
-        double treeHeight = tree.getHeight(tree.getRootNode()) + treeLayout.getTotalRootLength();
+	public double getAxisOrigin() {
+		return axisOrigin;
+	}
+
+	public void setAxisOrigin(double axisOrigin) {
+		this.axisOrigin = axisOrigin;
+	}
+
+	private void setupScaleAxis() {
+        double treeHeight = tree.getHeight(tree.getRootNode()) + treeLayout.getRootLength();
         double minValue = timeScale.getAge(0.0, tree);
         double maxValue = timeScale.getAge(treeHeight, tree);
 
         if (minValue < maxValue) {
+	        if (axisOrigin < minValue) {
+		        minValue = axisOrigin;
+	        }
             scaleAxis.setRange(minValue, maxValue);
-            axisReversed = true;
-        } else {
-            scaleAxis.setRange(maxValue, minValue);
             axisReversed = false;
+        } else {
+	        if (axisOrigin > minValue) {
+		        minValue = axisOrigin;
+	        }
+            scaleAxis.setRange(maxValue, minValue);
+            axisReversed = true;
         }
     }
+
+	public void setRootAge(double rootAge) {
+		double rootLength = timeScale.getHeight(rootAge, tree) - tree.getHeight(tree.getRootNode());
+		treeLayout.setRootLength(rootLength);
+		calibrated = false;
+		repaint();
+	}
+
+	public double getRootAge() {
+		double treeHeight = tree.getHeight(tree.getRootNode()) + treeLayout.getRootLength();
+		return timeScale.getAge(treeHeight, tree);
+	}
 
     public double getMajorTickSpacing() {
         return scaleAxis.getMajorTickSpacing();
@@ -1316,6 +1344,16 @@ public class TreePane extends JComponent implements PainterListener, Printable {
             }
         }
 
+	    for (Shape collapsedShape : treeLayoutCache.getCollapsedShapeMap().values()) {
+	        // Add the bounds of the branch path to the overall bounds
+		    final Rectangle2D branchBounds = transform.createTransformedShape(collapsedShape).getBounds2D();
+	        if (treeBounds == null) {
+	            treeBounds = branchBounds;
+	        } else {
+	            treeBounds.add(branchBounds);
+	        }
+	    }
+
         // Clear the map of individual taxon label bounds and transforms
         tipLabelBounds.clear();
         tipLabelTransforms.clear();
@@ -1515,12 +1553,13 @@ public class TreePane extends JComponent implements PainterListener, Printable {
     private boolean rootingOn = false;
     private RootingType rootingType = RootingType.USER_ROOTING;
     private Node rootingNode = null;
-    private double rootingLength = 0.5;
+    private double rootingLength = 0.01;
 
     private Rectangle2D treeBounds = new Rectangle2D.Double();
     private double treeScale;
 
     private ScaleAxis scaleAxis = new ScaleAxis(ScaleAxis.AT_DATA, ScaleAxis.AT_DATA);
+	private double axisOrigin = 0.0;
     private boolean axisReversed = false;
     private TimeScale timeScale = new TimeScale(1.0, 0.0);
 

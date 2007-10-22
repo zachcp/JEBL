@@ -8,7 +8,18 @@ import java.util.Set;
  * @version $Id$
  */
 public abstract class AbstractTreeLayout implements TreeLayout {
-    public void addTreeLayoutListener(TreeLayoutListener listener) {
+	private double rootLength = 0.0;
+
+	public double getRootLength() {
+		return rootLength;
+	}
+
+	public void setRootLength(double rootLength) {
+		this.rootLength = rootLength;
+		fireTreeLayoutChanged();
+	}
+
+	public void addTreeLayoutListener(TreeLayoutListener listener) {
         listeners.add(listener);
     }
 
@@ -16,7 +27,7 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         listeners.remove(listener);
     }
 
-    protected void fireTreeLayoutChanged() {
+	protected void fireTreeLayoutChanged() {
         for (TreeLayoutListener listener : listeners) {
             listener.treeLayoutChanged();
         }

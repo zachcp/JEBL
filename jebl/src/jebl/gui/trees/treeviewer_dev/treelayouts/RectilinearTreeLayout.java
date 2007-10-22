@@ -14,14 +14,13 @@ import java.util.List;
 public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	private double curvature = 0.0;
-	private double rootLengthProportion = 0.01;
 	private boolean alignTipLabels = false;
-
-	private double totalRootLength = 0.0;
 
 	private double fishEye = 0.0;
 	private double pointOfInterest = 0.5;
 	private int tipCount = 0;
+
+	private double rootLengthProportion = 0.01;
 
 	private double yPosition;
 	private double yIncrement;
@@ -40,12 +39,17 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		return true;
 	}
 
-	public double getTotalRootLength() {
-		return totalRootLength;
-	}
-
 	public boolean maintainAspectRatio() {
 		return false;
+	}
+
+	public double getRootLengthProportion() {
+		return rootLengthProportion;
+	}
+
+	public void setRootLengthProportion(double rootLengthProportion) {
+		this.rootLengthProportion = rootLengthProportion;
+		fireTreeLayoutChanged();
 	}
 
 	public double getHeightOfPoint(Point2D point) {
@@ -71,10 +75,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		return alignTipLabels;
 	}
 
-	public double getRootLengthProportion() {
-		return rootLengthProportion;
-	}
-
 	public double getCurvature() {
 		return curvature;
 	}
@@ -94,11 +94,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
 	public void setCurvature(double curvature) {
 		this.curvature = curvature;
-		fireTreeLayoutChanged();
-	}
-
-	public void setRootLengthProportion(double rootLengthProportion) {
-		this.rootLengthProportion = rootLengthProportion;
 		fireTreeLayoutChanged();
 	}
 
@@ -123,12 +118,12 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 		yIncrement = 1.0 / (tipCount - 1);
 
 		Node root = tree.getRootNode();
-		totalRootLength = rootLengthProportion * tree.getHeight(root);
+		setRootLength(rootLengthProportion * tree.getHeight(root));
 
 		maxXPosition = 0.0;
-		getMaxXPosition(tree, root, totalRootLength);
+		getMaxXPosition(tree, root, getRootLength());
 
-		Point2D rootPoint = constructNode(tree, root, totalRootLength, cache);
+		Point2D rootPoint = constructNode(tree, root, getRootLength(), cache);
 
 		// construct a root branch line
 		double ty = transformY(rootPoint.getY());
