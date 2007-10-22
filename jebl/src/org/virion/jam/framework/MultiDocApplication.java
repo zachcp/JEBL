@@ -150,6 +150,9 @@ public class MultiDocApplication extends Application {
 		}
 		documentFrame.setVisible(false);
 		documentFrame.dispose();
+		if (documents.size() == 0) {
+			doQuit();
+		}
 	}
 
 	private void addDocumentFrame(DocumentFrame documentFrame) {
