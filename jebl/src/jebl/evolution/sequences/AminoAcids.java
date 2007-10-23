@@ -174,6 +174,9 @@ public final class AminoAcids {
         return state == GAP_STATE;
     }
 
+    // TT: This method is badly named because the word "triplet" is usually used for
+    // a sequence of three DNA/RNA states that represent one amino acid; the
+    // three-letter name for amino acids is just called their three-letter code, I think.
     public static String getTripletCode(AminoAcidState state) {
         return AMINOACID_TRIPLETS[state.getIndex()];
     }
