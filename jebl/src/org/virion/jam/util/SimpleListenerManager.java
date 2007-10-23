@@ -35,7 +35,8 @@ public class SimpleListenerManager implements SimpleListener {
      * {@link #add(SimpleListener)} .
      */
     public synchronized void fire() {
-        for (SimpleListener simpleListener : listeners) {
+        List<SimpleListener> listenersCopy = new ArrayList<SimpleListener>(listeners);  // Copy to avoid ConcurrentModificationExceptions
+        for (SimpleListener simpleListener : listenersCopy) {
             simpleListener.objectChanged();
         }
     }
