@@ -135,7 +135,8 @@ public abstract class TreeViewer extends JPanel implements Printable {
 	    CONTAINS("Contains"),
 	    STARTS_WITH("Starts with"),
 	    ENDS_WITH("Ends with"),
-	    MATCHES("Matches");
+	    MATCHES("Matches"),
+		REG_EX("Regular Expression");
 
 	    SearchType(String name) {
 	        this.name = name;

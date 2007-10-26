@@ -28,7 +28,11 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener, Key
 	public enum ToolMode {
 	    SELECT,
 	    ROOTING,
-		ROTATING
+		CARTOONING,
+		COLLAPSING,
+		ROTATING,
+		ANNOTATING,
+		COLOURING
 	};
 
 

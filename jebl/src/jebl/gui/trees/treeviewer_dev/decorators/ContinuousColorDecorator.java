@@ -51,23 +51,45 @@ public class ContinuousColorDecorator implements Decorator {
 
 	// Private methods
 	private void setAttributableItem(Attributable item) {
-		paint = null;
+		double value = continuousScale.getValue((Attributable)item);
 
-		double value = continuousScale.getValue(item);
+		Color colour = getColour(value);
 
+		Color fillColour = null;
+		if (colour != null) {
+			fillColour = getLighterColour(colour);
+		}
+		if (colour != null) {
+			paint = colour;
+			fillPaint = fillColour;
+		} else {
+			paint = null;
+			fillPaint = null;
+		}
+	}
+
+	// Private methods
+	protected Color getColour(double value) {
 		if (!Double.isNaN(value)) {
 			float p = (float)value;
 			float q = 1.0F - p;
 
-			paint = new Color(
+			return new Color(
 					color1[0] * p + color2[0] * q,
 					color1[1] * p + color2[1] * q,
 					color1[2] * p + color2[2] * q,
 					color1[3] * p + color2[3] * q);
-			fillPaint = new Color(paint.getRed(), paint.getGreen(), paint.getBlue(), paint.getAlpha() / 2);
 		} else {
-			paint = fillPaint = null;
+			return null;
 		}
+	}
+
+	protected Color getLighterColour(Color color) {
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 2);
+	}
+
+	public ContinousScale getContinuousScale() {
+		return continuousScale;
 	}
 
 	private final ContinousScale continuousScale;

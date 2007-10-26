@@ -132,7 +132,7 @@ public class TreeAppearanceController extends AbstractController {
 		        } else {
 			        treeViewer.setBranchColouringDecorator(null, null);
 
-		            compoundDecorator.addDecorator(new ContinuousColorDecorator(
+		            compoundDecorator.addDecorator(new ContinuousGradientColorDecorator(
 		                    new ContinousScale(attribute, nodes, false, false),
 		                    new Color(192, 16, 0), new Color(0, 16, 192))
 			        );
@@ -155,6 +155,41 @@ public class TreeAppearanceController extends AbstractController {
 		}
 
 		treeViewer.setBranchDecorator(compoundDecorator);
+
+		// To apply a gradient decorator - not fully integrated with compound decorator
+
+//		Set<Node> nodes = new HashSet<Node>();
+//		for (Tree tree : treeViewer.getTrees()) {
+//		    for (Node node : tree.getNodes()) {
+//		        nodes.add(node);
+//		    }
+//		}
+//
+//		if (branchColourAttributeCombo.getSelectedIndex() == 0) {
+//		    treeViewer.setBranchColouringDecorator(null, null);
+//			treeViewer.setBranchDecorator(userBranchColourDecorator);
+//		} else {
+//		    String attribute = (String) branchColourAttributeCombo.getSelectedItem();
+//		    if (attribute != null && attribute.length() > 0) {
+//		        if (attribute.endsWith("*")) {
+//		            Decorator decorator = new DiscreteColorDecorator();
+//
+//		            treeViewer.setBranchColouringDecorator(attribute.substring(0, attribute.length() - 2), decorator);
+//		        } else if (DiscreteColorDecorator.isDiscrete(attribute, nodes)) {
+//			        treeViewer.setBranchColouringDecorator(null, null);
+//			        treeViewer.setBranchDecorator(new DiscreteColorDecorator(attribute, nodes));
+//		        } else {
+//			        treeViewer.setBranchColouringDecorator(null, null);
+//
+//		            treeViewer.setBranchDecorator(new ContinuousGradientColorDecorator(
+//		                    new ContinousScale(attribute, nodes, false, false),
+//		                    new Color(192, 16, 0), new Color(0, 16, 192))
+//			        );
+//
+//		        }
+//		    }
+//		}
+
 	}
 
     private void setupAttributes(Collection<? extends Tree> trees) {

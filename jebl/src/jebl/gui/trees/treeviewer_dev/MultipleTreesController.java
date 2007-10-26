@@ -21,9 +21,8 @@ public class MultipleTreesController extends AbstractController {
 		optionsPanel = new OptionsPanel(2, 2, "SmallSystemFont");
 
 		final JLabel treeNameLabel = new JLabel("Tree 1");
-		final SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, 1, 1);
+		final SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, 100000, 1);
 		JSpinner currentTreeSpinner = new JSpinner(spinnerModel);
-
 		currentTreeSpinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent changeEvent) {
 				treeViewer.showTree((Integer)spinnerModel.getValue() - 1);

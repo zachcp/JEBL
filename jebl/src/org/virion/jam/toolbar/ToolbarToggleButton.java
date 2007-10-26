@@ -7,10 +7,12 @@ import javax.swing.*;
  *         Date: Oct 18, 2005
  *         Time: 10:09:21 PM
  */
-public class ToolbarToggleButton extends JToggleButton implements ToolbarItem {
+public class ToolbarToggleButton extends JButton implements ToolbarItem {
 
-	public ToolbarToggleButton(ToolbarAction action) {
+	public ToolbarToggleButton(ToolbarAction action, boolean doubleClickToToggle) {
 		super(action);
+
+		this.doubleClickToToggle = doubleClickToToggle;
 
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -48,6 +50,14 @@ public class ToolbarToggleButton extends JToggleButton implements ToolbarItem {
 		}
 	}
 
+	public void doClick() {
+		super.doClick();
+	}
+
+	public void doClick(int i) {
+		super.doClick(i);
+	}
+
 	public void setAction(Action action) {
 		super.setAction(action);
 		if (action instanceof ToolbarAction) {
@@ -56,4 +66,5 @@ public class ToolbarToggleButton extends JToggleButton implements ToolbarItem {
 	}
 
 	private ToolbarAction action;
+	private boolean doubleClickToToggle;
 }

@@ -60,6 +60,10 @@ public class ContinuousStrokeDecorator implements Decorator {
 		}
 	}
 
+	public ContinousScale getContinuousScale() {
+		return continuousScale;
+	}
+
 	private final ContinousScale continuousScale;
 
 	private final float minWidth;
