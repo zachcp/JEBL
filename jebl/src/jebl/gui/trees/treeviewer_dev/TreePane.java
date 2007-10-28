@@ -15,7 +15,6 @@ import java.awt.print.*;
 import java.util.*;
 import java.util.List;
 
-import com.sun.tools.javac.util.Paths;
 
 /**
  * @author Andrew Rambaut
