@@ -24,8 +24,8 @@ public final class AminoAcids {
     
     public static final String NAME = "amino acid";
 
-    public static final int CANONICAL_STATE_COUNT = 20;
-    public static final int STATE_COUNT = 27;
+    public static final int CANONICAL_STATE_COUNT = 21;
+    public static final int STATE_COUNT = 28;
 
     public static final AminoAcidState A_STATE = new AminoAcidState("A", "A", 0);
     public static final AminoAcidState C_STATE = new AminoAcidState("C", "C", 1);
@@ -47,10 +47,16 @@ public final class AminoAcids {
     public static final AminoAcidState V_STATE = new AminoAcidState("V", "V", 17);
     public static final AminoAcidState W_STATE = new AminoAcidState("W", "W", 18);
     public static final AminoAcidState Y_STATE = new AminoAcidState("Y", "Y", 19);
-    // If you use these, make sure to change the numbers of B..- below to 22..28,
+
+    // TT: We've ordered all the other states alphabetically but I think it's better to let
+    // Selenocysteine be #20 because it's the first "nonstandard" amino acid.
+    public static final AminoAcidState U_STATE = new AminoAcidState("U", "U", 20); // Selenocysteine
+
+    // If you use this, make sure to change the numbers of B..- below to 22..28,
     // and increase CANONICAL_STATE_COUNT to 22, STATE_COUNT to 29
-    //public static final AminoAcidState U_STATE = new AminoAcidState("U", "U", 20); // Selenocysteine
     // As of 2006-12-14 I think there is no IUPAC one letter code for Pyrrolysine, but BioJava uses "O"
+    // and in fact "O" is the only letter of the alphabet that isn't yet assigned to another residue
+    // or ambiguity state.
     //public static final AminoAcidState O_STATE = new AminoAcidState("O", "O", 21); // Pyrrolysine
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
@@ -61,16 +67,16 @@ public final class AminoAcids {
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
             S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE,
-           // U_STATE, O_STATE,
+            U_STATE, // O_STATE,
     };
 
-    public static final AminoAcidState B_STATE = new AminoAcidState("B", "B", 20, new AminoAcidState[]{D_STATE, N_STATE});
-    public static final AminoAcidState Z_STATE = new AminoAcidState("Z", "Z", 21, new AminoAcidState[]{E_STATE, Q_STATE});
-    public static final AminoAcidState J_STATE = new AminoAcidState("J", "J", 22, new AminoAcidState[]{I_STATE, L_STATE});
-    public static final AminoAcidState X_STATE = new AminoAcidState("X", "X", 23, CANONICAL_STATES);
-    public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("?", "?", 24, CANONICAL_STATES);
-    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 25, CANONICAL_STATES);
-    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 26, CANONICAL_STATES);
+    public static final AminoAcidState B_STATE = new AminoAcidState("B", "B", 21, new AminoAcidState[]{D_STATE, N_STATE});
+    public static final AminoAcidState Z_STATE = new AminoAcidState("Z", "Z", 22, new AminoAcidState[]{E_STATE, Q_STATE});
+    public static final AminoAcidState J_STATE = new AminoAcidState("J", "J", 23, new AminoAcidState[]{I_STATE, L_STATE});
+    public static final AminoAcidState X_STATE = new AminoAcidState("X", "X", 24, CANONICAL_STATES);
+    public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("?", "?", 25, CANONICAL_STATES);
+    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 26, CANONICAL_STATES);
+    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 27, CANONICAL_STATES);
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
     // and will become private in the future. Use {@link #getStates} instead.
@@ -81,7 +87,8 @@ public final class AminoAcids {
             G_STATE, H_STATE, I_STATE, K_STATE, L_STATE,
             M_STATE, N_STATE, P_STATE, Q_STATE, R_STATE,
             S_STATE, T_STATE, V_STATE, W_STATE, Y_STATE,
-            //U_STATE, O_STATE,
+            U_STATE,
+            // O_STATE,
             // Ambiguity states
             B_STATE, Z_STATE, J_STATE, X_STATE, UNKNOWN_STATE,
             // STOP_STATE represents the amino acid equivalent of a stop codon to cater for
@@ -90,6 +97,8 @@ public final class AminoAcids {
             GAP_STATE
     };
 
+    // The following three arrays only contain meta information for the first 20 amino acids. They are not
+    // used anywhere in Geneious and could potentially be removed/replaced
     // Chemical classifications
     public static final StateClassification CHEMICAL_CLASSIFICATION = new StateClassification.Default("chemical",
             new String[]{"alphatic", "phenylalanine", "sulphur", "glycine", "hydroxyl", "tryptophan", "tyrosine", "proline", "acidic", "amide", "basic"},
@@ -120,9 +129,9 @@ public final class AminoAcids {
             // L     M      N      P      Q      R      S      T      V
             "Leu", "Met", "Asn", "Pro", "Gln", "Arg", "Ser", "Thr", "Val",
             //W      Y        U      O
-            "Trp", "Tyr", //"Sec", "Pyl",
-            //B       Z      J      X      *      ?     -
-            "Asx",  "Glx", "Xle", " X ", " * ", " ? ", " - "
+            "Trp", "Tyr", "Sec", //"Pyl",
+            //B      Z      J      X      *      ?     -
+            "Asx", "Glx", "Xle", " X ", " * ", " ? ", " - "
     };
     private static final int STATE_BY_CODE_SIZE = 128;
 
