@@ -108,7 +108,13 @@ public class PrintUtilities implements Printable {
             g2d.scale(scale, scale);
 
             disableDoubleBuffering(componentToBePrinted);
+            //try{
             componentToBePrinted.paint(g2d);
+            //}
+            //catch(NullPointerException ex){
+            //    System.out.print("ERROR: ");
+            //}
+            //System.out.println("x0: "+x0+", y0: "+y0+", w0: "+w0+", h0: "+h0+", w1: "+w1+", h1: "+h1);
             enableDoubleBuffering(componentToBePrinted);
 
             return (PAGE_EXISTS);
