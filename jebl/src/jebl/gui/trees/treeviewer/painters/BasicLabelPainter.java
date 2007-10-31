@@ -393,7 +393,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             optionsPanel.addComponentWithLabel("Display:", combo1);
             final JSpinner fontSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48, 1));
 
-            optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
+            //optionsPanel.addComponentWithLabel("Font Size:", fontSizeSpinner);
             //final boolean xselected = showTextCHeckBox.isSelected();
             //label1.setEnabled(selected);
             //fontSizeSpinner.setEnabled(selected);
@@ -403,13 +403,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             setFontSize(fontsize, false);
             fontSizeSpinner.setValue(fontsize);
 
-            fontSizeSpinner.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    final float size = ((Double) fontSizeSpinner.getValue()).floatValue();
-                    setFontSize(size, true);
-                    PREFS.putFloat(fontSizePrefKey, size);
-                }
-            });
 
 
             //-----------------------------------------
@@ -425,12 +418,49 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             setFontMinSize(size, false);
 
             final JSpinner fontMinSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultMinFontSize, 0.01, 48, 1));
-            optionsPanel.addComponentWithLabel("Minimum Size:", fontMinSizeSpinner);
+            //optionsPanel.addComponentWithLabel("Minimum Size:", fontMinSizeSpinner);
+            JPanel fontSizePanel = new JPanel(new FlowLayout());
+            fontSizePanel.add(fontMinSizeSpinner);
+            fontSizePanel.add(new JLabel("to"));
+            fontSizePanel.add(fontSizeSpinner);
+            optionsPanel.addComponentWithLabel("Font Size:", fontSizePanel);
             //fontMinSizeSpinner.setValue(size);
+
+            fontSizeSpinner.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent changeEvent) {
+                    float size = ((Double) fontSizeSpinner.getValue()).floatValue();
+                    Object value = fontMinSizeSpinner.getValue();
+                    final float minSize;
+                    if(value instanceof Double)
+                        minSize = ((Double)value).floatValue();
+                    else
+                        minSize = (Float)value;
+
+                    if(size < minSize){
+                        size = minSize;
+                        fontSizeSpinner.setValue((double)size);
+                    }
+
+
+                    setFontSize(size, true);
+                    PREFS.putFloat(fontSizePrefKey, size);
+                }
+            });
 
             fontMinSizeSpinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    final float size = ((Double) fontMinSizeSpinner.getValue()).floatValue();
+                    float size = ((Double) fontMinSizeSpinner.getValue()).floatValue();
+                    Object value = fontSizeSpinner.getValue();
+                    final float maxSize;
+                    if(value instanceof Double)
+                        maxSize = ((Double)value).floatValue();
+                    else
+                        maxSize = (Float)value;
+                    
+                    if(size > maxSize){
+                        size = maxSize;
+                        fontMinSizeSpinner.setValue((double)size);
+                    }
                     setFontMinSize(size, true);
                     PREFS.putFloat(fontMinSizePrefKey, size);
                 }
