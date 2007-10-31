@@ -429,18 +429,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             fontSizeSpinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     float size = ((Double) fontSizeSpinner.getValue()).floatValue();
-                    Object value = fontMinSizeSpinner.getValue();
-                    final float minSize;
-                    if(value instanceof Double)
-                        minSize = ((Double)value).floatValue();
-                    else
-                        minSize = (Float)value;
-
-                    if(size < minSize){
-                        size = minSize;
-                        fontSizeSpinner.setValue((double)size);
+                    final float minSize = ((Number) fontMinSizeSpinner.getValue()).floatValue();
+                    if (size < minSize) {
+                        fontMinSizeSpinner.setValue((double) size);
                     }
-
 
                     setFontSize(size, true);
                     PREFS.putFloat(fontSizePrefKey, size);
@@ -450,16 +442,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             fontMinSizeSpinner.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     float size = ((Double) fontMinSizeSpinner.getValue()).floatValue();
-                    Object value = fontSizeSpinner.getValue();
-                    final float maxSize;
-                    if(value instanceof Double)
-                        maxSize = ((Double)value).floatValue();
-                    else
-                        maxSize = (Float)value;
-                    
-                    if(size > maxSize){
-                        size = maxSize;
-                        fontMinSizeSpinner.setValue((double)size);
+                    final float maxSize = ((Number) fontSizeSpinner.getValue()).floatValue();
+                    if (size > maxSize) {
+                        fontSizeSpinner.setValue((double) size);
                     }
                     setFontMinSize(size, true);
                     PREFS.putFloat(fontMinSizePrefKey, size);
