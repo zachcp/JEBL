@@ -130,17 +130,6 @@ public interface SequenceType {
      */
     State[] toStateArray(byte[] indexArray);
 
-    /**
-     * Get a sequence string identical to <code>sequenceString</code>
-     * except that any invalid states are removed. Gaps are not removed nor
-     * are any other states such as * for amino acids.
-     * All valid characters remain unchanged (they maintain their original case and there are no U->T replacements for nucleotides)
-     * @param sequenceString a string of characters that may or may not be valid states.
-     * @return a sequence string identical to <code>sequenceString</code>
-     * except that any invalid states are removed. If there are no invalid states, <code>sequenceString</code> is returned.
-     */
-    String removeInvalidStates(String sequenceString);
-
     public static final SequenceType NUCLEOTIDE = new SequenceType() {
         public int getStateCount() {
             return Nucleotides.getStateCount();
@@ -208,10 +197,6 @@ public interface SequenceType {
 
         public String toString() {
             return getName();
-        }
-
-        public String removeInvalidStates(String sequenceString) {
-            return Nucleotides.removeInvalidStates(sequenceString);
         }
     };
 
@@ -283,10 +268,6 @@ public interface SequenceType {
         public String toString() {
             return getName();
         }
-
-        public String removeInvalidStates(String sequenceString) {
-            return AminoAcids.removeInvalidStates(sequenceString);
-        }
     };
 
     public static final SequenceType CODON = new SequenceType() {
@@ -357,10 +338,6 @@ public interface SequenceType {
 
         public String toString() {
             return getName();
-        }
-
-        public String removeInvalidStates(String sequenceString) {
-            return Nucleotides.removeInvalidStates(sequenceString);
         }
     };
 

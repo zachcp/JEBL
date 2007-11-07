@@ -217,8 +217,4 @@ public final class AminoAcids {
             statesByCode[Character.toLowerCase(code)] = state;
         }
     }
-
-    static String removeInvalidStates(String sequenceString) {
-        return Nucleotides.removeInvalidStates(sequenceString, statesByCode);
-    }
 }

@@ -107,31 +107,6 @@ public final class Nucleotides {
         return statesByCode[code];
 	}
 
-    static String removeInvalidStates(String sequenceString) {
-        return removeInvalidStates(sequenceString, statesByCode);
-    }
-
-    static String removeInvalidStates(String sequenceString, State[] states) {
-        int length=sequenceString.length();
-        int invalidCount=0;
-        for (int i = 0; i < length; i++) {
-            if (states[sequenceString.charAt(i)]==null) {
-                invalidCount++;
-            }
-        }
-        if (invalidCount==0)
-            return sequenceString;
-        StringBuilder builder=new StringBuilder(length-invalidCount);
-        for (int i = 0; i < length; i++) {
-            char c = sequenceString.charAt(i);
-            if (states[c] != null) {
-                builder.append(c);
-            }
-        }
-//        System.out.println("replaced '"+sequenceString+"' with '"+builder.toString()+"'");
-        return builder.toString();
-    }
-
     public static NucleotideState getState(String code) {
         return getState(code.charAt(0));
     }
