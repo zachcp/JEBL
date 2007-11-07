@@ -137,7 +137,7 @@ public interface SequenceType {
      * All valid characters remain unchanged (they maintain their original case and there are no U->T replacements for nucleotides)
      * @param sequenceString a string of characters that may or may not be valid states.
      * @return a sequence string identical to <code>sequenceString</code>
-     * except that any invalid states are removed.
+     * except that any invalid states are removed. If there are no invalid states, <code>sequenceString</code> is returned.
      */
     String removeInvalidStates(String sequenceString);
 
