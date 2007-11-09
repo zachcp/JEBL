@@ -9,6 +9,7 @@ package jebl.evolution.io;
 public class ImportException extends Exception {
 	public ImportException() { super(); }
 	public ImportException(String message) { super(message); }
+    public ImportException(String message, Throwable cause) { super(message, cause); }
     public String userMessage() { return getMessage(); }
 
     public static class DuplicateFieldException extends ImportException {
