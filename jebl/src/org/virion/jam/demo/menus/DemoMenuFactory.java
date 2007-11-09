@@ -1,17 +1,15 @@
-/*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
- */
 package org.virion.jam.demo.menus;
 
-import org.virion.jam.framework.MenuFactory;
 import org.virion.jam.framework.AbstractFrame;
+import org.virion.jam.framework.MenuFactory;
 
 import javax.swing.*;
 
 /**
- * @author rambaut
- *         Date: Feb 24, 2005
- *         Time: 5:12:11 PM
+ * @author Andrew Rambaut
+ * @version $Id$
+ *
+ * Created on 24 February 2005, 17:12:11
  */
 public class DemoMenuFactory implements MenuFactory {
 

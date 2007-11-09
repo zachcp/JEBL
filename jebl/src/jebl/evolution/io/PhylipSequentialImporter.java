@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
- */
-
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.BasicSequence;
