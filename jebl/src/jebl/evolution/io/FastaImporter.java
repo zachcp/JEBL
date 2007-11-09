@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2005 Your Corporation. All Rights Reserved.
- */
-
 package jebl.evolution.io;
 
 import jebl.evolution.sequences.BasicSequence;
@@ -112,7 +108,13 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
             do {
                 final String line = helper.readLine();
                 final StringTokenizer tokenizer = new StringTokenizer(line, " \t");
-                String name = ImportHelper.convertControlsChars(tokenizer.nextToken()).replace('_', ' ');
+                // TT: Got rid of the replace below (bug 4163). I originally thought that "_"
+                // was just a way of representing " " in sequence names in FASTA because they
+                // can't contain " ". However NCBI displays its accessions with a "_" on their
+                // website so I suppose we'll have to consider "_" a part of the name. Note
+                // that exporting and then importing a sequence will now replace any " "s in
+                // its name with "_".
+                String name = ImportHelper.convertControlsChars(tokenizer.nextToken()); //.replace('_', ' ');
 
                 final String description = tokenizer.hasMoreElements() ?
                         ImportHelper.convertControlsChars(tokenizer.nextToken("")) : null;
