@@ -92,7 +92,8 @@ public class PHYLIPExporter implements AlignmentExporter, TreeExporter {
 
     public void exportAlignment(Alignment alignment) throws IOException {
         List<Sequence> seqs = alignment.getSequenceList();
-        writer.println(" " + seqs.size() + " " + seqs.get(0).getLength());
+        final int alignmentLength = (seqs.isEmpty() ? 0 : seqs.get(0).getLength()); // # columns 
+        writer.println(" " + seqs.size() + " " + alignmentLength);
         List<String> names = phylipNames(seqs);
 
         for(int i = 0; i < seqs.size(); ++i) {
