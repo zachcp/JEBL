@@ -76,11 +76,13 @@ import jebl.util.ProgressListener;
 
 public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
-    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+            throws CannotBuildDistanceMatrixException
+    {
         super(alignment.getTaxa(), new Initializer().getDistances(alignment, progress,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable));
     }
 
-    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) {
+    public HKYDistanceMatrix(Alignment alignment, ProgressListener progress) throws CannotBuildDistanceMatrixException {
         this(alignment,progress,false);
     }
 
@@ -95,8 +97,9 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
 
         /**
          * Calculate the distance between two of the sequences from the alignment.
+         * @throws CannotBuildDistanceMatrixException
          */
-        public double calculatePairwiseDistance(int taxon1, int taxon2) {
+        public double calculatePairwiseDistance(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException {
             double sumTs = 0.0; // total weight of all columns that have a transition for these taxa
             double sumTv = 0.0; // total weight of all columns that have a transversion for these taxa
             double sumWeight = 0.0; // total weight of all columns (ignoring those with ambiguities, but
@@ -168,7 +171,9 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         }
 
 
-        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+                throws CannotBuildDistanceMatrixException
+        {
             Initializer.alignment = alignment;
 
             // ASK Alexei

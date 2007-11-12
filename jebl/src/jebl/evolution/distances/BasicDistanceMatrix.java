@@ -124,13 +124,16 @@ public class BasicDistanceMatrix implements DistanceMatrix {
     private final double[][] distances;
 
     protected interface PairwiseDistanceCalculator {
-        double calculatePairwiseDistance(int taxon1, int taxon2);
+        double calculatePairwiseDistance(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException;
     }
 
     /**
      * Utility method for building a matrix of distances based on a calculator for each pairwise sequence distance
+     * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false
      */
-    protected static double[][] buildDistancesMatrix(PairwiseDistanceCalculator pairwiseDistanceCalculator, int dimension, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable, ProgressListener progress) {
+    protected static double[][] buildDistancesMatrix(PairwiseDistanceCalculator pairwiseDistanceCalculator, int dimension, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable, ProgressListener progress)
+            throws CannotBuildDistanceMatrixException
+    {
         double[][] distances = new double[dimension][dimension];
 
         float tot = (dimension * (dimension - 1)) / 2;
@@ -165,6 +168,4 @@ public class BasicDistanceMatrix implements DistanceMatrix {
         }
         return distances;
     }
-
-
 }

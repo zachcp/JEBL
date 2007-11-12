@@ -18,10 +18,13 @@ import jebl.util.ProgressListener;
 
 public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
-    public JukesCantorDistanceMatrix(Alignment alignment, ProgressListener progress) {
+    public JukesCantorDistanceMatrix(Alignment alignment, ProgressListener progress) throws CannotBuildDistanceMatrixException {
         this(alignment,progress,false);    
     }
-    public JukesCantorDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+    
+    public JukesCantorDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+            throws CannotBuildDistanceMatrixException
+    {
         super(alignment.getTaxa(), new Initializer().getDistances(alignment, progress,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable));
     }
 
@@ -33,8 +36,9 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
         /**
          * Calculate number of substitution between sequences as a ratio.
+         * @throws CannotBuildDistanceMatrixException
          */
-        private double anySubstitutionRatio(int taxon1, int taxon2) {
+        private double anySubstitutionRatio(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException {
             double distance;
             double sumDistance = 0.0;
             double sumWeight = 0.0;
@@ -72,8 +76,9 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
         /**
          * Calculate a pairwise distance between the i'th and j'th taxons/sequences
+         * @throws CannotBuildDistanceMatrixException
          */
-        public double calculatePairwiseDistance(int taxon1, int taxon2) {
+        public double calculatePairwiseDistance(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException {
             double obsDist = anySubstitutionRatio(taxon1, taxon2);
 
             if (obsDist == 0.0) return 0.0;
@@ -88,7 +93,9 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
             return Math.min(expDist, MAX_DISTANCE);
         }
 
-        synchronized double[][] getDistances(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+        synchronized double[][] getDistances(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+                throws CannotBuildDistanceMatrixException
+        {
             this.alignment = alignment;
 
             // ASK Alexei
@@ -99,6 +106,5 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
             int dimension = alignment.getTaxa().size();
             return BasicDistanceMatrix.buildDistancesMatrix(this,dimension,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable,progress);
         }
-
     }
 }

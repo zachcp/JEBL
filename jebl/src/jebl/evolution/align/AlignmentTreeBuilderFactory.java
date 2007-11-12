@@ -8,8 +8,8 @@ import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.TreeBuilder;
 import jebl.evolution.trees.TreeBuilderFactory;
-import jebl.util.ProgressListener;
 import jebl.util.CompositeProgressListener;
+import jebl.util.ProgressListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class AlignmentTreeBuilderFactory {
     private final static Logger logger = Logger.getLogger(AlignmentTreeBuilderFactory.class.getName());
 
     private static interface DistanceMatrixBuilder {
-        DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener);
+        DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) throws CannotBuildDistanceMatrixException;
     }
 
     static public class Result {
@@ -44,14 +44,14 @@ public class AlignmentTreeBuilderFactory {
      * @param _progressListener must not be null
      * @return A tree building result (containing a tree and a distance matrix)
      */
-    private static Result build(DistanceMatrixBuilder distanceMatrixBuilder, TreeBuilderFactory.Method method, ProgressListener _progressListener) {
+    private static Result build(DistanceMatrixBuilder distanceMatrixBuilder, TreeBuilderFactory.Method method, ProgressListener _progressListener) throws CannotBuildDistanceMatrixException {
         // The requirement that progress isn't null has only been added on 2006-12-29.
         // For a grace period, we check whether it is null and only warn.
         if (_progressListener == null) {
             logger.warning("ProgressListener is null");
             _progressListener = ProgressListener.EMPTY;
         }
-        CompositeProgressListener progressListener = new CompositeProgressListener(_progressListener, new double[] { .5, .5 });
+        CompositeProgressListener progressListener = new CompositeProgressListener(_progressListener, .5, .5);
 
         progressListener.beginSubtask("Computing genetic distance for all pairs");
         long start = System.currentTimeMillis();
@@ -74,11 +74,13 @@ public class AlignmentTreeBuilderFactory {
      *          a tree from the alignment. If this parameter is false, then CannotBuildDistanceMatrixException will be thrown. If this parameter
      *          is true, then twice the maximum distance between all other pairs will be used non-overlapping pairs.
      * @return A tree building result (containing a tree and a distance matrix)
-     * @throws CannotBuildDistanceMatrixException
+     * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false
      */
-    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+            throws CannotBuildDistanceMatrixException
+    {
         DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
-            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) {
+            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) throws CannotBuildDistanceMatrixException {
                 switch( model ) {
                     case F84:
                         return new F84DistanceMatrix(alignment, progressListener);
@@ -102,7 +104,9 @@ public class AlignmentTreeBuilderFactory {
      * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
      * @return A tree building result (containing a tree and a distance matrix)
      */
-    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener) {
+    static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener)
+            throws CannotBuildDistanceMatrixException
+    {
         return build(alignment,method,model,progressListener,false);
     }
 
@@ -115,9 +119,11 @@ public class AlignmentTreeBuilderFactory {
      * @return A tree building result (containing a tree and a distance matrix)
      */
     static public Result build(final List<Sequence> seqs, TreeBuilderFactory.Method method, final PairwiseAligner aligner,
-                               ProgressListener progressListener) {
+                               ProgressListener progressListener)
+            throws CannotBuildDistanceMatrixException
+    {
         DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
-            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) {
+            public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) throws CannotBuildDistanceMatrixException {
                 return new SequenceAlignmentsDistanceMatrix(seqs, aligner, progressListener);
             }
         };
@@ -125,7 +131,9 @@ public class AlignmentTreeBuilderFactory {
     }
 
     static public Result build(List<Sequence> seqs, TreeBuilderFactory.Method method, MultipleAligner aligner,
-                                /*boolean needDistances, */ProgressListener progress, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+                                /*boolean needDistances, */ProgressListener progress, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+            throws CannotBuildDistanceMatrixException
+    {
        // needDistances = false;
 
         SimpleRootedTree gtree = new SimpleRootedTree();

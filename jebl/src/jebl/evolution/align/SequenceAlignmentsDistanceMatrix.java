@@ -1,6 +1,7 @@
 package jebl.evolution.align;
 
 import jebl.evolution.distances.BasicDistanceMatrix;
+import jebl.evolution.distances.CannotBuildDistanceMatrixException;
 import jebl.evolution.distances.F84DistanceMatrix;
 import jebl.evolution.distances.JukesCantorDistanceMatrix;
 import jebl.evolution.sequences.Sequence;
@@ -21,7 +22,9 @@ import java.util.List;
  *
  */
 public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
-    public SequenceAlignmentsDistanceMatrix(List<Sequence> seqs, PairwiseAligner aligner, ProgressListener progress) {
+    public SequenceAlignmentsDistanceMatrix(List<Sequence> seqs, PairwiseAligner aligner, ProgressListener progress)
+            throws CannotBuildDistanceMatrixException
+    {
         super(getTaxa(seqs), getDistances(seqs, aligner, progress));
     }
 
@@ -35,7 +38,7 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
 
 
 
-    static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, final ProgressListener progress) {
+    private static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, final ProgressListener progress) throws CannotBuildDistanceMatrixException {
         final int n = seqs.size();
         double [][] d = new double[n][n];
         boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount()> 4;

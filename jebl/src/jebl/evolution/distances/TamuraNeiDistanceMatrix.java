@@ -29,10 +29,13 @@ import jebl.util.ProgressListener;
 
 public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
-    public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+    /**
+     * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false
+     */
+    public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress, boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) throws CannotBuildDistanceMatrixException {
         super(alignment.getTaxa(), new Initializer().getDistances(alignment, progress, useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable));
     }
-    public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress) {
+    public TamuraNeiDistanceMatrix(Alignment alignment, ProgressListener progress) throws CannotBuildDistanceMatrixException {
         this(alignment,progress,false);
     }
 
@@ -45,8 +48,9 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
 
         /**
          * Calculate a pairwise distance
+         * @throws CannotBuildDistanceMatrixException
          */
-        public double calculatePairwiseDistance(int taxon1, int taxon2) {
+        public double calculatePairwiseDistance(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException {
 
             double sumTsAG = 0.0;
             double sumTsCT = 0.0;
@@ -133,7 +137,12 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
         }
 
 
-        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable) {
+        /**
+         * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false
+         */
+        double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
+                throws CannotBuildDistanceMatrixException
+        {
             this.alignment = alignment;
 
             // ASK Alexei

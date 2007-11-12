@@ -5,6 +5,7 @@ import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
+import jebl.evolution.distances.CannotBuildDistanceMatrixException;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.FastaImporter;
@@ -118,7 +119,9 @@ public class BartonSternberg implements MultipleAligner {
      * and this function will only refine the alignment.
      */
     public final String[] align(List<Sequence> sourceSequences, ProgressListener progress, boolean refineOnly,
-                          boolean estimateMatchMismatchCosts) {
+                          boolean estimateMatchMismatchCosts)
+            throws CannotBuildDistanceMatrixException
+    {
         if( origScores != null ) {
             establishScores(origScores);
         }
@@ -273,11 +276,15 @@ public class BartonSternberg implements MultipleAligner {
         BartonSternberg alignment = new BartonSternberg( new Blosum60(), 20, 1, 2, true, false);
         String[] sequences = sequenceStrings.toArray(new String[0]);
         System.out.println("aligning " + sequences.length);
-        String results[] = alignment.align(xsequences, null, false, false);
-        for (String result : results) {
-            System.out.println(result);
+        try {
+            String results[] = alignment.align(xsequences, null, false, false);
+            for (String result : results) {
+                System.out.println(result);
+            }
+            System.out.println("took " +(System.currentTimeMillis() - start) + " milliseconds");
+        } catch (CannotBuildDistanceMatrixException e) {
+            e.printStackTrace();
         }
-        System.out.println ("took " +(System.currentTimeMillis() - start) + " milliseconds");
     }
 
     public Alignment doAlign(List<Sequence> seqs, RootedTree guideTree, ProgressListener progress) {
