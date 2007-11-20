@@ -8,14 +8,12 @@
  */
 package jebl.evolution.treesimulation;
 
+import jebl.evolution.coalescent.*;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.io.NexusExporter;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.*;
 import jebl.math.Random;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -104,11 +102,93 @@ public class TreeSimulator {
 		});
 	}
 
-	public Tree simulate() {
+	public RootedTree simulate() {
 		return simulate(false);
 	}
 
-	public Tree simulate(boolean medianHeights) {
+	public RootedTree simulate(boolean medianHeights) {
+		SimpleRootedTree tree = new SimpleRootedTree();
+
+		Node[] tipNodes = new Node[taxa.size()];
+		int i = 0;
+		// create all the tips
+		for (Taxon taxon : taxa) {
+			Node tip = tree.createExternalNode(taxon);
+			tree.setHeight(tip, (Double)taxon.getAttribute(heightAttributeName));
+
+			tipNodes[i] = tip;
+
+			i++;
+		}
+
+		List<Node> activeNodes = new ArrayList<Node>();
+
+		int nextSampleNode = 0;
+		double currentHeight = 0.0;
+		double nextSampleHeight = 0.0;
+		boolean hasMoreSamples = true;
+
+		do {
+
+			// add at least 2 samples in (or more if they are sampled at the same time)
+			while (hasMoreSamples && (activeNodes.size() < 2 || currentHeight >= nextSampleHeight)) {
+
+				// Current height is now the height of the sampled node
+				currentHeight = tree.getHeight(tipNodes[nextSampleNode]);
+
+				// add the sampled node
+				activeNodes.add(tipNodes[nextSampleNode]);
+				nextSampleNode ++;
+
+				if (nextSampleNode < tipNodes.length) {
+					nextSampleHeight = tree.getHeight(tipNodes[nextSampleNode]);
+				} else {
+					hasMoreSamples = false;
+				}
+			}
+
+			double U;
+			if (!medianHeights) {
+				// draw a new height
+				U = - Math.log(Random.nextDouble());
+			} else {
+				// use the median height
+				U = - Math.log(0.5); // yes I know this is 2.0 but so does the Java compiler.
+			}
+
+			double X;
+
+			if (hasMoreSamples) {
+				// get the total intensity from the currentHeight up to the next sampling event...
+				X = intervalGenerator.getTotalIntensity(activeNodes.size(), currentHeight, nextSampleHeight);
+			} else {
+				X = Double.POSITIVE_INFINITY;
+			}
+
+			if (U < X) {
+				// if U < X, the coalescent event occurs before the next sampling event so use it...
+				double nextHeight = currentHeight + intervalGenerator.getInterval(U, activeNodes.size(), currentHeight);
+
+				// draw two nodes from the list of those available and remove them
+				Node leftNode = activeNodes.remove(Random.nextInt(activeNodes.size()));
+				Node rightNode = activeNodes.remove(Random.nextInt(activeNodes.size()));
+
+				Node node = coalesce(leftNode, rightNode, tree, nextHeight);
+				activeNodes.add(node);
+
+				currentHeight = nextHeight;
+			} else {
+				// Otherwise, subtract X from U and move on to the next sampling event...
+				U = U - X;
+				currentHeight = nextSampleHeight;
+			}
+
+		} while (hasMoreSamples || activeNodes.size() > 1);
+
+		return tree;
+	}
+
+	public RootedTree oldSimulate(boolean medianHeights) {
 		SimpleRootedTree tree = new SimpleRootedTree();
 
 		Node[] tipNodes = new Node[taxa.size()];
@@ -130,14 +210,12 @@ public class TreeSimulator {
 
 		// get at least two tips
 		int nextSampleNode = 0;
+		boolean hasMoreSamples = true;
 
 		do {
 
-			// if there are less than 2 lineages available or
-			// if the new height is older than some samples,
-			// then add the samples and reset the process
-			while (nextSampleNode < tipNodes.length &&
-					(activeNodes.size() < 2 || nextHeight >= tree.getHeight(tipNodes[nextSampleNode]))) {
+			// add at least 2 samples in (or more if they are sampled at the same time)
+			while (hasMoreSamples && (activeNodes.size() < 2 || currentHeight >= nextHeight)) {
 
 				// Current height is now the height of the sampled node
 				currentHeight = tree.getHeight(tipNodes[nextSampleNode]);
@@ -145,29 +223,35 @@ public class TreeSimulator {
 				// add the sampled node
 				activeNodes.add(tipNodes[nextSampleNode]);
 				nextSampleNode ++;
+
+				if (nextSampleNode < tipNodes.length) {
+					nextHeight = tree.getHeight(tipNodes[nextSampleNode]);
+				} else {
+					hasMoreSamples = false;
+				}
 			}
 
+			double U;
 			if (!medianHeights) {
 				// draw a new height
-				double U = Random.nextDouble();
-				nextHeight = currentHeight + intervalGenerator.getInterval(U, activeNodes.size(), currentHeight);
+				U = - Math.log(Random.nextDouble());
 			} else {
-				// obtain the median height
-				nextHeight = currentHeight + intervalGenerator.getInterval(0.5, activeNodes.size(), currentHeight);
+				// use the median height
+				U = - Math.log(0.5); // yes I know this is 2.0 but so does the Java compiler.
 			}
 
-			if (nextSampleNode >= tipNodes.length || nextHeight < tree.getHeight(tipNodes[nextSampleNode])) {
+			currentHeight = currentHeight + intervalGenerator.getInterval(U, activeNodes.size(), currentHeight);
+
+			if (!hasMoreSamples || currentHeight < nextHeight) {
 				// draw two nodes from the list of those available and remove them
 				Node leftNode = activeNodes.remove(Random.nextInt(activeNodes.size()));
 				Node rightNode = activeNodes.remove(Random.nextInt(activeNodes.size()));
 
-				Node node = coalesce(leftNode, rightNode, tree, nextHeight);
+				Node node = coalesce(leftNode, rightNode, tree, currentHeight);
 				activeNodes.add(node);
-
-				currentHeight = nextHeight;
 			}
 
-		} while (nextSampleNode < tipNodes.length || activeNodes.size() > 1);
+		} while (hasMoreSamples || activeNodes.size() > 1);
 
 		return tree;
 	}
@@ -176,7 +260,7 @@ public class TreeSimulator {
 
 		Node node = null;
 
-		node = tree.createInternalNode(Arrays.asList(new Node[] { leftNode, rightNode }));
+		node = tree.createInternalNode(Arrays.asList(leftNode, rightNode));
 		tree.setHeight(node, height);
 
 		return node;
@@ -197,42 +281,68 @@ public class TreeSimulator {
 				0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0
 		};
 
-		// A simple uniform interval generator..
-		IntervalGenerator intervals = new IntervalGenerator() {
-			public double getInterval(double criticalValue, int lineageCount, double currentHeight) {
-				return criticalValue;
-			}
-		};
+		LogisticGrowth logisticGrowth = new LogisticGrowth();
+		logisticGrowth.setN0(10);
+		logisticGrowth.setGrowthRate(0.01);
+		logisticGrowth.setTime50(5.0);
+
+		ExponentialGrowth exponentialGrowth = new ExponentialGrowth();
+		exponentialGrowth.setN0(10);
+		exponentialGrowth.setGrowthRate(0.1);
+
+		ConstantPopulation constantPopulation = new ConstantPopulation();
+		constantPopulation.setN0(10);
+
+		IntervalGenerator intervals = new CoalescentIntervalGenerator(logisticGrowth);
 		TreeSimulator sim = new TreeSimulator(intervals, "tip", samplingTimes);
+		RootedTree tree1 = sim.simulate(true);
+		RootedTree tree2 = sim.oldSimulate(true);
 
-		int REPLICATE_COUNT = 100;
-
-		try {
-			Tree[] trees = new Tree[REPLICATE_COUNT];
-
-			System.err.println("Simulating " + REPLICATE_COUNT + " trees of " + samplingTimes.length + " tips:");
-			System.err.print("[");
-			for (int i = 0; i < REPLICATE_COUNT; i++) {
-
-				trees[i] = sim.simulate();
-				if (i != 0 && i % 100 == 0) {
-					System.err.print(".");
-				}
-			}
-			System.err.println("]");
-
-			Writer writer = new FileWriter("simulated.trees");
-			NexusExporter exporter = new NexusExporter(new OutputStreamWriter(System.out));
-
-			exporter.exportTrees(Arrays.asList(trees));
-
-			writer.close();
-
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+		List<Double> heights1 = new ArrayList<Double>();
+		for (Node node : tree1.getInternalNodes()) {
+			heights1.add(tree1.getHeight(node));
 		}
+
+		List<Double> heights2 = new ArrayList<Double>();
+		for (Node node : tree2.getInternalNodes()) {
+			heights2.add(tree2.getHeight(node));
+		}
+
+		Collections.sort(heights1);
+		Collections.sort(heights2);
+
+		for (int i = 0; i < heights1.size(); i++) {
+			System.out.println(i + "\t" + heights1.get(i) + "\t" + heights2.get(i));
+		}
+
+//		int REPLICATE_COUNT = 100;
+//
+//		try {
+//			Tree[] trees = new Tree[REPLICATE_COUNT];
+//
+//			System.err.println("Simulating " + REPLICATE_COUNT + " trees of " + samplingTimes.length + " tips:");
+//			System.err.print("[");
+//			for (int i = 0; i < REPLICATE_COUNT; i++) {
+//
+//				trees[i] = sim.simulate(true);
+//				if (i != 0 && i % 100 == 0) {
+//					System.err.print(".");
+//				}
+//			}
+//			System.err.println("]");
+//
+//			Writer writer = new FileWriter("simulated.trees");
+//			NexusExporter exporter = new NexusExporter(new OutputStreamWriter(System.out));
+//
+//			exporter.exportTrees(Arrays.asList(trees));
+//
+//			writer.close();
+//
+//		} catch (IOException ioe) {
+//			ioe.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 }

@@ -36,15 +36,42 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
     private static final double INTEGRATION_PRECISION = 1.0e-5;
     private static final double INTEGRATION_MAX_ITERATIONS = 50;
 
-    public double getInterval(double criticalValue, int lineageCount, double currentHeight) {
+	/**
+	 * Returns the integral of the coalescent intensity from current height to
+	 * limitHeight. LimitHeight will be where the number of lineages changes (due
+	 * to sampling for example). This function is used to see if the drawn deviate
+	 * would go beyond this limit and needs adjusting.
+	 *
+	 * @param lineageCount  the number of lineages
+	 * @param currentHeight the current height in the simulation
+	 * @param limitHeight   the limit to which the integral is calculated
+	 * @return the intensity
+	 */
+	public double getTotalIntensity(int lineageCount, double currentHeight, double limitHeight) {
+//		return (0.5 * lineageCount * (lineageCount - 1)) * demographicFunction.getIntegral(currentHeight, limitHeight);
+		return (0.5 * lineageCount * (lineageCount - 1)) * getIntegral(currentHeight, limitHeight);
+	}
+
+	/**
+	 * Calculates the waiting time to the next coalescent for a given critical value
+	 * (an intensity).
+	 * @param criticalValue the critical value = -ln(U) where U ~ [0,1]
+	 * @param lineageCount the number of lineages present
+	 * @param currentHeight the starting height
+	 * @return the interval time
+	 */
+	public double getInterval(double criticalValue, int lineageCount, double currentHeight) {
 
         assert lineageCount >= 2;
-        assert criticalValue > 0.0 && criticalValue < 1.0;
+        assert criticalValue > 0.0;
 
         // The simulation equation cannot be rearranged for g, and is therefore solved
         // numerically. The integration method is determined by 'numericalIntegration',
         // the correct method is selected within SolveForIntervalSize();
-        double c = (-Math.log(criticalValue)) / ((0.5 * lineageCount * (lineageCount - 1)));
+        double c = criticalValue / ((0.5 * lineageCount * (lineageCount - 1)));
+//		double tmp = c + demographicFunction.getIntensity(currentHeight);
+//		return demographicFunction.getInverseIntensity(tmp) - currentHeight;
+
         return solveForIntervalSize(c, currentHeight);
     }
 
@@ -71,7 +98,7 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
 
         for (double gEst=1.0; gEst < LARGE_POSITIVE_NUMBER; gEst=gEst*factor) {
 
-            if (getIntegral(gEst, inT) > constant) {	// solution must be smaller than gEst
+            if (getIntegral(inT, inT + gEst) > constant) {	// solution must be smaller than gEst
                 highBracket = gEst;
 
                 if (gEst == 1.0) {
@@ -86,7 +113,7 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
             }
         }
 
-        throw new RuntimeException("Unable to bracket solution in solveForIntervalSize");
+        throw new RuntimeException("Unable to bracket solution in solveForIntervalSize: inC = " + inC + ", inT = " + inT);
     }
 
     /** This function returns the solved interval size. inLB and inHB must bracket the solution.
@@ -102,7 +129,7 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
 
         do {
             halfway = ((highB - lowB) / 2.0) + lowB;
-            if (getIntegral(halfway, t) > inConst) {
+            if (getIntegral(t, t + halfway) > inConst) {
                 // solution must be smaller than halfway
                 highB = halfway;
             } else {
@@ -121,19 +148,19 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
      * Returns the integral of 1/N(x) between t and g+t, calling either the getAnalyticalIntegral or
      * getNumericalIntegral function as appropriate.
      */
-    private double getIntegral(double g, double t) {
+    private double getIntegral(double t0, double t1) {
 
-        if (g==0.0) {
-            // integral value equals 0 if g=0
+        if (t0 == t1) {
+            // integral value equals 0 if interval=0
             return 0.0;
         }
 
         if (demographicFunction.hasIntegral()) {
             // Calculate integral analytically
-            return demographicFunction.getIntegral(t, t + g);
+            return demographicFunction.getIntegral(t0, t1);
         } else {
             // Calculate integral numerically
-            return getNumericalIntegral(t, t + g);
+            return getNumericalIntegral(t0, t1);
         }
 
     }

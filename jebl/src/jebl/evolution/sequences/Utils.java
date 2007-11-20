@@ -18,6 +18,18 @@ import jebl.evolution.taxa.Taxon;
  */
 public class Utils {
 
+	/**
+	 * Translates a given {@link Sequence} to a corresponding {@link Sequence} under the given genetic code.
+	 * Simply a utility function that calls AminoAcidState[] translate(final State[] states, GeneticCode geneticCode)
+	 *
+	 * @param sequence the Sequence.
+	 * @param geneticCode
+	 * @return
+	 */
+	public static Sequence translate(final Sequence sequence, GeneticCode geneticCode) {
+		return new BasicSequence(SequenceType.AMINO_ACID, sequence.getTaxon(), translate(sequence.getStates(), geneticCode));
+	}
+
     /**
      * Translates each of a given sequence of {@link NucleotideState}s or {@link CodonState}s
      * to the {@link AminoAcidState} corresponding to it under the given genetic code.
