@@ -1,9 +1,10 @@
 package org.virion.jam.html;
 
 
-import javax.swing.event.*;
-
 import org.virion.jam.util.BrowserLauncher;
+
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * iSeek prototype. Codename seekquence.
@@ -13,7 +14,7 @@ import org.virion.jam.util.BrowserLauncher;
  * Open a browser from a Java application on Windows, Unix, or Macintosh.
  * see  http://ostermiller.org/utils/Browser.html  for more information
  *
- * @author Nasser
+ * @author Nasser Giacaman
  * @version $Id$
  *          Date: 26/01/2005
  *          Time: 11:54:50
