@@ -37,25 +37,8 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
     private static final double INTEGRATION_MAX_ITERATIONS = 50;
 
 	/**
-	 * Returns the integral of the coalescent intensity from current height to
-	 * limitHeight. LimitHeight will be where the number of lineages changes (due
-	 * to sampling for example). This function is used to see if the drawn deviate
-	 * would go beyond this limit and needs adjusting.
-	 *
-	 * @param lineageCount  the number of lineages
-	 * @param currentHeight the current height in the simulation
-	 * @param limitHeight   the limit to which the integral is calculated
-	 * @return the intensity
-	 */
-	public double getTotalIntensity(int lineageCount, double currentHeight, double limitHeight) {
-//		return (0.5 * lineageCount * (lineageCount - 1)) * demographicFunction.getIntegral(currentHeight, limitHeight);
-		return (0.5 * lineageCount * (lineageCount - 1)) * getIntegral(currentHeight, limitHeight);
-	}
-
-	/**
 	 * Calculates the waiting time to the next coalescent for a given critical value
 	 * (an intensity).
-	 * @param criticalValue the critical value = -ln(U) where U ~ [0,1]
 	 * @param lineageCount the number of lineages present
 	 * @param currentHeight the starting height
 	 * @return the interval time
@@ -63,15 +46,12 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
 	public double getInterval(double criticalValue, int lineageCount, double currentHeight) {
 
         assert lineageCount >= 2;
-        assert criticalValue > 0.0;
+        assert criticalValue > 0.0 && criticalValue < 1.0;
 
         // The simulation equation cannot be rearranged for g, and is therefore solved
         // numerically. The integration method is determined by 'numericalIntegration',
         // the correct method is selected within SolveForIntervalSize();
-        double c = criticalValue / ((0.5 * lineageCount * (lineageCount - 1)));
-//		double tmp = c + demographicFunction.getIntensity(currentHeight);
-//		return demographicFunction.getInverseIntensity(tmp) - currentHeight;
-
+        double c = (-Math.log(criticalValue)) / ((0.5 * lineageCount * (lineageCount - 1)));
         return solveForIntervalSize(c, currentHeight);
     }
 
