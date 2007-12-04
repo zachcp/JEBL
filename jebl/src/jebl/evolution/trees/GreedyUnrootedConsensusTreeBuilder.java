@@ -45,14 +45,15 @@ import java.util.*;
  * @version $Id$
  */
 
-public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree> {
+final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree> {
     /**
      * Set of trees.
      */
     private final Tree[] trees;
 
     /**
-     * Outgroup, if any. Currently used only for display purposes.
+     * Outgroup, if any. Currently used only for display purposes (i.e. to decide where to display
+     * the root when viewing the unrooted tree as rooted).
      */
     private final Taxon outGroup;
 
@@ -61,7 +62,8 @@ public final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuild
      */
     private final double supportThreshold;
 
-	GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
+    // Each tree must have the same taxa
+    GreedyUnrootedConsensusTreeBuilder(Tree[] trees, Taxon outGroup, double supportThreshold) {
 	    super(trees);
 	    this.trees = trees;
 	    this.outGroup = outGroup;

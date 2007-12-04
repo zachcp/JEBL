@@ -10,13 +10,13 @@ import java.util.List;
 /**
  * Construct a consensus tree for a set of rooted trees. The construction is done via clustering. For any two
  * clusters/clades, their distance is the height of their most recent common ancesstor (computed as an average over all
- * trees). This seem natural as it connectes clades in reverse time order.
+ * trees). This seems natural as it connects clades in reverse time order.
  *
  * @author Joseph Heled
  * @version $Id$
  **/
 
-public class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> {
+class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> {
     RootedTree[] trees;
     private double supportThreshold;
     private List<FixedBitSet> tipsInCluster;

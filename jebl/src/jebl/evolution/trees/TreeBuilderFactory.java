@@ -17,7 +17,7 @@ public class TreeBuilderFactory {
     /**
      * Supported methods for tree building
      */
-    public enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
+    public static enum Method { NEIGHBOR_JOINING("Neighbor-Joining"), UPGMA("UPGMA");
         Method(String name) { this.name = name; }
         public String toString() { return getName(); }
         public String getName() { return name; }
@@ -27,12 +27,12 @@ public class TreeBuilderFactory {
     /**
      * Supported pairwise distance methods
      */
-    public enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
+    public static enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
 
     /**
      * Supported consensus methods.
      */
-    public enum ConsensusMethod { GREEDY, MRCAC }
+    public static enum ConsensusMethod { GREEDY, MRCAC }
 
     /**
      *
@@ -82,6 +82,7 @@ public class TreeBuilderFactory {
         return builder;
     }
 
+    // trees must have the same taxa
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold, ConsensusMethod method) {
         if( ! (supportThreshold >= 0 && supportThreshold <= 1) ) {
              throw new IllegalArgumentException("support not in [01]");
@@ -95,21 +96,20 @@ public class TreeBuilderFactory {
         throw new IllegalArgumentException(method.toString());
     }
 
+    // trees must have the same taxa
     static public ConsensusTreeBuilder buildRooted(RootedTree[] trees, double supportThreshold, ConsensusMethod method) {
         if( ! (supportThreshold >= 0 && supportThreshold <= 1) ) {
-             throw new IllegalArgumentException("support not in [01]");
+             throw new IllegalArgumentException("Expected support value in [0..1], got " + String.format("%.3f", supportThreshold));
         }
 
-        switch( method ) {
-            case GREEDY: {
+        switch (method) {
+            case GREEDY:
                 return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
-            }
-            case MRCAC: {
+            case MRCAC:
                 return new MRCACConsensusTreeBuilder(trees, supportThreshold);
-            }
+            default:
+                throw new IllegalArgumentException("Unknown consensus method: " + method);
         }
-        // bug
-        throw new IllegalArgumentException(method.toString());
     }
 
     /**
