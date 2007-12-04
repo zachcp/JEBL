@@ -122,6 +122,11 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
         }
     }
 
+    /**
+     * Stops a ProgressListener from receiving progress. Note: Due to threading, the
+     * the listener may keep receiving progress for a short while after this method returns.
+     * @param listener The ProgressListener for which to no longer report progress.
+     */
     public void removeProgressListener(ProgressListener listener) {
         synchronized(listeners) {
             listeners.remove(listener);
@@ -135,11 +140,13 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
      */
     protected boolean fireSetProgress(double fractionCompleted) {
 	    boolean canceled = false;
-        synchronized(listeners) {
-            for (ProgressListener listener : listeners) {
-                if (listener.setProgress(fractionCompleted)) {
-                    canceled = true;
-                }
+        List<ProgressListener> listenersCopy;
+        synchronized(listeners) { // create a copy because we don't want to hold the lock while calling the listeners
+            listenersCopy = new ArrayList<ProgressListener>(listeners);
+        }
+        for (ProgressListener listener : listenersCopy) {
+            if (listener.setProgress(fractionCompleted)) {
+                canceled = true;
             }
         }
         return canceled;
