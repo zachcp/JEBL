@@ -64,13 +64,19 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
     }
 
     /**
-     * This constructor should normally never be needed because usually we
+     * This constuctor takes a reader.
+     *
+     * AR notes - this constructor was depeciated with the explanation below. I
+     * disagree that we can predict that we want to import from a file, and a
+     * reader is more flexible (it may be from the network or the clipboard).
+     *
+     * -- This constructor should normally never be needed because usually we
      * want to import from a file. Then, the constructor expecting a file
-     * should be used. Therefore, this constructor is deprecated for now.
+     * should be used.
+     *
      * @param reader       holds sequences data
      * @param sequenceType pre specified sequences type. We should try and guess them some day.
      */
-    @Deprecated
     public FastaImporter(Reader reader, SequenceType sequenceType) {
         this(reader, sequenceType, false);
     }
