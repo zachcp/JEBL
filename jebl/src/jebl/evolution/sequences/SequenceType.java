@@ -342,6 +342,7 @@ public interface SequenceType {
     };
 
     public class Utils {
+        private Utils() { }  // make class uninstantiable
 
         public static String getAlphabet(SequenceType sequenceType) {
 

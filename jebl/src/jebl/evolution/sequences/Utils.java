@@ -17,8 +17,9 @@ import jebl.evolution.taxa.Taxon;
  * @version $Id$
  */
 public class Utils {
+    private Utils() { }  // make class uninstantiable
 
-	/**
+    /**
 	 * Translates a given {@link Sequence} to a corresponding {@link Sequence} under the given genetic code.
 	 * Simply a utility function that calls AminoAcidState[] translate(final State[] states, GeneticCode geneticCode)
 	 *

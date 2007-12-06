@@ -17,6 +17,7 @@ package jebl.evolution.graphs;
  * @version $Id$
  */
 public class Utils {
+    private Utils() { }  // make class uninstantiable
 
     /**
      * @param graph

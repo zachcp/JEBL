@@ -9,10 +9,10 @@
 
 package jebl.util;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for associating attributeNames with an object.
@@ -53,6 +53,8 @@ public interface Attributable {
     Map<String, Object> getAttributeMap();
 
     public static class Utils {
+        private Utils() { }  // make class uninstantiable
+
         Set<String> getAttributeNames(Collection<Attributable> attributables) {
             Set<String> names = new HashSet<String>();
 

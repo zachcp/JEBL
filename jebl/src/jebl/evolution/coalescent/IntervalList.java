@@ -108,8 +108,9 @@ public interface IntervalList {
 
 
 	public class Utils {
+        private Utils() { }  // make class uninstantiable
 
-		/**
+        /**
 		 * @return the number of lineages at time t.
 		 * @param t the time that you are counting the number of lineages
 		 */

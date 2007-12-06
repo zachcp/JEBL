@@ -1,8 +1,8 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.taxa.MissingTaxonException;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
 
@@ -16,8 +16,9 @@ import java.util.*;
  */
 
 public class RootedTreeUtils {
+    private RootedTreeUtils() { }  // make class uninstantiable
 
-	/**
+    /**
 	 * Return the number of leaves under this node.
 	 * @param tree
 	 * @param node

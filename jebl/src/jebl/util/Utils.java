@@ -14,6 +14,8 @@ package jebl.util;
  * @version $Id$
  */
 public class Utils {
+    private Utils() { }  // make class uninstantiable
+
     /**
      * Test if a string occurs within a set
      *

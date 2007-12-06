@@ -10,7 +10,10 @@
 // terms of the Lesser GNU General Public License (LGPL)
 
 package jebl.math;
-import java.io.*;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * interface for a classes that wish to monitor the progress of a Minimiser
  *
@@ -34,8 +37,9 @@ public interface MinimiserMonitor {
 //=====================================================================
 
 	public static class Utils {
+        private Utils() { }  // make class uninstantiable
 
-		/**
+        /**
 		 * Creates a MinimiserMonitor that outputs current minimum to a print stream
 		 */
 		public static final MinimiserMonitor createSimpleMonitor(PrintWriter output) {

@@ -46,7 +46,9 @@ public interface OrderEnumerator {
 //=====================================================================================================
 
 	public static class Utils {
-		private static final Constant ZERO = new Constant(0);
+        private Utils() { }  // make class uninstantiable
+
+        private static final Constant ZERO = new Constant(0);
 		/**
 		 * @param index The index to always return
 		 * @return an OrderEnumerator object that always returns 'index'

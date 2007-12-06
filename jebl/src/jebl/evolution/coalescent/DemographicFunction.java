@@ -82,8 +82,9 @@ public interface DemographicFunction {
 
     public static class Utils
 	{
+        private Utils() { }  // make class uninstantiable
 
-		/**
+        /**
 		 * This function tests the consistency of the
 		 * getIntensity and getInverseIntensity methods
 		 * of this demographic model. If the model is

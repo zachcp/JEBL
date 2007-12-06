@@ -22,8 +22,9 @@ import java.util.*;
  * @version $Id$
  */
 public final class Utils {
+    private Utils() { }  // make class uninstantiable
 
-	/**
+    /**
 	 * @param tree
 	 * @return the rooted tree as a newick format string
 	 */

@@ -15,7 +15,8 @@ import java.util.List;
  * @author Korbinian Strimmer
  */
 public class SplitUtils {
-	//
+    private SplitUtils() { } // make class uninstantiable
+    //
 	// Public stuff
 	//
 

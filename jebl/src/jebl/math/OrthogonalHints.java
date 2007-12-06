@@ -43,7 +43,9 @@ public interface OrthogonalHints {
 //=====================================================================================================
 
 	public static class Utils {
-		/**
+        private Utils() { }  // make class uninstantiable
+
+        /**
 		 * @return a new OrthogonalHints object base on toAdjust that works with parameters from adjustmentFactor + what toAdjust worked with
 		 * That is if the value x is the parameter will be passed toAdjust as x-adjustmentFactor, and
 		 * the suggested OrderEnumerator adjusts input x by adding adjustment factor before returning to

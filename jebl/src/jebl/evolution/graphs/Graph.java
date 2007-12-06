@@ -10,8 +10,8 @@ package jebl.evolution.graphs;
 
 import jebl.util.Attributable;
 
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Andrew Rambaut
@@ -84,6 +84,7 @@ public interface Graph extends Attributable {
     public class NoEdgeException extends Exception {}
 
     public class Utils {
+        private Utils() { }  // make class uninstantiable
 
         /**
          * @param graph
