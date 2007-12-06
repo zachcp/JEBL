@@ -4,9 +4,9 @@ import jebl.evolution.taxa.Taxon;
 import jebl.util.ProgressListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -73,21 +73,11 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
         if (trees.length == 0) {
             throw new IllegalArgumentException("Expected at least one tree, but got none");
         }
-        Tree first = trees[0];
-	    this.supportAttributeName = supportAttributeName;
+        this.supportAttributeName = supportAttributeName;
 	    this.supportAsPercent = supportInPercent;
-
-        this.nExternalNodes = first.getExternalNodes().size();
-
-        final Set<Taxon> taxa = first.getTaxa();
-        this.taxons = Collections.unmodifiableList(new ArrayList<Taxon>(taxa));
-
-        for (Tree t : trees) {
-            final int nExternal = t.getExternalNodes().size();
-            if (nExternal != nExternalNodes || !t.getTaxa().containsAll(taxa)) {
-                throw new IllegalArgumentException("Trees have different leaf sets");
-            }
-        }
+        this.nExternalNodes = trees[0].getExternalNodes().size();
+        this.taxons = Collections.unmodifiableList(new ArrayList<Taxon>(trees[0].getTaxa()));
+        Utils.assertAllTreesHaveTheSameTaxa(Arrays.asList(trees));
     }
 
     /**

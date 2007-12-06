@@ -568,8 +568,55 @@ public final class Utils {
 		};
 	}
 
+    /**
+     * Subtracts a collection from a set and returns the result as a new Set, without modifying either of the parameters.
+     * @param a The set from which to subtract the elements of b
+     * @param b The elements to be subtracted from b
+     * @return An unmodifiable set which contains all of the elements of a except for those which are also in b.
+     */
+    private static<T> Set<T> setMinus(Set<T> a, Collection<T> b) {
+        Set<T> diff = new HashSet<T>(a);
+        diff.removeAll(b);
+        return Collections.unmodifiableSet(diff);
+    }
 
-	/**
+
+    /**
+     * Checks whether all of the trees passed in have the same taxa sets (ignoring
+     * order of taxa), and throws an IllegalArgumentException if this is not the case.
+     * If no tree or only one tree is passed in, immediately returns without throwing an exception.
+     * @param trees Zero or more trees
+     * @throws IllegalArgumentException if not all of the trees have the same taxa
+     * @throws NullPointerException if trees is null
+     */
+    public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
+        if (trees.size() <= 1) {
+            return;
+        }
+        Tree firstTree = trees.get(0);
+        final int firstNumExternalNodes = firstTree.getExternalNodes().size();
+        final Set<Taxon> firstTaxa = firstTree.getTaxa();
+
+        int currentTreeNumber = 0;
+        for (Tree currentTree : trees) {
+            currentTreeNumber++;
+            final int numExternalNodes = currentTree.getExternalNodes().size();
+            if (numExternalNodes != firstNumExternalNodes || !currentTree.getTaxa().containsAll(firstTaxa)) {
+                Set<Taxon> firstMinusCurrent = setMinus(firstTree.getTaxa(), currentTree.getTaxa()); // Taxa that occur in the first tree but not in currentTree
+                String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
+                if (!firstMinusCurrent.isEmpty()) {
+                    // We use human counting in error messages, i.e. we number the trees from 1
+                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + firstMinusCurrent);
+                } else {
+                    Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
+                    assert !currentMinusFirst.isEmpty();
+                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + currentMinusFirst);
+                }
+            }
+        }
+    }
+
+    /**
 	 * Generates a unique representation of a node
 	 *
 	 * @param tree tree
