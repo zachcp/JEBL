@@ -580,6 +580,11 @@ public final class Utils {
         return Collections.unmodifiableSet(diff);
     }
 
+    private static<T extends Comparable> List<T> sort(Collection<T> c) {
+        List<T> result = new ArrayList<T>(c);
+        Collections.sort(result);
+        return result;
+    }
 
     /**
      * Checks whether all of the trees passed in have the same taxa sets (ignoring
@@ -606,11 +611,11 @@ public final class Utils {
                 String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
                 if (!firstMinusCurrent.isEmpty()) {
                     // We use human counting in error messages, i.e. we number the trees from 1
-                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + firstMinusCurrent);
+                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent));
                 } else {
                     Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
                     assert !currentMinusFirst.isEmpty();
-                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + currentMinusFirst);
+                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst));
                 }
             }
         }
