@@ -85,7 +85,7 @@ public class TreeBuilderFactory {
     // trees must have the same taxa
     static public ConsensusTreeBuilder buildUnRooted(Tree[] trees, Taxon outGroup, double supportThreshold, ConsensusMethod method) {
         if( ! (supportThreshold >= 0 && supportThreshold <= 1) ) {
-             throw new IllegalArgumentException("support not in [01]");
+             throw new IllegalArgumentException("support not in [0..1]: " + supportThreshold);
         }
         switch( method ) {
             case GREEDY: {
