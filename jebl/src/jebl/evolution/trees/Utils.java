@@ -609,13 +609,14 @@ public final class Utils {
             if (numExternalNodes != firstNumExternalNodes || !currentTree.getTaxa().containsAll(firstTaxa)) {
                 Set<Taxon> firstMinusCurrent = setMinus(firstTree.getTaxa(), currentTree.getTaxa()); // Taxa that occur in the first tree but not in currentTree
                 String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
+                String suffix=". Tree 1 has "+firstNumExternalNodes+" taxa. Tree "+currentTreeNumber+" has "+numExternalNodes+" taxa. Tree 1 has taxa: "+sort(firstTaxa)+" Tree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa());
                 if (!firstMinusCurrent.isEmpty()) {
                     // We use human counting in error messages, i.e. we number the trees from 1
-                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent));
+                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent) + suffix);
                 } else {
                     Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
                     assert !currentMinusFirst.isEmpty();
-                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst));
+                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst)+ suffix);
                 }
             }
         }
