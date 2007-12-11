@@ -39,7 +39,6 @@ public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
     //
 
     private double[] r; // r[i] = sum of distances from node i to all other nodes
-    private double scale;
 
     /** Find next two clusters to join. set shared best{i,j}
      *
@@ -58,18 +57,17 @@ public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
                 double dist = getDist(i, j);
                 r[i] += dist;
             }
+            r[i] /= ((double) numClusters-2.0);
         }
 
         besti = 0;
         bestj = 1;
-        double smax = -1.0;
-        scale = 1.0/(numClusters-2);
+        double smin = Double.MAX_VALUE;
         for (int i = 0; i < numClusters-1; i++) {
             for (int j = i+1; j < numClusters; j++) {
-                double sij = (r[i] + r[j]) * scale - getDist(i, j);
-
-                if (sij > smax) {
-                    smax = sij;
+                double sij = getDist(i,j) - (r[i] + r[j]);
+                if (sij < smin) {
+                    smin = sij;
                     besti = i;
                     bestj = j;
                 }
@@ -117,7 +115,7 @@ public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
 
     protected double[] joinClusters() {
         double dij = getDist(besti, bestj);
-        double li = (dij + (r[besti] - r[bestj]) * scale) * 0.5;
+        double li = (dij + (r[besti] - r[bestj])) * 0.5;
         double lj = dij - li;
 
         if (li < 0.0) li = 0.0;
