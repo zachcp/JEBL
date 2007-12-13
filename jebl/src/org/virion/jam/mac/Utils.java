@@ -13,7 +13,11 @@ public class Utils {
         return MAC_OS_X;
     }
 
-    public static void macOSXRegistration(org.virion.jam.framework.Application application) {
+	public static String getMacOSXVersion() {
+		return MAC_OS_X_VERSION;
+	}
+
+	public static void macOSXRegistration(org.virion.jam.framework.Application application) {
         if (MAC_OS_X) {
 
             Class osxAdapter = null;
@@ -54,7 +58,7 @@ public class Utils {
     }
 
     static {
-        MAC_OS_X_VERSION = System.getProperty("mrj.version");
-        MAC_OS_X = MAC_OS_X_VERSION != null;
+	    MAC_OS_X = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+        MAC_OS_X_VERSION = MAC_OS_X ? System.getProperty("os.version") : null;
     }
 }

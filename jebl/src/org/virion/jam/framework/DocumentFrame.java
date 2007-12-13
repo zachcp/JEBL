@@ -132,6 +132,11 @@ public abstract class DocumentFrame extends AbstractFrame {
 		String title = getTitle();
 		if (documentFile != null) {
 			setTitle(title + " - " + documentFile.getName());
+
+			// This only has an effect on Mac OS X 10.5 -
+			// it puts an icon in the title bar that can be used to drag
+			// the file to another app.
+			getRootPane().putClientProperty("Window.documentFile", documentFile);
 		}
 
 	}

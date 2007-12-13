@@ -10,13 +10,17 @@ import javax.swing.*;
 public class ToolbarButton extends JButton implements ToolbarItem {
 
 	public ToolbarButton(ToolbarAction action) {
+		this(action, false);
+	}
+
+	public ToolbarButton(ToolbarAction action, boolean paintBorder) {
 		super(action);
 
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		putClientProperty("Quaqua.Button.style", "toolBarRollover");
 		putClientProperty("JButton.buttonType", "toolbar");
-		setBorderPainted(false);
+		setBorderPainted(paintBorder);
 
 	    setToolTipText(action.getToolTipText());
 

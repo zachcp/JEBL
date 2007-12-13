@@ -142,7 +142,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         JPanel controllerPanel = controller.getPanel();
         controllerPanel.setOpaque(false);
 
-		// This tells Quaqua L&F to use a small components (ignored otherwise)
+		// This tells Mac L&Fs to use a small components (ignored otherwise)
         controller.getTitleComponent().setFont(UIManager.getFont("SmallSystemFont"));
         controller.getTitleComponent().setOpaque(false);
 

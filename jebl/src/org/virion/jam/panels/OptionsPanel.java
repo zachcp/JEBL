@@ -6,6 +6,7 @@ package org.virion.jam.panels;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 /**
  * OptionsPanel.
@@ -18,24 +19,14 @@ public class OptionsPanel extends JPanel {
 	protected GridBagLayout gridbag = new GridBagLayout();
 	private final int hGap;
 	private final int vGap;
-	private final String fontProperty;
 
 	public OptionsPanel() {
 		this(4, 4);
 	}
 
-	public OptionsPanel(String fontProperty) {
-		this(4, 4, fontProperty);
-	}
-
 	public OptionsPanel(int hGap, int vGap) {
-		this(hGap, vGap, null);
-	}
-
-	public OptionsPanel(int hGap, int vGap, String fontProperty) {
 		this.hGap = hGap;
 		this.vGap = vGap;
-		this.fontProperty = fontProperty;
 
 		setBorder(BorderFactory.createEmptyBorder(3,6,6,6));
 		setLayout(gridbag);
@@ -140,10 +131,7 @@ public class OptionsPanel extends JPanel {
 		add(comp2);
 	}
 
-	private void adjustComponent(JComponent comp) {
-		comp.putClientProperty("Quaqua.Component.visualMargin", new Insets(0,0,0,0));
-		if (fontProperty != null) {
-			comp.setFont(UIManager.getFont(fontProperty));
-		}
+	protected void adjustComponent(JComponent comp) {
+		// do nothing
 	}
 }

@@ -15,6 +15,7 @@ public class GenericToolbarItem extends JPanel implements ToolbarItem {
         add(component, BorderLayout.NORTH);
 
         label = new JLabel(title);
+	    label.setFont(UIManager.getFont("SmallSystemFont"));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         add(label, BorderLayout.SOUTH);
         setToolTipText(toolTipText);
