@@ -205,7 +205,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                     sequence.setAttribute(descriptionPropertyName, description);
                 }
                 if( callback != null ) {
-                    // this may use more memeory by getting the string from the jebl seq yet again
+                    // this may use more memory by getting the string from the jebl seq yet again
                     callback.add(sequence);
                 } else {
                     sequences.add(sequence);

@@ -1,5 +1,7 @@
 package jebl.evolution.io;
 
+import java.util.logging.Logger;
+
 /**
  * Similar to a StringBuilder, but its internal buffer is a byte[] with
  * one entry for each character, so it can only correctly append single-byte
@@ -9,6 +11,7 @@ package jebl.evolution.io;
  * @version $Id$
  */
 public class ByteBuilder implements CharSequence {
+    private static final Logger logger = Logger.getLogger(ByteBuilder.class.getName());
     int maxCapacity;
     int current;
     byte[] data;
@@ -34,8 +37,14 @@ public class ByteBuilder implements CharSequence {
      */
     public ByteBuilder(int maxCapacity) {
         this.maxCapacity = maxCapacity;
+        if (maxCapacity < 0) {
+            throw new IllegalArgumentException("maxCapacity must be positive, but got " + maxCapacity);
+        }
         current = 0;
         data = new byte[16];
+        if (maxCapacity < data.length) {
+            logger.warning("ByteBuilder with a very small maxCapacity constructed: " + maxCapacity);
+        }
     }
 
 

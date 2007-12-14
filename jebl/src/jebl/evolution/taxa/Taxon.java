@@ -11,7 +11,10 @@ package jebl.evolution.taxa;
 import jebl.util.Attributable;
 import jebl.util.AttributableHelper;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Andrew Rambaut
@@ -36,7 +39,7 @@ public final class Taxon implements Attributable, Comparable {
      * @param name the name of the taxon
      */
     private Taxon(String name, TaxonomicLevel taxonomicLevel) {
-        this.name = name;
+        this.name = name.intern();
         this.taxonomicLevel = taxonomicLevel;
     }
 
@@ -94,14 +97,44 @@ public final class Taxon implements Attributable, Comparable {
 
 	private AttributableHelper helper = null;
 
+    private static void purgeGarbageCollectedTaxa() {
+        synchronized(taxa) {
+            List<String> taxonNamesToPurge = new ArrayList<String>();
+            for (Map.Entry<String,WeakReference<Taxon>> entry : taxa.entrySet()) {
+                Taxon taxon = entry.getValue().get();
+                if (taxon == null) {
+                    taxonNamesToPurge.add(entry.getKey());
+                }
+            }
+            for (String taxonName : taxonNamesToPurge) {
+                taxa.remove(taxonName);
+            }
+            taxaCreatedSinceLastPurge.set(0);
+            lastPurgeTime.set(System.currentTimeMillis());
+        }
+    }
+
     // Static factory methods
 
     /**
      * @return a Set containing all the currently created Taxon objects.
      */
     public static Set<Taxon> getAllTaxa() {
-        return Collections.unmodifiableSet(new HashSet<Taxon>(taxa.values()));
+        Set<Taxon> result = new HashSet<Taxon>();
+        synchronized (taxa) {
+            purgeGarbageCollectedTaxa();
+            for (Map.Entry<String,WeakReference<Taxon>> entry : taxa.entrySet()) {
+                Taxon taxon = entry.getValue().get();
+                if (taxon != null) { // might have been garbage collected just now
+                    result.add(taxon);
+                }
+            }
+        }
+        return Collections.unmodifiableSet(result);
     }
+
+    private static AtomicInteger taxaCreatedSinceLastPurge = new AtomicInteger(0);
+    private static AtomicLong lastPurgeTime = new AtomicLong(0);
 
     /**
      * A static method that returns a Taxon object with the given name. If this has
@@ -117,14 +150,23 @@ public final class Taxon implements Attributable, Comparable {
         if (name.length() == 0) {
             throw new IllegalArgumentException("Illegal empty string for taxon name");
         }
-
-        Taxon taxon = taxa.get(name);
-
-        if (taxon == null) {
-            taxon = new Taxon(name);
-            taxa.put(name, taxon);
+        Taxon taxon;
+        synchronized(taxa) {
+            // TT: Can we somehow get around having to manually purge WeakReferences whose values have been
+            // garbage collected? E.g. using a WeakHashMap<Taxon,Taxon>() which maps each taxon to is canonicalized form
+            // and could be accessed as map.get(new Taxon(...))? Or would a WeakHashMap entry where key==value not get
+            // garbage collected?
+            if (taxaCreatedSinceLastPurge.get() > 10000 || (lastPurgeTime.get() + 10000 < System.currentTimeMillis())) {
+                purgeGarbageCollectedTaxa();
+            }
+            WeakReference<Taxon> taxonReference = taxa.get(name);
+            taxon = (taxonReference == null ? null : taxonReference.get());
+            if (taxon == null) {
+                taxaCreatedSinceLastPurge.incrementAndGet();
+                taxon = new Taxon(name);
+                taxa.put(name, new WeakReference<Taxon>(taxon));
+            }
         }
-
         return taxon;
     }
 
@@ -137,9 +179,10 @@ public final class Taxon implements Attributable, Comparable {
     private final String name;
 
     /**
-     * A hash map containing taxon name, object pairs.
+     * Maps taxon name to the taxon of that name. We use WeakReferences so that if no other references
+     * to a taxon exist, it no longer wastes memoryt.
      */
-    private static Map<String, Taxon> taxa = new HashMap<String, Taxon>();
+    private static final Map<String, WeakReference<Taxon>> taxa = new HashMap<String, WeakReference<Taxon>>();
 
     /**
      * the taxonomic level of this taxon.
