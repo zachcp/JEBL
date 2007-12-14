@@ -39,7 +39,7 @@ public final class Taxon implements Attributable, Comparable {
      * @param name the name of the taxon
      */
     private Taxon(String name, TaxonomicLevel taxonomicLevel) {
-        this.name = name.intern();
+        this.name = name;
         this.taxonomicLevel = taxonomicLevel;
     }
 
