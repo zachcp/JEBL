@@ -13,6 +13,7 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.util.ProgressListener;
 
 import java.io.*;
+import java.util.regex.Pattern;
 
 /**
  * A helper class for phylogenetic file format importers
@@ -23,6 +24,22 @@ import java.io.*;
  * @version $Id$
  */
 public class ImportHelper {
+    // Private stuff
+
+    private LineNumberReader reader;
+    private BufferedWriter commentWriter = null;
+
+    private char lastChar = '\0';
+    private char lastDelimiter = '\0';
+
+    private boolean hasComments = false;
+    private char startComment = (char)-1;
+    private char stopComment = (char)-1;
+    private char lineComment = (char)-1;
+    private char writeComment = (char)-1;
+    private char metaComment = (char)-1;
+
+    private String lastMetaComment = null;
     private long totalCharactersRead = 0;
 
     // Expected length of input in bytes, or 0 if unknown
@@ -115,21 +132,17 @@ public class ImportHelper {
         if (lastChar == '\0') {
             lastChar = readCharacter();
         }
-        return (char)lastChar;
+        return lastChar;
     }
 
     public char readCharacter() throws IOException {
-
         skipSpace();
-
         char ch = read();
-
         while (hasComments && (ch == startComment || ch == lineComment)) {
             skipComments(ch);
             skipSpace();
             ch = read();
         }
-
         return ch;
     }
 
@@ -141,7 +154,7 @@ public class ImportHelper {
         if (lastChar == '\0') {
             lastChar = read();
         }
-        return (char)lastChar;
+        return lastChar;
     }
 
     /**
@@ -168,6 +181,7 @@ public class ImportHelper {
 
     /**
      * Reads a line, skipping over any comments.
+     * @return one line of text
      */
     public String readLine() throws IOException {
 
@@ -257,7 +271,11 @@ public class ImportHelper {
         final char gapCode = sequenceType.getGapState().getCode().charAt(0);
         final char unknownCode = sequenceType.getUnknownState().getCode().charAt(0);
 
-        ByteBuilder bb = new ByteBuilder((int)expectedInputLength);
+        int byteBuilderMaxCapacity = (expectedInputLength == 0 || expectedInputLength > Integer.MAX_VALUE)
+                ? Integer.MAX_VALUE
+                : (int) expectedInputLength;
+        // Note this doesn't actually allocate this many bytes to start with - it only sets a limit on how far to expand
+        ByteBuilder bb = new ByteBuilder(byteBuilderMaxCapacity);
 
         try {
             int nSites = 0;
@@ -301,7 +319,7 @@ public class ImportHelper {
 
             lastDelimiter = ch;
 
-            if (Character.isWhitespace((char)lastDelimiter)) {
+            if (Character.isWhitespace(lastDelimiter)) {
                 ch = nextCharacter();
                 if (delimiters.indexOf(ch) != -1) {
                     lastDelimiter = readCharacter();
@@ -380,7 +398,7 @@ public class ImportHelper {
 
             lastDelimiter = ch;
 
-            if (Character.isWhitespace((char)lastDelimiter)) {
+            if (Character.isWhitespace(lastDelimiter)) {
                 ch = nextCharacter();
                 if (delimiters.indexOf(ch) != -1) {
                     lastDelimiter = readCharacter();
@@ -458,7 +476,6 @@ public class ImportHelper {
      * quote is found (including whitespace or comments).
      */
     public String readToken(String delimiters) throws IOException {
-        int space = 0;
         char ch, ch2, quoteChar = '\0';
         boolean done = false, first = true, quoted = false, isSpace;
 
@@ -480,9 +497,7 @@ public class ImportHelper {
                         token.append(ch);
                     } else {
                         // otherwise it terminates the token
-
                         lastDelimiter = ' ';
-
                         if (hasComments && (ch2 == startComment || ch2 == lineComment)) {
                             skipComments(ch2, startComment!= '\"' && startComment != '\'');
                         } else {
@@ -497,7 +512,6 @@ public class ImportHelper {
                     quoted = true;
                     quoteChar = ch;
                     first = false;
-                    space = 0;
                 } else if (!quoted && (ch == startComment || ch == lineComment) ) {
                     // comment markers don't count if we are quoted
                     skipComments(ch, startComment!= '\"' && startComment != '\'');
@@ -523,7 +537,7 @@ public class ImportHelper {
             }
         }
 
-        if (Character.isWhitespace((char)lastDelimiter)) {
+        if (Character.isWhitespace(lastDelimiter)) {
             ch = nextCharacter();
             while (Character.isWhitespace(ch)) {
                 read();
@@ -700,20 +714,22 @@ public class ImportHelper {
         lastMetaComment = null;
     }
 
+    private static final Pattern safeNamePattern = Pattern.compile("[a-zA-Z0-9_.]+");
     static String safeName(String name) {
-        if( ! name.matches("[a-zA-Z0-9_.]+") ) {
+        if( ! safeNamePattern.matcher(name).matches() ) {
             name = "\"" + name + "\"";
         }
         return name;
     }
 
+    private static final Pattern controlsCharsPattern = Pattern.compile("[^\\p{Cntrl}]+");
     /**
      * Convert control (unprintable) characters to something printable
      * @param token
      * @return token printable version
      */
     static String convertControlsChars(String token) {
-        if( ! token.matches("[^\\p{Cntrl}]+") ) {
+        if( ! (controlsCharsPattern.matcher(token).matches()) ) {
             StringBuilder b = new StringBuilder();
             for( char c : token.toCharArray() ) {
                 if( c < 0x20 || c >= 0xfe ) {
@@ -726,21 +742,4 @@ public class ImportHelper {
         }
         return token;
     }
-
-    // Private stuff
-
-    private LineNumberReader reader;
-    private BufferedWriter commentWriter = null;
-
-    private int lastChar = '\0';
-    private int lastDelimiter = '\0';
-
-    private boolean hasComments = false;
-    private char startComment = (char)-1;
-    private char stopComment = (char)-1;
-    private char lineComment = (char)-1;
-    private char writeComment = (char)-1;
-    private char metaComment = (char)-1;
-
-    private String lastMetaComment = null;
 }
