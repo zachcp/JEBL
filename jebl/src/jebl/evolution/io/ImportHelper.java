@@ -185,7 +185,7 @@ public class ImportHelper {
      */
     public String readLine() throws IOException {
 
-        StringBuffer line = new StringBuffer();
+        StringBuilder line = new StringBuilder();
         char ch = read();
         try {
             while (ch != '\n' && ch != '\r') {

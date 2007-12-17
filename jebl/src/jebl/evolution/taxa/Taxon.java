@@ -39,7 +39,9 @@ public final class Taxon implements Attributable, Comparable {
      * @param name the name of the taxon
      */
     private Taxon(String name, TaxonomicLevel taxonomicLevel) {
-        this.name = name;
+        // use String.intern() or new String(name) if you want to make sure the String isn't a substring
+        // which references the original string's characters - e.g. if the string was obtained from a fasta file
+        this.name = name; // new String(name);
         this.taxonomicLevel = taxonomicLevel;
     }
 
