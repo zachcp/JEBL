@@ -15,9 +15,11 @@ import java.util.List;
  */
 public abstract class TreeDrawableElement {
     final protected Node node;
+    protected Paint foreground;
 
     TreeDrawableElement(Node  node) {
         this.node = node;
+        this.foreground = Color.black;
     }
     
     public Point2D.Double getCenter() {
@@ -53,6 +55,14 @@ public abstract class TreeDrawableElement {
     public void setVisible(boolean visible) { this.visible = visible; }
 
     public boolean isVisible() {  return visible; }
+
+    public void setForeground(Paint p){
+        this.foreground = p;
+    }
+
+    public Paint getForeground(){
+        return foreground;
+    }
 
     public abstract boolean intersects(TreeDrawableElement e);
 

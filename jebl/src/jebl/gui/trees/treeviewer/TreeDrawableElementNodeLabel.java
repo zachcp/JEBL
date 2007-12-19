@@ -114,6 +114,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         if( painter.setFontSize(curSize, false) ) {
             painter.calibrate(g2);
         }
+        painter.setForeground(foreground);
         painter.paint(g2, node, taxonLabelJustification, bounds);
 
         if( painter.setFontSize(s, false) ) {

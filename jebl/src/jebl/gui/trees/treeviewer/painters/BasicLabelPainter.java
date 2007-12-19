@@ -269,12 +269,12 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     public void setForeground(Paint foreground) {
         this.foreground = foreground;
-        firePainterChanged();
+        //firePainterChanged(); ssh: commented out because if we set the colour during a paint we end up with an endless loop of paints...
     }
 
     public void setBackground(Paint background) {
         this.background = background;
-        firePainterChanged();
+        //firePainterChanged();
     }
 
     public void setBorder(Paint borderPaint, Stroke borderStroke) {

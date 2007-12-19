@@ -25,6 +25,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -41,8 +43,15 @@ import java.util.prefs.Preferences;
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
     public static boolean goBackwards = false;
+    public Point mouseLocation = new Point(0,0);
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
+        addMouseMotionListener(new MouseMotionAdapter(){
+            public void mouseMoved(MouseEvent e) {
+                mouseLocation = e.getPoint();
+                repaint();
+            }
+        });
     }
 
     public RootedTree getTree() {
@@ -879,7 +888,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         setDoubleBuffered(false);
 
-        drawTree(g2, false, false, true, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+        drawTree(g2, false, false, true, true, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 
         setDoubleBuffered(true);
         calibrated = false;
@@ -894,10 +903,30 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return result;
     }
 
-    private void nodeMarker(Graphics2D g2, Node node) {
+    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers) {
         final Point2D.Double nodeLocation = nodeCoord(node);
         final boolean isSelected = selectedNodes.contains(node);
         final Paint color = g2.getPaint();
+
+        //set up the node marker ellipse
+        final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
+
+        final double x = nodeLocation.getX();
+        final int ix1 = (int) Math.round(x);
+        final double y = nodeLocation.getY();
+        final int iy1 = (int) Math.round(y);
+
+        int d = circDiameter;
+//        if( rlimit >= 0 ) { //commented out so all node markers are the same size
+//            d = Math.min(2*rlimit+1, d);
+//        }
+        int d2 = 7*d; //this is the diameter of the circle for detecting when to show the marker
+
+        final int r = (d-1)/2;
+        final int r2 = (d2 - 1)/2;
+
+        Shape nodeMarker = new Ellipse2D.Float(ix1 - r, iy1 - r, d, d);
+        Shape nodeMarkerClip = new Ellipse2D.Float(ix1 - r2, iy1 - r2, d2, d2);
 
         if( isNodeCollapsed(node) ) {
            // final Color c = isSelected ? selectionPaint : branch;
@@ -905,6 +934,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if( isSelected ) g2.setPaint(selectionPaint);
             final Shape cn = treeLayout.getCollapsedNode(node, .25);
             final Shape transformedShape = transform.createTransformedShape(cn);
+
+            if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && ! transformedShape.contains(mouseLocation))
+                return;
 
             final Stroke save = g2.getStroke();
             g2.setStroke(collapsedStroke);
@@ -941,26 +973,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            }
         }
 
-        final Paint c = isSelected ? selectionPaint : Color.LIGHT_GRAY;
+        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation))
+            return;
+
+        final Paint c = nodeMarker.contains(mouseLocation) ? selectionPaint :  Color.LIGHT_GRAY;
         g2.setPaint(c);
 
-        final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
-
-        final double x = nodeLocation.getX();
-        final int ix1 = (int) Math.round(x);
-        final double y = nodeLocation.getY();
-        final int iy1 = (int) Math.round(y);
-
-        int d = circDiameter;
-        if( rlimit >= 0 ) {
-            d = Math.min(2*rlimit+1, d);
-        }
-
-        final int r = (d-1)/2;
-
-        g2.fillOval(ix1 - r, iy1 - r, d, d);
+        g2.fill(nodeMarker);
         g2.setColor(Color.black);
-        g2.drawOval(ix1 - r, iy1 - r, d, d);
+        g2.draw(nodeMarker);
         g2.setPaint(color);
     }
 
@@ -994,6 +1015,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param height the height of the tree
      */
     public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, double width, double height) {
+        drawTree(g2, drawNodes, clipOffscreenShapes, drawOnlyVisibleElements, false, width, height);
+    }
+
+    /**
+     *
+     * @param g2 the graphics to draw on to
+     * @param drawNodes prints circles at nodes and tips if true
+     * @param clipOffscreenShapes only draws elements which fall in the current viewport if true (should always be false for printing)
+     * @param drawOnlyVisibleElements tries to stop elements overlapping by not drawing some of them if true
+     * @param width the width of the tree
+     * @param height the height of the tree
+     */
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, boolean drawAllNodeMarkers, double width, double height) {
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1040,7 +1074,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.draw(branchPath);
 
             if(drawNodes)
-                nodeMarker(g2, node);
+                nodeMarker(g2, node, drawAllNodeMarkers);
 
             if( preElementDrawCode ) {
                 if (showingTaxonLables) {
@@ -1089,7 +1123,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     g2.draw(branchPath);
 
                     if(drawNodes)
-                        nodeMarker(g2, node);
+                        nodeMarker(g2, node, drawAllNodeMarkers);
 
                     if (preElementDrawCode && nodesLables) {
                         final AffineTransform nodeTransform = nodeLabelTransforms.get(node);
@@ -1127,14 +1161,21 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
-                if(e.isVisible() || !drawOnlyVisibleElements)
+                if(e.isVisible() || !drawOnlyVisibleElements){
+                    if(selectedNodes.contains(e.getNode())){
+                        e.setForeground(Color.blue);
+                    }
+                    else{
+                        e.setForeground(Color.black);
+                    }
                     e.draw(g2, clipOffscreenShapes ? viewport : null);
+                }
             }
         }
 
         if( ! hideNode(rootNode) && drawNodes ) {
           g2.setStroke(branchLineStroke);
-          nodeMarker(g2, rootNode);
+          nodeMarker(g2, rootNode, drawAllNodeMarkers);
         }
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
@@ -1466,7 +1507,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         taxonLabelTransforms.clear();
         taxonLabelJustifications.clear();
         treeElements.clear();
-        
+
+        List<TreeDrawableElement> taxonLabels = new ArrayList<TreeDrawableElement>();
         if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
             final double labelHeight = taxonLabelPainter.getPreferredHeight();
             Rectangle2D labelBounds = (nodeWithLongestTaxon == null) ? null :
@@ -1507,9 +1549,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                                                          nodeWithLongestTaxon, (BasicLabelPainter) taxonLabelPainter,
                         null);
 
-                treeElements.add(e);
+                taxonLabels.add(e);
             }
         }
+
+
+        //the contents of taxonLabels are added to treeElements at the end of this method...
 
         // Clear the map of individual node label bounds and transforms
         nodeLabelBounds.clear();
@@ -1644,7 +1689,21 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         long now = System.currentTimeMillis();
         TreeDrawableElement.setOverlappingVisiblitiy(treeElements, g2);
+        TreeDrawableElement.setOverlappingVisiblitiy(taxonLabels, g2);
         System.err.println("Clash " + (System.currentTimeMillis() - now));
+
+        int size = Integer.MAX_VALUE;
+        boolean visible = true;
+        for(TreeDrawableElement element : taxonLabels){
+            size = Math.min (size, element.getCurrentSize());
+            if(!element.isVisible())
+                visible = false;
+        }
+        for(TreeDrawableElement element : taxonLabels){
+            element.setSize(size,g2);
+            element.setVisible(visible);
+        }
+        treeElements.addAll(taxonLabels);
 
         calibrated = true;
 
