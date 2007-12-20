@@ -95,7 +95,7 @@ public class TreeSimulator {
 				if (attr != null) {
 					height1 = attr.doubleValue();
 				}
-				attr = (Double)taxon1.getAttribute(heightAttributeName);
+				attr = (Double)taxon2.getAttribute(heightAttributeName);
 				if (attr != null) {
 					height2 = attr.doubleValue();
 				}
@@ -248,7 +248,7 @@ public class TreeSimulator {
 			System.err.print("[");
 			for (int i = 0; i < REPLICATE_COUNT; i++) {
 
-				trees[i] = sim.simulate(false);
+				trees[i] = sim.simulate(true);
 				if (i != 0 && i % 100 == 0) {
 					System.err.print(".");
 				}
