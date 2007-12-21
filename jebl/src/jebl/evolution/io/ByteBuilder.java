@@ -51,19 +51,36 @@ public class ByteBuilder implements CharSequence, Appendable {
         }
     }
 
+    public static boolean isCharacterAscii(final char c) {
+        return ((int) c) < 128;
+    }
 
+    /**
+     * Appends an ASCII character to this ByteBuilder.
+     * @param c ASCII character to append
+     * @return this ByteBuilder
+     * @throws IllegalArgumentException if c is not an ASCII character
+     */
     public ByteBuilder append(char c) {
         if( current + 1 > data.length ) {
-            ensureCapacity(current + 1);
+            ensureCapacity(current + 1); // will throw an exception if insufficient capacity (maxCapacity reached)
         }
-        // will throw an exception if insufficient capacity (maxCapacity reached)
+        if (!isCharacterAscii(c)) {
+            throw new IllegalArgumentException("Can't append multi-byte character #" + (int) c + " to a ByteBuilder: " + c);
+        }
         data[current] = (byte)c;
         ++current;
         return this;
     }
 
-    public ByteBuilder append(CharSequence csq) throws IOException {
-        return append(csq, 0, csq.length());
+    /**
+     * Appends an ASCII CharSequence to this ByteBuilder.
+     * @param charSequence ASCII CharSequence to append
+     * @return this ByteBuilder
+     * @throws IllegalArgumentException if charSequence contains non-ASCII characters
+     */
+    public ByteBuilder append(CharSequence charSequence) throws IOException {
+        return append(charSequence, 0, charSequence.length());
     }
 
     public ByteBuilder append(CharSequence csq, int start, int end) throws IOException {
