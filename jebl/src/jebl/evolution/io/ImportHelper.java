@@ -180,16 +180,16 @@ public class ImportHelper {
     }
 
     /**
-     * Reads a line, skipping over any comments.
-     * @return one line of text
+     * Reads and returns one line of text
+     * @param skipComments If true, any comments that start in the text will be omitted from the returned line
+     *                    (pass false e.g. if you've already encountered a lineComment and want to read the rest of the line without parsing)
      */
-    public String readLine() throws IOException {
-
+    private String readLine(boolean skipComments) throws IOException {
         StringBuilder line = new StringBuilder();
         char ch = read();
         try {
             while (ch != '\n' && ch != '\r') {
-                if (hasComments) {
+                if (hasComments && skipComments) {
                     if (ch == lineComment) {
                         skipComments(ch);
                         break;
@@ -215,6 +215,14 @@ public class ImportHelper {
         }
 
         return line.toString();
+    }
+
+    /**
+     * Reads a line, skipping over any comments.
+     * @return one line of text
+     */
+    public String readLine() throws IOException {
+        return readLine(true);
     }
 
    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
@@ -585,9 +593,9 @@ public class ImportHelper {
         lastMetaComment = null;
 
         if (delimiter == lineComment) {
-            String line = readLine();
+            String line = readLine(false);
             if (write && commentWriter != null) {
-                commentWriter.write(line, 0, line.length());
+                commentWriter.write(line);
                 commentWriter.newLine();
             } else if (meta != null) {
                 meta.append(line);
