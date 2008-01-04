@@ -32,7 +32,7 @@ final public class SimpleRootedTree implements RootedTree {
     /**
      * Make a copy of the given rooted tree
      * @param tree a rooted tree
-     * @param nodeMapping store {source tree node -> new tree node} mapping in here if non-null 
+     * @param nodeMapping store {source tree node -> new tree node} mapping in here if non-null
      */
     public SimpleRootedTree(RootedTree tree, Map<Node, Node> nodeMapping) {
         createNodes(tree, tree.getRootNode(), nodeMapping);
@@ -143,7 +143,7 @@ final public class SimpleRootedTree implements RootedTree {
         if( getTaxa().contains(taxon) ) {
             throw new IllegalArgumentException("duplicate taxon "+taxon.getName());
         }
-        
+
         SimpleRootedNode node = new SimpleRootedNode(taxon);
         externalNodes.put(taxon, node);
         return node;
@@ -200,7 +200,7 @@ final public class SimpleRootedTree implements RootedTree {
     public void swapNodes(Node n, int i0, int i1) {
         ((SimpleRootedNode)n).swapChildren(i0, i1);
     }
-    
+
     /**
      * @param node the node whose height is being set
      * @param height the height
@@ -497,9 +497,7 @@ final public class SimpleRootedTree implements RootedTree {
     public Set<Node> getNodes(int degree) {
         Set<Node> nodes = new HashSet<Node>();
         for (Node node : getNodes()) {
-            // Account for no anncesstor of root, assumed by default in getDegree
-            final int deg = ((SimpleRootedNode)node).getDegree() - ((node == rootNode) ? 1 : 0);
-            if (deg == degree) nodes.add(node);
+            if (((SimpleRootedNode)node).getDegree() == degree) nodes.add(node);
         }
         return nodes;
     }
@@ -713,13 +711,13 @@ final public class SimpleRootedTree implements RootedTree {
         }
 
         public int getDegree() {
-            return children.size() + 1;
+            return children.size() + (parent != null ? 1 : 0);
         }
 
         public void setTaxa(Taxon to) {
             taxon = to;
         }
-        
+
         /**
          * returns the edge connecting this node to the parent node
          * @return the edge
