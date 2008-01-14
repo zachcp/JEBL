@@ -1,24 +1,30 @@
 package org.virion.jam.util;
 
-import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Used for a managing a list of SimpleListeners.
- * Calling {@link #objectChanged()} calls that method on all internal SimpleListeners.  
+ * A composite SimpleListener that manages a list of component SimpleListeners to which
+ * it forwards all {@link #objectChanged()} calls (i.e. it calls that method on all
+ * internal SimpleListeners). This class is thread safe.
+ *
  * @author Richard Moir
  * @version $Id$
  */
 public class SimpleListenerManager implements SimpleListener {
-
-    private List<SimpleListener> listeners = new ArrayList<SimpleListener>();
+    private final List<SimpleListener> listeners;
 
     public SimpleListenerManager(SimpleListenerManager manager) {
-        this.listeners = new ArrayList<SimpleListener>(manager.listeners);
+        this(manager.listeners);
     }
 
     public SimpleListenerManager() {
+        this(Collections.<SimpleListener>emptyList());
+    }
+
+    private SimpleListenerManager(List<SimpleListener> initialListeners) {
+        this.listeners = new ArrayList<SimpleListener>(initialListeners);
     }
 
     public synchronized void add(SimpleListener listener) {
