@@ -245,7 +245,7 @@ public class TreeSimulator {
 			Tree[] trees = new Tree[REPLICATE_COUNT];
 
 			System.err.println("Simulating " + REPLICATE_COUNT + " trees of " + samplingTimes.length + " tips:");
-			System.err.print("[");
+			System.err.print("[");                                                                                                                      
 			for (int i = 0; i < REPLICATE_COUNT; i++) {
 
 				trees[i] = sim.simulate(true);
