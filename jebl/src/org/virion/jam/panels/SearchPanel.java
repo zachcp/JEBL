@@ -207,17 +207,23 @@ public class SearchPanel extends JPanel {
 
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-		findButton.setEnabled(enabled);
-	}
+        if (findButton != null) {
+            findButton.setEnabled(enabled);
+        }
+    }
 
 	public void setToolTipText(String text) {
 		super.setToolTipText(text);
 		searchText.setToolTipText(text);
-		findButton.setToolTipText(text);
-	}
+        if (findButton != null) {
+            findButton.setToolTipText(text);
+        }
+    }
 
 	public void setFindIcon(Icon icon) {
-		findButton.setIcon(icon);
+        if (findButton != null) {
+            findButton.setIcon(icon);
+        }
 	}
 
 	public void addSearchPanelListener(SearchPanelListener listener) {
