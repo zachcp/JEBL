@@ -198,6 +198,10 @@ public final class CompositeProgressListener extends ProgressListener {
         currentOperationProgress = 0.0;
     }
 
+    public final boolean setComplete() {
+        return setProgress(1.0);
+    }
+
 //    public Iterator<ProgressListener> iterator() {
 //        final AtomicBoolean isFirst = new AtomicBoolean(true);
 //        return new Iterator<ProgressListener>() {
