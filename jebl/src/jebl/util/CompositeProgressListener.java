@@ -3,15 +3,17 @@ package jebl.util;
 import jebl.math.MachineAccuracy;
 
 import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A {@link jebl.util.ProgressListener} that is suitable for a task that consists of several subtasks.
  * You specify the relative duration of each subtask, and then the subtasks' setProgress()
  * calls with values between 0 and 1 are translated to reflect the overall progress on the whole
  * (combined) task. In other words, each subtask reports progress as if it were the whole task,
- * and the CompositeProgressListener translates this into overall progress.
+ * and the CompositeProgressListener translates this into overall progress. This also implies
+ * that calling {@link jebl.util.ProgressListener#setComplete()} or {@link ProgressListener#setProgress(double) setProgress(1.0)}
+ * marks the current subtask rather than the entire task completed.
  * <p/>
  * As the combined progress listener cannot know which subtask it is currently being called from,
  * you have to explicitely let it know when a new subtask (not the first) starts, by calling
@@ -19,7 +21,7 @@ import java.util.Arrays;
  * argument, {@link #beginNextSubtask()} should be called precisely N-1 times.
  * <p/>
  * Alternatively, instead of calling {@link #beginNextSubtask()} after each subtask (except the last),
- * you can instead call {@link #beginSubtask()} before each subtask (including the first)
+ * you can instead call {@link #beginSubtask()} before each subtask (including the first).
  * <p/>
  *
  * @author Tobias Thierer
@@ -150,15 +152,6 @@ public final class CompositeProgressListener extends ProgressListener {
 
     public boolean addProgress(double fractionCompletedDiff) {
         return setProgress(currentOperationProgress + fractionCompletedDiff);
-    }
-
-    /**
-     * Marks the current subtask (not the entire task!) as completed -- same
-     * as setProgress(1.0).
-     * @return true if the user has requested that this operation be canceled.
-     */
-    public boolean setComplete() {
-        return setProgress(1.0);
     }
 
     /**

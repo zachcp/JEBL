@@ -37,6 +37,14 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
     }
 
     /**
+     * Marks the operation as completed; same as {@link #setProgress(double) setProgress(1.0)}.
+     * @return true if the user has requested that this operation be canceled.
+     */
+    public final boolean setComplete() {
+        return setProgress(1.0);
+    }    
+
+    /**
      * This method is a hook called from {@link #setProgress} to allow subclasses a
      * custom reaction to setProgress events. Currently, subclasses are required to
      * implement this method, but in the future it may get an empty default
