@@ -184,6 +184,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public Taxon getTaxon(Node node) {
+        if( node == root ) return null;
         return source.getTaxon(node);
     }
 
