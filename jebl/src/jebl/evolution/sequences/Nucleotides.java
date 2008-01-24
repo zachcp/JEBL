@@ -123,19 +123,96 @@ public final class Nucleotides {
 
 	public static boolean isGap(NucleotideState state) { return state == GAP_STATE; }
 
-    // states must not be ambiguous/gaps nor equal
-    // transition A<==>G or C<==>T
+    /**
+     * @return true if state1 and state2 are different non-ambigous states that are a transition.
+     * (i.e. A-G or C-T)
+     * @see #isPossibleTransition(State, State)
+     */
     public static boolean isTransition(State state1, State state2) {
         // use A,G is even and C,T are odd
+        if (state1.isGap() || state1.isAmbiguous() || state2.isGap() || state2.isAmbiguous() || state1==state2)
+            return false;
         return ((state1.getIndex() + state2.getIndex()) & 0x1) == 0; // checks if sum is even
     }
 
-    // states must not be ambiguous/gaps nor equal
+    /**
+     * @return true if state1 and state2 are different non-ambigous states that are a transversion.
+     * (i.e. A-C or A-T or G-C or G-T)
+     * @see #isPossibleTransversion(State, State)
+     */
     public static boolean isTransversion(State state1, State state2) {
+        if (state1.isGap() || state1.isAmbiguous() || state2.isGap() || state2.isAmbiguous() || state1 == state2)
+            return false;
         return !isTransition(state1, state2);
     }
 
-    public static boolean isPurine(State state) {
+    /**
+     * @return true if there is a possible transition betwen these states.
+     * Possible transition means there is at least 1 transition between 
+     * at least one of the possible combintaitons of non-ambiguous cannonical states
+     * represented by the ambiguity symbols. If neither state is ambigous this
+     * method returns true if and only if the states are a transversion.
+     */
+    public static boolean isPossibleTransition(char c1, char c2) {
+        if (c1 > 127 || c2 > 127) return false;
+        return isPossibleTransition[c1][c2];
+    }
+
+    /**
+     * @return true if there is a possible transversion betwen these states.
+     * Possible transversion means there is at least 1 transversion between
+     * at least one of the possible combintaitons of non-ambiguous cannonical states
+     * represented by the ambiguity symbols. If neither state is ambigous this
+     * method returns true if and only if the states are a transversion.
+     */
+    public static boolean isPossibleTransversion(char c1, char c2) {
+        if (c1 > 127 || c2 > 127) return false;
+        return isPossibleTransversion[c1][c2];
+    }
+
+    /**
+     * @return true if there is a possible transition betwen these states.
+     * Possible transition means there is at least 1 transition between
+     * at least one of the possible combintaitons of non-ambiguous cannonical states
+     * represented by the ambiguity symbols. If neither state is ambigous this
+     * method returns true if and only if the states are a transversion.
+     */
+    public static boolean isPossibleTransition(State s1, State s2) {
+        return isPossibleTransition[s1.getCode().charAt(0)][s2.getCode().charAt(0)];
+    }
+
+    /**
+     * @return true if there is a possible transversion betwen these states.
+     * Possible transversion means there is at least 1 transversion between
+     * at least one of the possible combintaitons of non-ambiguous cannonical states
+     * represented by the ambiguity symbols. If neither state is ambigous this
+     * method returns true if and only if the states are a transversion.
+     */
+    public static boolean isPossibleTransversion(State s1, State s2) {
+        return isPossibleTransversion[s1.getCode().charAt(0)][s2.getCode().charAt(0)];
+    }
+
+    private static boolean calculateIsPossibleTransition(State s1, State s2) {
+        if (s1.isGap() || s2.isGap()) return false;
+        for (State state1 : s1.getCanonicalStates()) {
+            for (State state2 : s2.getCanonicalStates()) {
+                if (isTransition(state1, state2)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean calculateIsPossibleTransversion(State s1, State s2) {
+        if (s1.isGap() || s2.isGap()) return false;
+        for (State state1 : s1.getCanonicalStates()) {
+            for (State state2 : s2.getCanonicalStates()) {
+                if (isTransversion(state1, state2)) return true;
+            }
+        }
+        return false;
+    }
+
+   public static boolean isPurine(State state) {
         if (state.isAmbiguous()) {
             // return true only if all its ambiguities are isPurine()
             for (State state1 : state.getCanonicalStates()) {
@@ -199,4 +276,25 @@ public final class Nucleotides {
         statesByCode['u'] = T_STATE;
         statesByCode['U'] = T_STATE;
     }
+
+
+    private static boolean[][] isPossibleTransition;
+    private static boolean[][] isPossibleTransversion;
+
+    static {
+        isPossibleTransition = new boolean[128][128];
+        isPossibleTransversion = new boolean[128][128];
+        for (int i = 0; i < 128; i++) {
+            for (int j = 0; j < 128; j++) {
+                char c1 = (char) i;
+                char c2 = (char) j;
+                NucleotideState s1 = Nucleotides.getState(c1);
+                NucleotideState s2 = Nucleotides.getState(c2);
+                isPossibleTransition[i][j] = s1 != null && s2 != null && calculateIsPossibleTransition(s1, s2);
+                isPossibleTransversion[i][j] = s1 != null && s2 != null && calculateIsPossibleTransversion(s1, s2);
+            }
+        }
+    }
+
+
 }
