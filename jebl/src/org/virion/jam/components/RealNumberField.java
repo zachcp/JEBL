@@ -158,7 +158,7 @@ public class RealNumberField extends JTextField
 
             int length = getLength();
             String buf = getText(0, offs) + str + getText(offs, length - offs);
-            buf = buf.trim();
+            buf = buf.trim().toUpperCase();
             char[] array = buf.toCharArray();
 
             if (array.length > 0) {
@@ -170,11 +170,19 @@ public class RealNumberField extends JTextField
             }
 
             boolean period_found = (array.length > 0 && array[0] == PERIOD);
+            boolean exponent_found =  false;
+            int exponent_index = -1;
+            boolean exponent_sign_found =  false;
 
             for (int i = 1; i < array.length; i++) {
                 if (!member(array[i], numberSet)) {
                     if (!period_found && array[i] == PERIOD) {
                         period_found = true;
+                    } else if (!exponent_found && array[i] == 'E') {
+                        exponent_found = true;
+                        exponent_index = i;
+                    } else if (exponent_found && i == (exponent_index + 1) && !exponent_sign_found && array[i] == '-') {
+                        exponent_sign_found = true;
                     } else {
                         Toolkit.getDefaultToolkit().beep();
                         return;
