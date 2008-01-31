@@ -315,7 +315,11 @@ public class ImportHelper {
                         //sequence.append(matchSequence.charAt(n));
                     } else {
                         //sequence.append(ch);
-                        bb.append(ch);
+                        if (!ByteBuilder.isCharacterAscii(ch)) {
+                            throw new ImportException("Encountered non-ascii character while reading sequence: " + ch);
+                        } else {
+                            bb.append(ch);
+                        }
                     }
                     nSites++;
                 }

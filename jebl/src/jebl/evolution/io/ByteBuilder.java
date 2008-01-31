@@ -56,7 +56,7 @@ public class ByteBuilder implements CharSequence, Appendable {
     }
 
     /**
-     * Appends an ASCII character to this ByteBuilder.
+     * Appends an ASCII character (see {@link #isCharacterAscii(char)}) to this ByteBuilder.
      * @param c ASCII character to append
      * @return this ByteBuilder
      * @throws IllegalArgumentException if c is not an ASCII character
