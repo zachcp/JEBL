@@ -401,7 +401,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             final String fontSizePrefKey = getTitle() + "_fontsize";
             final float fontsize = PREFS.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
             setFontSize(fontsize, false);
-            fontSizeSpinner.setValue(fontsize);
+            fontSizeSpinner.setValue((double)fontsize);
 
 
 
