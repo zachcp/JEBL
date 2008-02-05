@@ -4,27 +4,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
 public class ColorWellButton extends JButton {
+	private JColorChooser chooser;
+	private String colorChooserTitle;
 
 	public ColorWellButton(Color color, final String colorChooserTitle) {
 		super();
-		putClientProperty("JButton.buttonType", "toolbar");
-		putClientProperty("Quaqua.Button.style", "colorWell");
+
+		this.colorChooserTitle = colorChooserTitle;
+
+		putClientProperty("JButton.buttonType", "square");
+		setBorderPainted(true);
+//		putClientProperty("Quaqua.Button.style", "colorWell");
 		setIcon(new ColorWell(color));
-		setMargin(new Insets(8, 8, 8, 8));
+		setMargin(new Insets(10, 10, 10, 10));
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				Color color = JColorChooser.showDialog(JOptionPane.getFrameForComponent(ColorWellButton.this),
-						colorChooserTitle,
-						((ColorWell)getIcon()).color);
-				if (color != null) {
-					setSelectedColor(color);
-				}
+				chooserButtonActionPerformed(evt);
 			}
 		});
 	}
@@ -38,6 +41,35 @@ public class ColorWellButton extends JButton {
 		repaint();
 	}
 
+    private void chooserButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            //      System.out.println("chooserButtonActionPerformed "+evt);
+            if (chooser == null) {
+                chooser = new JColorChooser();
+                /*
+                chooser.setSelectionModel(new DefaultColorSelectionModel() {
+                    public void setSelectedColor(Color c) {
+                        new Throwable().printStackTrace();
+                        super.setSelectedColor(c);
+                    }
+                }
+                );*/
+                //JOptionPane.showMessageDialog(this, "Made a new chooser");
+            }
+            Color color = chooser.showDialog(this, colorChooserTitle, ((ColorWell)getIcon()).color);
+	        if (color != null) {
+		        setSelectedColor(color);
+	        }
+        } catch (Throwable t) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            pw.close();
+            JOptionPane.showMessageDialog(this, "JColorChooser Failed "+sw.toString());
+            t.printStackTrace();
+        }
+    }
+
 	private class ColorWell implements Icon {
 		Color color;
 
@@ -47,11 +79,11 @@ public class ColorWellButton extends JButton {
 		}
 
 		public int getIconWidth() {
-			return 20;
+			return 15;
 		}
 
 		public int getIconHeight() {
-			return 20;
+			return 15;
 		}
 
 		public void paintIcon(Component c, Graphics g, int x, int y) {
