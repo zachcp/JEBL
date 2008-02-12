@@ -57,8 +57,8 @@ public abstract class DocumentFrame extends AbstractFrame {
     public boolean openFile(File file) {
 
         try {
-	        documentFile = file;
             if (readFromFile(file)) {
+	            documentFile = file;
                 clearDirty();
 	            setFrameTitle();
 
