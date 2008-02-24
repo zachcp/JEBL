@@ -28,6 +28,7 @@ public class DisclosureButton extends JToggleButton {
         setBorderPainted(false);
         // this is required on Windows XP platform -- untested on Macintosh
         setContentAreaFilled(false);
+	    setFocusable(false);
 
         setupIcon();
 

@@ -5,6 +5,7 @@ import org.virion.jam.util.IconUtils;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.*;
 
 /**
  * @author Andrew Rambaut
@@ -21,7 +22,9 @@ public class PinnedButton extends JToggleButton {
 
 		setupIcon();
 		setRolloverEnabled(true);
+		setFocusable(false);
 
+		setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// the button will already have changed state
