@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
  * @version $Id$
  */
 public class NewickImporter implements TreeImporter {
+    private final ImportHelper helper;
+    private boolean unquotedLabels;
 
     /**
      * Constructor
@@ -116,20 +118,23 @@ public class NewickImporter implements TreeImporter {
     }
 
     /**
-     * Reads a branch in. This could be a node or a tip (calls readNode or readTip
-     * accordingly). It then reads the branch length and SimpleNode that will
-     * point at the new node or tip.
+     * Reads a internal or external node along with its incoming branch and
+     * its complete subtree from helper and adds it to the tree. If the branch
+     * length is not specified in the newick file, it is assumed to be 1.0.
+     * This method calls {@link #readInternalNode(jebl.evolution.trees.SimpleRootedTree)}
+     * or {@link #readExternalNode(jebl.evolution.trees.SimpleRootedTree)} to read
+     * the internal or external node and add it to the tree.
+     *
+     * @param tree Tree to which to add the new node along with is incoming branch
+     * @return the internal or external node read from helper and added to the tree.
      */
     private Node readBranch(SimpleRootedTree tree) throws IOException, ImportException
     {
         Node branch;
 
-        if (helper.nextCharacter() == '(') {
-            // is an internal node
+        if (helper.nextCharacter() == '(') { // it's an internal node
             branch = readInternalNode(tree);
-
-        } else {
-            // is an external node
+        } else { // it's an external node
             branch = readExternalNode(tree);
         }
 
@@ -155,18 +160,18 @@ public class NewickImporter implements TreeImporter {
         helper.readCharacter();
 
         // read the first child
-        children.add( readBranch(tree) );
+        children.add(readBranch(tree));
 
-        // an internal node must have at least 2 children
-        if (helper.getLastDelimiter() != ',') {
+        // We used to require that an internal node has at least 2 children, however this
+        // caused bug 4303 and I'm not sure if any other code depends on the outdegree 2
+        /*if (helper.getLastDelimiter() != ',') {
             throw new ImportException.BadFormatException("Missing ',' in tree");
+        } */
+
+        // read subsequent children (recursively)
+        while (helper.getLastDelimiter() == ',') {
+            children.add(readBranch(tree));
         }
-
-        // read subsequent children
-        do {
-            children.add( readBranch(tree) );
-
-        } while (helper.getLastDelimiter() == ',');
 
         // should have had a closing ')'
         if (helper.getLastDelimiter() != ')') {
@@ -200,7 +205,9 @@ public class NewickImporter implements TreeImporter {
     }
 
     /**
-     * Reads an external node in.
+     * Reads an external node from helper and adds it to the specified tree. As a side effect,
+     * the new node is added to the tree and helper's read position is advanced.
+     * @return the external node read from helper
      */
     private Node readExternalNode(SimpleRootedTree tree) throws IOException, ImportException
     {
@@ -208,13 +215,10 @@ public class NewickImporter implements TreeImporter {
         while( unquotedLabels && helper.getLastDelimiter() == ' ' ) {
             label = label + " " + helper.readToken(":(),;");
         }
-          try {
-              return tree.createExternalNode(Taxon.getTaxon(label));
+        try {
+            return tree.createExternalNode(Taxon.getTaxon(label));
         } catch (IllegalArgumentException e) {
            throw new ImportException.DuplicateTaxaException(e.getMessage());
         }
     }
-
-    private final ImportHelper helper;
-    private boolean unquotedLabels;
 }
