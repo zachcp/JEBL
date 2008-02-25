@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class BasicControlPalette extends JPanel implements ControlPalette {
 
-    public final static int DEFAULT_OPENING_SPEED = 50;
+    public final static int DEFAULT_OPENING_SPEED = 100;
 
     public enum DisplayMode {
         DEFAULT_OPEN,
@@ -209,7 +209,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
 
     private int preferredWidth;
     private DisplayMode displayMode;
-    private int openingSpeed = 50;
+    private final int openingSpeed;
     private int currentlyOpen = 0;
     private List<Controller> controllers = new ArrayList<Controller>();
     private List<DisclosurePanel> disclosurePanels = new ArrayList<DisclosurePanel>();
