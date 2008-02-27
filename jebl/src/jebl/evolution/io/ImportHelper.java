@@ -256,7 +256,7 @@ public class ImportHelper {
     /**
      *
      * Reads sequence, skipping over any comments and filtering using sequenceType.
-     * @param sequence a StringBuffer into which the sequence is put
+     * @param sequence a StringBuilder into which the sequence is put
      * @param sequenceType the sequenceType of the sequence
      * @param delimiters list of characters that will stop the reading
      * @param gapCharacters list of characters that will be read as gaps
@@ -283,7 +283,8 @@ public class ImportHelper {
                 ? Integer.MAX_VALUE
                 : (int) expectedInputLength;
         // Note this doesn't actually allocate this many bytes to start with - it only sets a limit on how far to expand
-        ByteBuilder bb = new ByteBuilder(byteBuilderMaxCapacity);
+        Appendable builder = new ByteBuilder(byteBuilderMaxCapacity);
+        assert builder instanceof CharSequence; // will be cast to CharSequence below
 
         try {
             int nSites = 0;
@@ -299,9 +300,9 @@ public class ImportHelper {
 
                 if (!Character.isWhitespace(ch)) {
                     if (gapCharacters.indexOf(ch) != -1) {
-                        bb.append(gapCode);
+                        builder.append(gapCode);
                     } else if (missingCharacters.indexOf(ch) != -1) {
-                        bb.append(unknownCode);
+                        builder.append(unknownCode);
                         //sequence.append(unknownCode);
                     } else if (matchCharacters.indexOf(ch) != -1) {
                         if (matchSequence == null) {
@@ -311,14 +312,20 @@ public class ImportHelper {
                             throw new ImportException("Match sequences too short");
                         }
 
-                        bb.append(matchSequence.charAt(nSites));
+                        builder.append(matchSequence.charAt(nSites));
                         //sequence.append(matchSequence.charAt(n));
                     } else {
                         //sequence.append(ch);
-                        if (!ByteBuilder.isCharacterAscii(ch)) {
-                            throw new ImportException("Encountered non-ascii character while reading sequence: " + ch);
+                        if (!ByteBuilder.isCharacterAscii(ch) && builder instanceof ByteBuilder) {
+                             // ByteBuilder can't cope with non-ascii characters, so switch to using a StringBuilder (might use more memory)
+                            // We can't just throw an ImportException because as of 2008-02-27 the policy in JEBL
+                            // sequences is to silently replace invalid characters with '?' if the sequenceType is != null
+                            // (Geneious' FastaImporterTest.testInvalidCharacters() depends on this).                            
+                            // (and we don't want to explicitely duplicate that policy here in case it ever changes)
+                            builder = new StringBuilder((CharSequence) builder);
+                            assert builder instanceof CharSequence; // will be cast to CharSequence below
                         } else {
-                            bb.append(ch);
+                            builder.append(ch);
                         }
                     }
                     nSites++;
@@ -340,8 +347,7 @@ public class ImportHelper {
         } catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
         }
-        sequence.ensureCapacity(bb.length());
-        sequence.append(bb);
+        sequence.append((CharSequence) builder);
     }
 
     /**
