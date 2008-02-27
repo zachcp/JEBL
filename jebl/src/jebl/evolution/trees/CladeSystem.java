@@ -78,7 +78,7 @@ public class CladeSystem {
 
 		// Recurse over the tree and add all the clades (or increment their
 		// frequency if already present). The root clade is not added.
-		addClades(tree, tree.getRootNode(), null);
+		addClades(tree, tree.getRootNode(), new LinkedHashSet<Taxon>());
 	}
 
 	private void addClades(RootedTree tree, Node node, Set<Taxon> cladeTaxa) {
