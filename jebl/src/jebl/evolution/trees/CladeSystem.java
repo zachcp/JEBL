@@ -1,8 +1,7 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.RootedTree;
+import jebl.evolution.taxa.Taxon;
 
 import java.util.*;
 
@@ -13,14 +12,19 @@ import java.util.*;
  *
  * @author Andrew Rambaut
  */
-public class CladeSystem
-{
+public class CladeSystem {
+    //
+    // Private stuff
+    //
+    private Set<Taxon> taxa = null;
+
+    private final List<Clade> clades = new ArrayList<Clade>();
+
 	//
 	// Public stuff
 	//
 
-	public CladeSystem()
-	{
+	public CladeSystem() {
 	}
 
 	/**
@@ -78,7 +82,6 @@ public class CladeSystem
 	}
 
 	private void addClades(RootedTree tree, Node node, Set<Taxon> cladeTaxa) {
-
 		if (tree.isExternal(node)) {
 			cladeTaxa.add(tree.getTaxon(node));
 		} else {
@@ -95,7 +98,7 @@ public class CladeSystem
 		}
 	}
 
-	private class Clade {
+	private static class Clade {
 		public Clade(Set<Taxon> taxa) {
 			this.taxa = taxa;
 			this.frequency = 1.0;
@@ -132,12 +135,5 @@ public class CladeSystem
 			return taxa.hashCode();
 		}
 	}
-
-	//
-	// Private stuff
-	//
-	private Set<Taxon> taxa = null;
-
-	private final List<Clade> clades = new ArrayList<Clade>();
 }
 
