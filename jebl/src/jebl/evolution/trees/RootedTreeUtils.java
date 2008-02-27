@@ -93,7 +93,7 @@ public class RootedTreeUtils {
 	 */
 	public static Set<Node> getTipsForTaxa(RootedTree tree, Collection<Taxon> taxa) throws MissingTaxonException {
 
-		Set<Node> tipNodes = new HashSet<Node>();
+		Set<Node> tipNodes = new LinkedHashSet<Node>();
 
 		for (Taxon taxon : taxa) {
 
@@ -114,7 +114,7 @@ public class RootedTreeUtils {
 	 */
 	public static Set<Node> getDescendantTips(RootedTree tree, Node node) {
 
-		Set<Node> tipNodes = new HashSet<Node>();
+		Set<Node> tipNodes = new LinkedHashSet<Node>();
 		getDescendantTips(tree, node, tipNodes);
 		return tipNodes;
 	}

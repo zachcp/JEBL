@@ -7,6 +7,7 @@ import jebl.util.FixedBitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * Work in progress
@@ -32,7 +33,7 @@ public class TreeBiPartitionInfo {
         this.t = t;
         this.taxa = taxa;
         nTips = t.getExternalNodes().size();
-        all = new HashMap<FixedBitSet, BiPartiotionInfo>();
+        all = new LinkedHashMap<FixedBitSet, BiPartiotionInfo>();
         forNode(t.getRootNode());
     }
 

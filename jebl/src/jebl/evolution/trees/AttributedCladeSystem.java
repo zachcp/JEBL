@@ -3,10 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Stores a set of unique clades for a tree
@@ -40,7 +37,7 @@ public class AttributedCladeSystem extends CladeSystem {
 			cladeTaxa.add(tree.getTaxon(node));
 		} else {
 
-			Set<Taxon> childCladeTaxa = new HashSet<Taxon>();
+			Set<Taxon> childCladeTaxa = new LinkedHashSet<Taxon>();
 			for (Node child : tree.getChildren(node)) {
 
 				addClades(tree, child, childCladeTaxa);

@@ -193,7 +193,7 @@ public class CalculateSplitRates {
 	}
 
 	private Map<Double, Double> getClockDwellTimes(RootedTree tree) {
-		Map<Double, Double> rateDwellTimes = new HashMap<Double, Double>();
+		Map<Double, Double> rateDwellTimes = new LinkedHashMap<Double, Double>();
 		Set<Node> nodes = tree.getNodes();
 		for (Node node : nodes) {
 			if (node != tree.getRootNode()) {

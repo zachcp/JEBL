@@ -213,7 +213,7 @@ public class MostProbableTopology {
 
         public UnrootedTreeInfo(SimpleTree t) {
             super(t);
-            m = new HashMap<FixedBitSet, EdgeInfo>();
+            m = new LinkedHashMap<FixedBitSet, EdgeInfo>();
             traverse(new EdgeCallback() {
                 public void visit(Edge e, FixedBitSet tipSet) {
                      m.put(tipSet, new EdgeInfo(e));
@@ -286,7 +286,7 @@ public class MostProbableTopology {
 
         TreeInfo(SimpleRootedTree t) {
             super(t);
-            m = new HashMap<FixedBitSet, NodeInfo>();
+            m = new LinkedHashMap<FixedBitSet, NodeInfo>();
             traverse(new NodeCallback() {
                 public void visit(Node n, FixedBitSet tipSet) {
                      m.put(tipSet, new NodeInfo(n));
@@ -332,7 +332,7 @@ public class MostProbableTopology {
         // Unrooted trees are rooted at the internal node connected to the first tip (taxa[0]) and the rooted
         // method is applied to that.
 
-        Map<String, TopologyEntry> m = new HashMap<String, TopologyEntry>(nTrees);
+        Map<String, TopologyEntry> m = new LinkedHashMap<String, TopologyEntry>(nTrees);
         for(int nTree = 0; nTree < nTrees; ++ nTree) {
             final Tree t = trees.get(nTree);
             final String rep = standardTopologyRepresentation(t);

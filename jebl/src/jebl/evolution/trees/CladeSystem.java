@@ -83,7 +83,7 @@ public class CladeSystem
 			cladeTaxa.add(tree.getTaxon(node));
 		} else {
 
-			Set<Taxon> childCladeTaxa= new HashSet<Taxon>();
+			Set<Taxon> childCladeTaxa= new LinkedHashSet<Taxon>();
 			for (Node child : tree.getChildren(node)) {
 
 				addClades(tree, child, childCladeTaxa);

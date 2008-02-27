@@ -320,7 +320,7 @@ public final class Utils {
 		// Method - find the pair of tips with the longest distance. It is easy to see that the center
 		// is at the midpoint of the path between them.
 
-		HashMap<HashPair<Node>, Double> dists = new HashMap<HashPair<Node>, Double>();
+		HashMap<HashPair<Node>, Double> dists = new LinkedHashMap<HashPair<Node>, Double>();
 		try {
 			double maxDistance = -Double.MAX_VALUE;
 			// node on maximal path
@@ -575,7 +575,7 @@ public final class Utils {
      * @return An unmodifiable set which contains all of the elements of a except for those which are also in b.
      */
     private static<T> Set<T> setMinus(Set<T> a, Collection<T> b) {
-        Set<T> diff = new HashSet<T>(a);
+        Set<T> diff = new LinkedHashSet<T>(a);
         diff.removeAll(b);
         return Collections.unmodifiableSet(diff);
     }

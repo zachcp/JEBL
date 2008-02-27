@@ -70,7 +70,7 @@ public class RootedFromUnrooted implements RootedTree {
         this.intentUnrooted = intentUnrooted;
         topLeft = topRight  = null;
         rootToLeft = rootToRight = 0.0;
-        parents = new HashMap<Node, Node>();
+        parents = new LinkedHashMap<Node, Node>();
         for( Node adj : source.getAdjacencies(root) ) {
             setParent(adj, root);
         }
@@ -94,7 +94,7 @@ public class RootedFromUnrooted implements RootedTree {
         } catch (NoEdgeException e) {
             // bug
         }
-        parents = new HashMap<Node, Node>();
+        parents = new LinkedHashMap<Node, Node>();
 
         // This is just a handle used to refer to the root so create the simplest possible implementation...
         root = new BaseNode() { public int getDegree() { return 0; } };
@@ -174,7 +174,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public Set<Node> getInternalNodes() {
-        HashSet<Node> s = new HashSet<Node>(source.getInternalNodes());
+        HashSet<Node> s = new LinkedHashSet<Node>(source.getInternalNodes());
         s.add(root);
         return s;
     }
@@ -254,7 +254,7 @@ public class RootedFromUnrooted implements RootedTree {
     }
 
     public Set<Node> getNodes() {
-        Set<Node> nodes = new HashSet<Node>(getInternalNodes());
+        Set<Node> nodes = new LinkedHashSet<Node>(getInternalNodes());
         nodes.addAll(getExternalNodes());
         if( topLeft != null ) {
             nodes.add(root);

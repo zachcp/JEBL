@@ -309,7 +309,7 @@ final public class SimpleRootedTree implements RootedTree {
      *         These nodes are often refered to as 'tips'.
      */
     public Set<Node> getExternalNodes() {
-        return new HashSet<Node>(externalNodes.values());
+        return new LinkedHashSet<Node>(externalNodes.values());
     }
 
     /**
@@ -317,7 +317,7 @@ final public class SimpleRootedTree implements RootedTree {
      *         These nodes are often refered to as internal nodes.
      */
     public Set<Node> getInternalNodes() {
-        return new HashSet<Node>(internalNodes);
+        return new LinkedHashSet<Node>(internalNodes);
     }
 
     /**
@@ -326,7 +326,7 @@ final public class SimpleRootedTree implements RootedTree {
      *         same as the size of the external nodes set.
      */
     public Set<Taxon> getTaxa() {
-        return new HashSet<Taxon>(externalNodes.keySet());
+        return new LinkedHashSet<Taxon>(externalNodes.keySet());
     }
 
     /**
@@ -452,7 +452,7 @@ final public class SimpleRootedTree implements RootedTree {
 	 * @return the set of all nodes in this graph.
 	 */
 	public Set<Node> getNodes() {
-	    Set<Node> nodes = new HashSet<Node>(internalNodes);
+	    Set<Node> nodes = new LinkedHashSet<Node>(internalNodes);
 	    nodes.addAll(externalNodes.values());
 	    return nodes;
 	}
@@ -461,7 +461,7 @@ final public class SimpleRootedTree implements RootedTree {
      * @return the set of all edges in this graph.
      */
     public Set<Edge> getEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new LinkedHashSet<Edge>();
         for (Node node : getNodes()) {
             if (node != getRootNode()) {
                 edges.add(((SimpleRootedNode)node).getEdge());
@@ -477,7 +477,7 @@ final public class SimpleRootedTree implements RootedTree {
 	 * @return the set of external edges.
 	 */
 	public Set<Edge> getExternalEdges() {
-		Set<Edge> edges = new HashSet<Edge>();
+		Set<Edge> edges = new LinkedHashSet<Edge>();
 		for (Node node : getExternalNodes()) {
 			edges.add(((SimpleRootedNode)node).getEdge());
 		}
@@ -490,7 +490,7 @@ final public class SimpleRootedTree implements RootedTree {
 	 * @return the set of internal edges.
 	 */
 	public Set<Edge> getInternalEdges() {
-		Set<Edge> edges = new HashSet<Edge>();
+		Set<Edge> edges = new LinkedHashSet<Edge>();
 		for (Node node : getInternalNodes()) {
 			if (node != getRootNode()) {
 			    edges.add(((SimpleRootedNode)node).getEdge());
@@ -504,7 +504,7 @@ final public class SimpleRootedTree implements RootedTree {
      * @return a set containing all nodes in this graph of the given degree.
      */
     public Set<Node> getNodes(int degree) {
-        Set<Node> nodes = new HashSet<Node>();
+        Set<Node> nodes = new LinkedHashSet<Node>();
         for (Node node : getNodes()) {
             // Account for no anncesstor of root, assumed by default in getDegree
             final int deg = ((SimpleRootedNode)node).getDegree() - ((node == rootNode) ? 1 : 0);
@@ -637,8 +637,8 @@ final public class SimpleRootedTree implements RootedTree {
     private AttributableHelper helper = null;
 
     protected SimpleRootedNode rootNode = null;
-    protected final Set<Node> internalNodes = new HashSet<Node>();
-    private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
+    protected final Set<Node> internalNodes = new LinkedHashSet<Node>();
+    private final Map<Taxon, Node> externalNodes = new LinkedHashMap<Taxon, Node>();
 
     private boolean heightsKnown = false;
     private boolean lengthsKnown = false;

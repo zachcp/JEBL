@@ -121,12 +121,12 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      */
     private Map<String, Object> aMap(short index) {
         if( all == null ) {
-            all = new HashMap<Short, Map<String, Object>>();
+            all = new LinkedHashMap<Short, Map<String, Object>>();
         }
 
         Map<String, Object> map = all.get(index);
         if( map == null ) {
-            map = new HashMap<String, Object>();
+            map = new LinkedHashMap<String, Object>();
             all.put(index, map);
         }
         return map;
@@ -344,7 +344,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     // O(number of nodes)
     public Set<Node> getExternalNodes() {
-        Set<Node> n = new HashSet<Node>();
+        Set<Node> n = new LinkedHashSet<Node>();
         for(int i = 0; i < nodes.length; ++i) {
             if( (noSons[i] & 0x8000) != 0 ) {
                 n.add(nodes[i]);
@@ -355,7 +355,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     // O(number of nodes)
     public Set<Node> getInternalNodes() {
-        Set<Node> n = new HashSet<Node>();
+        Set<Node> n = new LinkedHashSet<Node>();
         for(int i = 0; i < nodes.length; ++i) {
             if( (noSons[i] & 0x8000) == 0 ) {
                 n.add(nodes[i]);
@@ -365,7 +365,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Set<Edge> getExternalEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new LinkedHashSet<Edge>();
         for (Node node : getExternalNodes()) {
             edges.add( establishEdge( ((SimpleRootedNode)node).index) ) ;
         }
@@ -373,7 +373,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Set<Edge> getInternalEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new LinkedHashSet<Edge>();
         for (Node node : getInternalNodes()) {
             if (node != getRootNode()) {
                 edges.add( establishEdge( ((SimpleRootedNode)node).index) );
@@ -383,7 +383,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Set<Taxon> getTaxa() {
-        return new HashSet<Taxon>(Arrays.asList(taxa));
+        return new LinkedHashSet<Taxon>(Arrays.asList(taxa));
     }
 
     public Taxon getTaxon(Node node) {
@@ -488,18 +488,18 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Set<Node> getNodes() {
-        return new HashSet<Node>(Arrays.asList(nodes));
+        return new LinkedHashSet<Node>(Arrays.asList(nodes));
     }
 
     public Set<Edge> getEdges() {
         for(int k = 1; k < nodes.length; ++k) {
             establishEdge((short)k);
         }
-        return new HashSet<Edge>( Arrays.asList(edges));
+        return new LinkedHashSet<Edge>( Arrays.asList(edges));
     }
 
     public Set<Node> getNodes(int degree) {
-        Set<Node> ns = new HashSet<Node>();
+        Set<Node> ns = new LinkedHashSet<Node>();
         // check non root nodes
         for(int k = 1; k < nodes.length; ++k) {
             if( degree == nSons(k) + 1 )

@@ -124,7 +124,7 @@ class GreedyRootedConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> 
     public final RootedTree build() {
 
         // establish support
-        Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();
+        Map<FixedBitSet, Support> support = new LinkedHashMap<FixedBitSet, Support>();
         int k = 0;
         for (RootedTree tree : rtrees) {
             if (debug) {

@@ -147,14 +147,14 @@ final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree
     public final Tree build() {
 
         try {
-            Map<FixedBitSet, Support> support = new HashMap<FixedBitSet, Support>();
+            Map<FixedBitSet, Support> support = new LinkedHashMap<FixedBitSet, Support>();
             double[] sumBranchesOfExternal = new double[taxons.size()];
 
             int nTree = 0;
             for (Tree tree : trees) {
                 int initialCapacity = tree.getNodes().size();
                 Set<Node> scanSet = new LinkedHashSet<Node>(initialCapacity);
-                Map<Node, FixedBitSet> doneSet = new HashMap<Node, FixedBitSet>(initialCapacity);
+                Map<Node, FixedBitSet> doneSet = new LinkedHashMap<Node, FixedBitSet>(initialCapacity);
 
                 for (Node n : tree.getExternalNodes()) {
                     FixedBitSet b = new FixedBitSet(nExternalNodes);
@@ -400,7 +400,7 @@ final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree
 
             if (outGroup != null) {
                 Node out = consTree.getNode(outGroup);
-                Set<String> a = new HashSet<String>();
+                Set<String> a = new LinkedHashSet<String>();
                 a.add(getSupportAttributeName());
                 consTree.reRootWithOutgroup(out, a);
             }

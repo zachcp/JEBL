@@ -186,7 +186,7 @@ public final class SimpleTree implements Tree {
      *         These nodes are often refered to as 'tips'.
      */
     public Set<Node> getExternalNodes() {
-        return new HashSet<Node>(externalNodes.values());
+        return new LinkedHashSet<Node>(externalNodes.values());
     }
 
     /**
@@ -194,7 +194,7 @@ public final class SimpleTree implements Tree {
      *         These nodes are often refered to as internal nodes.
      */
     public Set<Node> getInternalNodes() {
-        return new HashSet<Node>(internalNodes);
+        return new LinkedHashSet<Node>(internalNodes);
     }
 
 	/**
@@ -203,7 +203,7 @@ public final class SimpleTree implements Tree {
 	 *         same as the size of the external nodes set.
 	 */
 	public Set<Taxon> getTaxa() {
-	    return new HashSet<Taxon>(externalNodes.keySet());
+	    return new LinkedHashSet<Taxon>(externalNodes.keySet());
 	}
     /**
      * @param node the node whose associated taxon is being requested.
@@ -268,7 +268,7 @@ public final class SimpleTree implements Tree {
 	 * @return the set of all nodes in this graph.
 	 */
 	public Set<Node> getNodes() {
-	    Set<Node> nodes = new HashSet<Node>(internalNodes);
+	    Set<Node> nodes = new LinkedHashSet<Node>(internalNodes);
 	    nodes.addAll(externalNodes.values());
 	    return nodes;
 	}
@@ -277,7 +277,7 @@ public final class SimpleTree implements Tree {
      * @return the set of all edges in this graph.
      */
     public Set<Edge> getEdges() {
-        return new HashSet<Edge>(edges.values());
+        return new LinkedHashSet<Edge>(edges.values());
     }
 
     /**
@@ -285,7 +285,7 @@ public final class SimpleTree implements Tree {
      * @return a set containing all nodes in this graph of the given degree.
      */
     public Set<Node> getNodes(int degree) {
-        Set<Node> nodes = new HashSet<Node>();
+        Set<Node> nodes = new LinkedHashSet<Node>();
         for (Node node : getNodes()) {
             if (((SimpleNode)node).getDegree() == degree) nodes.add(node);
         }
@@ -298,7 +298,7 @@ public final class SimpleTree implements Tree {
 	 * @return the set of external edges.
 	 */
 	public Set<Edge> getExternalEdges() {
-		Set<Edge> externalEdges = new HashSet<Edge>();
+		Set<Edge> externalEdges = new LinkedHashSet<Edge>();
 		for (Edge edge : getEdges()) {
 			if (((SimpleEdge)edge).isExternal()) {
  				externalEdges.add(edge);
@@ -313,7 +313,7 @@ public final class SimpleTree implements Tree {
 	 * @return the set of internal edges.
 	 */
 	public Set<Edge> getInternalEdges() {
-		Set<Edge> internalEdges = new HashSet<Edge>();
+		Set<Edge> internalEdges = new LinkedHashSet<Edge>();
 		for (Edge edge : getEdges()) {
 			if (!((SimpleEdge)edge).isExternal()) {
  				internalEdges.add(edge);
@@ -361,12 +361,12 @@ public final class SimpleTree implements Tree {
     // PRIVATE members
 
     private AttributableHelper helper = null;
-    private final Set<Node> internalNodes = new HashSet<Node>();
-    private final Map<Taxon, Node> externalNodes = new HashMap<Taxon, Node>();
+    private final Set<Node> internalNodes = new LinkedHashSet<Node>();
+    private final Map<Taxon, Node> externalNodes = new LinkedHashMap<Taxon, Node>();
     /**
      * A mapping between edges and edge length.
      */
-    Map<HashPair, Edge> edges = new HashMap<HashPair, Edge>();
+    Map<HashPair, Edge> edges = new LinkedHashMap<HashPair, Edge>();
 
     final class SimpleNode extends BaseNode {
 
