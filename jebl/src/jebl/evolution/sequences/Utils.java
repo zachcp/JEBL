@@ -51,10 +51,9 @@ public class Utils {
         if (states[0] instanceof NucleotideState) {
             AminoAcidState[] translation = new AminoAcidState[states.length / 3];
             for (int i = 0; i < translation.length; i++) {
-                CodonState state = Codons.getState((NucleotideState)states[i * 3],
-                                                    (NucleotideState)states[(i * 3) + 1],
-                                                    (NucleotideState)states[(i * 3) + 2]);
-                translation[i] = geneticCode.getTranslation(state);
+                translation[i] = geneticCode.getTranslation((NucleotideState)states[i * 3],
+                                                            (NucleotideState)states[(i * 3) + 1],
+                                                            (NucleotideState)states[(i * 3) + 2]);
             }
             return translation;
         } else if (states[0] instanceof CodonState) {
