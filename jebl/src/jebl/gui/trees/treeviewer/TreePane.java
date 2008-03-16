@@ -935,8 +935,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             final Shape cn = treeLayout.getCollapsedNode(node, .25);
             final Shape transformedShape = transform.createTransformedShape(cn);
 
-            if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && ! transformedShape.contains(mouseLocation))
-                return;
+            //we want to draw if the clade is selected, or if the mouse is close
+           // if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && ! transformedShape.contains(mouseLocation) && !isSelected)
+           //     return;
 
             final Stroke save = g2.getStroke();
             g2.setStroke(collapsedStroke);
@@ -973,10 +974,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            }
         }
 
-        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation))
+        //we want to draw node markers either if they are selected, or if the mouse is close to them
+        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && !isSelected)
             return;
 
-        final Paint c = nodeMarker.contains(mouseLocation) ? selectionPaint :  Color.LIGHT_GRAY;
+        //we want them to have the selected colour either if they are selected, or if the mouse is over them
+        final Paint c = (nodeMarker.contains(mouseLocation) || isSelected) ? selectionPaint :  Color.LIGHT_GRAY;
         g2.setPaint(c);
 
         g2.fill(nodeMarker);
@@ -1162,12 +1165,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
                 if(e.isVisible() || !drawOnlyVisibleElements){
-                    if(selectedNodes.contains(e.getNode())){
-                        e.setForeground(Color.blue);
-                    }
-                    else{
-                        e.setForeground(Color.black);
-                    }
+//                    if(selectedNodes.contains(e.getNode())){
+//                        e.setForeground(Color.blue);
+//                    }
+//                    else{
+//                        e.setForeground(Color.black);
+//                    }
                     e.draw(g2, clipOffscreenShapes ? viewport : null);
                 }
             }
