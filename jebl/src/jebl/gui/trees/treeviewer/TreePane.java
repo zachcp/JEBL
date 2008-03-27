@@ -1992,7 +1992,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Rectangle2D scaleBarBounds = null;
 
     private Stroke branchLineStroke = new BasicStroke(1.0F);
-    private Stroke collapsedStroke = new BasicStroke(1.5F);
+    private Stroke collapsedStroke = new BasicStroke(3.0F);
     private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
     private Stroke selectionStroke = new BasicStroke(6.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
