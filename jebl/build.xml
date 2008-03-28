@@ -31,8 +31,7 @@
         </condition>
         <javac source="1.5" srcdir="${src}" destdir="${build}" debug="true">
             <include name="org/**/*"/>
-            <exclude name="org/**/maconly/*"/>
-            <!--<exclude name="org/**/maconly/*" unless = "isMac"/>-->
+            <exclude name="org/**/maconly/*" unless = "isMac"/>
         </javac>
 
         <!-- Utils.class was getting included in jebl.jar    -->
@@ -130,10 +129,10 @@
             <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
         </jar>
     </target>
-   
-   
+
+
    <property name="api" location="doc/api"/>
-   
+
    <target name="document" depends="clean-api,prepare-api">
       <javadoc destdir="${api}"
                version="false"
