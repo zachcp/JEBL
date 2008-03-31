@@ -12,6 +12,9 @@ class HashPair<T> {
     HashPair(T a, T b) {
         first = a;
         second = b;
+        if (a == null || b == null) {
+            throw new NullPointerException("Expected two non-null objects, got " + a + ", " + b);
+        }
     }
 
     public int hashCode() {
