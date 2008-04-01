@@ -363,6 +363,14 @@ final public class SimpleRootedTree implements RootedTree {
 
     public void renameTaxa(Taxon from, Taxon to) {
         SimpleRootedNode node = (SimpleRootedNode)externalNodes.get(from);
+
+        // TT: The javadoc doesn't specify whether renameTaxa() should fail or silently do nothing
+        // if Taxon from doesn't exist. But the code already threw a NullPointerException before (bug 4824),
+        // so it's probably ok to throw a more informative IllegalArgumentException instead.
+        if (node == null) {
+            throw new IllegalArgumentException("Unknown taxon " + from + "; can't rename to " + to);
+        }
+
         node.setTaxa(to);
     }
 
