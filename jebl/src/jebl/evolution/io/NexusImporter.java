@@ -763,9 +763,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Reads a 'TAXA' block.
 	 */
-	private List<Taxon> readTaxaBlock() throws ImportException, IOException
-	{
-
+	private List<Taxon> readTaxaBlock() throws ImportException, IOException {
 		taxonCount = 0;
 
 		readDataBlockHeader("TAXLABELS", NexusBlock.TAXA);
@@ -778,7 +776,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		do {
             String name = helper.readToken(";");
-
+            if (name.equals("")) {
+                throw new ImportException.UnknownTaxonException("Expected nonempty taxon name, got empty string");
+            }
             Taxon taxon = Taxon.getTaxon(name);
 			taxa.add(taxon);
 
