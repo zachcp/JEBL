@@ -372,6 +372,9 @@ final public class SimpleRootedTree implements RootedTree {
         }
 
         node.setTaxa(to);
+
+        externalNodes.remove(from);
+        externalNodes.put(to, node);
     }
 
     /**

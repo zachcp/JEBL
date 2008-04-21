@@ -398,6 +398,9 @@ public class MutableRootedTree implements RootedTree {
     public void renameTaxa(Taxon from, Taxon to) {
         MutableRootedNode node = (MutableRootedNode)externalNodes.get(from);
         node.setTaxa(to);
+        
+        externalNodes.remove(from);
+        externalNodes.put(to, node);
     }
 
     /**

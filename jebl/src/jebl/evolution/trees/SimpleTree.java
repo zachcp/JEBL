@@ -242,6 +242,9 @@ public final class SimpleTree implements Tree {
     public void renameTaxa(Taxon from, Taxon to) {
         SimpleNode node = (SimpleNode)externalNodes.get(from);
         node.setTaxa(to);
+
+        externalNodes.remove(from);
+        externalNodes.put(to, node);
     }
 
     /**
