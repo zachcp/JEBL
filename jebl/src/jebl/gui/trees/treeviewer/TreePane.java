@@ -1062,6 +1062,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             
             final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
 
+            final Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
+            g2.setPaint(paint);
+            
             if (showingTaxonCallouts && showingTaxonLables) {
                 final Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
                 if (calloutPath != null) {
@@ -1070,8 +1073,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
 
-            final Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
-            g2.setPaint(paint);
 
             g2.setStroke(branchLineStroke);
             g2.draw(branchPath);
