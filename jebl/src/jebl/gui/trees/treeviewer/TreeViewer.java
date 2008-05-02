@@ -108,6 +108,10 @@ public class TreeViewer extends JPanel implements Printable {
         this(new BasicControlPalette(defaultPaletteSize, BasicControlPalette.DisplayMode.ONLY_ONE_OPEN, true), CONTROL_PALETTE_ALIGNMENT);
     }
 
+    public Tree getTree(){
+        return treePane.getTree();
+    }
+
     /**
      * Creates new TreeViewer
      */

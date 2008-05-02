@@ -45,6 +45,8 @@ public class MultipleTreeViewer extends TreeViewer {
 
     private int labelSize = 6;
 
+    private int currentTree = 0;
+
     public void setTrees(Collection<? extends Tree> trees) {
         setTrees(trees, labelSize);
     }
@@ -57,6 +59,15 @@ public class MultipleTreeViewer extends TreeViewer {
 
     private void setCurrentTree(Tree tree) {
         super.setTree(tree, labelSize);
+    }
+
+    public List<Tree> getAllTrees(){
+        trees.set(currentTree, treePane.getTree()); //make sure the list is up to date
+        return new ArrayList<Tree>(trees);
+    }
+
+    public Tree getTree(){
+        return trees.get(currentTree);
     }
 
     private ControlsProvider multipleTreeControlsProvider = new ControlsProvider() {
@@ -93,7 +104,9 @@ public class MultipleTreeViewer extends TreeViewer {
 
                     spinner1.addChangeListener(new ChangeListener() {
                         public void stateChanged(ChangeEvent changeEvent) {
-                            setCurrentTree(trees.get( names.indexOf( (String)spinner1.getValue()) ) );
+                            trees.set(currentTree, treePane.getTree());
+                            currentTree = names.indexOf( (String)spinner1.getValue()) ;
+                            setCurrentTree(trees.get(currentTree) );
                             //this is here becasue the selection clears when we change trees, and we
                             //want to refresh the toolbar
                             treePane.clearSelection();
