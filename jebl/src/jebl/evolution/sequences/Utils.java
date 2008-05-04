@@ -128,24 +128,26 @@ public class Utils {
     }
 
     /**
-     * Translates the given nucleotideSequence into an amino acid sequence string,
-     * using the given geneticCode. The translation is done triplet by triplet,
-     * starting with the triplet that is at index 0..2 in nucleotideSequence,
-     * then the one at index 3..5 etc. until there are less than 3 nucleotides
-     * left.
-     *
-     * This method uses {@link #translate(State[], GeneticCode)} to do the
+     * Translates the given nucleotideSequence into an amino acid sequence
+     * string, using the given geneticCode. The translation is done triplet by
+     * triplet, starting with the triplet that is at index 0..2 in
+     * nucleotideSequence, then the one at index 3..5 etc. until there are
+     * less than 3 nucleotides left.
+     * <p/>
+     * This method uses {@link #translate(State[],GeneticCode)} to do the
      * translation, hence it shares some properties with that method:
      * 1.) Any excess nucleotides at the end will be silently discarded,
      * 2.) Translation doesn't stop at stop codons; instead, they are
-     *     translated to "*", which is {@link jebl.evolution.sequences.AminoAcids#STOP_STATE}'s code.
-     * @param nucleotideSequence nucleotide sequence string to translate
-     * @param geneticCode genetic code to use for the translation
-     * @return A string with length nucleotideSequence.length() / 3 (rounded down),
-     *         the translation of <code>nucleotideSequence</code> with the given
-     *         genetic code.
+     * translated to "*", which is
+     * {@link jebl.evolution.sequences.AminoAcids#STOP_STATE}'s code.
+     *
+     * @param nucleotideSequence nucleotide sequence to translate
+     * @param geneticCode        genetic code to use for the translation
+     * @return A string with length nucleotideSequence.length() / 3 (rounded
+     *         down), the translation of <code>nucleotideSequence</code> with
+     *         the given genetic code
      */
-    public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
+    public static String translateCharSequence(final CharSequence nucleotideSequence, GeneticCode geneticCode) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         seq = new GaplessSequence(seq);
         State[] states = seq.getStates();
@@ -153,6 +155,22 @@ public class Utils {
         states = translate(states, geneticCode);
         seq = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("x"), states);
         return seq.getString();
+    }
+
+    /**
+     * A wrapper for {@link #translateCharSequence(CharSequence,GeneticCode)}
+     * that takes a nucleotide sequence as a String only rather than a
+     * CharSequence. This is to preserve backwards compatibility with
+     * existing compiled code.
+     *
+     * @param nucleotideSequence nucleotide sequence string to translate
+     * @param geneticCode        genetic code to use for the translation
+     * @return A string with length nucleotideSequence.length() / 3 (rounded
+     *         down), the translation of <code>nucleotideSequence</code> with
+     *         the given genetic code
+     */
+    public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
+        return translateCharSequence(nucleotideSequence, geneticCode);
     }
 
     public static State[] stripGaps(final State[] sequence) {
