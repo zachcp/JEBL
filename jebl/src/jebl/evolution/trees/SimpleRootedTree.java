@@ -518,7 +518,7 @@ final public class SimpleRootedTree implements RootedTree {
         Set<Node> nodes = new LinkedHashSet<Node>();
         for (Node node : getNodes()) {
             // Account for no anncesstor of root, assumed by default in getDegree
-            final int deg = ((SimpleRootedNode)node).getDegree() - ((node == rootNode) ? 1 : 0);
+            final int deg = node.getDegree() ;
             if (deg == degree) nodes.add(node);
         }
         return nodes;
@@ -733,7 +733,7 @@ final public class SimpleRootedTree implements RootedTree {
         }
 
         public int getDegree() {
-            return children.size() + 1;
+            return children.size() +(this==rootNode?0:1);
         }
 
         public void setTaxa(Taxon to) {

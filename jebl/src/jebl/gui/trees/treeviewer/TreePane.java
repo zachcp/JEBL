@@ -863,7 +863,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         long start = System.currentTimeMillis();
         drawTree(g2, true, true, true, getWidth(), getHeight());
-        System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
+//        System.err.println("tree draw " + (System.currentTimeMillis() - start) + "ms");
         
         if (dragRectangle != null) {
             g2.setPaint(new Color(128, 128, 128, 128));

@@ -97,7 +97,7 @@ public class RootedFromUnrooted implements RootedTree {
         parents = new LinkedHashMap<Node, Node>();
 
         // This is just a handle used to refer to the root so create the simplest possible implementation...
-        root = new BaseNode() { public int getDegree() { return 0; } };
+        root = new BaseNode() { public int getDegree() { return 2; } };
 
         parents.put(root, null);
         setParent(left, root);

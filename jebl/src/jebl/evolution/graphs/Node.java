@@ -22,5 +22,12 @@ import jebl.util.Attributable;
  */
 public interface Node extends Attributable {
 
+    /**
+     * Get the number of edges connected to this node. (this is also the number of nodes connected to this node).
+     * <p/>
+     * Note: In previous implementations, this method would return a different value on the root node of trees.
+     * It would previously return 1 more than the correct value in that case.
+     * @return the number of edges connected to this node
+     */
     int getDegree();
 }

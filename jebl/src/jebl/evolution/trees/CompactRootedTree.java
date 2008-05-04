@@ -144,7 +144,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         }
 
         public int getDegree() {
-            return nSons(index) + 1;
+            return nSons(index) + (this==getRootNode()?0:1);
         }
 
         Map<String, Object> getExistingMap() {
@@ -236,7 +236,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         while( level.size() > 0 ) {
             nlevel.clear();
             for( Node n : level ) {
-                short ns = (short) (n.getDegree() - 1);
+                short ns = (short) t.getChildren(n).size();
 
                 if( hasHeights ) {
                     heights[iNode] = t.getHeight(n);

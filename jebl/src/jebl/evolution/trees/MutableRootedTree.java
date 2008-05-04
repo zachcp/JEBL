@@ -38,7 +38,7 @@ public class MutableRootedTree implements RootedTree {
         try {
             MutableRootedNode newSubtreeRoot = rootAdjaceincesWith(tree, root, outGroup);
 
-            
+
             // Add the outgroup in
             MutableRootedNode out = (MutableRootedNode)createExternalNode( tree.getTaxon(outGroup) );
             setLength(out, tree.getEdgeLength(outGroup, root));
@@ -46,15 +46,15 @@ public class MutableRootedTree implements RootedTree {
             ArrayList<MutableRootedNode> rootChildren = new ArrayList<MutableRootedNode>();
             rootChildren.add(out);
             rootChildren.add(newSubtreeRoot);
-            //MutableRootedNode newRoot = 
+            //MutableRootedNode newRoot =
             	this.createInternalNode( rootChildren );
-            setLength(newSubtreeRoot,0);	
+            setLength(newSubtreeRoot,0);
         } catch (NoEdgeException e) {
             // bug
         }
     }
-    
-  
+
+
     /**
      *  Remove internal node. Move all children to their grandparent.
      *  @param node  to be removed
@@ -545,7 +545,7 @@ public class MutableRootedTree implements RootedTree {
         Set<Node> nodes = new LinkedHashSet<Node>();
         for (Node node : getNodes()) {
             // Account for no anncesstor of root, assumed by default in getDegree
-            final int deg = ((MutableRootedNode)node).getDegree() - ((node == rootNode) ? 1 : 0);
+            final int deg = node.getDegree();
             if (deg == degree) nodes.add(node);
         }
         return nodes;
@@ -746,7 +746,7 @@ public class MutableRootedTree implements RootedTree {
         }
 
         public int getDegree() {
-            return children.size() + 1;
+            return children.size() + (this==rootNode?0:1);
         }
 
         /**

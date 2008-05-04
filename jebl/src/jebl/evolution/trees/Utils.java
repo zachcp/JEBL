@@ -217,7 +217,16 @@ public final class Utils {
 		return nodeDistance(tree, tree.getRootNode());
 	}
 
-	public static String[] asText(Tree tree, int widthGuide) {
+    public static String asText(Tree tree) {
+        String[] lines=asText(tree,100);
+        StringBuilder builder=new StringBuilder();
+        for (String line : lines) {
+            builder.append(line).append("\n");
+        }
+        return builder.toString();
+    }
+
+    public static String[] asText(Tree tree, int widthGuide) {
 		RootedTree rtree = rootTheTree(tree);
 
 		Node root = rtree.getRootNode();
