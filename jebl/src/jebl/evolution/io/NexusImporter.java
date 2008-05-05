@@ -33,7 +33,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class for importing NEXUS file format
+ * Class for importing NEXUS file format.
+ *
+ * This is a good starting point for documentation about the nexus file format:
+ * 
+ * https://www.nescent.org/wg_phyloinformatics/NEXUS_Specification
  *
  * @version $Id$
  *
@@ -976,21 +980,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * Reads a 'TREES' block.
 	 */
-	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
-	{
+	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException {
 		List<Tree> trees = new ArrayList<Tree>();
-
 		String[] lastToken = new String[1];
 		translationList = readTranslationList(taxonList, lastToken);
-
-		while( true ) {
-
+        while( true ) {
 			RootedTree tree = readNextTree(lastToken);
-
 			if (tree == null) {
 				break;
 			}
-
 			trees.add(tree);
 		}
 
@@ -999,12 +997,10 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		}
 
 		nextBlock = NexusBlock.UNKNOWN;
-
 		return trees;
 	}
 
-	private Map<String, Taxon> readTranslationList(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException
-	{
+	private Map<String, Taxon> readTranslationList(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException {
 		Map<String, Taxon> translationList = new HashMap<String, Taxon>();
 
 		String token = helper.readToken(";");
@@ -1065,20 +1061,26 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
             boolean isUnrooted = token.equalsIgnoreCase("UTREE");
             if ( isUnrooted || token.equalsIgnoreCase("TREE")) {
-
 				if (helper.nextCharacter() == '*') {
 					// Star is used to specify a default tree - ignore it
 					helper.readCharacter();
 				}
 
-				final String meta = helper.getLastMetaComment();
-				if (meta != null) {
-					// Look for the unrooted meta comment [&U]
-					if (meta.equalsIgnoreCase("U")) {
-						isUnrooted = true;
-					}
-					helper.clearLastMetaComment();
-				}
+                {
+                    // According to the Nexus specification at http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
+                    // and all Nexus files I (TT) have seen, the [&U] unrooted meta comment must actually occur not
+                    // here but only after the ' = ' behind the name. However until 2008-05-05 JEBL produced Nexus
+                    // files with the [&U] in this wrong location so we need to continue supporting such broken
+                    // files; this has caused bug 5150.
+                    final String meta = helper.getLastMetaComment();
+                    if (meta != null) {
+                        // Look for the unrooted meta comment [&U]
+                        if (meta.equalsIgnoreCase("U")) {
+                            isUnrooted = true;
+                        }
+                        helper.clearLastMetaComment();
+                    }
+                }
 
 				final String treeName = helper.readToken( "=;" );
 
@@ -1087,7 +1089,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				}
 
 				try {
-
 					if (helper.nextCharacter() != '(') {
 						throw new ImportException.BadFormatException("Missing tree definition in TREE command of TREES block");
 					}
@@ -1115,10 +1116,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 						throw new ImportException.BadFormatException("Expecting ';' after tree, '" + treeName + "', TREE command of TREES block");
 					}
 
-					if  (comment != null) {
-						// if '[W number]' (MrBayes), set weight attribute
-						if( comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) {
-							tree.setAttribute("weight", new Float(comment.substring(2)) );
+					if  (comment != null && comment.length() > 0) {
+                        if (Character.toUpperCase(comment.charAt(0)) == 'U') { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
+                            isUnrooted = true;
+                        } else if (comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) { // if '[W number]' (MrBayes), set weight attribute
+                            tree.setAttribute("weight", Float.valueOf(comment.substring(2)));
 						} else {
 							try {
 								parseMetaCommentPairs(comment, tree);

@@ -120,13 +120,17 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             ++nt;
             final String treeName = (name != null) ? name.toString() : "tree_" + nt;
 
-            StringBuilder builder = new StringBuilder("\ttree [&");
+            StringBuilder builder = new StringBuilder("\ttree ");
+
+            builder.append(treeName);
+            builder.append(" = ");
 
             // TREE & UTREE are depreciated in the NEXUS format in favour of a metacomment
             // [&U] or [&R] after the TREE command. Andrew.
-            builder.append(isRooted && !rtree.conceptuallyUnrooted() ? "r] " : "u] ");
-            builder.append(treeName);
-            builder.append(" = ");
+            // TT: The [&U], [&R] should actually come *after* the " = " and be uppercase, see
+            // e.g. tree_rest in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar .
+            // Before 2008-05-05 we incorrectly inserted it before the treeName.
+            builder.append(isRooted && !rtree.conceptuallyUnrooted() ? "[&R] " : "[&U] ");
 
             appendAttributes(rtree, treeNameAttributeKey, builder);
 
