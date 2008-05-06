@@ -321,8 +321,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	/**
 	 * return whether another tree is available.
 	 */
-	public boolean hasTree() throws IOException, ImportException
-	{
+	public boolean hasTree() throws IOException, ImportException {
 		if (!isReadingTreesBlock) {
 			isReadingTreesBlock = startReadingTrees();
 			translationList = readTranslationList(treeTaxonList, lastToken);
@@ -385,49 +384,31 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return false;
 	}
 
-	// **************************************************************
-	// DistanceMatrixImporter IMPLEMENTATION
-	// **************************************************************
-
 	/**
-	 * importDistances.
+	 * This is an implementation of a method from the DistanceMatrixImporter interface
 	 */
 	public List<DistanceMatrix> importDistanceMatrices() throws IOException, ImportException {
 		boolean done = false;
-
 		List<Taxon> taxonList = null;
 		List<DistanceMatrix> distanceMatrices = new ArrayList<DistanceMatrix>();
-
 		while (!done) {
 			try {
-
 				NexusBlock block = findNextBlock();
-
 				if (block == NexusBlock.TAXA) {
-
 					taxonList = readTaxaBlock();
-
 				} else if (block == NexusBlock.DISTANCES) {
-
 					if (taxonList == null) {
 						throw new MissingBlockException("TAXA block is missing");
 					}
-
 					DistanceMatrix distanceMatrix = readDistancesBlock(taxonList);
 					distanceMatrices.add(distanceMatrix);
-
 				} else {
 					// Ignore the block..
 				}
-
 			} catch (EOFException ex) {
 				done = true;
 			}
 		}
-
-		// assert distanceMatrices != null;
-		//   throw new MissingBlockException("DISTANCES block is missing");
-
 		return distanceMatrices;
 	}
 
@@ -1014,7 +995,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     if( token2.length() == 0 && (char)helper.getLastDelimiter() == ';') {
                         //assume an extra comma at end of list
                         break;
-
                     }
                     throw new ImportException.BadFormatException("Missing taxon label in TRANSLATE command of TREES block");
 				}
@@ -1037,19 +1017,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					throw new ImportException.UnknownTaxonException(message.toString());
 				}
 				translationList.put(token2, taxon);
-
 			} while (helper.getLastDelimiter() != ';');
-
 			token = helper.readToken(";");
-
 		} else if (taxonList != null) {
 			for (Taxon taxon : taxonList) {
 				translationList.put(taxon.getName(), taxon);
 			}
 		}
-
 		lastToken[0] = token;
-
 		return translationList;
 	}
 
