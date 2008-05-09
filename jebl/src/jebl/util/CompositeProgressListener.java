@@ -201,35 +201,4 @@ public final class CompositeProgressListener extends ProgressListener {
     public final boolean setComplete() {
         return setProgress(1.0);
     }
-
-//    public Iterator<ProgressListener> iterator() {
-//        final AtomicBoolean isFirst = new AtomicBoolean(true);
-//        return new Iterator<ProgressListener>() {
-//            public boolean hasNext() {
-//                return hasNextOperation();
-//            }
-//
-//            public ProgressListener next() {
-//                if (!hasNext()) {
-//                    throw new NoSuchElementException();
-//                }
-//                if (isFirst.get()) {
-//                    isFirst.set(false);
-//                } else {
-//                    startNextOperation();
-//                }
-//                return CompositeProgressListener.this;
-//            }
-//
-//            /**
-//             * Currently not implemented, but may be implemented in the future.
-//             *
-//             * @throws UnsupportedOperationException
-//             */
-//            public void remove() {
-//                throw new UnsupportedOperationException();
-//            }
-//        };
-//    }
-
 }
