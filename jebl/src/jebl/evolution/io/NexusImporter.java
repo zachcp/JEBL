@@ -356,11 +356,19 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	public List<Tree> importTrees() throws IOException, ImportException {
-		isReadingTreesBlock = false;
-		if (!startReadingTrees()) {
-			throw new MissingBlockException("TREES block is missing");
-		}
-		return readTreesBlock(treeTaxonList);
+        // We can't call startReadingTrees() here because if hasTree() was called before
+        // then this importer will already have read into the trees block. However
+        // is hasTree() was called then the following is still guaranteed to work as
+        // per the TreeImporter.hasTree() javadoc.
+        List<Tree> result = new ArrayList<Tree>();
+        while (hasTree()) {
+            result.add(importNextTree());
+        }
+        if (result.isEmpty()) {
+            throw new MissingBlockException("TREES block is missing");
+        } else {
+            return Collections.unmodifiableList(result);
+        }
 	}
 
 	public boolean startReadingTrees() throws IOException, ImportException
