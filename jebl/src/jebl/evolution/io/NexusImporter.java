@@ -37,7 +37,13 @@ import java.util.regex.Pattern;
  *
  * This is a good starting point for documentation about the nexus file format:
  * 
- * https://www.nescent.org/wg_phyloinformatics/NEXUS_Specification
+ *    https://www.nescent.org/wg_phyloinformatics/NEXUS_Specification
+ *
+ * For a quick check if something is probably valid or not, consider this attempt at a
+ * nexus grammar (the above page says "Don't treat this as gospel, its just an attempt
+ * to get the syntax rules"):
+ *
+ *    http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
  *
  * @version $Id$
  *
@@ -1068,7 +1074,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				final String treeName = helper.readToken( "=;" );
 
 				if (helper.getLastDelimiter() != '=') {
-					throw new ImportException.BadFormatException("Missing label for tree'" + treeName + "' or missing '=' in TREE command of TREES block");
+					throw new ImportException.BadFormatException("Missing label for tree '" + treeName + "' or missing '=' in TREE command of TREES block");
 				}
 
 				try {
