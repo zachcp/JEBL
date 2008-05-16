@@ -113,7 +113,13 @@ public class NumberFormatter {
 
 		decimalFormat.setMaximumFractionDigits(numFractionDigits);
 		decimalFormat.setMinimumFractionDigits(numFractionDigits);
-		return decimalFormat.format(value);
+        String labelString = decimalFormat.format(value);
+        //remove trailing zeros (we can't trust the formatter to do this)
+        while(labelString.charAt(labelString.length()-1) == '0'){
+            labelString = labelString.substring(0, labelString.length()-1);
+        }
+
+        return labelString;
 	}
 
 	private int getNumFractionDigits(double value) {

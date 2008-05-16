@@ -49,6 +49,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         this.defaultFontSize = defaultSize;
         taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultSize);
+        taxonExponentFont = taxonLabelFont.deriveFont(taxonLabelFont.getSize2D()*0.66f);
 
         this.tree = tree;
 
@@ -244,6 +245,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public boolean setFontSize(float size, boolean fire) {
         if( defaultFontSize != size ) {
             taxonLabelFont = taxonLabelFont.deriveFont(size);
+            taxonExponentFont = taxonLabelFont.deriveFont(taxonLabelFont.getSize2D()*0.66f);
             defaultFontSize = size;
             if( fire ) firePainterChanged();
             return true;
@@ -302,8 +304,17 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         final String label = getLabel(item);
         if (label != null) {
+            String prefix = label;
+            String suffix = "";
 
-            Rectangle2D rect = g2.getFontMetrics().getStringBounds(label, g2);
+            int exponentIndex = label.indexOf("E");
+            if(exponentIndex >= 0){
+                prefix = label.substring(0, exponentIndex)+"x10";
+                suffix = label.substring(exponentIndex+1, label.length());
+                //valueString = valueString.replace("E", "x10");
+            }
+
+            Rectangle2D rect = g2.getFontMetrics().getStringBounds(prefix, g2);
 
             float xOffset = 0;
             float y = yOffset + (float) bounds.getY();
@@ -325,7 +336,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                     throw new IllegalArgumentException("Unrecognized alignment enum option");
             }
 
-            g2.drawString(label, xOffset, y);
+            g2.drawString(prefix, xOffset, y);
+            if(suffix.length() > 0){
+                g2.setFont(taxonExponentFont);
+                g2.drawString(suffix, xOffset+(float)rect.getWidth(), y-(float)rect.getHeight()/2);
+            }
             //g2.draw(bounds);
         }
 
@@ -502,6 +517,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private Stroke borderStroke = null;
 
     private Font taxonLabelFont;
+    private Font taxonExponentFont;
     //private double preferredWidth;
     private double preferredHeight;
     private float yOffset;
