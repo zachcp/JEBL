@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * Class for importing NEXUS file format.
  *
  * This is a good starting point for documentation about the nexus file format:
- * 
+ *
  *    https://www.nescent.org/wg_phyloinformatics/NEXUS_Specification
  *
  * For a quick check if something is probably valid or not, consider this attempt at a
@@ -52,7 +52,10 @@ import java.util.regex.Pattern;
  */
 public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeImporter, DistanceMatrixImporter {
 
-	public enum NexusBlock {
+    /**
+     * Represents the block types used in the nexus format
+     */
+    public enum NexusBlock {
 		UNKNOWN,
 		TAXA,
 		CHARACTERS,
@@ -65,13 +68,18 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     private boolean compactTrees = false;
 
     // NEXUS specific ImportException classes
-	public static class MissingBlockException extends ImportException {
+    /**
+     * Thrown when a block is missing that is required for importing a particular type of data from the nexus input.
+     */
+    public static class MissingBlockException extends ImportException {
 		public MissingBlockException() { super(); }
 		public MissingBlockException(String message) { super(message); }
 	}
 
 	/**
-	 * Constructor
+     * @param reader
+     * @param expectedLength Expected length of the input in bytes, or 0 if unknown. Used for optimization and tracking
+     *                       progress.
 	 */
 	public NexusImporter(Reader reader, long expectedLength) {
 		helper = new ImportHelper(reader);
@@ -79,13 +87,18 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         initHelper();
 	}
 
-    /**
-	 * Constructor
-	 */
 	public NexusImporter(Reader reader) {
 		this(reader, 0);
 	}
 
+    /**
+     *
+     * @param reader
+     * @param compactTrees true to import trees as {@link jebl.evolution.trees.CompactRootedTree}, false to use
+     * {@link jebl.evolution.trees.SimpleRootedTree}.
+     * @param expectedInputLength Expected length of the input in bytes, or 0 if unknown. Used for optimization and tracking
+     *                            progress.
+     */
     public NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength) {
         this(reader, expectedInputLength);
         this.compactTrees = compactTrees;
@@ -94,8 +107,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     /**
      * @param reader
      * @param compactTrees
-     * @deprecated Use NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength) 
+     * @deprecated Use NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength)
      */
+    @Deprecated
     public NexusImporter(Reader reader, boolean compactTrees) {
         // a wild guess on the low side
         this(reader, compactTrees, 4*1024);
@@ -108,11 +122,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     }
 
     /**
-	 * This function returns an integer to specify what the
-	 * next block in the file is. The internal variable nextBlock is also set to this
-	 * value. This should be overridden to provide support for other blocks. Once
-	 * the block is read in, nextBlock is automatically set to UNKNOWN_BLOCK by
+     * Read ahead to the next block in the input.
+     *
+	 * This should be overridden to provide support for other blocks. Once
+	 * the block is read in, nextBlock is automatically set to UNKNOWN by
 	 * findEndBlock.
+     *
+     * @return the type of the next block
 	 */
 	public NexusBlock findNextBlock() throws IOException
 	{
@@ -141,14 +157,17 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return nextBlock;
 	}
 
-	public String getNextBlockName() {
+    /**
+     *
+     * @return the name of the next block which will be read. eg "TREES"
+     * @see {@link jebl.evolution.io.NexusImporter.NexusBlock}
+     */
+    public String getNextBlockName() {
 		return nextBlockName;
 	}
 
 	/**
-	 * Returns an iterator over a set of elements of type T.
-	 *
-	 * @return an Iterator.
+	 * @return an Iterator over the trees in the nexus input.
 	 */
 	public Iterator<Tree> iterator() {
 		return new Iterator<Tree>() {
@@ -185,7 +204,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Parses a 'TAXA' block.
+	 * Parse the next 'TAXA' block encountered in the input.
 	 */
 	public List<Taxon> parseTaxaBlock() throws ImportException, IOException
 	{
@@ -193,7 +212,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Parses a 'CHARACTERS' block.
+	 * Parse the next 'CHARACTERS' block encountered in the input.
 	 */
 	public List<Sequence> parseCharactersBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
@@ -201,7 +220,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Parses a 'DATA' block.
+	 * Parse the next 'DATA' block encountered in the input.
 	 */
 	public List<Sequence> parseDataBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
@@ -209,14 +228,17 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Parses a 'TREES' block.
+	 * Parse the next 'TREES' block encountered in the input.
 	 */
 	public List<Tree> parseTreesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
 		return readTreesBlock(taxonList);
 	}
 
-	public DistanceMatrix parseDistancesBlock(List<Taxon> taxonList) throws ImportException, IOException
+    /**
+	 * Parse the next 'DISTANCES' block encountered in the input.
+	 */
+    public DistanceMatrix parseDistancesBlock(List<Taxon> taxonList) throws ImportException, IOException
 	{
 		return readDistancesBlock(taxonList);
 	}
@@ -226,7 +248,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	// **************************************************************
 
 	/**
-	 * importAlignment.
+	 * Import all alignments in the input from the current position.
 	 */
 	public List<Alignment> importAlignments() throws IOException, ImportException
 	{
@@ -277,7 +299,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * importSequences.
+	 * Import all sequences in the input from the current position
 	 */
 	public List<Sequence> importSequences() throws IOException, ImportException {
 		boolean done = false;
@@ -325,7 +347,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	private String[] lastToken = new String[1];
 
 	/**
-	 * return whether another tree is available.
+     * If not currently reading a TREES block then read ahead to the next TREES block, parsing TRANSLATE and TAXA blocks
+     * in the process if necessary.
+     * <p/>
+     * Then determine if the current (or next) TREES block contains any more trees. If true then importNextTree will return a
+     * non-null value.
+     *
+	 * @return true if another tree is available, false otherwise.
 	 */
 	public boolean hasTree() throws IOException, ImportException {
 		if (!isReadingTreesBlock) {
@@ -344,8 +372,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 
 	/**
-	 * import the next tree.
-	 * return the tree or null if no more trees are available
+     * If not currently reading a TREES block then read ahead to the next TREES block, parsing TRANSLATE and TAXA blocks
+     * in the process if necessary.
+     * <p/>
+	 * Then parse the next available tree.
+     *
+	 * @return the next available tree or null if no more trees are available
 	 */
 	public Tree importNextTree() throws IOException, ImportException
 	{
@@ -361,7 +393,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return tree;
 	}
 
-	public List<Tree> importTrees() throws IOException, ImportException {
+    /**
+     * Import all trees in the file from the current position. Will read ahead to the next TREES block if necessary
+     *
+     * @return list of trees
+     * @throws IOException
+     * @throws ImportException
+     */
+    public List<Tree> importTrees() throws IOException, ImportException {
         // We can't call startReadingTrees() here because if hasTree() was called before
         // then this importer will already have read into the trees block. However
         // is hasTree() was called then the following is still guaranteed to work as
@@ -377,7 +416,14 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         }
 	}
 
-	public boolean startReadingTrees() throws IOException, ImportException
+    /**
+     * Read nexus blocks until the next TREES block (or the end of the input) is encountered.
+     *
+     * @return true if a TREES block was found, false otherwise
+     * @throws IOException
+     * @throws ImportException
+     */
+    public boolean startReadingTrees() throws IOException, ImportException
 	{
 		treeTaxonList = null;
 
@@ -399,7 +445,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * This is an implementation of a method from the DistanceMatrixImporter interface
+	 * Import all distance matrices from all DISTANCES blocks in the input form the current position.
 	 */
 	public List<DistanceMatrix> importDistanceMatrices() throws IOException, ImportException {
 		boolean done = false;
@@ -448,7 +494,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Finds the end of the current block.
+	 * Read ahead to the end of the current block.
 	 */
 	public void findEndBlock() throws IOException
 	{
@@ -466,26 +512,31 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
 	/**
-	 * Reads the header information for a 'DATA', 'CHARACTERS' or 'TAXA' block.
+	 * Reads the header information (DIMENSIONS, TITLE and FORMAT) for the current 'DATA', 'CHARACTERS' or 'TAXA' block.
+     * Requires that the importer is already at the block's position (this will not read ahead to the specified block).
+     *
+     * @param tokenToLookFor the first token which is expected to occur after the header fields. once this token has is
+     * reached, the method will return.
+     * @param block the type of the block currently being parsed.
 	 */
 	private void readDataBlockHeader(String tokenToLookFor, NexusBlock block) throws ImportException, IOException
 	{
 
-		boolean dim = false, ttl = false, fmt = false;
+		boolean foundDimensions = false, foundTitle = false, foundFormat = false;
 		String token;
 
 		do {
 			token = helper.readToken();
 
 			if ( token.equalsIgnoreCase("TITLE") ) {
-				if (ttl) {
+				if (foundTitle) {
 					throw new ImportException.DuplicateFieldException("TITLE");
 				}
 
-				ttl = true;
+				foundTitle = true;
 			} else if ( token.equalsIgnoreCase("DIMENSIONS") ) {
 
-				if (dim) {
+				if (foundDimensions) {
 					throw new ImportException.DuplicateFieldException("DIMENSIONS");
 				}
 
@@ -529,11 +580,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				if (!nchar) {
 					throw new ImportException.BadFormatException("NCHAR subcommand missing from DIMENSIONS command");
 				}
-				dim = true;
+				foundDimensions = true;
 
 			} else if ( token.equalsIgnoreCase("FORMAT") ) {
 
-				if (fmt) {
+				if (foundFormat) {
 					throw new ImportException.DuplicateFieldException("FORMAT");
 				}
 
@@ -594,11 +645,11 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 				} while (helper.getLastDelimiter() != ';');
 
-				fmt = true;
+				foundFormat = true;
 			}
 		} while ( !token.equalsIgnoreCase(tokenToLookFor) );
 
-		if ( !dim ) {
+		if ( !foundDimensions ) {
 			throw new ImportException.MissingFieldException("DIMENSIONS");
 		}
 		if ( block != NexusBlock.TAXA && sequenceType == null ) {
@@ -690,7 +741,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 						}
 						for (int k = 0; k < taxonCount; k++) {
 							if (charsRead[k] != siteCount) {
-								throw new ImportException.ShortSequenceException(taxList.get(k).getName() 
+								throw new ImportException.ShortSequenceException(taxList.get(k).getName()
                                         + " has length " + charsRead[k] + ", expecting " + siteCount);
 							}
 						}
