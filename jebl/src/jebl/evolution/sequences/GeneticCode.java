@@ -202,6 +202,15 @@ public final class GeneticCode {
         NucleotideState n1=Nucleotides.getState(nucleotides.charAt(0));
         NucleotideState n2=Nucleotides.getState(nucleotides.charAt(1));
         NucleotideState n3=Nucleotides.getState(nucleotides.charAt(2));
+        if (n1==null) {
+            n1=Nucleotides.UNKNOWN_STATE;
+        }
+        if (n2==null) {
+            n2=Nucleotides.UNKNOWN_STATE;
+        }
+        if (n3==null) {
+            n3=Nucleotides.UNKNOWN_STATE;
+        }
         return getTranslation(n1,n2,n3);
     }
 
