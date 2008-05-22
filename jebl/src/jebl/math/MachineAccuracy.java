@@ -24,13 +24,13 @@ public class MachineAccuracy
 	//
 
 	/** machine accuracy constant */
-	public static double EPSILON = 2.220446049250313E-16;
+	public static final double EPSILON = 2.220446049250313E-16;
 	
-	public static double SQRT_EPSILON = 1.4901161193847656E-8;
-	public static double SQRT_SQRT_EPSILON = 1.220703125E-4;
+	public static final double SQRT_EPSILON = 1.4901161193847656E-8;
+	public static final double SQRT_SQRT_EPSILON = 1.220703125E-4;
 
 	/** compute EPSILON from scratch */
-	public static double computeEpsilon()
+	private static double computeEpsilon() // used to determine the EPSILON constant above
 	{
 		double eps = 1.0;
 
@@ -60,7 +60,7 @@ public class MachineAccuracy
     }
 
     public static boolean largerOrEqual(double a, double b) {
-        return !smallerOrEqual(b,a);
+        return !strictlySmaller(b,a);
     } */
 
     /**
