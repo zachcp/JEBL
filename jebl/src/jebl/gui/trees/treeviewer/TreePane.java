@@ -210,6 +210,18 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         addSelectedTaxa(selectedNode);
     }
 
+    public void setSelectedNodes(Set<Node> nodes) {
+        selectedNodes.clear();
+        selectedTaxa.clear();
+        addSelectedNodes(nodes);
+    }
+
+    private void addSelectedNodes(Set<Node> nodes) {
+        selectedNodes.addAll(nodes);
+        fireSelectionChanged();
+        repaint();
+    }
+
     private boolean canSelectNode(final Node selectedNode) {
         return selectedNode != null && isNodeVisible(selectedNode);
     }
