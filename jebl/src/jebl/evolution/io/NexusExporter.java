@@ -28,11 +28,17 @@ import java.util.regex.Pattern;
  */
 
 public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
-    /**
+
+	public NexusExporter(Writer writer) {
+		this(writer, true);
+	}
+
+	/**
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer) {
+    public NexusExporter(Writer writer, boolean writeMetaComments) {
+		this.writeMetaComments = writeMetaComments;
         this.writer = new PrintWriter(writer);
         this.writer.println("#NEXUS");
     }
@@ -332,6 +338,10 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     private StringBuilder appendAttributes(Attributable item, String excludeKey, StringBuilder builder) {
+	    if (!writeMetaComments) {
+		    return builder;
+	    }
+
         boolean first = true;
         for( String key : item.getAttributeNames() ) {
             // we should replace the explicit check for name by something more general.
@@ -398,4 +408,5 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
     private Set<Taxon> taxa = null;
     protected final PrintWriter writer;
+	private boolean writeMetaComments;
 }
