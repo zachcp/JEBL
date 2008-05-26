@@ -47,15 +47,15 @@ public class NucleotideScores extends Scores {
      * @param misMatch mismatch score
      */
     public NucleotideScores(float match, float misMatch) {
-        this("", match, misMatch, misMatch);
+        this("", match, misMatch);
     }
 
     public NucleotideScores(float match, float misMatch, float ambiguousMatch) {
-        this("", match, misMatch, misMatch, ambiguousMatch);
+        this("", match, misMatch, misMatch, ambiguousMatch, false);
     }
 
     public NucleotideScores(String name, float match, float misMatch) {
-        this(name, match, misMatch, misMatch, 0);
+        this(name, match, misMatch, misMatch, 0, true);
     }
 
     public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion) {
@@ -63,9 +63,9 @@ public class NucleotideScores extends Scores {
         buildScores(match, mismatchTransition, mismatchTransversion, 0, false);
     }
 
-    public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch) {
+    public NucleotideScores(String name, float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch, boolean useWeightedAmbigousMatches) {
         this.name = name;
-        buildScores(match, mismatchTransition, mismatchTransversion, ambiguousMatch, true);
+        buildScores(match, mismatchTransition, mismatchTransversion, ambiguousMatch, true, useWeightedAmbigousMatches);
     }
 
     public NucleotideScores(Scores scores, double percentmatches) {
@@ -82,6 +82,16 @@ public class NucleotideScores extends Scores {
     }
 
     void buildScores(float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch, boolean includeAmbiguities) {
+        buildScores(match, mismatchTransition, mismatchTransversion, ambiguousMatch, includeAmbiguities,false);
+    }
+
+    /**
+     *
+     * @param useWeightedAmbigousMatches true so that abiguities are converted to a fraction between 0 and 1 representing the fractional number of
+     * matches of all canonical states represented by them. the score of such matches = mismatchScore + (match-mismatchScore)*fraction. For
+     * example, if misamtch=0 and match = 1, then score(A,R)=0.5, score(T,R)=0, score(R,R)=0.5, score(B,B)=0.33.
+     */
+    void buildScores(float match, float mismatchTransition, float mismatchTransversion, float ambiguousMatch, boolean includeAmbiguities, boolean useWeightedAmbigousMatches) {
 
         this.match = match;
         this.mismatchTransition = mismatchTransition;
@@ -104,15 +114,21 @@ public class NucleotideScores extends Scores {
         int statesCount = states.size();
         float[][] scores = new float[statesCount][statesCount];
         for (int i = 0; i < statesCount; i++) {
-            State state1 = states.get(i);
+            NucleotideState state1 = states.get(i);
             for (int j = 0; j < statesCount; j++) {
-                State state2 = states.get(j);
+                NucleotideState state2 = states.get(j);
                 float value;
-                if (state1.equals(state2)) {
+                if (state1.equals(state2) && !useWeightedAmbigousMatches) {
                     value = match;
                 }
                 else if (state1.possiblyEqual(state2)) {
-                    value = ambiguousMatch;
+                    if (useWeightedAmbigousMatches) {
+                        float min=Math.min(mismatchTransition, mismatchTransversion);                        
+                        value = (float) (min + state1.fractionEqual(state2)*(match-min));
+                    }
+                    else {
+                        value = ambiguousMatch;
+                    }
                 }
                 else if (
                     (Nucleotides.isPurine(state1) && Nucleotides.isPurine(state2)) ||

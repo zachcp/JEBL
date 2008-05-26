@@ -173,6 +173,27 @@ public abstract class Scores implements ScoreMatrix {
          return extraResidues;
      }
 
+    /**
+     * @return this score matrix as a string.
+     */
+    public String getMatrixString() {
+        String alphabet = getAlphabet();
+        StringBuilder builder = new StringBuilder();
+        builder.append("  ");
+        for (char c1 : alphabet.toCharArray()) {
+            builder.append("  ").append(c1).append("   ");
+        }
+        builder.append("\n");
+        for (char c : alphabet.toCharArray()) {
+            builder.append(c).append(" ");
+            for (char c1 : alphabet.toCharArray()) {
+                float s=score[c][c1];
+                builder.append(String.format("%+1.2f ",s));
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
 
     /**
      * extends the given score matrix to include gap Versus gap and gap Versus residue costs
