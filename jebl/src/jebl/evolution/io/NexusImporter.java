@@ -342,7 +342,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 	private boolean isReadingTreesBlock = false;
 	private List<Taxon> treeTaxonList = null;
-	private Map<String, Taxon> translationList = Collections.emptyMap();
+	private Map<String, Taxon> translationMap = Collections.emptyMap();
 	private Tree nextTree = null;
 	private String[] lastToken = new String[1];
 
@@ -358,7 +358,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	public boolean hasTree() throws IOException, ImportException {
 		if (!isReadingTreesBlock) {
 			isReadingTreesBlock = startReadingTrees();
-			translationList = readTranslationList(treeTaxonList, lastToken);
+			translationMap = readTranslationMap(treeTaxonList, lastToken);
 		}
 
 		if (!isReadingTreesBlock) return false;
@@ -1029,7 +1029,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	private List<Tree> readTreesBlock(List<Taxon> taxonList) throws ImportException, IOException {
 		List<Tree> trees = new ArrayList<Tree>();
 		String[] lastToken = new String[1];
-		translationList = readTranslationList(taxonList, lastToken);
+		translationMap = readTranslationMap(taxonList, lastToken);
         while( true ) {
 			RootedTree tree = readNextTree(lastToken);
 			if (tree == null) {
@@ -1046,7 +1046,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return trees;
 	}
 
-	private Map<String, Taxon> readTranslationList(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException {
+	private Map<String, Taxon> readTranslationMap(List<Taxon> taxonList, String[] lastToken) throws ImportException, IOException {
 		Map<String, Taxon> translationList = new HashMap<String, Taxon>();
 
 		String token = helper.readToken(";");
@@ -1304,8 +1304,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             throw new ImportException.UnknownTaxonException(e.getMessage());
         }
 
-        if (translationList.size() > 0) {
-			taxon = translationList.get(label);
+        if (translationMap.size() > 0) {
+			taxon = translationMap.get(label);
 
 			if (taxon == null) {
 				// taxon not found in taxon list...
