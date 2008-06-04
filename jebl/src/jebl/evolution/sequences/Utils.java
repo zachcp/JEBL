@@ -323,9 +323,9 @@ public class Utils {
                 final double threshold = 0.7;
                 final int nucStates = canonicalNucStates + undeterminedStates;
                 // note: This implicitely assumes that every valid nucleotide
-                // symbol is also a valid amino acid. This is not true as of
-                // 2006-12-27, but will become true once we allow the 21st
-                // amino acid, U (Selenocysteine).
+                // symbol is also a valid amino acid. This is true since we
+                // added support for the 21st amino acid, U (Selenocysteine)
+                // in AminoAcids.java.
                 result = nucStates >= sequenceLength * threshold ? SequenceType.NUCLEOTIDE : SequenceType.AMINO_ACID;
             }
         } else if (onlyValidAminoAcids) {
