@@ -22,9 +22,9 @@ import java.util.*;
  * @version $Id$
  */
 public final class Utils {
-    private Utils() { }  // make class uninstantiable
+	private Utils() { }  // make class uninstantiable
 
-    /**
+	/**
 	 * @param tree
 	 * @return the rooted tree as a newick format string
 	 */
@@ -217,16 +217,16 @@ public final class Utils {
 		return nodeDistance(tree, tree.getRootNode());
 	}
 
-    public static String asText(Tree tree) {
-        String[] lines=asText(tree,100);
-        StringBuilder builder=new StringBuilder();
-        for (String line : lines) {
-            builder.append(line).append("\n");
-        }
-        return builder.toString();
-    }
+	public static String asText(Tree tree) {
+		String[] lines=asText(tree,100);
+		StringBuilder builder=new StringBuilder();
+		for (String line : lines) {
+			builder.append(line).append("\n");
+		}
+		return builder.toString();
+	}
 
-    public static String[] asText(Tree tree, int widthGuide) {
+	public static String[] asText(Tree tree, int widthGuide) {
 		RootedTree rtree = rootTheTree(tree);
 
 		Node root = rtree.getRootNode();
@@ -385,7 +385,12 @@ public final class Utils {
 	 * @return the path length between the two nodes
 	 */
 	public static double getPathLength(Tree tree, Node node1, Node node2) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		try {
+			HashMap<HashPair<Node>, Double> dists = new LinkedHashMap<HashPair<Node>, Double>();
+			return dist(tree, node1, node2, dists);
+		} catch (Graph.NoEdgeException e1) {
+			return -1.0;
+		}
 	}
 
 	/**
@@ -577,61 +582,61 @@ public final class Utils {
 		};
 	}
 
-    /**
-     * Subtracts a collection from a set and returns the result as a new Set, without modifying either of the parameters.
-     * @param a The set from which to subtract the elements of b
-     * @param b The elements to be subtracted from b
-     * @return An unmodifiable set which contains all of the elements of a except for those which are also in b.
-     */
-    private static<T> Set<T> setMinus(Set<T> a, Collection<T> b) {
-        Set<T> diff = new LinkedHashSet<T>(a);
-        diff.removeAll(b);
-        return Collections.unmodifiableSet(diff);
-    }
+	/**
+	 * Subtracts a collection from a set and returns the result as a new Set, without modifying either of the parameters.
+	 * @param a The set from which to subtract the elements of b
+	 * @param b The elements to be subtracted from b
+	 * @return An unmodifiable set which contains all of the elements of a except for those which are also in b.
+	 */
+	private static<T> Set<T> setMinus(Set<T> a, Collection<T> b) {
+		Set<T> diff = new LinkedHashSet<T>(a);
+		diff.removeAll(b);
+		return Collections.unmodifiableSet(diff);
+	}
 
-    private static<T extends Comparable> List<T> sort(Collection<T> c) {
-        List<T> result = new ArrayList<T>(c);
-        Collections.sort(result);
-        return result;
-    }
+	private static<T extends Comparable> List<T> sort(Collection<T> c) {
+		List<T> result = new ArrayList<T>(c);
+		Collections.sort(result);
+		return result;
+	}
 
-    /**
-     * Checks whether all of the trees passed in have the same taxa sets (ignoring
-     * order of taxa), and throws an IllegalArgumentException if this is not the case.
-     * If no tree or only one tree is passed in, immediately returns without throwing an exception.
-     * @param trees Zero or more trees
-     * @throws IllegalArgumentException if not all of the trees have the same taxa
-     * @throws NullPointerException if trees is null
-     */
-    public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
-        if (trees.size() <= 1) {
-            return;
-        }
-        Tree firstTree = trees.get(0);
-        final int firstNumExternalNodes = firstTree.getExternalNodes().size();
-        final Set<Taxon> firstTaxa = firstTree.getTaxa();
+	/**
+	 * Checks whether all of the trees passed in have the same taxa sets (ignoring
+	 * order of taxa), and throws an IllegalArgumentException if this is not the case.
+	 * If no tree or only one tree is passed in, immediately returns without throwing an exception.
+	 * @param trees Zero or more trees
+	 * @throws IllegalArgumentException if not all of the trees have the same taxa
+	 * @throws NullPointerException if trees is null
+	 */
+	public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
+		if (trees.size() <= 1) {
+			return;
+		}
+		Tree firstTree = trees.get(0);
+		final int firstNumExternalNodes = firstTree.getExternalNodes().size();
+		final Set<Taxon> firstTaxa = firstTree.getTaxa();
 
-        int currentTreeNumber = 0;
-        for (Tree currentTree : trees) {
-            currentTreeNumber++;
-            final int numExternalNodes = currentTree.getExternalNodes().size();
-            if (numExternalNodes != firstNumExternalNodes || !currentTree.getTaxa().containsAll(firstTaxa)) {
-                Set<Taxon> firstMinusCurrent = setMinus(firstTree.getTaxa(), currentTree.getTaxa()); // Taxa that occur in the first tree but not in currentTree
-                String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
-                String suffix=". Tree 1 has "+firstNumExternalNodes+" taxa. Tree "+currentTreeNumber+" has "+numExternalNodes+" taxa. Tree 1 has taxa: "+sort(firstTaxa)+" Tree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa());
-                if (!firstMinusCurrent.isEmpty()) {
-                    // We use human counting in error messages, i.e. we number the trees from 1
-                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent) + suffix);
-                } else {
-                    Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
-                    assert !currentMinusFirst.isEmpty();
-                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst)+ suffix);
-                }
-            }
-        }
-    }
+		int currentTreeNumber = 0;
+		for (Tree currentTree : trees) {
+			currentTreeNumber++;
+			final int numExternalNodes = currentTree.getExternalNodes().size();
+			if (numExternalNodes != firstNumExternalNodes || !currentTree.getTaxa().containsAll(firstTaxa)) {
+				Set<Taxon> firstMinusCurrent = setMinus(firstTree.getTaxa(), currentTree.getTaxa()); // Taxa that occur in the first tree but not in currentTree
+				String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
+				String suffix=". Tree 1 has "+firstNumExternalNodes+" taxa. Tree "+currentTreeNumber+" has "+numExternalNodes+" taxa. Tree 1 has taxa: "+sort(firstTaxa)+" Tree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa());
+				if (!firstMinusCurrent.isEmpty()) {
+					// We use human counting in error messages, i.e. we number the trees from 1
+					throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent) + suffix);
+				} else {
+					Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
+					assert !currentMinusFirst.isEmpty();
+					throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst)+ suffix);
+				}
+			}
+		}
+	}
 
-    /**
+	/**
 	 * Generates a unique representation of a node
 	 *
 	 * @param tree tree
@@ -706,14 +711,14 @@ public final class Utils {
 	}
 
 
-    /**
-     * This method creates an unattached copy of the given rooted tree such that changes to the copied tree do not affect the original tree.
-     * @param treeToCopy the tree to copy
-     * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
-     */
-    public static RootedTree copyTree(RootedTree treeToCopy){
-       return new CompactRootedTree(treeToCopy);
-    }
+	/**
+	 * This method creates an unattached copy of the given rooted tree such that changes to the copied tree do not affect the original tree.
+	 * @param treeToCopy the tree to copy
+	 * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
+	 */
+	public static RootedTree copyTree(RootedTree treeToCopy){
+		return new CompactRootedTree(treeToCopy);
+	}
 
 	// debug aid - unrooted tree printout - un-comment in emergency
 

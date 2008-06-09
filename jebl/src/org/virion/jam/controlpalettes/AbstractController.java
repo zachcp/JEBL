@@ -9,6 +9,8 @@ import java.util.List;
  * @version $Id$
  */
 public abstract class AbstractController implements Controller {
+	protected static final String IS_SHOWN = "isShown";
+
     /**
      * Add a ControllerListener to this controllers list of listeners
      * The main listener will be the ControlPalette itself which will use
