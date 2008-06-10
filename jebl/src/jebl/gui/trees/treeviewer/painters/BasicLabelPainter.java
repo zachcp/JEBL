@@ -309,8 +309,16 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
             int exponentIndex = label.indexOf("E");
             if(exponentIndex >= 0){
-                prefix = label.substring(0, exponentIndex)+"x10";
-                suffix = label.substring(exponentIndex+1, label.length());
+                try{
+                    Double.parseDouble(label.substring(0, exponentIndex).trim());
+                    Integer.parseInt(label.substring(exponentIndex+1, label.length()).trim());
+                    prefix = label.substring(0, exponentIndex)+"x10";
+                    suffix = label.substring(exponentIndex+1, label.length());
+                }
+                catch(NumberFormatException ex){} //skip out
+                catch(IndexOutOfBoundsException ex){} //skip out
+
+
                 //valueString = valueString.replace("E", "x10");
             }
 
