@@ -189,7 +189,12 @@ public class BrowserLauncher {
 	private static final String NETSCAPE_OPEN_PARAMETER_START = "'openURL(";
 	private static final String NETSCAPE_OPEN_PARAMETER_END = ")'";
 
-	/**
+    /**
+     * Kill browser processes if they don't return before this many millis
+     */
+    private static final int BROWSER_LAUNCH_TIMEOUT = 20000;
+
+    /**
 	 * The message from any exception thrown throughout the initialization process.
 	 */
 	private static String errorMessage;
@@ -575,7 +580,10 @@ public class BrowserLauncher {
 				// This avoids a memory leak on some versions of Java on Windows.
 				// That's hinted at in <http://developer.java.sun.com/developer/qow/archive/68/>.
 				try {
-					process.waitFor();
+                    // Make sure we don't hang forever waiting for an external process.
+                    startTimeoutThread(process, BROWSER_LAUNCH_TIMEOUT);
+
+                    process.waitFor();
 					process.exitValue();
 				} catch (InterruptedException ie) {
 					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
@@ -591,6 +599,8 @@ public class BrowserLauncher {
 													url +
 													NETSCAPE_OPEN_PARAMETER_END });
 				try {
+                    startTimeoutThread(process, BROWSER_LAUNCH_TIMEOUT);
+
 					int exitCode = process.waitFor();
 					if (exitCode != 0) {	// if Netscape was not open
 						Runtime.getRuntime().exec(new String[] { (String) browser, url });
@@ -606,7 +616,29 @@ public class BrowserLauncher {
 		}
 	}
 
-	/**
+
+    /**
+     * Will call process.destroy on a process if it runs for longer than the timeout period.  Used to make sure
+     * that we do not hang forever waiting on an external process to launch a web browser.
+     *
+     * @param process The process to cancel if it has exceeded the timeout period.
+     * @param timeout The timeout period in milliseconds
+     */
+    private static void startTimeoutThread(final Process process, final int timeout) {
+        new Thread("Timeout Browser Launch Exceeding " + timeout + " ms") {
+            public void run() {
+                try {
+                    sleep(timeout);
+                } catch (InterruptedException e) {
+                    // Do nothing
+                }
+                process.destroy();
+            }
+        }.start();
+    }
+
+
+    /**
 	 * Methods required for Mac OS X.  The presence of native methods does not cause
 	 * any problems on other platforms.
 	 */
