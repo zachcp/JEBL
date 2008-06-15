@@ -69,13 +69,20 @@ public class TreeBiPartitionInfo {
 
             for( Node c : t.getChildren(n) ) {
                 final FixedBitSet info = forNode(c);
-                p.union(p);
+                p.union(info);
             }
         }
+        boolean wasComplemented = false;
         if( t.getParent(n) != t.getRootNode() && ! p.contains(0)  ) {
             p.complement();
+            wasComplemented = true;
         }
+
         all.put(p, new BiPartiotionInfo(n));
+
+        if( wasComplemented ) {
+            p.complement();
+        }
         return p;
     }
 
@@ -85,7 +92,7 @@ public class TreeBiPartitionInfo {
     }
 
     public static double distance(TreeBiPartitionInfo t1, TreeBiPartitionInfo t2, DistanceNorm norm) {
-        double d = 0.0;
+
         for( BiPartiotionInfo k : t2.all.values() ) {
             k.has = false;
         }
@@ -126,7 +133,7 @@ public class TreeBiPartitionInfo {
                 }
             }
         }
-        d = din + dout;
+        double d = din + dout;
         return ( norm == DistanceNorm.NORM1 ) ? d : Math.sqrt(d);
     }
 }
