@@ -72,8 +72,8 @@ public final class AminoAcids {
     public static final AminoAcidState J_STATE = new AminoAcidState("J", "J", 24, new AminoAcidState[]{I_STATE, L_STATE});
     public static final AminoAcidState X_STATE = new AminoAcidState("X", "X", 25, CANONICAL_STATES);
     public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("?", "?", 26, CANONICAL_STATES);
-    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 27, CANONICAL_STATES);
-    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 28, CANONICAL_STATES);
+    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 27);
+    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 28, CANONICAL_STATES); // This really shouldn't include the canonical states, but I'm scared changing it may break stuff.
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
     // and will become private in the future. Use {@link #getStates} instead.
