@@ -44,6 +44,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public static boolean goBackwards = false;
     public Point mouseLocation = new Point(0,0);
+    private float labelFontSize;
+
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
         addMouseMotionListener(new MouseMotionAdapter(){
@@ -408,7 +410,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return treeLayout.maintainAspectRatio();
     }
 
-    public void setTaxonLabelPainter(Painter<Node> taxonLabelPainter) {
+    public void setTaxonLabelPainter(BasicLabelPainter taxonLabelPainter) {
         if (this.taxonLabelPainter != null) {
             this.taxonLabelPainter.removePainterListener(this);
         }
@@ -416,6 +418,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (this.taxonLabelPainter != null) {
             this.taxonLabelPainter.addPainterListener(this);
         }
+        labelFontSize = taxonLabelPainter.getFontSize();
         controlPalette.fireControlsChanged();
         calibrated = false;
         repaint();
@@ -507,7 +510,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         } else {
             super.setPreferredSize(dimension);
         }
-
+        taxonLabelPainter.setFontSize(labelFontSize, false); //triggers a resize of the label fonts
         calibrated = false;
     }
 
@@ -1708,20 +1711,23 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         TreeDrawableElement.setOverlappingVisiblitiy(taxonLabels, g2);
         System.err.println("Clash " + (System.currentTimeMillis() - now));
 
-        int size = Integer.MAX_VALUE;
-        boolean visible = true;
+        //this block of code makes sure that all labels are the same size
+        //so that users don't thing that some labels are more important than others
+        calibrated = true;
+        float size = taxonLabelPainter.getFontSize();
         for(TreeDrawableElement element : taxonLabels){
-            size = Math.min (size, element.getCurrentSize());
-            if(!element.isVisible())
-                visible = false;
+            if(element.getCurrentSize() < size){
+                size = element.getCurrentSize();
+                taxonLabelPainter.setFontSize(size, false);
+                calibrated = false;
+            }
         }
         for(TreeDrawableElement element : taxonLabels){
-            element.setSize(size,g2);
-            element.setVisible(visible);
+            element.setSize((int)size,g2);
         }
         treeElements.addAll(taxonLabels);
 
-        calibrated = true;
+
 
         System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
@@ -1996,7 +2002,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private BranchDecorator branchDecorator = null;
 
     private float labelXOffset = 5.0F;
-    private Painter<Node> taxonLabelPainter = null;
+    private BasicLabelPainter taxonLabelPainter = null;
     private double taxonLabelWidth;
     private Painter<Node> nodeLabelPainter = null;
     private Painter<Node> branchLabelPainter = null;

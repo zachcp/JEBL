@@ -123,6 +123,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         this.tree = tree;
     }
 
+    public Font getLabelFont(){
+        return taxonLabelFont;
+    }
+
     protected String getLabel(Node node) {
         String prefix = " ";
         String suffix = " ";
@@ -470,6 +474,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                         fontSizeSpinner.setValue((double) size);
                     }
                     setFontMinSize(size, true);
+                    setFontSize(maxSize, true);
                     PREFS.putFloat(fontMinSizePrefKey, size);
                 }
             });
