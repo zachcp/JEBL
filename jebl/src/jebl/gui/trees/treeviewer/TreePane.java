@@ -1967,6 +1967,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setSize(int width, int height) {
+        taxonLabelPainter.setFontSize(labelFontSize, false); //triggers a resize of the label fonts
         calibrated = false;
         super.setSize(width, height);
     }
