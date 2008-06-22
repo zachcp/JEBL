@@ -441,7 +441,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //fontSizeSpinner.setEnabled(selected);
 
             final String fontMinSizePrefKey = getTitle() + "_fontminsize";
-            final float size = PREFS.getFloat(fontMinSizePrefKey, 6);
+            final float size = PREFS.getFloat(fontMinSizePrefKey, 8);
             setFontMinSize(size, false);
 
             final JSpinner fontMinSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultMinFontSize, 0.01, 48, 1));
