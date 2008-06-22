@@ -6,11 +6,12 @@ import org.virion.jam.controlpanels.*;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * @author Andrew Rambaut
@@ -83,46 +84,28 @@ public class MultipleTreeViewer extends TreeViewer {
             if (controls == null) {
                 OptionsPanel optionsPanel = new OptionsPanel();
 
-                boolean useNames = false;
-                for( Tree t : trees ) {
-                    Object name = t.getAttribute(NexusExporter.treeNameAttributeKey);
-                    if( name != null && !NexusExporter.isGeneratedTreeName(name.toString()) ) {
-                        useNames = true;
-                        break;
-                    }
+                final Vector<String> names = new Vector<String>();
+                for( int i = 0; i < trees.size(); i ++) {
+                    Tree tree = trees.get(i);
+                    final Object oname = tree.getAttribute(NexusExporter.treeNameAttributeKey);
+                    final String indexString = "" + (i + 1) + "/" + trees.size();
+                    final String name = oname == null ? indexString : oname.toString() + " (" + indexString + ")";
+
+                    names.add(name);
                 }
-                if( useNames ) {
-                    final List<String> names = new ArrayList<String>();
-                    for( Tree t : trees ) {
-                        final Object oname = t.getAttribute(NexusExporter.treeNameAttributeKey);
-                        final String i = "" + (1+trees.indexOf(t)) + "/" + trees.size();
-                        final String name = oname == null ? i : oname.toString() + " (" + i + ")";
-
-                        names.add(name);
+                final JComboBox currentTreeCombo = new JComboBox(names);
+                currentTreeCombo.setMaximumRowCount(24);
+                currentTreeCombo.addItemListener(new ItemListener() {
+                    public void itemStateChanged(ItemEvent e) {
+                        trees.set(currentTree, treePane.getTree());
+                        currentTree = names.indexOf((String)currentTreeCombo.getSelectedItem()) ;
+                        setCurrentTree(trees.get(currentTree) );
+                        //this is here becasue the selection clears when we change trees, and we
+                        //want to refresh the toolbar
+                        treePane.clearSelection();
                     }
-                    final JSpinner spinner1 = new JSpinner(new SpinnerListModel(names));
-
-                    spinner1.addChangeListener(new ChangeListener() {
-                        public void stateChanged(ChangeEvent changeEvent) {
-                            trees.set(currentTree, treePane.getTree());
-                            currentTree = names.indexOf( (String)spinner1.getValue()) ;
-                            setCurrentTree(trees.get(currentTree) );
-                            //this is here becasue the selection clears when we change trees, and we
-                            //want to refresh the toolbar
-                            treePane.clearSelection();
-                        }
-                    });
-                    optionsPanel.addComponentWithLabel("Tree:", spinner1);
-                }  else {
-                    final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(1, 1, trees.size(), 1));
-
-                    spinner1.addChangeListener(new ChangeListener() {
-                        public void stateChanged(ChangeEvent changeEvent) {
-                            setCurrentTree(trees.get((Integer) spinner1.getValue() - 1));
-                        }
-                    });
-                    optionsPanel.addComponentWithLabel("Tree:", spinner1);
-                }
+                });
+                optionsPanel.addComponentWithLabel("Tree:", currentTreeCombo);
 
                 controls = new Controls("Current Tree", optionsPanel, true);
             }
