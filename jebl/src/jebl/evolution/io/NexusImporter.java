@@ -832,13 +832,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             Taxon taxon = Taxon.getTaxon(name);
 			taxa.add(taxon);
 
-            if (helper.getLastMetaComment() != null) {
+            for (String meta : helper.getLastMetaComments()) {
                 // There was a meta-comment which should be in the form:
                 // \[&label[=value][,label[=value]>[,/..]]\]
-                parseMetaCommentPairs(helper.getLastMetaComment(), taxon);
+                parseMetaCommentPairs(meta, taxon);
 
-                helper.clearLastMetaComment();
             }
+            helper.clearLastMetaComment();
 		} while (helper.getLastDelimiter() != ';');
 
 		if (taxa.size() != taxonCount) {
@@ -1112,14 +1112,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     // here but only after the ' = ' behind the name. However until 2008-05-05 JEBL produced Nexus
                     // files with the [&U] in this wrong location so we need to continue supporting such broken
                     // files; this has caused bug 5150.
-                    final String meta = helper.getLastMetaComment();
-                    if (meta != null) {
+                    for (String meta : helper.getLastMetaComments()) {
                         // Look for the unrooted meta comment [&U]
                         if (meta.equalsIgnoreCase("U")) {
                             isUnrooted = true;
                         }
-                        helper.clearLastMetaComment();
                     }
+                    helper.clearLastMetaComment();
                 }
 
 				final String treeName = helper.readToken( "=;" );
@@ -1134,7 +1133,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					}
 
 					// Save tree comment and attach it later
-					final String comment = helper.getLastMetaComment();
+					final List<String> comments = helper.getLastMetaComments();
 					helper.clearLastMetaComment();
 
 					tree = new SimpleRootedTree();
@@ -1156,7 +1155,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 						throw new ImportException.BadFormatException("Expecting ';' after tree, '" + treeName + "', TREE command of TREES block");
 					}
 
-					if  (comment != null && comment.length() > 0) {
+                    for (String comment : comments) {
                         if (Character.toUpperCase(comment.charAt(0)) == 'U') { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
                             isUnrooted = true;
                         } else if (comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) { // if '[W number]' (MrBayes), set weight attribute
@@ -1221,13 +1220,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		// If there is a metacomment after the branch length indicator (:), then it is a branch attribute
 		// however, in the present implementation, this simply gets added to the node attributes.
-		if (helper.getLastMetaComment() != null) {
+        for (String meta : helper.getLastMetaComments()) {
 			// There was a meta-comment which should be in the form:
 			// \[&label[=value][,label[=value]>[,/..]]\]
-			parseMetaCommentPairs(helper.getLastMetaComment(), branch);
+            NexusImporter.parseMetaCommentPairs(meta, branch);
+        }
 
-			helper.clearLastMetaComment();
-		}
+        helper.clearLastMetaComment();
 
 		return branch;
 	}
@@ -1279,13 +1278,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		}
 
 		// If there is a metacomment before the branch length indicator (:), then it is a node attribute
-		if (helper.getLastMetaComment() != null) {
+        for (String meta : helper.getLastMetaComments()) {
 			// There was a meta-comment which should be in the form:
 			// \[&label[=value][,label[=value]>[,/..]]\]
-			parseMetaCommentPairs(helper.getLastMetaComment(), node);
+            NexusImporter.parseMetaCommentPairs(meta, node);
+        }
 
-			helper.clearLastMetaComment();
-		}
+        helper.clearLastMetaComment();
 
 		return node;
 	}
@@ -1318,13 +1317,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 	        // Attempt to parse external node attributes
 	        // If there is a metacomment before the branch length indicator (:), then it is a node attribute
-	        if (helper.getLastMetaComment() != null) {
+            for (String meta : helper.getLastMetaComments()) {
 		        // There was a meta-comment which should be in the form:
 		        // \[&label[=value][,label[=value]>[,/..]]\]
-		        parseMetaCommentPairs(helper.getLastMetaComment(), node);
+                NexusImporter.parseMetaCommentPairs(meta, node);
+            }
 
-		        helper.clearLastMetaComment();
-	        }
+            helper.clearLastMetaComment();
 
             return node;
         } catch (IllegalArgumentException e) {

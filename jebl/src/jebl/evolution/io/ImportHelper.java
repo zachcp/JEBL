@@ -13,6 +13,8 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.util.ProgressListener;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +42,7 @@ public class ImportHelper {
     private char metaComment = (char)-1;
 
     private String lastMetaComment = null;
+    private final List<String> lastMetaComments = new ArrayList<String>();
     private long totalCharactersRead = 0;
 
     // Expected length of input in bytes, or 0 if unknown
@@ -648,6 +651,7 @@ public class ImportHelper {
 
         if (meta != null) {
             lastMetaComment = meta.toString();
+            lastMetaComments.add(lastMetaComment);
         }
     }
 
@@ -724,12 +728,29 @@ public class ImportHelper {
         return ch;
     }
 
+    /**
+     * This method has been introduced because this class previously skipped over consecutive comments and discarded all
+     * but the last. This method returns all comments that have been read over since {@link #clearLastMetaComment()}
+     * was last called.
+     * 
+     * @return List of previously read comments (since clearLastMetaComment was called), never null but may be empty.
+     * @see #clearLastMetaComment()
+     */
+    public List<String> getLastMetaComments() {
+        return new ArrayList<String>(lastMetaComments);
+    }
+
+    /**
+     * @deprecated use {@link #getLastMetaComments()} instead
+     */
+    @Deprecated
     public String getLastMetaComment() {
         return lastMetaComment;
     }
 
     public void clearLastMetaComment() {
         lastMetaComment = null;
+        lastMetaComments.clear();
     }
 
     private static final Pattern safeNamePattern = Pattern.compile("[a-zA-Z0-9_.]+");
