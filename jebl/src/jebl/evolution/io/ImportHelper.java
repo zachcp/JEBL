@@ -736,12 +736,12 @@ public class ImportHelper {
      * @return List of previously read comments (since clearLastMetaComment was called), never null but may be empty.
      * @see #clearLastMetaComment()
      */
-    public List<String> getLastMetaComments() {
+    public List<String> getMetaComments() {
         return new ArrayList<String>(lastMetaComments);
     }
 
     /**
-     * @deprecated use {@link #getLastMetaComments()} instead
+     * @deprecated use {@link #getMetaComments()} instead
      */
     @Deprecated
     public String getLastMetaComment() {

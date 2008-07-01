@@ -189,13 +189,7 @@ public class NewickImporter implements TreeImporter {
             }
 
             // If there is a metacomment before the branch length indicator (:), then it is a node attribute
-            for (String meta : helper.getLastMetaComments()) {
-            // There was a meta-comment which should be in the form:
-            // \[&label[=value][,label[=value]>[,/..]]\]
-                NexusImporter.parseMetaCommentPairs(meta, node);
-            }
-
-            helper.clearLastMetaComment();
+            NexusImporter.parseAndClearMetaComments(node, helper);
 
         } catch( EOFException e) {
             // Ok if we just finished
