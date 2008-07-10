@@ -38,7 +38,16 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * @param writer where export text goes
      */
     public NexusExporter(Writer writer, boolean writeMetaComments) {
+		this(writer, writeMetaComments, false);
+    }
+
+    /**
+     *
+     * @param writer where export text goes
+     */
+    public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) {
 		this.writeMetaComments = writeMetaComments;
+        this.interleave = interleave;
         this.writer = new PrintWriter(writer);
         this.writer.println("#NEXUS");
     }
@@ -76,25 +85,28 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         if( seqType != null ) {
             writer.println("\tformat datatype=" + seqType.getNexusDataType() +
                     " missing=" + seqType.getUnknownState().getName() +
-                    " gap=" + seqType.getGapState().getCode() + ";");
+                    " gap=" + seqType.getGapState().getCode() + (interleave ? " interleave=yes" : "") + ";");
 
             writer.println("\tmatrix");
-            for (Sequence sequence : sequences) {
-
-
-                if( sequence.getSequenceType() != seqType ) {
-                    throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
-                }
-                StringBuilder builder = new StringBuilder("\t");
-                appendTaxonName(sequence.getTaxon(), builder);
-                builder.append("\t").append(sequence.getString());
-                int shortBy = maxLength - sequence.getLength();
-                if (shortBy > 0) {
-                    for (int i = 0; i < shortBy; i++) {
-                        builder.append(seqType.getGapState().getCode());
+            int maxRowLength = interleave ? MAX_ROW_LENGTH : maxLength;
+            for(int n=0; n < Math.ceil((double)maxLength/maxRowLength); n++){
+                for (Sequence sequence : sequences) {
+                    if( sequence.getSequenceType() != seqType ) {
+                        throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
                     }
+                    StringBuilder builder = new StringBuilder("\t");
+                    appendTaxonName(sequence.getTaxon(), builder);
+                    String sequenceString = sequence.getString();
+                    builder.append("\t").append(sequenceString.subSequence(n*maxRowLength, Math.min((n+1)*maxRowLength, sequenceString.length())));
+                    int shortBy = Math.min(Math.min(n*maxRowLength, maxLength) - sequence.getLength(),  maxRowLength);
+                    if (shortBy > 0) {
+                        for (int i = 0; i < shortBy; i++) {
+                            builder.append(seqType.getGapState().getCode());
+                        }
+                    }
+                    writer.println(builder);
                 }
-                writer.println(builder);
+                writer.println();
             }
             writer.println(";\nend;");
         }
@@ -409,4 +421,6 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     private Set<Taxon> taxa = null;
     protected final PrintWriter writer;
 	private boolean writeMetaComments;
+    private boolean interleave;
+    public static final int MAX_ROW_LENGTH = 60;
 }
