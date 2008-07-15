@@ -97,7 +97,7 @@ public class NumberFormatter {
 
 			double absValue = Math.abs(value);
 
-			if ((absValue > upperCutoff) || (absValue < 0.1)) {
+			if ((absValue > upperCutoff) || (absValue < 0.001)) {
 
 				return scientificFormat.format(value);
 
@@ -123,8 +123,10 @@ public class NumberFormatter {
 	}
 
 	private int getNumFractionDigits(double value) {
-		value = Math.abs(value);
-		for (int i = 0; i < cutoffTable.length; i++) {
+        value = Math.abs(value);
+        if(value <1)
+            return sf;
+        for (int i = 0; i < cutoffTable.length; i++) {
 			if (value < cutoffTable[i]) return sf-i-1;
 		}
 		return sf - 1;

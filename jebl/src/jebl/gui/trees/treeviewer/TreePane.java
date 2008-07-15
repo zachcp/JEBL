@@ -7,6 +7,7 @@ import jebl.evolution.trees.SortedRootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
+import jebl.gui.trees.treeviewer.decorators.RgbBranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.PainterListener;
@@ -83,6 +84,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         setupTree();
+    }
+
+    public void recalibrate(){
+        calibrated = false;
+        repaint();
     }
 
     private void setupTree() {
@@ -486,6 +492,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.branchDecorator = branchDecorator;
         calibrated = false;
         repaint();
+    }
+
+    public BranchDecorator getBranchDecorator() {
+        return branchDecorator;
     }
 
     private boolean setBranchLineWeightValues(float weight) {
@@ -1181,6 +1191,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
                 if(e.isVisible() || !drawOnlyVisibleElements){
+                    //e.setForeground(new RgbBranchDecorator().getBranchPaint(tree, node));
+                    
 //                    if(selectedNodes.contains(e.getNode())){
 //                        e.setForeground(Color.blue);
 //                    }
@@ -1568,6 +1580,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                                                          nodeWithLongestTaxon, (BasicLabelPainter) taxonLabelPainter,
                         null);
 
+                Object colorAttr = node.getAttribute("nodeColor");
+                Color nodeColor = Color.black;
+                if(colorAttr != null){
+                    nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString()); 
+                }
+                e.setForeground(nodeColor);
                 taxonLabels.add(e);
             }
         }
@@ -1614,6 +1632,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 9,
                                                           null, ((BasicLabelPainter) nodeLabelPainter), "node");
 
+
+                Object colorAttr = node.getAttribute("nodeColor");
+                Color nodeColor = Color.black;
+                if(colorAttr != null){
+                    nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
+                }
+                e.setForeground(nodeColor);
                     treeElements.add(e);
                 }
             }
@@ -1676,6 +1701,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 8,
                                                           null, ((BasicLabelPainter) branchLabelPainter), "branch");
 
+
+                    Paint nodeColor = new RgbBranchDecorator().getBranchPaint(tree, node);
+                    e.setForeground(nodeColor);
                     treeElements.add(e);
                 //}
                 }
