@@ -514,6 +514,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
     }
 
+    public float getBranchLineWeight() {
+        if(branchLineStroke instanceof BasicStroke)
+            return ((BasicStroke)branchLineStroke).getLineWidth();
+        return 1.0f;
+    }
+
     public void setPreferredSize(Dimension dimension) {
         if (treeLayout.maintainAspectRatio()) {
             super.setPreferredSize(new Dimension(dimension.width, dimension.height));
