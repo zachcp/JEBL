@@ -1232,7 +1232,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 		// If there is a metacomment after the branch length indicator (:), then it is a branch attribute
 		// however, in the present implementation, this simply gets added to the node attributes.
-        parseAndClearMetaComments(branch, helper);
+        parseAndClearMetaComments(tree.getParentEdge(branch), helper);
 
 		return branch;
 	}

@@ -330,6 +330,9 @@ public class MutableRootedTree implements RootedTree {
         return ((MutableRootedNode)node).getParent();
     }
 
+	public Edge getParentEdge(Node node) {
+	    return ((MutableRootedNode)node).getEdge();
+	}
     /**
      * The root of the tree has the largest node height of
      * all nodes in the tree.
@@ -398,7 +401,7 @@ public class MutableRootedTree implements RootedTree {
     public void renameTaxa(Taxon from, Taxon to) {
         MutableRootedNode node = (MutableRootedNode)externalNodes.get(from);
         node.setTaxa(to);
-        
+
         externalNodes.remove(from);
         externalNodes.put(to, node);
     }

@@ -326,6 +326,10 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return index == 0 ? null : nodes[parent[index]];
     }
 
+	public Edge getParentEdge(Node node) {
+		throw new UnsupportedOperationException("getParentEdge not implemented in CompactRootedTree");
+	}
+
     public Node getRootNode() {
         return nodes[0];
     }

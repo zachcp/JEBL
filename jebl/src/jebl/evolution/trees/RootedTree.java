@@ -9,6 +9,7 @@
 package jebl.evolution.trees;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.graphs.Edge;
 
 import java.util.List;
 
@@ -61,6 +62,12 @@ public interface RootedTree extends Tree {
      * if the node is the root node.
      */
     Node getParent(Node node);
+
+	/**
+	 * @param node the node whose parent is requested
+	 * @return the parent edge of the given node.
+	 */
+	Edge getParentEdge(Node node);
 
     /**
      * The root of the tree has the largest node height of

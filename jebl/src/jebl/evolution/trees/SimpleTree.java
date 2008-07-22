@@ -412,7 +412,7 @@ public final class SimpleTree implements Tree {
         public List<Node> getAdjacencies() {
             return adjacencies;
         }
-      
+
         public void setTaxa(Taxon to) {
             taxon = to;
         }

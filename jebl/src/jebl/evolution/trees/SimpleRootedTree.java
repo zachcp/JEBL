@@ -293,6 +293,13 @@ final public class SimpleRootedTree implements RootedTree {
         return ((SimpleRootedNode)node).getParent();
     }
 
+	public Edge getParentEdge(Node node) {
+	    if (!(node instanceof SimpleRootedNode)) {
+	        throw new IllegalArgumentException("Node, " + node.toString() + " is not an instance of SimpleRootedNode");
+	    }
+	    return ((SimpleRootedNode)node).getEdge();
+	}
+
     /**
      * The root of the tree has the largest node height of
      * all nodes in the tree.
