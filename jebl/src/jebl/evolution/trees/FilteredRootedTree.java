@@ -51,10 +51,6 @@ public abstract class FilteredRootedTree implements RootedTree {
         return source.getParent(node);
     }
 
-	public Edge getParentEdge(Node node) {
-	    return source.getParentEdge(node);
-	}
-
     public Node getRootNode() {
         return source.getRootNode();
     }

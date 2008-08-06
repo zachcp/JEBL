@@ -31,7 +31,6 @@ public class RootedFromUnrooted implements RootedTree {
 	 * Maps each nodes to its parent.
 	 */
 	private Map<Node, Node> parents;
-	private Map<Node, Edge> parentEdges;
 
 	/**
 	 *  Children of the synthetic root (when rooted between nodes)
@@ -49,34 +48,11 @@ public class RootedFromUnrooted implements RootedTree {
 	 * @param node
 	 * @param parent
 	 */
-	private void setUnrootedParent(Tree source, Node node, Node parent) {
+    private void setParent(Node node, Node parent) {
 		parents.put(node, parent);
-		try {
-			parentEdges.put(node, source.getEdge(node, parent));
-		} catch (NoEdgeException e) {
-			throw new IllegalArgumentException("Edge not found in source tree");
-		}
 		for( Node adj : source.getAdjacencies(node) ) {
 			if( adj != parent && ! (node == topLeft && adj == topRight) && !(node == topRight && adj == topLeft) ) {
-				setUnrootedParent(source, adj, node);
-			}
-		}
-	}
-
-	/**
-	 * Set <arg>parent</arg> as parent of <arg>node</arg>, and recursivly set parents for node subtree
-	 * (whose root is parent). This version has a rooted source tree to correctly set the parent edge
-	 * objects. The parent edges are used to store attributes that are specific to branches.
-	 * @param source the rooted tree source.
-	 * @param node
-	 * @param parent
-	 */
-	private void setRootedParent(RootedTree source, Node node, Node parent) {
-		parents.put(node, parent);
-		parentEdges.put(parent, source.getParentEdge(node));
-		for( Node adj : source.getAdjacencies(node) ) {
-			if( adj != parent && ! (node == topLeft && adj == topRight) && !(node == topRight && adj == topLeft) ) {
-				setRootedParent(source, adj, node);
+                setParent(adj, node);
 			}
 		}
 	}
@@ -96,14 +72,9 @@ public class RootedFromUnrooted implements RootedTree {
 		rootToLeft = rootToRight = 0.0;
 		parents = new LinkedHashMap<Node, Node>();
 		for( Node adj : source.getAdjacencies(root) ) {
-			if (source instanceof RootedTree) {
-				setRootedParent((RootedTree)source, adj, root);
-			} else {
-				setUnrootedParent(source, adj, root);
-
+            setParent(adj, root);
 			}
 		}
-	}
 
 	/**
 	 * Root source by creating a new internal node whose children are (the adjacent) left and right.
@@ -126,20 +97,12 @@ public class RootedFromUnrooted implements RootedTree {
 		parents = new LinkedHashMap<Node, Node>();
 
 		// This is just a handle used to refer to the root so create the simplest possible implementation...
-		root = new BaseNode() {
-			public int getDegree() { return 2; }
-		};
+        root = new BaseNode() { public int getDegree() { return 2; } };
 
 		parents.put(root, null);
-		if (source instanceof RootedTree) {
-			setRootedParent((RootedTree)source, left, root);
-			setRootedParent((RootedTree)source, right, root);
-		} else {
-			setUnrootedParent(source, left, root);
-			setUnrootedParent(source, right, root);
-
-		}
-	}
+        setParent(left, root);
+        setParent(right, root);
+    }
 
 	public List<Node> getChildren(Node node) {
 		ArrayList<Node> s = new ArrayList<Node>(getAdjacencies(node));
@@ -198,17 +161,9 @@ public class RootedFromUnrooted implements RootedTree {
 		return parents.get(node);
 	}
 
-	/**
-	 * @param node the node whose parent is requested
-	 * @return the parent edge of the given node.
-	 */
-	public Edge getParentEdge(Node node) {
-		return parentEdges.get(node);
-	}
-
-	public Node getRootNode() {
-		return root;
-	}
+    public Node getRootNode() {
+        return root;
+    }
 
 	public boolean conceptuallyUnrooted() {
 		return intentUnrooted;

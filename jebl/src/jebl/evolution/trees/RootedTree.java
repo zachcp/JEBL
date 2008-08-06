@@ -63,12 +63,6 @@ public interface RootedTree extends Tree {
      */
     Node getParent(Node node);
 
-	/**
-	 * @param node the node whose parent is requested
-	 * @return the parent edge of the given node.
-	 */
-	Edge getParentEdge(Node node);
-
     /**
      * The root of the tree has the largest node height of
      * all nodes in the tree.
