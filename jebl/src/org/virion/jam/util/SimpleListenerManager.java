@@ -40,8 +40,11 @@ public class SimpleListenerManager implements SimpleListener {
      * calls {@link org.virion.jam.util.SimpleListener#objectChanged()}  on all listeners added using
      * {@link #add(SimpleListener)} .
      */
-    public synchronized void fire() {
-        List<SimpleListener> listenersCopy = new ArrayList<SimpleListener>(listeners);  // Copy to avoid ConcurrentModificationExceptions
+    public void fire() {
+        List<SimpleListener> listenersCopy;
+        synchronized(this) {
+            listenersCopy = new ArrayList<SimpleListener>(listeners);  // Copy to avoid ConcurrentModificationExceptions
+        }
         for (SimpleListener simpleListener : listenersCopy) {
             simpleListener.objectChanged();
         }
