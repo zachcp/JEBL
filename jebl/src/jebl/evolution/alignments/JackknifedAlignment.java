@@ -1,6 +1,7 @@
 package jebl.evolution.alignments;
 
-import jebl.math.Random;
+import java.util.Random;
+
 
 /**
  * Date: 17/01/2006
@@ -11,7 +12,15 @@ import jebl.math.Random;
  *
  */
 public class JackknifedAlignment extends ResampledAlignment {
-     public JackknifedAlignment(Alignment srcAlignment, double percent) {
+    public JackknifedAlignment(Alignment srcAlignment, double percent){
+        this(srcAlignment, percent, new Random());
+    }
+
+    public JackknifedAlignment(Alignment srcAlignment, double percent, long seed){
+        this(srcAlignment, percent, new Random(seed));
+    }
+
+     public JackknifedAlignment(Alignment srcAlignment, double percent, Random r) {
         final int nSites = srcAlignment.getSiteCount();
         final int nNewSites = (int)Math.ceil(nSites * percent);
         int[] sites = new int[nSites];
@@ -20,10 +29,23 @@ public class JackknifedAlignment extends ResampledAlignment {
             sites[n] = n;
         }
 
-        Random.shuffle(sites);
+         shuffle(sites, r);
 
         int[] newSites = new int[nNewSites];
         System.arraycopy(sites, 0, newSites, 0, nNewSites);
         init(srcAlignment, newSites);
+    }
+
+    /**
+     * Shuffles an array.
+     */
+    private void shuffle(int[] array, Random random) {
+        int l = array.length;
+        for (int i = 0; i < l; i++) {
+            int index = random.nextInt(l-i) + i;
+            int temp = array[index];
+            array[index] = array[i];
+            array[i] = temp;
+        }
     }
 }
