@@ -1743,7 +1743,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         long now = System.currentTimeMillis();
         TreeDrawableElement.setOverlappingVisiblitiy(treeElements, g2);
         TreeDrawableElement.setOverlappingVisiblitiy(taxonLabels, g2);
-        System.err.println("Clash " + (System.currentTimeMillis() - now));
+//        System.err.println("Clash " + (System.currentTimeMillis() - now));
 
         //this block of code makes sure that all labels are the same size
         //so that users don't thing that some labels are more important than others
@@ -1763,7 +1763,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 
 
-        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+//        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
 
 
