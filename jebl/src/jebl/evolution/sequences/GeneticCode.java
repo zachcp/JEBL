@@ -331,7 +331,14 @@ public final class GeneticCode {
         return aaSet;
 	}
 
-	/**
+    /**
+     * @return the codon states of starts
+     */
+    public Set<CodonState> getStartCodons() {
+        return Collections.unmodifiableSet(startCodons);
+    }
+
+    /**
 	 * @return the codon states of stops.
 	 */
 	public Set<CodonState> getStopCodons() {
