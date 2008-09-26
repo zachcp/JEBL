@@ -201,4 +201,15 @@ public final class CompositeProgressListener extends ProgressListener {
     public final boolean setComplete() {
         return setProgress(1.0);
     }
+
+    /**
+     * @return The root {@link jebl.util.ProgressListener} that this forwards adjusted progress reports to.
+     */
+    public ProgressListener getRootProgressListener() {
+        if(listener instanceof CompositeProgressListener) {
+            return ((CompositeProgressListener)listener).getRootProgressListener();
+        } else {
+            return listener;
+        }
+    }
 }
