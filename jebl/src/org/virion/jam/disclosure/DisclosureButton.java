@@ -2,9 +2,10 @@ package org.virion.jam.disclosure;
 
 import javax.swing.*;
 import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import org.virion.jam.util.IconUtils;
 
@@ -18,6 +19,7 @@ public class DisclosureButton extends JToggleButton {
     private boolean opening;
     private final List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();
     private int animationSpeed;
+    private boolean mouseInside = false;
 
     public DisclosureButton() {
         this(150);
@@ -40,6 +42,18 @@ public class DisclosureButton extends JToggleButton {
                 startAnimation();
             }
         });
+
+        addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                mouseInside = true;
+                setupIcon();
+            }
+
+            public void mouseExited(MouseEvent e) {
+                mouseInside = false;
+                setupIcon();
+            }
+        });
     }
 
     public void addDisclosureListener(DisclosureListener listener) {
@@ -52,10 +66,10 @@ public class DisclosureButton extends JToggleButton {
 
     private void setupIcon() {
         if (isSelected()) {
-            setIcon(downIcon);
+            setIcon(mouseInside?downPressedIcon:downIcon);
             //setSelectedIcon(downPressedIcon);
         } else {
-            setIcon(rightIcon);
+            setIcon(mouseInside?rightPressedIcon:rightIcon);
             //setSelectedIcon(rightPressedIcon);
         }
     }
@@ -143,12 +157,18 @@ public class DisclosureButton extends JToggleButton {
         }
     }
 
+    public Dimension getPreferredSize() {
+        return new Dimension(width+4,height+4); // +4 to give 2 pixels each side of it
+    }
+
     private static Icon[] disclosureIcons = null;
     private static Icon rightIcon = null;
     private static Icon rightPressedIcon = null;
     private static Icon rightDownIcon = null;
     private static Icon downIcon = null;
     private static Icon downPressedIcon = null;
+    private static int width=0;
+    private static int height=0;
 
     static {
         try {
@@ -165,6 +185,10 @@ public class DisclosureButton extends JToggleButton {
             disclosureIcons[0] = rightPressedIcon;
             disclosureIcons[1] = rightDownIcon;
             disclosureIcons[2] = downPressedIcon;
+            for (Icon disclosureIcon : disclosureIcons) {
+                width=Math.max(width,disclosureIcon.getIconWidth());
+                height=Math.max(height,disclosureIcon.getIconHeight());
+            }
 
         } catch (Exception e) {
             // no icons...
