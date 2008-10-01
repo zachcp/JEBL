@@ -102,8 +102,8 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         controlsStates.clear();
 
         for (Controller controller : controllers) {
-            add(Box.createVerticalStrut(1));
             setupController(controller);
+            add(Box.createVerticalStrut(0));
         }
         add(Box.createVerticalStrut(Integer.MAX_VALUE));
     }
@@ -152,7 +152,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
         titlePanel.add(pinnedButton, BorderLayout.EAST);
 
         final DisclosurePanel panel = new DisclosurePanel(
-                titlePanel, controllerPanel, controller.isInitiallyVisible(), openingSpeed);
+                titlePanel, preferredTitleHeight, controllerPanel, controller.isInitiallyVisible(), openingSpeed);
 
         if (displayMode == DisplayMode.ONLY_ONE_OPEN) {
             panel.addDisclosureListener(new DisclosureListener() {
@@ -208,6 +208,8 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
     }
 
     private int preferredWidth;
+    private int preferredTitleHeight = 20;
+
     private DisplayMode displayMode;
     private final int openingSpeed;
     private int currentlyOpen = 0;

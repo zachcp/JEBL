@@ -22,7 +22,17 @@ public class DisclosurePanel extends JPanel {
 	 * @param isOpen Whether the panel should start open
 	 */
 	public DisclosurePanel(final String title, final JPanel panel, boolean isOpen) {
-        this(new JLabel(title), panel, isOpen, 50);
+        this(new JLabel(title), -1, panel, isOpen, 50);
+    }
+
+    /**
+     *
+     * @param titleComponent The title component of the panel
+     * @param panel The contents of the panel
+     * @param isOpen Whether the panel should start open
+     */
+    public DisclosurePanel(final JComponent titleComponent, final JPanel panel, boolean isOpen, int openSpeed) {
+        this(titleComponent, -1, panel, isOpen, openSpeed);
     }
 
 	/**
@@ -32,7 +42,8 @@ public class DisclosurePanel extends JPanel {
 	 * @param isOpen Whether the panel should start open
 	 * @param openSpeed The opening speed in milliseconds
 	 */
-    public DisclosurePanel(final JComponent titleComponent, final JPanel panel,
+    public DisclosurePanel(final JComponent titleComponent, int preferredTitleHeight,
+                           final JPanel panel,
 	                       boolean isOpen, int openSpeed) {
 
         setOpaque(false);
@@ -67,11 +78,15 @@ public class DisclosurePanel extends JPanel {
 		componentPanel.add(titleComponent, BorderLayout.CENTER);
         panel1.add(componentPanel, BorderLayout.CENTER);
 
+        if (preferredTitleHeight > 0) {
+            panel1.setPreferredSize(new Dimension(0, preferredTitleHeight));
+        }
+
         add(panel1, BorderLayout.NORTH);
 
 		add(panel, BorderLayout.CENTER);
 
-		button.setSelected(isOpen);
+        button.setSelected(isOpen);
 		panel.setVisible(isOpen);
 
 		button.addDisclosureListener(new DisclosureListener() {
