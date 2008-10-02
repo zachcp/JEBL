@@ -38,20 +38,18 @@ public class DisclosurePanel extends JPanel {
 	/**
 	 *
 	 * @param titleComponent The component to use as the title of the panel
-	 * @param panel The contents of the panel
+	 * @param contentPanel The contents of the panel
 	 * @param isOpen Whether the panel should start open
 	 * @param openSpeed The opening speed in milliseconds
 	 */
     public DisclosurePanel(final JComponent titleComponent, int preferredTitleHeight,
-                           final JPanel panel,
+                           final JPanel contentPanel,
 	                       boolean isOpen, int openSpeed) {
 
         setOpaque(false);
 
-        this.panel = panel;
+        panel = contentPanel;
         panel.setOpaque(false);
-
-        setLayout(new BorderLayout());
 
 		button = new DisclosureButton(openSpeed);
 
@@ -62,7 +60,7 @@ public class DisclosurePanel extends JPanel {
 			public void paint(Graphics graphics) {
 				graphics.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
                 super.paint(graphics);
-			}
+            }
 		};
         panel1.setOpaque(false);
         panel1.addMouseListener(new MouseAdapter() {
@@ -81,15 +79,14 @@ public class DisclosurePanel extends JPanel {
         if (preferredTitleHeight > 0) {
             panel1.setPreferredSize(new Dimension(0, preferredTitleHeight));
         }
-
+        
+        setLayout(new BorderLayout(0, 0));
         add(panel1, BorderLayout.NORTH);
-
 		add(panel, BorderLayout.CENTER);
 
-        button.setSelected(isOpen);
-		panel.setVisible(isOpen);
+        setOpen(isOpen);
 
-		button.addDisclosureListener(new DisclosureListener() {
+        button.addDisclosureListener(new DisclosureListener() {
 			public void opening(Component component) {
 				fireOpening();
 			}
@@ -108,12 +105,17 @@ public class DisclosurePanel extends JPanel {
 				fireClosed();
 			}
 		});
-	}
+    }
 
-	public void setOpen(boolean isOpen) {
+    public Dimension getMinimumSize() {
+        Dimension size = super.getPreferredSize();
+        return size;
+    }
+
+    public void setOpen(boolean isOpen) {
 		button.setSelected(isOpen);
 		panel.setVisible(isOpen);
-	}
+    }
 
 	public void addDisclosureListener(DisclosureListener listener) {
 		listeners.add(listener);
@@ -159,7 +161,7 @@ public class DisclosurePanel extends JPanel {
 		return panel;
 	}
 
-	private final DisclosureButton button;
+    private final DisclosureButton button;
     private final Component titleComponent;
     private final JPanel panel;
 	private final java.util.List<DisclosureListener> listeners = new ArrayList<DisclosureListener>();

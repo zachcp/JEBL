@@ -103,9 +103,9 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
 
         for (Controller controller : controllers) {
             setupController(controller);
-            add(Box.createVerticalStrut(0));
+            //add(Box.createVerticalGlue());
         }
-        add(Box.createVerticalStrut(Integer.MAX_VALUE));
+        add(Box.createRigidArea(new Dimension(0, Integer.MAX_VALUE)));
     }
 
     public void layoutControls() {
@@ -208,7 +208,7 @@ public class BasicControlPalette extends JPanel implements ControlPalette {
     }
 
     private int preferredWidth;
-    private int preferredTitleHeight = 20;
+    private int preferredTitleHeight = 22;
 
     private DisplayMode displayMode;
     private final int openingSpeed;
