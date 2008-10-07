@@ -9,9 +9,9 @@ package jebl.util;
  */
 
 public class BasicProgressListener extends ProgressListener {
-    private boolean canceled=false;
-    private String message="";
-    private double fractionCompleted = 0;
+    private volatile boolean canceled=false;
+    private volatile String message="";
+    private volatile double fractionCompleted = 0;
     protected void _setProgress(double fractionCompleted) {
         this.fractionCompleted = fractionCompleted;
     }
