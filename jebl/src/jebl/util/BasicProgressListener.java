@@ -12,11 +12,14 @@ public class BasicProgressListener extends ProgressListener {
     private volatile boolean canceled=false;
     private volatile String message="";
     private volatile double fractionCompleted = 0;
+    private volatile boolean indeterminate = false;
     protected void _setProgress(double fractionCompleted) {
+        this.indeterminate = false;
         this.fractionCompleted = fractionCompleted;
     }
 
     protected void _setIndeterminateProgress() {
+        this.indeterminate = true;
     }
 
     protected void _setMessage(String message) {
@@ -47,5 +50,12 @@ public class BasicProgressListener extends ProgressListener {
      */
     public double getFractionCompleted() {
         return fractionCompleted;
+    }
+
+    /**
+     * @return true if {@link #setIndeterminateProgress()} has been called, and {@link #setProgress(double)} has not been called since
+     */
+    public boolean isIndeterminate() {
+        return indeterminate;
     }
 }
