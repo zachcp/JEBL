@@ -1,6 +1,9 @@
 package org.virion.jam.toolbar;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 /**
  * @author rambaut
@@ -43,7 +46,7 @@ public abstract class ToolbarAction extends AbstractAction {
 		return toolTipText;
 	}
 
-	private String label;
+    private String label;
 	private String toolTipText;
 	private Icon icon;
 	private Icon disabledIcon;
