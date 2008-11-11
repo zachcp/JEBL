@@ -163,6 +163,17 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
     }
 
+    /**
+     * returns the currently applied branch transform or null if there is no transform applied
+     * @return the currently applied branch transform or null if there is no transform applied
+     */
+    public TransformedRootedTree.Transform getBranchTransform() {
+        if(transformBranches) {
+            return branchTransform;
+        }
+        return null;
+    }
+
     public boolean isShowingRootBranch() {
         return showingRootBranch;
     }
