@@ -343,7 +343,7 @@ final public class SimpleRootedTree implements RootedTree {
      */
     public Taxon getTaxon(Node node) {
         if (!(node instanceof SimpleRootedNode)) {
-            throw new IllegalArgumentException("Node, " + node.toString() + " is not an instance of SimpleRootedNode");
+            throw new IllegalArgumentException("Node, " + node.toString() + " is not an instance of SimpleRootedNode.  It is an instance of "+node.getClass().getName());
         }
         return ((SimpleRootedNode)node).getTaxon();
     }
@@ -354,7 +354,7 @@ final public class SimpleRootedTree implements RootedTree {
      */
     public boolean isExternal(Node node) {
         if (!(node instanceof SimpleRootedNode)) {
-            throw new IllegalArgumentException("Node, " + node.toString() + " is not an instance of SimpleRootedNode");
+            throw new IllegalArgumentException("Node, " + node.toString() + " is not an instance of SimpleRootedNode.  It is an instance of "+node.getClass().getName());
         }
         return ((SimpleRootedNode)node).getChildren().size() == 0;
     }
