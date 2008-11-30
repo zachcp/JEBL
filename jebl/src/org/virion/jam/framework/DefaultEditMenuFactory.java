@@ -49,6 +49,12 @@ public class DefaultEditMenuFactory implements MenuFactory {
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, MenuBarFactory.MENU_MASK));
 		menu.add(item);
 
+        menu.addSeparator();
+
+        item = new JMenuItem(frame.getPreferencesAction());
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, MenuBarFactory.MENU_MASK));
+        menu.add(item);
+
 	}
 
 	public int getPreferredAlignment() {
