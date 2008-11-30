@@ -5,7 +5,7 @@ import org.virion.jam.toolbar.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -76,13 +76,24 @@ public class PreferencesDialog {
 
         showSection(currentSection);
 
-        for (PreferencesSection section : sections) {
-            section.retrievePreferences();
-        }
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent event) {
+                storePreferences();
+            }
+
+            public void windowDeactivated(WindowEvent event) {
+                storePreferences();
+            }
+        });
 
         dialog.pack();
         dialog.setVisible(true);
+    }
 
+    public void storePreferences() {
+        for (PreferencesSection section : sections) {
+            section.storePreferences();
+        }
     }
 
     public void showSection(String title) {
