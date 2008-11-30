@@ -4,6 +4,7 @@ import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.AttributableHelper;
+import jebl.util.HashPair;
 
 import java.util.*;
 

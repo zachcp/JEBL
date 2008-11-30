@@ -16,7 +16,7 @@ import java.util.Map;
  *
  */
 
-abstract class BaseEdge implements Edge {
+public abstract class BaseEdge implements Edge {
     // Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {

@@ -1,4 +1,4 @@
-package jebl.evolution.trees;
+package jebl.util;
 
 /**
  * A pair suitable for use in a HashMap.
@@ -8,8 +8,8 @@ package jebl.evolution.trees;
  * @version $Id$
  */
 
-class HashPair<T> {
-    HashPair(T a, T b) {
+public class HashPair<T> {
+    public HashPair(T a, T b) {
         first = a;
         second = b;
         if (a == null || b == null) {

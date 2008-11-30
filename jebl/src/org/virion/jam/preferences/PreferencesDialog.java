@@ -33,7 +33,7 @@ public class PreferencesDialog {
 
         cardLayout = new CardLayout();
         sectionsPanel = new JPanel(cardLayout);
-	    sectionsPanel.setBorder(new EmptyBorder(12,12,12,12));
+        sectionsPanel.setBorder(new EmptyBorder(12,12,12,12));
 
         panel.add(toolbar, BorderLayout.NORTH);
         panel.add(sectionsPanel, BorderLayout.CENTER);
@@ -76,27 +76,29 @@ public class PreferencesDialog {
 
         showSection(currentSection);
 
-	    for (PreferencesSection section : sections) {
-	        section.retrievePreferences();
-	    }
+        for (PreferencesSection section : sections) {
+            section.retrievePreferences();
+        }
 
         dialog.pack();
         dialog.setVisible(true);
-	   
+
     }
 
     public void showSection(String title) {
         cardLayout.show(sectionsPanel, title);
 
         JPanel buttonPanel = buttons.get(currentSection);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0,1,0,1));
-        buttonPanel.setOpaque(false);
+        if (buttonPanel != null) {
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(0,1,0,1));
+            buttonPanel.setOpaque(false);
 
-        buttonPanel = buttons.get(title);
-        buttonPanel.setBorder(BorderFactory.createMatteBorder(0,1,0,1,Color.gray));
-        buttonPanel.setBackground(new Color(0.85F, 0.85F, 0.85F, 0.5F));
-        buttonPanel.setOpaque(true);
-        buttonPanel.repaint();
+            buttonPanel = buttons.get(title);
+            buttonPanel.setBorder(BorderFactory.createMatteBorder(0,1,0,1,Color.gray));
+            buttonPanel.setBackground(new Color(0.85F, 0.85F, 0.85F, 0.5F));
+            buttonPanel.setOpaque(true);
+            buttonPanel.repaint();
+        }
     }
 
 

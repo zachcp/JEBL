@@ -55,7 +55,7 @@ final public class SimpleRootedTree implements RootedTree {
         children.add(node1);
 
         Node node2 = createNodes(tree, ingroupNode, outgroupNode);
-        setLength(node1, Math.max(tree.getEdgeLength(ingroupNode, outgroupNode) - ingroupBranchLength, 0.0));
+        setLength(node2, Math.max(tree.getEdgeLength(ingroupNode, outgroupNode) - ingroupBranchLength, 0.0));
         children.add(node2);
 
         createInternalNode(children);

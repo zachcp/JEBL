@@ -9,13 +9,13 @@ import java.util.Set;
 
 /**
  * Common implementation of Attributable interface used by Nodes.
- * 
+ *
  * @author Joseph Heled
  * @version $Id$
  *
  */
 
-abstract class BaseNode implements Node {
+public abstract class BaseNode implements Node {
     // Attributable IMPLEMENTATION
 
     public void setAttribute(String name, Object value) {
@@ -31,7 +31,7 @@ abstract class BaseNode implements Node {
         }
         return helper.getAttribute(name);
     }
-    
+
     public void removeAttribute(String name) {
         if( helper != null ) {
             helper.removeAttribute(name);
