@@ -46,7 +46,9 @@ public class OptionsPanel extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(vGap / 2, 0, vGap / 2, 0);
 		c.weightx = 1.0;
+        c.weighty = 0.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.PAGE_START;
 
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
@@ -70,15 +72,32 @@ public class OptionsPanel extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(0,0,0,0);
 		c.weightx = 1.0;
+        c.weighty = 0.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
 		c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.PAGE_START;
 		JSeparator separator = new JSeparator();
 		adjustComponent(separator);
 		separator.setOpaque(false);
 		gridbag.setConstraints(separator, c);
 		add(separator);
 	}
+
+    public void addFlexibleSpace() {
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(0,0,0,0);
+        c.weightx = 0.0;
+        c.weighty = 1.0;
+        c.fill = GridBagConstraints.NONE;
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        JSeparator separator = new JSeparator();
+        separator.setPreferredSize(new Dimension(0,0));
+        gridbag.setConstraints(separator, c);
+        add(separator);
+    }
 
 	public void addComponent(JComponent comp) {
 		addComponent(comp, false);
@@ -115,6 +134,7 @@ public class OptionsPanel extends JPanel {
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx = 0.0;
+        c.weighty = 0.0;
 		c.fill = fill1 ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
 
 		c.insets = new Insets(vGap / 2, 0, vGap / 2, hGap / 2);
