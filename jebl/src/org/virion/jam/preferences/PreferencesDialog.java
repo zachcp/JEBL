@@ -62,6 +62,7 @@ public class PreferencesDialog {
                         }
                     }
             );
+            button.setFocusable(false);
             JPanel buttonPanel = new JPanel(new BorderLayout());
             buttonPanel.setBorder(BorderFactory.createEmptyBorder(0,1,0,1));
             buttonPanel.add(button, BorderLayout.CENTER);
