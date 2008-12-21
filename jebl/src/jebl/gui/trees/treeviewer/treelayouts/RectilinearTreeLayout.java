@@ -257,6 +257,21 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             final double x = xPosition;
             final double y = yPos;
 
+            float minDx = Float.MAX_VALUE;
+
+            for( final Node child : children) {
+                final Point2D childPoint = nodePoints.get(child);
+
+                // start point
+                final float x0 = (float) x;
+
+                // end point
+                final double cx = childPoint.getX();
+                final float x1 = (float) cx;
+                
+                minDx = Math.min(minDx,((x1 - x0) * (float) (1-xProportion)));
+            }
+
             for( final Node child : children ) {
 
                 final Point2D childPoint = nodePoints.get(child);
@@ -273,7 +288,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 final double yChild = childPoint.getY();
                 final float y1 = (float) yChild;
 
-                float x2 = x1 - ((x1 - x0) * (float) xProportion);
+                float x2 = x0 + minDx;
                 float y2 = y0 + ((y1 - y0) * (float) yProportion);
 
                 branchPath.moveTo(x0, y0);
