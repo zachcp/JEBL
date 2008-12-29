@@ -22,7 +22,7 @@ public class IconUtils {
     }
 
     private static void showWarning(final String message){
-
+        System.err.println(message);
         if (EventQueue.isDispatchThread()){
            JOptionPane.showMessageDialog(null, message, "Warning",JOptionPane.WARNING_MESSAGE);
         }
