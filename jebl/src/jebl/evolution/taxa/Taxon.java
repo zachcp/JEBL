@@ -149,7 +149,7 @@ public final class Taxon implements Attributable, Comparable {
             throw new IllegalArgumentException("Illegal null string for taxon name");
         }
         if (name.length() == 0) {
-            throw new IllegalArgumentException("Illegal empty string for taxon name");
+            assert false:"Illegal empty string for taxon name"; // This is an assertion rather than an exception because we have users in the real world who have sequences with empty names. Ideally we prevent users from creating such sequences, but if we forget to check for empty sequence names somewhere, it isn't nice to crash on them.
         }
         Taxon taxon;
         synchronized(taxa) {
