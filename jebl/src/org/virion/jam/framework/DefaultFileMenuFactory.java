@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Biomatters LTD. All Rights Reserved.
+ * DefaultFileMenuFactory.java.
  */
 package org.virion.jam.framework;
 
