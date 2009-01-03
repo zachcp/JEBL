@@ -1,10 +1,10 @@
 /*
  * Arguments.java
  *
- * (c) 2002-2005 BEAST Development Core Team
+ * Copyright (c) 2009 JAM Development Team
  *
- * This package may be distributed under the
- * Lesser Gnu Public Licence (LGPL)
+ * This package is distributed under the Lesser Gnu Public Licence (LGPL)
+ *
  */
 
 package org.virion.jam.app;
@@ -14,31 +14,31 @@ import java.util.StringTokenizer;
 public class Arguments {
 
 	public static final String ARGUMENT_CHARACTER = "-";
-	
+
 	public static class ArgumentException extends Exception {
 		public ArgumentException() { super(); }
 		public ArgumentException(String message) { super(message); }
 	};
 
 	public static class Option {
-		
+
 		public Option(String label, String description) {
 			this.label = label;
 			this.description = description;
 		}
-		
+
 		String label;
 		String description;
 		boolean isAvailable = false;
 	};
-	
+
 	public static class StringOption extends Option {
-		
+
 		public StringOption(String label, String tag, String description) {
 			super(label, description);
 			this.tag = tag;
 		}
-		
+
 		public StringOption(String label, String[] options, boolean caseSensitive, String description) {
 			super(label, description);
 			this.options = options;
@@ -47,12 +47,12 @@ public class Arguments {
 		String[] options = null;
 		String tag = null;
 		boolean caseSensitive = false;
-		
+
 		String value = null;
 	};
-	
+
 	public static class IntegerOption extends Option {
-		
+
 		public IntegerOption(String label, String description) {
 			super(label, description);
 		}
@@ -62,15 +62,15 @@ public class Arguments {
 			this.minValue = minValue;
 			this.maxValue = maxValue;
 		}
-		
+
 		int minValue = Integer.MIN_VALUE;
 		int maxValue = Integer.MAX_VALUE;
 
 		int value = 0;
 	};
-	
+
 	public static class IntegerArrayOption extends IntegerOption {
-		
+
         public IntegerArrayOption(String label, String description) {
             this(label, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, description);
         }
@@ -86,14 +86,14 @@ public class Arguments {
 		public IntegerArrayOption(String label, int count, int minValue, int maxValue, String description) {
 			super(label, minValue, maxValue, description);
 			this.count = count;		}
-		
+
 		int count;
-		
+
 		int[] values = null;
 	};
-	
+
 	public static class RealOption extends Option {
-		
+
 		public RealOption(String label, String description) {
 			super(label, description);
 		}
@@ -103,13 +103,13 @@ public class Arguments {
 			this.minValue = minValue;
 			this.maxValue = maxValue;
 		}
-		
+
 		double minValue = Double.NEGATIVE_INFINITY;
 		double maxValue = Double.POSITIVE_INFINITY;
-		
+
 		double value = 0;
 	};
-	
+
 	public static class RealArrayOption extends RealOption {
 
         public RealArrayOption(String label, String description) {
@@ -128,40 +128,40 @@ public class Arguments {
 			super(label, minValue, maxValue, description);
 			this.count = count;
         }
-		
+
 		private int count;
-		
+
 		double[] values = null;
 	};
-	
+
 	/**
 	 * Parse a list of arguments ready for accessing
 	 */
-	public Arguments(Option[] options) { 
+	public Arguments(Option[] options) {
 		this.options = options;
 	}
-	
-	public Arguments(Option[] options, boolean caseSensitive) { 
+
+	public Arguments(Option[] options, boolean caseSensitive) {
 		this.options = options;
 		this.caseSensitive = caseSensitive;
 	}
-	
+
 	/**
 	 * Parse a list of arguments ready for accessing
 	 */
 	public void parseArguments(String[] arguments) throws ArgumentException {
-	
+
 		int[] optionIndex = new int[arguments.length];
 		for (int i = 0; i < optionIndex.length; i++) {
 			optionIndex[i] = -1;
 		}
-				
+
 		for (int i = 0; i < options.length; i++) {
 			Option option = options[i];
-			
+
 			int index = findArgument(arguments, option.label);
 			if (index != -1) {
-			
+
 				if (optionIndex[index] != -1) {
 					throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 				}
@@ -170,14 +170,14 @@ public class Arguments {
 				String arg = arguments[index].substring(option.label.length() + 1);
 				optionIndex[index] = i;
 				option.isAvailable = true;
-				
+
 				if (option instanceof IntegerArrayOption) {
-				
+
 					IntegerArrayOption o = (IntegerArrayOption)option;
 					o.values = new int[o.count];
 					int k = index;
 					int j = 0;
-					
+
 					while (j < o.count) {
 						if (arg.length() > 0) {
 							StringTokenizer tokenizer = new StringTokenizer(arg, ",\t ");
@@ -187,68 +187,68 @@ public class Arguments {
 									try {
 										o.values[j] = Integer.parseInt(token);
 									} catch (NumberFormatException nfe) {
-										throw new ArgumentException("Argument, " + arguments[index] + 
+										throw new ArgumentException("Argument, " + arguments[index] +
 											" has a bad integer value: " + token);
 									}
 									if (o.values[j] > o.maxValue || o.values[j] < o.minValue) {
-										throw new ArgumentException("Argument, " + arguments[index] + 
+										throw new ArgumentException("Argument, " + arguments[index] +
 											" has a bad integer value: " + token);
 									}
 									j++;
-								}							
+								}
 							}
 						}
-												
+
 						k++;
-						
+
 						if (j < o.count) {
 							if (k >= arguments.length) {
-								throw new ArgumentException("Argument, " + arguments[index] + 
+								throw new ArgumentException("Argument, " + arguments[index] +
 									" is missing one or more values: expecting " + o.count + " integers");
 							}
-							
+
 							if (optionIndex[k] != -1) {
 								throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 							}
-							
+
 							arg = arguments[k];
 							optionIndex[k] = i;
 						}
 					}
 				} else if (option instanceof IntegerOption) {
-				
+
 					IntegerOption o = (IntegerOption)option;
 					if (arg.length() == 0) {
 						int k = index + 1;
 						if (k >= arguments.length) {
-							throw new ArgumentException("Argument, " + arguments[index] + 
+							throw new ArgumentException("Argument, " + arguments[index] +
 								" is missing its value: expecting an integer");
 						}
-							
+
 						if (optionIndex[k] != -1) {
 							throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 						}
 						arg = arguments[k];
 						optionIndex[k] = i;
 					}
-					
+
 					try {
 						o.value = Integer.parseInt(arg);
 					} catch (NumberFormatException nfe) {
-						throw new ArgumentException("Argument, " + arguments[index] + 
+						throw new ArgumentException("Argument, " + arguments[index] +
 							" has a bad integer value: " + arg);
 					}
 					if (o.value > o.maxValue || o.value < o.minValue) {
-						throw new ArgumentException("Argument, " + arguments[index] + 
+						throw new ArgumentException("Argument, " + arguments[index] +
 							" has a bad integer value: " + arg);
 					}
 				} else if (option instanceof RealArrayOption) {
-				
+
 					RealArrayOption o = (RealArrayOption)option;
 					o.values = new double[o.count];
 					int k = index;
 					int j = 0;
-					
+
 					while (j < o.count) {
 						if (arg.length() > 0) {
 							StringTokenizer tokenizer = new StringTokenizer(arg, ",\t ");
@@ -258,82 +258,82 @@ public class Arguments {
 									try {
 										o.values[j] = Double.parseDouble(token);
 									} catch (NumberFormatException nfe) {
-										throw new ArgumentException("Argument, " + arguments[index] + 
+										throw new ArgumentException("Argument, " + arguments[index] +
 											" has a bad real value: " + token);
 									}
 									if (o.values[j] > o.maxValue || o.values[j] < o.minValue) {
-										throw new ArgumentException("Argument, " + arguments[index] + 
+										throw new ArgumentException("Argument, " + arguments[index] +
 											" has a bad real value: " + token);
 									}
 									j++;
-								}							
+								}
 							}
 						}
-												
+
 						k++;
-						
+
 						if (j < o.count) {
 							if (k >= arguments.length) {
-								throw new ArgumentException("Argument, " + arguments[index] + 
+								throw new ArgumentException("Argument, " + arguments[index] +
 									" is missing one or more values: expecting " + o.count + " integers");
 							}
-							
+
 							if (optionIndex[k] != -1) {
 								throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 							}
-							
+
 							arg = arguments[k];
 							optionIndex[k] = i;
 						}
 					}
 				} else if (option instanceof RealOption) {
-				
+
 					RealOption o = (RealOption)option;
 					if (arg.length() == 0) {
 						int k = index + 1;
 						if (k >= arguments.length) {
-							throw new ArgumentException("Argument, " + arguments[index] + 
+							throw new ArgumentException("Argument, " + arguments[index] +
 								" is missing its value: expecting a real number");
 						}
-							
+
 						if (optionIndex[k] != -1) {
 							throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 						}
 						arg = arguments[k];
 						optionIndex[k] = i;
 					}
-					
+
 					try {
 						o.value = Double.parseDouble(arg);
 					} catch (NumberFormatException nfe) {
-						throw new ArgumentException("Argument, " + arguments[index] + 
+						throw new ArgumentException("Argument, " + arguments[index] +
 							" has a bad real value: " + arg);
 					}
 					if (o.value > o.maxValue || o.value < o.minValue) {
-						throw new ArgumentException("Argument, " + arguments[index] + 
+						throw new ArgumentException("Argument, " + arguments[index] +
 							" has a bad real value: " + arg);
 					}
 				} else if (option instanceof StringOption) {
-				
+
 					StringOption o = (StringOption)option;
 					if (arg.length() == 0) {
 						int k = index + 1;
 						if (k >= arguments.length) {
-							throw new ArgumentException("Argument, " + arguments[index] + 
+							throw new ArgumentException("Argument, " + arguments[index] +
 								" is missing its value: expecting a string");
 						}
-							
+
 						if (optionIndex[k] != -1) {
 							throw new ArgumentException("Argument, " + arguments[index] + " overlaps with another argument");
 						}
 						arg = arguments[k];
 						optionIndex[k] = i;
 					}
-					
+
 					o.value = arg;
 
 					if (o.options != null) {
-						boolean found = false;					
+						boolean found = false;
 						for (int j = 0; j < o.options.length; j++) {
 							if (o.options[j].equals(o.value)) {
 								found = true;
@@ -341,7 +341,7 @@ public class Arguments {
 							}
 						}
 						if (!found)	 {
-							throw new ArgumentException("Argument, " + arguments[index] + 
+							throw new ArgumentException("Argument, " + arguments[index] +
 								" has a bad string value: " + arg);
 						}
 					}
@@ -349,7 +349,7 @@ public class Arguments {
 				}
 			}
 		}
-		
+
 		int n = 0;
 		int i = arguments.length - 1;
 		while (i >= 0 && optionIndex[i] == -1 && !arguments[i].startsWith(ARGUMENT_CHARACTER)) {
@@ -360,31 +360,31 @@ public class Arguments {
 		for (i = 0; i < n; i++) {
 			leftoverArguments[i] = arguments[arguments.length - n + i];
 		}
-		
+
 		for (i = 0; i < arguments.length - n; i++) {
 			if (optionIndex[i] == -1) {
 				throw new ArgumentException("Unrecognized argument: " + arguments[i]);
 			}
-		}	
-		
+		}
+
 	}
 
 	private int findArgument(String[] arguments, String label) {
 		for (int i = 0; i < arguments.length; i++) {
-			
+
 			if (arguments[i].length() - 1 >= label.length()) {
 				if (arguments[i].startsWith(ARGUMENT_CHARACTER)) {
 					String l = arguments[i].substring(1, label.length() + 1);
 					if ((!caseSensitive && label.equalsIgnoreCase(l)) || label.equals(l)) {
 						return i;
 					}
-						
+
 				}
 			}
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Does an argument with label exist?
 	 */
@@ -393,7 +393,7 @@ public class Arguments {
 		if (n == -1) {
 			return false;
 		}
-		
+
 		return options[n].isAvailable;
 	}
 
@@ -445,34 +445,34 @@ public class Arguments {
 	}
 
 	public void printUsage(String name, String commandLine) {
-		
+
 		System.out.print("  Usage: " + name);
 		for (int i = 0; i < options.length; i++) {
 			Option option = options[i];
 			System.out.print(" [-" + option.label);
-			
+
 			if (option instanceof IntegerArrayOption) {
-			
+
 				IntegerArrayOption o = (IntegerArrayOption)option;
 				for (int j = 1; j <= o.count; j++) {
 					System.out.print(" <i" + j + ">");
 				}
 				System.out.print("]");
 			} else if (option instanceof IntegerOption) {
-			
+
 				System.out.print(" <i>]");
 			} else if (option instanceof RealArrayOption) {
-			
+
 				RealArrayOption o = (RealArrayOption)option;
 				for (int j = 1; j <= o.count; j++) {
 					System.out.print(" <r" + j + ">");
 				}
 				System.out.print("]");
 			} else if (option instanceof RealOption) {
-			
+
 				System.out.print(" <r>]");
 			} else if (option instanceof StringOption) {
-			
+
 				StringOption o = (StringOption)option;
 				if (o.options != null) {
 					System.out.print(" <" + o.options[0]);
@@ -506,9 +506,9 @@ public class Arguments {
 	}
 
 	private Option[] options = null;
-	
+
 	private String[] leftoverArguments = null;
-	
+
 	private boolean caseSensitive = false;
 }
 

@@ -1,6 +1,15 @@
 /*
  * Utils.java
  *
+ * Copyright (c) 2009 JAM Development Team
+ *
+ * This package is distributed under the Lesser Gnu Public Licence (LGPL)
+ *
+ */
+
+/*
+ * Utils.java
+ *
  * (c) 2002-2005 BEAST Development Core Team
  *
  * This package may be distributed under the
@@ -23,9 +32,9 @@ import java.io.StringWriter;
  */
 public class Utils {
 
-	
+
 	private static javax.swing.JFileChooser SAVE_FILE_CHOOSER = null;
-        
+
 	public static String getLoadFileName(String message) {
 		java.io.File file = getLoadFile(message);
 		if (file == null) return null;
@@ -42,14 +51,14 @@ public class Utils {
     public static File getLoadFile(String message) {
 		// No file name in the arguments so throw up a dialog box...
 		java.awt.Frame frame = new java.awt.Frame();
-		java.awt.FileDialog chooser = new java.awt.FileDialog(frame, message, 
+		java.awt.FileDialog chooser = new java.awt.FileDialog(frame, message,
 															java.awt.FileDialog.LOAD);
         chooser.show();
 		if (chooser.getFile() == null) return null;
 		java.io.File file = new java.io.File(chooser.getDirectory(), chooser.getFile());
 		chooser.dispose();
 		frame.dispose();
-		
+
 		return file;
 	}
 
@@ -79,16 +88,16 @@ public class Utils {
 	public static String trimExtensions(String fileName, String[] extensions) {
 
 		String newName = null;
-		
+
 		for (int i = 0; i < extensions.length; i++) {
 			String ext = "." + extensions[i];
 			if (fileName.endsWith(ext)) {
 				newName = fileName.substring(0, fileName.length() - ext.length());
 			}
 		}
-		
+
 		if (newName == null) newName = fileName;
-	
+
 		return newName;
 	}
 
@@ -96,9 +105,9 @@ public class Utils {
 	 * @return a named image from file or resource bundle.
 	 */
 	public static Image getImage(Object caller, String name) {
-		
+
 		java.net.URL url = caller.getClass().getResource(name);
-		if (url != null) { 
+		if (url != null) {
 			return Toolkit.getDefaultToolkit().createImage(url);
 		} else {
 			if (caller instanceof Component) {
@@ -110,18 +119,18 @@ public class Utils {
 			} else return null;
 		}
 	}
-       
-	
+
+
 	/*public static void showExceptionDialog(JFrame parent, Throwable e, String title) {
-		
+
 		JOptionPane pane = new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
 		JDialog dialog = pane.createDialog(parent, title);
 		dialog.show();
 	}
 
 	public static void showExceptionDialog(JFrame parent, Throwable e) {
-		
-		JExceptionDialog d = new JExceptionDialog(parent, true, "Exception", getStackTrace(e));	
+
+		JExceptionDialog d = new JExceptionDialog(parent, true, "Exception", getStackTrace(e));
 	}*/
 
 	/**
