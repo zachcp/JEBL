@@ -209,6 +209,9 @@ public class NewickImporter implements TreeImporter {
         while( unquotedLabels && helper.getLastDelimiter() == ' ' ) {
             label = label + " " + helper.readToken(":(),;");
         }
+        if ("".equals(label)) {
+            throw new ImportException.UnknownTaxonException("Emtpy node names are not allowed.");
+        }
         try {
             return tree.createExternalNode(Taxon.getTaxon(label));
         } catch (IllegalArgumentException e) {

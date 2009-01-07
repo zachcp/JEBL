@@ -1295,6 +1295,9 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	private Node readExternalNode(SimpleRootedTree tree) throws ImportException, IOException
 	{
 		String label = helper.readToken(":(),;");
+        if ("".equals(label)) {
+            throw new ImportException.UnknownTaxonException("Emtpy node names are not allowed.");
+        }
 
         Taxon taxon;
         try {
