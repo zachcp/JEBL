@@ -45,7 +45,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public static boolean goBackwards = false;
     public Point mouseLocation = new Point(0,0);
-    private float labelFontSize;
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
@@ -435,7 +434,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (this.taxonLabelPainter != null) {
             this.taxonLabelPainter.addPainterListener(this);
         }
-        labelFontSize = taxonLabelPainter.getFontSize();
         controlPalette.fireControlsChanged();
         calibrated = false;
         repaint();
@@ -537,7 +535,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         } else {
             super.setPreferredSize(dimension);
         }
-        taxonLabelPainter.setFontSize(labelFontSize, false); //triggers a resize of the label fonts
+        taxonLabelPainter.resetFontSizes(false); //triggers a resize of the label fonts
         calibrated = false;
     }
 
@@ -1759,7 +1757,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         //this block of code makes sure that all labels are the same size
         //so that users don't thing that some labels are more important than others
         calibrated = true;
-        float size = taxonLabelPainter.getFontSize();
+        float size = Float.MAX_VALUE;
         for(TreeDrawableElement element : taxonLabels){
             if(element.getCurrentSize() < size){
                 size = element.getCurrentSize();
@@ -2012,7 +2010,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setSize(int width, int height) {
-        taxonLabelPainter.setFontSize(labelFontSize, false); //triggers a resize of the label fonts
+        taxonLabelPainter.resetFontSizes(false); //triggers a resize of the label fonts
         calibrated = false;
         super.setSize(width, height);
     }

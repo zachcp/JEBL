@@ -32,6 +32,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public static final String NODE_HEIGHTS = "Node Heights";
     public static final String BRANCH_LENGTHS = "Substitutions per Site";
 
+    final String fontMinSizePrefKey;
+    final String fontSizePrefKey;
+
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent) {
         this(title, tree, intent, 6);
@@ -46,6 +49,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent, int defaultSize) {
         this.title = title;
+
+        fontMinSizePrefKey = getTitle() + "_fontminsize";
+        fontSizePrefKey = getTitle() + "_fontsize";
 
         this.defaultFontSize = defaultSize;
         taxonLabelFont = new Font("sansserif", Font.PLAIN, defaultSize);
@@ -246,6 +252,13 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return preferredHeight + yOffset;
     }
 
+    public void resetFontSizes(boolean fire) {
+        float fontSize = PREFS.getFloat(fontSizePrefKey, defaultFontSize);
+        float minFontSize = PREFS.getFloat(fontMinSizePrefKey, defaultMinFontSize);
+        setFontSize(fontSize, fire);
+        setFontMinSize(minFontSize, fire);
+    }
+
     public boolean setFontSize(float size, boolean fire) {
         if( defaultFontSize != size ) {
             taxonLabelFont = taxonLabelFont.deriveFont(size);
@@ -425,7 +438,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //label1.setEnabled(selected);
             //fontSizeSpinner.setEnabled(selected);
 
-            final String fontSizePrefKey = getTitle() + "_fontsize";
+
             final float fontsize = PREFS.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
             setFontSize(fontsize, false);
             fontSizeSpinner.setValue((double)fontsize);
@@ -440,7 +453,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //label1.setEnabled(selected);
             //fontSizeSpinner.setEnabled(selected);
 
-            final String fontMinSizePrefKey = getTitle() + "_fontminsize";
             final float size = PREFS.getFloat(fontMinSizePrefKey, 8);
             setFontMinSize(size, false);
 
@@ -461,6 +473,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                         fontMinSizeSpinner.setValue((double) size);
                     }
 
+                    setFontMinSize(minSize, true);
                     setFontSize(size, true);
                     PREFS.putFloat(fontSizePrefKey, size);
                 }
