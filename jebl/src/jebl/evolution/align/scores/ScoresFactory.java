@@ -3,8 +3,39 @@ package jebl.evolution.align.scores;
 import java.lang.reflect.Constructor;
 
 public class ScoresFactory {
-	
-	/**
+    public static final Blosum45 BLOSUM_45 = new Blosum45();
+    public static final Blosum50 BLOSUM_50 = new Blosum50();
+    public static final Blosum55 BLOSUM_55 = new Blosum55 ();
+    public static final Blosum60 BLOSUM_60 = new Blosum60 ();
+    public static final Blosum62 BLOSUM_62 = new Blosum62 ();
+    public static final Blosum65 BLOSUM_65 = new Blosum65 ();
+    public static final Blosum70 BLOSUM_70 = new Blosum70 ();
+    public static final Blosum75 BLOSUM_75 = new Blosum75 ();
+    public static final Blosum80 BLOSUM_80 = new Blosum80 ();
+    public static final Blosum85 BLOSUM_85 = new Blosum85 ();
+    public static final Blosum90 BLOSUM_90 = new Blosum90 ();
+    public static final Pam100 PAM_100 = new Pam100();
+    public static final Pam110 PAM_110 = new Pam110 ();
+    public static final Pam120 PAM_120 = new Pam120 ();
+    public static final Pam130 PAM_130 = new Pam130();
+    public static final Pam140 PAM_140 = new Pam140 ();
+    public static final Pam150 PAM_150 = new Pam150 ();
+    public static final Pam160 PAM_160 = new Pam160 ();
+    public static final Pam170 PAM_170 = new Pam170 ();
+    public static final Pam180 PAM_180 = new Pam180();
+    public static final Pam190 PAM_190 = new Pam190 ();
+    public static final Pam200 PAM_200 = new Pam200 ();
+    public static final Pam210 PAM_210 = new Pam210 ();
+    public static final Pam220 PAM_220 = new Pam220 ();
+    public static final Pam230 PAM_230 = new Pam230 ();
+    public static final Pam240 PAM_240 = new Pam240 ();
+    public static final Pam250 PAM_250 = new Pam250 ();
+    public static final NucleotideScores NUCLEOTIDE_51_PERCENT_SIMILARITY = new NucleotideScores("51% similarity", 5.0f, -3.0f);
+    public static final NucleotideScores NUCLEOTIDE_65_PERCENT_SIMILARITY = new NucleotideScores("65% similarity", 5.0f, -4.0f);
+    public static final NucleotideScores NUCLEOTIDE_70_PERCENT_SIMILARITY = new NucleotideScores("70% similarity (IUB)", 5 * 1.0f, 5 * -0.9f);
+    public static final NucleotideScores NUCLEOTIDE_93_PERCENT_SIMILARITY = new NucleotideScores("93% similarity", 5.0f, -9.0261674571825044f);
+
+    /**
 	 * For any matrix.
 	 * 
 	 * @param nameVal name and value of the matrix in String form. (eg Blosum45).
@@ -76,28 +107,28 @@ public class ScoresFactory {
 	}
 
     public static AminoAcidScores[] getAvailableAminoAcidScores () {
-        return new AminoAcidScores[] {new Blosum45(), new Blosum50(), new Blosum55 (), new Blosum60 (),
-        new Blosum62 (), new Blosum65 (), new Blosum70 (), new Blosum75 (), new Blosum80 (),
-        new Blosum85 (), new Blosum90 (), new Pam100(),new Pam110 (), new Pam120 (),
-        new Pam130(),new Pam140 (), new Pam150 (), new Pam160 (), new Pam170 (),
-        new Pam180(), new Pam190 (), new Pam200 (), new Pam210 (), new Pam220 (),
-        new Pam230 (), new Pam240 (), new Pam250 ()};
+        return new AminoAcidScores[] {BLOSUM_45, BLOSUM_50, BLOSUM_55, BLOSUM_60,
+                BLOSUM_62, BLOSUM_65, BLOSUM_70, BLOSUM_75, BLOSUM_80,
+                BLOSUM_85, BLOSUM_90, PAM_100, PAM_110, PAM_120,
+                PAM_130, PAM_140, PAM_150, PAM_160, PAM_170,
+                PAM_180, PAM_190, PAM_200, PAM_210, PAM_220,
+                PAM_230, PAM_240, PAM_250};
     }
     public static NucleotideScores[] getAvailableNucleotideScores () {
         return new NucleotideScores[] {
-                new NucleotideScores("51% similarity", 5.0f, -3.0f),
-                new NucleotideScores("65% similarity", 5.0f, -4.0f),
+                NUCLEOTIDE_51_PERCENT_SIMILARITY,
+                NUCLEOTIDE_65_PERCENT_SIMILARITY,
                // new NucleotideScores("70% similarity (IUB)", 1.0f, -0.9f),
 
                 // This seems like a bad choice as it implies a very high kappa
                //  new NucleotideScores("93% similarity, Transition/Transversion", 1, -1,-5, 0),
 
-                new NucleotideScores("70% similarity (IUB)", 5 * 1.0f, 5 * -0.9f),
+                NUCLEOTIDE_70_PERCENT_SIMILARITY,
 
                // new NucleotideScores("93% similarity, Transition/Transversion", 5*1, 5*-1, 5*-5, 0),
 
               //  new NucleotideScores("88% similarity", 5.0f, -7.2810419984342278f),
-                new NucleotideScores("93% similarity", 5.0f, -9.0261674571825044f),
+                NUCLEOTIDE_93_PERCENT_SIMILARITY,
 
 
 //                new NucleotideScores("Assembly", 10.0f, -9.0f),
