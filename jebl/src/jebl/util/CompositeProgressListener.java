@@ -30,8 +30,8 @@ public final class CompositeProgressListener extends ProgressListener {
     private int numOperations;
     private ProgressListener listener;
     private int currentOperationNum = 0;
-    private double[] time;
-    private double timeIfTasksAreEvenlyWeighted;
+    private double[] taskFractions;
+    private double taskFractionIfTasksAreEvenlyWeighted;
     private double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
     private double currentOperationProgress = 0.0;
     private boolean beganFirstSubTask=false;
@@ -55,7 +55,7 @@ public final class CompositeProgressListener extends ProgressListener {
         } else {
             this.listener = listener;
         }
-        this.time = operationDuration.clone();
+        this.taskFractions = operationDuration.clone();
 
         // scale times to a sum of 1
         double totalTime = 0.0;
@@ -69,7 +69,7 @@ public final class CompositeProgressListener extends ProgressListener {
             throw new IllegalArgumentException("There must be at least one subtask that takes > 0 time");
         }
         for (int i = 0; i < numOperations; i++) {
-            this.time[i] = (operationDuration[i] / totalTime);
+            this.taskFractions[i] = (operationDuration[i] / totalTime);
         }
     }
 
@@ -83,7 +83,7 @@ public final class CompositeProgressListener extends ProgressListener {
             throw new IllegalArgumentException("numberOfEvenlyWeightedSubTasks="+numberOfEvenlyWeightedSubTasks+" but it must be >=0");
         }
         numOperations = numberOfEvenlyWeightedSubTasks;
-        timeIfTasksAreEvenlyWeighted = 1.0/numberOfEvenlyWeightedSubTasks;
+        taskFractionIfTasksAreEvenlyWeighted = 1.0/numberOfEvenlyWeightedSubTasks;
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
         } else {
@@ -132,15 +132,15 @@ public final class CompositeProgressListener extends ProgressListener {
 
     protected void _setProgress(double fractionCompleted) {
         currentOperationProgress = fractionCompleted;
-        listener._setProgress(baseTime + fractionCompleted * getTime(currentOperationNum));
+        listener._setProgress(baseTime + fractionCompleted * getTaskFraction(currentOperationNum));
     }
 
-    private double getTime(int operationNum) {
-        if (time==null) {
-            return timeIfTasksAreEvenlyWeighted;
+    private double getTaskFraction(int operationNum) {
+        if (taskFractions ==null) {
+            return taskFractionIfTasksAreEvenlyWeighted;
         }
         else {
-            return time[operationNum];
+            return taskFractions[operationNum];
         }
     }
 
@@ -204,7 +204,7 @@ public final class CompositeProgressListener extends ProgressListener {
         if (!hasNextSubtask()) {
             throw new IllegalStateException(currentOperationNum + " " + numOperations);
         }
-        baseTime += getTime(currentOperationNum);
+        baseTime += getTaskFraction(currentOperationNum);
         currentOperationNum++;
         currentOperationProgress = 0.0;
     }
