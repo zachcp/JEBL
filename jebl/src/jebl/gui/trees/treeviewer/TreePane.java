@@ -1019,7 +1019,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             return;
 
         //we want them to have the selected colour either if they are selected, or if the mouse is over them
-        final Paint c = (nodeMarker.contains(mouseLocation) || isSelected) ? selectionPaint :  Color.LIGHT_GRAY;
+        Paint c = isSelected ? selectionPaint :  Color.LIGHT_GRAY;
+        if(nodeMarker.contains(mouseLocation)) {
+            c = highlightedPaint;
+        }
         g2.setPaint(c);
 
         g2.fill(nodeMarker);
@@ -2059,7 +2062,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
     private Stroke selectionStroke = new BasicStroke(6.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
-    //private Color selectionPaint = new Color(180, 213, 254);
+    private Paint highlightedPaint = new Color(180, 213, 254);
     private boolean calibrated = false;
 
     // Transform which scales the tree from it's own units to pixles and moves it to center of window
