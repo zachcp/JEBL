@@ -3,7 +3,6 @@ package jebl.util;
 import jebl.math.MachineAccuracy;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,7 +11,7 @@ import java.util.List;
  * calls with values between 0 and 1 are translated to reflect the overall progress on the whole
  * (combined) task. In other words, each subtask reports progress as if it were the whole task,
  * and the CompositeProgressListener translates this into overall progress. This also implies
- * that calling {@link jebl.util.ProgressListener#setComplete()} or {@link ProgressListener#setProgress(double) setProgress(1.0)}
+ * that calling {@link jebl.util.CompositeProgressListener#setComplete()} or {@link ProgressListener#setProgress(double) setProgress(1.0)}
  * marks the current subtask rather than the entire task completed.
  * <p/>
  * As the combined progress listener cannot know which subtask it is currently being called from,
@@ -28,12 +27,13 @@ import java.util.List;
  * @version $Id$
  */
 public final class CompositeProgressListener extends ProgressListener {
-    protected int numOperations;
-    protected ProgressListener listener;
-    protected int currentOperationNum = 0;
-    protected double[] time;
-    protected double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
-    protected double currentOperationProgress = 0.0;
+    private int numOperations;
+    private ProgressListener listener;
+    private int currentOperationNum = 0;
+    private double[] time;
+    private double timeIfTasksAreEvenlyWeighted;
+    private double baseTime = 0.0; // overall progress (0..1) at the start of the current sub-operation
+    private double currentOperationProgress = 0.0;
     private boolean beganFirstSubTask=false;
     private String currentSubTaskMessage="";
 
@@ -73,20 +73,22 @@ public final class CompositeProgressListener extends ProgressListener {
         }
     }
 
-    private static double[] getWeights(int numberOfEvenlyWeightedSubTasks) {
-        double[] results=new double[numberOfEvenlyWeightedSubTasks];
-        Arrays.fill(results,1);
-        return results;
-    }
-
     /**
      * Construct a CompositeProgressListener with a number of evenly weighted subtasks.
      * @param listener the ProgressListener that all progress reports are forwarded to after adjusting them for the currently active sub-task
      * @param numberOfEvenlyWeightedSubTasks the number of evenly weighted sub-tasks.
      */
     public CompositeProgressListener(ProgressListener listener, int numberOfEvenlyWeightedSubTasks) {
-        //noinspection PrimitiveArrayArgumentToVariableArgMethod
-        this(listener,getWeights(numberOfEvenlyWeightedSubTasks));
+        if (numberOfEvenlyWeightedSubTasks<=0) {
+            throw new IllegalArgumentException("numberOfEvenlyWeightedSubTasks="+numberOfEvenlyWeightedSubTasks+" but it must be >=0");
+        }
+        numOperations = numberOfEvenlyWeightedSubTasks;
+        timeIfTasksAreEvenlyWeighted = 1.0/numberOfEvenlyWeightedSubTasks;
+        if (listener == null) {
+            this.listener = ProgressListener.EMPTY;
+        } else {
+            this.listener = listener;
+        }
     }
 
     public static CompositeProgressListener forFiles(ProgressListener listener, List<File> files) {
@@ -130,7 +132,16 @@ public final class CompositeProgressListener extends ProgressListener {
 
     protected void _setProgress(double fractionCompleted) {
         currentOperationProgress = fractionCompleted;
-        listener._setProgress(baseTime + fractionCompleted * time[currentOperationNum]);
+        listener._setProgress(baseTime + fractionCompleted * getTime(currentOperationNum));
+    }
+
+    private double getTime(int operationNum) {
+        if (time==null) {
+            return timeIfTasksAreEvenlyWeighted;
+        }
+        else {
+            return time[operationNum];
+        }
     }
 
     protected void _setIndeterminateProgress() {
@@ -193,7 +204,7 @@ public final class CompositeProgressListener extends ProgressListener {
         if (!hasNextSubtask()) {
             throw new IllegalStateException(currentOperationNum + " " + numOperations);
         }
-        baseTime += time[currentOperationNum];
+        baseTime += getTime(currentOperationNum);
         currentOperationNum++;
         currentOperationProgress = 0.0;
     }
