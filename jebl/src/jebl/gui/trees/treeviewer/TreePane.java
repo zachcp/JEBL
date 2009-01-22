@@ -556,6 +556,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
     // direction, null otherwise
     Node[] getNodeAt(final Point point) {
+        if(point == null) {
+            return null;
+        }
+
         final Graphics2D g2 = (Graphics2D)getGraphics();
         Node[] result = new Node[2];
 
@@ -601,10 +605,18 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return result;
     }
 
-    private boolean checkNodeIntersects(Node node, Point point){
+    private Shape getNodeMarker(Node node, int d) {
         final Point2D.Double coord = nodeCoord(node);
-        final double v = coord.distanceSq(point);
-        return v < circDiameter * circDiameter;
+        final int r = (d-1)/2;
+
+        Shape nodeMarker = new Ellipse2D.Float((float)coord.x - r, (float)coord.y - r, d, d);
+
+        return nodeMarker;
+    }
+
+    private boolean checkNodeIntersects(Node node, Point point){
+        Shape nodeMarker = getNodeMarker(node, circDiameter);
+        return nodeMarker.contains(point);
     }
 
     /**
@@ -943,30 +955,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return result;
     }
 
-    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers) {
+    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers, Node selectedNode) {
         final Point2D.Double nodeLocation = nodeCoord(node);
         final boolean isSelected = selectedNodes.contains(node);
         final Paint color = g2.getPaint();
 
-        //set up the node marker ellipse
-        final int rlimit = treeLayout.getNodeMarkerRadiusUpperLimit(node, transform);
 
-        final double x = nodeLocation.getX();
-        final int ix1 = (int) Math.round(x);
-        final double y = nodeLocation.getY();
-        final int iy1 = (int) Math.round(y);
-
-        int d = circDiameter;
-//        if( rlimit >= 0 ) { //commented out so all node markers are the same size
-//            d = Math.min(2*rlimit+1, d);
-//        }
-        int d2 = 7*d; //this is the diameter of the circle for detecting when to show the marker
-
-        final int r = (d-1)/2;
-        final int r2 = (d2 - 1)/2;
-
-        Shape nodeMarker = new Ellipse2D.Float(ix1 - r, iy1 - r, d, d);
-        Shape nodeMarkerClip = new Ellipse2D.Float(ix1 - r2, iy1 - r2, d2, d2);
+        Shape nodeMarker = getNodeMarker(node, circDiameter);
+        Shape nodeMarkerClip = getNodeMarker(node, 7*circDiameter);
 
         if( isNodeCollapsed(node) ) {
            // final Color c = isSelected ? selectionPaint : branch;
@@ -984,34 +980,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.draw(transformedShape);            
             g2.setStroke(save);
 
-//            if( false) {
-//            Line2D labelPath = treeLayout.getBranchLabelPath(node);
-//            if( labelPath == null ) {
-//                // root only?
-//                labelPath = new Line2D.Double(0,0, 1,0);
-//            }
-//            final Point2D d1 = labelPath.getP2();
-//            final Point2D d2 = labelPath.getP1();
-//            final double dx = d1.getX() - d2.getX();
-//            final double dy = d1.getY() - d2.getY();
-//            final double branchLength = Math.sqrt(dx*dx + dy*dy);
-//
-//            final double sint = dy / branchLength;
-//            final double cost = dx / branchLength;
-//
-//            final int r = circRadius;
-//            final int h = 172*r/200;
-//            int[] xp = {0, h, h};
-//            int[] yp = {0, r/2, -r/2};
-//
-//            for(int k = 0; k < 3; ++k) {
-//                final double rx = x + xp[k] * cost - yp[k] * sint;
-//                final double ry = y + xp[k] * sint + yp[k] * cost;
-//                xp[k] = (int)(rx + 0.5);
-//                yp[k] = (int)(ry + 0.5);
-//            }
-//            g2.drawPolygon(xp, yp, 3);
-//            }
         }
 
         //we want to draw node markers either if they are selected, or if the mouse is close to them
@@ -1020,7 +988,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         //we want them to have the selected colour either if they are selected, or if the mouse is over them
         Paint c = isSelected ? selectionPaint :  Color.LIGHT_GRAY;
-        if(nodeMarker.contains(mouseLocation)) {
+        if(node == selectedNode) {
             c = highlightedPaint;
         }
         g2.setPaint(c);
@@ -1099,6 +1067,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         final boolean alignedTaxa = treeLayout.alignTaxa();
 
+        Node nodeUnderMouse = null;
+        Node[] result = getNodeAt(mouseLocation);
+        if(result != null) {
+            nodeUnderMouse = result[0];
+        }
+
         for (Node node : externalNodes) {
             if( !isNodeVisible(node) ) continue;
             if( hideNode(node) ) continue;
@@ -1121,7 +1095,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.draw(branchPath);
 
             if(drawNodes)
-                nodeMarker(g2, node, drawAllNodeMarkers);
+                nodeMarker(g2, node, drawAllNodeMarkers, nodeUnderMouse);
 
             if( preElementDrawCode ) {
                 if (showingTaxonLables) {
@@ -1170,7 +1144,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     g2.draw(branchPath);
 
                     if(drawNodes)
-                        nodeMarker(g2, node, drawAllNodeMarkers);
+                        nodeMarker(g2, node, drawAllNodeMarkers, nodeUnderMouse);
 
                     if (preElementDrawCode && nodesLables) {
                         final AffineTransform nodeTransform = nodeLabelTransforms.get(node);
@@ -1224,7 +1198,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! hideNode(rootNode) && drawNodes ) {
           g2.setStroke(branchLineStroke);
-          nodeMarker(g2, rootNode, drawAllNodeMarkers);
+          nodeMarker(g2, rootNode, drawAllNodeMarkers, nodeUnderMouse);
         }
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
