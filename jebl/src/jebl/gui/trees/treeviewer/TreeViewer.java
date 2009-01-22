@@ -36,6 +36,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -136,6 +138,11 @@ public class TreeViewer extends JPanel implements Printable {
 
         scrollPane.setBorder(null);
         viewport = scrollPane.getViewport();
+        viewport.addComponentListener(new ComponentAdapter(){
+            public void componentResized(ComponentEvent e) {
+                refreshZoom();
+            }
+        });
 
         this.controlPalette = controlPalette;
         controlPalette.getPanel().setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
