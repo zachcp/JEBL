@@ -565,17 +565,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
-        //todo: this allows clicking on node/branch labels to select nodes.  At this point this behaviour is considered undesirable
-        /*for( TreeDrawableElement e : treeElements ) {
-            Node node = e.getNode();
-            if( node != null ) {
-                if( e.hit(g2, rect) ) {
-                   result[0] = node;
-                   return result;
-                }
-            }
-        }*/
-
         // this piece of code must run in reverse of how the nodes are drawn so that if the user clicks on 
         // overlapping nodes, the top node is selected
         Node rootNode = tree.getRootNode();
@@ -600,6 +589,20 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if( checkNodeIntersects(externalNodes[i], point)) {
                 result[0] = externalNodes[i];
                 return result;
+            }
+        }
+        for( TreeDrawableElement e : treeElements ) {
+            if (e instanceof TreeDrawableElementNodeLabel) {
+                TreeDrawableElementNodeLabel nodeLabel = (TreeDrawableElementNodeLabel) e;
+                if (!"branch".equals(nodeLabel.dtype)) {
+                    Node node = e.getNode();
+                    if( node != null ) {
+                        if( e.hit(g2, rect) ) {
+                           result[0] = node;
+                           return result;
+                        }
+                    }
+                }
             }
         }
         return result;
@@ -983,13 +986,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         //we want to draw node markers either if they are selected, or if the mouse is close to them
-        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && !isSelected)
+        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && !isSelected && node != selectedNode)
             return;
 
         //we want them to have the selected colour either if they are selected, or if the mouse is over them
         Paint c = isSelected ? selectionPaint :  Color.LIGHT_GRAY;
         if(node == selectedNode) {
-            c = highlightedPaint;
+            c = isSelected ? highlightedSelectedPaint :  highlightedPaint;
         }
         g2.setPaint(c);
 
@@ -2036,6 +2039,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
     private Stroke selectionStroke = new BasicStroke(6.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
+    private Paint highlightedSelectedPaint = new Color(90, 107, 255);
     private Paint highlightedPaint = new Color(180, 213, 254);
     private boolean calibrated = false;
 
