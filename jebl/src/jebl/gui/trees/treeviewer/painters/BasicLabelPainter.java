@@ -35,6 +35,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     final String fontMinSizePrefKey;
     final String fontSizePrefKey;
 
+    private final PainterIntent intent;
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent) {
         this(title, tree, intent, 6);
@@ -49,6 +50,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent, int defaultSize) {
         this.title = title;
+        this.intent = intent;
 
         fontMinSizePrefKey = getTitle() + "_fontminsize";
         fontSizePrefKey = getTitle() + "_fontsize";
@@ -399,7 +401,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 optionsPanel.addComponent(showTextCHeckBox);
             }
 
-            visible = PREFS.getBoolean(getTitle() + isOPenKey, isVisible());
+            int consensusSupportIndex = getConsensusSupportIndex();
+            boolean containsConsensusSupport = consensusSupportIndex >= 0;
+            visible = PREFS.getBoolean(getTitle() + isOPenKey + (containsConsensusSupport ? "_withconsensusSupport" : ""), containsConsensusSupport || intent == PainterIntent.TIP);
             showTextCHeckBox.setSelected(visible);
 
             showTextCHeckBox.addChangeListener(new ChangeListener() {
@@ -411,7 +415,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 }
             });
 
-            final String whatPrefKey = getTitle() + "_whatToDisplay";
+
+            final String whatPrefKey = getTitle() + "_whatToDisplay" + (containsConsensusSupport ? "_withconsensusSupport" : "");
             String[] attributes = getAttributes();
             final JComboBox combo1 = new JComboBox(attributes);
             combo1.addItemListener(new ItemListener() {
@@ -422,7 +427,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 }
             });
 
-            final String whatToDisplay = PREFS.get(whatPrefKey, null);
+            final String whatToDisplay = PREFS.get(whatPrefKey, consensusSupportIndex >= 0 ? attributes[consensusSupportIndex] : null);
             if( whatToDisplay != null ) {
                 int i = Arrays.asList(attributes).indexOf(whatToDisplay);
                 if( i >= 0 ) {
@@ -521,6 +526,22 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return controlsList;
     }
 
+    private int getConsensusSupportIndex() {
+
+        //we can put other names that represent consensus support here as we discover them
+        String[] valuesToTest = new String[]{
+            "Consensus support(%)",
+            "Clade Support"
+        };
+        List<String> attributesList = Arrays.asList(getAttributes());
+        for(String s : valuesToTest) {
+            int index = attributesList.indexOf(s);
+            if(index >= 0) {
+                return index;
+            }
+        }
+        return -1;
+    }
 
 
     public void setSettings(ControlsSettings settings) {
