@@ -100,6 +100,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
 
+        if(paintAsMirrorImage) {
+            g2.scale(-1,1);
+            g2.translate(-bounds.getWidth()-2*bounds.getX(),0);
+        }
+
         if (background != null) {
             g2.setPaint(background);
             g2.fill(bounds);
@@ -155,6 +160,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         g2.setFont(oldFont);
         g2.setPaint(oldPaint);
         g2.setStroke(oldStroke);
+
+        if(paintAsMirrorImage) {
+            g2.translate(bounds.getWidth()+2*bounds.getX(),0);
+            g2.scale(-1,1);
+        }
     }
 
     public double getWidth(Graphics2D g2, TreePane treePane) {
@@ -240,7 +250,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
      *
      * eg. Disable the scale bar when a transform is in effect because there is no valid scale.
      *
-     * @param isEnabled
+     * @param enabled
      */
     public void setEnabled(boolean enabled) {
         if (controls == null) {

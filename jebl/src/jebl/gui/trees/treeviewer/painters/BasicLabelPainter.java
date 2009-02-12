@@ -307,6 +307,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
         final Font oldFont = g2.getFont();
 
+        if(paintAsMirrorImage) {
+            g2.scale(-1,1);
+            g2.translate(-bounds.getWidth()-2*bounds.getX(),0);
+        }
+
         if (background != null) {
             g2.setPaint(background);
             g2.fill(bounds);
@@ -372,6 +377,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         }
 
         g2.setFont(oldFont);
+
+        if(paintAsMirrorImage) {
+            g2.translate(bounds.getWidth()+2*bounds.getX(),0);
+            g2.scale(-1,1);
+        }
     }
 
     public String[] getAttributes() {

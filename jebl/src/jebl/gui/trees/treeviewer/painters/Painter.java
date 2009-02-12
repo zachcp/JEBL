@@ -43,4 +43,6 @@ public interface Painter<T> extends ControlsProvider {
 
     void addPainterListener(PainterListener listener);
     void removePainterListener(PainterListener listener);
+
+    void setPaintAsMirrorImage(boolean paintAsMirrorImage);
 }

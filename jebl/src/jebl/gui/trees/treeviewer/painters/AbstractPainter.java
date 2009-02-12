@@ -8,6 +8,8 @@ import java.util.List;
  * @version $Id$
  */
 public abstract class AbstractPainter<T> implements Painter<T> {
+    protected boolean paintAsMirrorImage = true;
+
     public void addPainterListener(PainterListener listener) {
         listeners.add(listener);
     }
@@ -22,4 +24,8 @@ public abstract class AbstractPainter<T> implements Painter<T> {
         }
     }
     private final List<PainterListener> listeners = new ArrayList<PainterListener>();
+
+    public void setPaintAsMirrorImage(boolean paintAsMirrorImage) {
+        this.paintAsMirrorImage = paintAsMirrorImage;
+    }
 }
