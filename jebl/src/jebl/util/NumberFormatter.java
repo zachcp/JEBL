@@ -118,6 +118,9 @@ public class NumberFormatter {
         while(labelString.charAt(labelString.length()-1) == '0'){
             labelString = labelString.substring(0, labelString.length()-1);
         }
+        if (labelString.endsWith(".")) {
+            labelString = labelString.substring(0, labelString.length()-1);
+        }
 
         return labelString;
 	}

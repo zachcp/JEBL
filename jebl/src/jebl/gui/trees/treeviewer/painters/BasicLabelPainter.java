@@ -36,6 +36,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     final String fontSizePrefKey;
 
     private final PainterIntent intent;
+    private int consensusSupportIndex;
+    private boolean containsConsensusSupport;
+
+    private final String isOpenKey;
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent) {
         this(title, tree, intent, 6);
@@ -125,6 +129,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         sources.toArray(this.attributes);
 
         formatter = new NumberFormatter(4);
+
+        consensusSupportIndex = getConsensusSupportIndex();
+        containsConsensusSupport = consensusSupportIndex >= 0;
+        isOpenKey = getTitle() + "_isopen" + (containsConsensusSupport ? "_withconsensusSupport" : "");
     }
 
     public void setTree(RootedTree tree) {
@@ -192,12 +200,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return visible;
     }
 
-    private static final String isOPenKey = "_isopen";
-
     public void setVisible(boolean visible) {
         this.visible = visible;
         firePainterChanged();
-        PREFS.putBoolean(getTitle() + isOPenKey, visible);
+        PREFS.putBoolean(isOpenKey, visible);
     }
 
 //    public void calibrate(Graphics2D g2, Node item) {
@@ -411,9 +417,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 optionsPanel.addComponent(showTextCHeckBox);
             }
 
-            int consensusSupportIndex = getConsensusSupportIndex();
-            boolean containsConsensusSupport = consensusSupportIndex >= 0;
-            visible = PREFS.getBoolean(getTitle() + isOPenKey + (containsConsensusSupport ? "_withconsensusSupport" : ""), containsConsensusSupport || intent == PainterIntent.TIP);
+            visible = PREFS.getBoolean(isOpenKey, containsConsensusSupport || intent == PainterIntent.TIP);
             showTextCHeckBox.setSelected(visible);
 
             showTextCHeckBox.addChangeListener(new ChangeListener() {
