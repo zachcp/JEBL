@@ -32,6 +32,7 @@ public final class Utils {
 	public static String toNewick(RootedTree tree) {
 		StringBuilder buffer = new StringBuilder();
 		toNewick(tree, tree.getRootNode(), buffer);
+        buffer.append(";");
 		return buffer.toString();
 	}
 
