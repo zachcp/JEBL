@@ -545,7 +545,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         //we can put other names that represent consensus support here as we discover them
         String[] valuesToTest = new String[]{
             "Consensus support(%)",
-            "Clade Support"
+            "Clade Support",
+            "bootstrap proportion"
         };
         List<String> attributesList = Arrays.asList(getAttributes());
         for(String s : valuesToTest) {
