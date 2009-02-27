@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.treelayouts;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Utils;
+import jebl.evolution.trees.Tree;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -18,12 +19,15 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
  * @version $Id$
  */
 public class RadialTreeLayout extends AbstractTreeLayout {
+
+    private static final Preferences prefs = Preferences.userNodeForPackage(RadialTreeLayout.class);
 
     public AxisType getXAxisType() {
         return AxisType.CONTINUOUS;
@@ -223,6 +227,13 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         invalidate();
     }
 
+    @Override
+     public void setTree(Tree tree) {
+        super.setTree(tree);
+        if(tree != null) {
+            setRootAngle(prefs.getDouble("radial_root_angle", 180.0));
+        }
+    }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
@@ -231,15 +242,16 @@ public class RadialTreeLayout extends AbstractTreeLayout {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-            slider1.setValue((int) (rootAngle * 10));
+            final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 360, 0);
+            slider1.setValue((int) (rootAngle*(180.0/Math.PI))+180);
             slider1.setPaintTicks(true);
             slider1.setPaintLabels(true);
 
             slider1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    double value = (slider1.getValue() / 10.0);
-                    setRootAngle(value % 360);
+                    int value = slider1.getValue() - 180;
+                    setRootAngle(value);
+                    prefs.putDouble("radial_root_angle", value);
                 }
             });
             optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);

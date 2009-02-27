@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Tree;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -15,6 +16,7 @@ import java.awt.event.ItemListener;
 import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
@@ -22,10 +24,24 @@ import java.util.List;
  */
 public class PolarTreeLayout extends AbstractTreeLayout {
 
+    private static final Preferences prefs = Preferences.userNodeForPackage(PolarTreeLayout.class);
+
     public enum TaxonLabelPosition {
         FLUSH,
         RADIAL,
         HORIZONTAL
+    }
+
+    @Override
+    public void setTree(Tree tree) {
+        super.setTree(tree);
+        if(tree != null) {
+            setAngularRange(prefs.getDouble("polar_angle_range", 360.0));
+            if( ! this.tree.conceptuallyUnrooted() ) {
+                setRootAngle(prefs.getDouble("polar_root_angle", 180.0));
+                setRootLength(prefs.getDouble("polar_root_length", 0));
+            }
+        }
     }
 
     public AxisType getXAxisType() {
@@ -81,15 +97,17 @@ public class PolarTreeLayout extends AbstractTreeLayout {
             OptionsPanel optionsPanel = new OptionsPanel();
 
             if( ! tree.conceptuallyUnrooted() ) {
-                final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-                slider1.setValue((int) (180.0 - (rootAngle * 10)));
+                final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, 360, 0);
+                slider1.setValue((int) ((rootAngle) +180));
                 slider1.setPaintTicks(true);
                 slider1.setPaintLabels(true);
 
                 slider1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        double value = 180 + (slider1.getValue() / 10.0);
-                        setRootAngle(value % 360);
+                        double value = slider1.getValue()-180;
+                        setRootAngle(value);
+                        System.out.println(rootAngle);
+                        prefs.putDouble("polar_root_angle", rootAngle);
                     }
                 });
                 optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
@@ -103,20 +121,22 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                     public void stateChanged(ChangeEvent changeEvent) {
                         double value = slider2.getValue();
                         setRootLength(value / 10000.0);
+                        prefs.putDouble("polar_root_length", rootLength);
                     }
                 });
                 optionsPanel.addComponentWithLabel("Root Length:", slider2, true);
             }
 
-            final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 3600, 0);
-            slider3.setValue((int) (360.0 - (angularRange * 10)));
+            final JSlider slider3 = new JSlider(SwingConstants.HORIZONTAL, 0, 360, 0);
+            slider3.setValue((int) (360.0 - (angularRange)));
             slider3.setPaintTicks(true);
             slider3.setPaintLabels(true);
 
             slider3.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    double value = 360.0 - (slider3.getValue() / 10.0);
+                    double value = 360.0 - slider3.getValue();
                     setAngularRange(value);
+                    prefs.putDouble("polar_angle_range", value);
                 }
             });
             optionsPanel.addComponentWithLabel("Angle Range:", slider3, true);
