@@ -678,7 +678,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setDragRectangle(Rectangle2D dragRectangle) {
-        this.dragRectangle = dragRectangle;
+        Rectangle2D newDragRect = dragRectangle;
+
+        if(flipTree && dragRectangle != null) {
+            AffineTransform tr = new AffineTransform();
+            tr.scale(-1,1);
+            tr.translate(-getWidth(),0);
+            newDragRect = tr.createTransformedShape(dragRectangle).getBounds2D();
+        }
+        this.dragRectangle = newDragRect;
         repaint();
     }
 
