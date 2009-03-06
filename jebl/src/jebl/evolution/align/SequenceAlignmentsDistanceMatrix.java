@@ -1,11 +1,9 @@
 package jebl.evolution.align;
 
-import jebl.evolution.distances.BasicDistanceMatrix;
-import jebl.evolution.distances.CannotBuildDistanceMatrixException;
-import jebl.evolution.distances.F84DistanceMatrix;
-import jebl.evolution.distances.JukesCantorDistanceMatrix;
+import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.util.ProgressListener;
 
 import java.util.ArrayList;
@@ -22,10 +20,21 @@ import java.util.List;
  *
  */
 public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
+    
     public SequenceAlignmentsDistanceMatrix(List<Sequence> seqs, PairwiseAligner aligner, ProgressListener progress)
             throws CannotBuildDistanceMatrixException
     {
-        super(getTaxa(seqs), getDistances(seqs, aligner, progress));
+        super(getTaxa(seqs), getDistances(seqs, aligner, getDefaultDistanceModel(seqs), progress));
+    }
+
+    public SequenceAlignmentsDistanceMatrix(List<Sequence> seqs, PairwiseAligner aligner, ProgressListener progress, TreeBuilderFactory.DistanceModel model)
+            throws CannotBuildDistanceMatrixException
+    {
+        super(getTaxa(seqs), getDistances(seqs, aligner, model, progress));
+        boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount() > 4;
+        if (model != TreeBuilderFactory.DistanceModel.JukesCantor && isProtein) {
+            throw new IllegalArgumentException("Model " + model + " does not support protein sequences");
+        }
     }
 
     static List<Taxon> getTaxa(List<Sequence> seqs) {
@@ -36,26 +45,44 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
         return t;
     }
 
-
-
-    private static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, final ProgressListener progress) throws CannotBuildDistanceMatrixException {
-        final int n = seqs.size();
-        double [][] d = new double[n][n];
+    public static TreeBuilderFactory.DistanceModel getDefaultDistanceModel(List<Sequence> seqs) {
         boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount()> 4;
 
-        CompoundAlignmentProgressListener compoundProgress = new CompoundAlignmentProgressListener(progress,(n * (n - 1)) / 2);
+        if(isProtein) {
+            return TreeBuilderFactory.DistanceModel.JukesCantor;
+        } else {
+            return TreeBuilderFactory.DistanceModel.F84;
+        }
+    }
+
+    private static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, TreeBuilderFactory.DistanceModel model, final ProgressListener progressListener) throws CannotBuildDistanceMatrixException {
+        final int n = seqs.size();
+        double [][] d = new double[n][n];
+
+        CompoundAlignmentProgressListener compoundProgress = new CompoundAlignmentProgressListener(progressListener,(n * (n - 1)) / 2);
 
         for(int i = 0; i < n; ++i) {
             for(int j = i+1; j < n; ++j) {
                 PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), compoundProgress.getMinorProgress());
                 compoundProgress.incrementSectionsCompleted(1);
                 if(compoundProgress.isCanceled()) return d;
-                if(isProtein) {
-                    d[i][j] = new JukesCantorDistanceMatrix(result.alignment, null).getDistances()[0][1];
-                } else {
-                    d[i][j] = new F84DistanceMatrix(result.alignment).getDistances()[0][1];
 
+                BasicDistanceMatrix matrix;
+                switch( model ) {
+                    case F84:
+                        matrix = new F84DistanceMatrix(result.alignment, progressListener);
+                        break;
+                    case HKY:
+                        matrix = new HKYDistanceMatrix(result.alignment, progressListener);
+                        break;
+                    case TamuraNei:
+                        matrix = new TamuraNeiDistanceMatrix(result.alignment, progressListener);
+                        break;
+                    case JukesCantor:
+                    default:
+                        matrix = new JukesCantorDistanceMatrix(result.alignment, progressListener);
                 }
+                d[i][j] = matrix.getDistances()[0][1];
                 d[j][i] = d[i][j];
             }
         }

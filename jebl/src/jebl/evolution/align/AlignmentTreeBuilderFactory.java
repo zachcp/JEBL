@@ -111,6 +111,7 @@ public class AlignmentTreeBuilderFactory {
     }
 
     /**
+     * Will use model F84 for nucleotides and Jukes-Cantor for amino acid
      *
      * @param seqs Sequences to build distance matrix from
      * @param method method the tree building method to use
@@ -122,9 +123,25 @@ public class AlignmentTreeBuilderFactory {
                                ProgressListener progressListener)
             throws CannotBuildDistanceMatrixException
     {
+        return build(seqs, method, aligner, progressListener, SequenceAlignmentsDistanceMatrix.getDefaultDistanceModel(seqs));
+    }
+
+    /**
+     *
+     * @param seqs Sequences to build distance matrix from
+     * @param method method the tree building method to use
+     * @param aligner pairwise aligner which will be used to calculate a pairwise distance
+     * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
+     * @param model distance model to use
+     * @return A tree building result (containing a tree and a distance matrix)
+     */
+    static public Result build(final List<Sequence> seqs, TreeBuilderFactory.Method method, final PairwiseAligner aligner,
+                               ProgressListener progressListener, final TreeBuilderFactory.DistanceModel model)
+            throws CannotBuildDistanceMatrixException
+    {
         DistanceMatrixBuilder matrixBuilder = new DistanceMatrixBuilder() {
             public DistanceMatrix buildDistanceMatrix(final ProgressListener progressListener) throws CannotBuildDistanceMatrixException {
-                return new SequenceAlignmentsDistanceMatrix(seqs, aligner, progressListener);
+                return new SequenceAlignmentsDistanceMatrix(seqs, aligner, progressListener, model);
             }
         };
         return build(matrixBuilder, method, progressListener);
