@@ -37,6 +37,10 @@ public abstract class State implements Comparable {
         this.index = index;
     }
 
+    /**
+     * Returns the 1 letter code for this state.
+     * @return the 1 letter code for this state.
+     */
     public String getCode() {
         return stateCode;
     }
@@ -45,7 +49,19 @@ public abstract class State implements Comparable {
         return index;
     }
 
-    public String getName() { return name; }
+    /**
+     * A descriptive name for this state. e.g. "Phenylalanine" or "Adenine".
+     * @return A descriptive name for this state. e.g. "Phenylalanine" or "Adenine".
+     */
+    public String getFullName() { return name; }
+
+    /**
+     * The 1 letter code (for legacy purposes). Same as {@link #getCode()}
+     * @return The 1 letter code (for legacy purposes). Same as {@link #getCode()}
+     * @see #getFullName()
+     * @deprecated you probably want to use {@link #getFullName()} or {@link #getCode()}.
+     */
+    @Deprecated public String getName() { return stateCode; }
 
     public boolean isAmbiguous() {
         return getCanonicalStates().size() > 1;

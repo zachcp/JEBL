@@ -27,34 +27,34 @@ public final class AminoAcids {
     public static final int CANONICAL_STATE_COUNT = 22;
     public static final int STATE_COUNT = 29;
 
-    public static final AminoAcidState A_STATE = new AminoAcidState("A", "A", 0);
-    public static final AminoAcidState C_STATE = new AminoAcidState("C", "C", 1);
-    public static final AminoAcidState D_STATE = new AminoAcidState("D", "D", 2);
-    public static final AminoAcidState E_STATE = new AminoAcidState("E", "E", 3);
-    public static final AminoAcidState F_STATE = new AminoAcidState("F", "F", 4);
-    public static final AminoAcidState G_STATE = new AminoAcidState("G", "G", 5);
-    public static final AminoAcidState H_STATE = new AminoAcidState("H", "H", 6);
-    public static final AminoAcidState I_STATE = new AminoAcidState("I", "I", 7);
-    public static final AminoAcidState K_STATE = new AminoAcidState("K", "K", 8);
-    public static final AminoAcidState L_STATE = new AminoAcidState("L", "L", 9);
-    public static final AminoAcidState M_STATE = new AminoAcidState("M", "M", 10);
-    public static final AminoAcidState N_STATE = new AminoAcidState("N", "N", 11);
-    public static final AminoAcidState P_STATE = new AminoAcidState("P", "P", 12);
-    public static final AminoAcidState Q_STATE = new AminoAcidState("Q", "Q", 13);
-    public static final AminoAcidState R_STATE = new AminoAcidState("R", "R", 14);
-    public static final AminoAcidState S_STATE = new AminoAcidState("S", "S", 15);
-    public static final AminoAcidState T_STATE = new AminoAcidState("T", "T", 16);
-    public static final AminoAcidState V_STATE = new AminoAcidState("V", "V", 17);
-    public static final AminoAcidState W_STATE = new AminoAcidState("W", "W", 18);
-    public static final AminoAcidState Y_STATE = new AminoAcidState("Y", "Y", 19);
+    public static final AminoAcidState A_STATE = new AminoAcidState("Alanine", "Ala", "A", 0);
+    public static final AminoAcidState C_STATE = new AminoAcidState("Cysteine", "Cys", "C", 1);
+    public static final AminoAcidState D_STATE = new AminoAcidState("Aspartic acid", "Asp", "D", 2);
+    public static final AminoAcidState E_STATE = new AminoAcidState("Glutamic acid", "Glu", "E", 3);
+    public static final AminoAcidState F_STATE = new AminoAcidState("Phenylalanine", "Phe", "F", 4);
+    public static final AminoAcidState G_STATE = new AminoAcidState("Glycine", "Gly", "G", 5);
+    public static final AminoAcidState H_STATE = new AminoAcidState("Histidine", "His", "H", 6);
+    public static final AminoAcidState I_STATE = new AminoAcidState("Isoleucine", "Ile", "I", 7);
+    public static final AminoAcidState K_STATE = new AminoAcidState("Lysine", "Lys", "K", 8);
+    public static final AminoAcidState L_STATE = new AminoAcidState("Leucine", "Leu", "L", 9);
+    public static final AminoAcidState M_STATE = new AminoAcidState("Methionine", "Met", "M", 10);
+    public static final AminoAcidState N_STATE = new AminoAcidState("Asparagine", "Asn", "N", 11);
+    public static final AminoAcidState P_STATE = new AminoAcidState("Proline", "Pro", "P", 12);    
+    public static final AminoAcidState Q_STATE = new AminoAcidState("Glutamine", "Gln", "Q", 13);
+    public static final AminoAcidState R_STATE = new AminoAcidState("Arginine", "Arg", "R", 14);
+    public static final AminoAcidState S_STATE = new AminoAcidState("Serine", "Ser", "S", 15);
+    public static final AminoAcidState T_STATE = new AminoAcidState("Threonine", "Thr", "T", 16);
+    public static final AminoAcidState V_STATE = new AminoAcidState("Valine", "Val", "V", 17);
+    public static final AminoAcidState W_STATE = new AminoAcidState("Tryptophan", "Trp", "W", 18);
+    public static final AminoAcidState Y_STATE = new AminoAcidState("Tyrosine", "Tyr", "Y", 19);
 
     // TT: We've ordered all the other states alphabetically but I think it's better to let
     // Selenocysteine be #20 because it's the first "nonstandard" amino acid.
-    public static final AminoAcidState U_STATE = new AminoAcidState("U", "U", 20); // Selenocysteine
+    public static final AminoAcidState U_STATE = new AminoAcidState("Selenocysteine", "Sec", "U", 20);
     // According to Wikipedia (2007-10-30), "O" for Pyrrolysine is now an official IUPAC
     // recommendation. BioJava already used this code by 2006-12-14 at the latest, although
     // I (TT) think it wasn't an IUPAC recommendation at that time.
-    public static final AminoAcidState O_STATE = new AminoAcidState("O", "O", 21); // Pyrrolysine
+    public static final AminoAcidState O_STATE = new AminoAcidState("Pyrrolysine", "Pyl", "O", 21);
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
     // and will become private in the future. Use {@link #getCanonicalStates} instead.
@@ -67,13 +67,13 @@ public final class AminoAcids {
             U_STATE, O_STATE,
     };
 
-    public static final AminoAcidState B_STATE = new AminoAcidState("B", "B", 22, new AminoAcidState[]{D_STATE, N_STATE});
-    public static final AminoAcidState Z_STATE = new AminoAcidState("Z", "Z", 23, new AminoAcidState[]{E_STATE, Q_STATE});
-    public static final AminoAcidState J_STATE = new AminoAcidState("J", "J", 24, new AminoAcidState[]{I_STATE, L_STATE});
-    public static final AminoAcidState X_STATE = new AminoAcidState("X", "X", 25, CANONICAL_STATES);
-    public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("?", "?", 26, CANONICAL_STATES);
-    public static final AminoAcidState STOP_STATE = new AminoAcidState("*", "*", 27);
-    public static final AminoAcidState GAP_STATE = new AminoAcidState("-", "-", 28, CANONICAL_STATES); // This really shouldn't include the canonical states, but I'm scared changing it may break stuff.
+    public static final AminoAcidState B_STATE = new AminoAcidState("Asparagine or aspartic acid", "Asx", "B", 22, new AminoAcidState[]{D_STATE, N_STATE});
+    public static final AminoAcidState Z_STATE = new AminoAcidState("Glutamine or glutamic acid", "Glx", "Z", 23, new AminoAcidState[]{E_STATE, Q_STATE});
+    public static final AminoAcidState J_STATE = new AminoAcidState("Leucine or Isoleucine", "Xle", "J", 24, new AminoAcidState[]{I_STATE, L_STATE});
+    public static final AminoAcidState X_STATE = new AminoAcidState("Unknown amino acid", "Xaa", "X", 25, CANONICAL_STATES);
+    public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("Unknown amino acid", "Xaa", "?", 26, CANONICAL_STATES);
+    public static final AminoAcidState STOP_STATE = new AminoAcidState("Stop codon", " * ","*", 27);
+    public static final AminoAcidState GAP_STATE = new AminoAcidState("Gap",  " - ", "-", 28, CANONICAL_STATES); // This really shouldn't include the canonical states, but I'm scared changing it may break stuff.
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
     // and will become private in the future. Use {@link #getStates} instead.

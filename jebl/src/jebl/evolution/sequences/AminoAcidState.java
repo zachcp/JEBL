@@ -15,12 +15,16 @@ package jebl.evolution.sequences;
  * @version $Id$
  */
 public final class AminoAcidState extends State {
-    AminoAcidState(String name, String stateCode, int index) {
-        super(name, stateCode, index);
+    private final String threeLetterName;
+    
+    AminoAcidState(String fullName, String threeLetterName, String singleLetterStateCode, int index) {
+        super(fullName, singleLetterStateCode, index);
+        this.threeLetterName = threeLetterName;
     }
 
-    AminoAcidState(String name, String stateCode, int index, AminoAcidState[] ambiguities) {
-        super(name, stateCode, index, ambiguities);
+    AminoAcidState(String fullName, String threeLetterName, String singleLetterStateCode, int index, AminoAcidState[] ambiguities) {
+        super(fullName, singleLetterStateCode, index, ambiguities);
+        this.threeLetterName = threeLetterName;
     }
 
     @Override
@@ -28,6 +32,13 @@ public final class AminoAcidState extends State {
         // throws ClassCastException on across-class comparison
         AminoAcidState that = (AminoAcidState) o;
         return super.compareTo(that);
+    }
+
+    /**
+     * @return the 3 letter name for this amino acid. E.g "Ala" for "Alanine".
+     */
+    public String getThreeLetterName() {
+        return threeLetterName;
     }
 
     // we do not need to override equals() and hashCode() because there is only one
