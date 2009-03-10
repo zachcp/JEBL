@@ -29,20 +29,20 @@ public final class GeneticCode {
     private static final Set<CodonState> DEFAULT_START_CODONS = Collections.singleton(DEFAULT_START_CODON);
 
     public static final GeneticCode
-            UNIVERSAL = new GeneticCode("universal", "Universal", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
-            VERTEBRATE_MT = new GeneticCode("vertebrateMitochondrial", "Vertebrate Mitochondrial", "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            YEAST = new GeneticCode("yeast", "Yeast", "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            MOLD_PROTOZOAN_MT = new GeneticCode("moldProtozoanMitochondrial", "Mold Protozoan Mitochondrial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
+            UNIVERSAL = new GeneticCode("universal", "Standard", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 1),
+            VERTEBRATE_MT = new GeneticCode("vertebrateMitochondrial", "Vertebrate Mitochondrial", "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 2),
+            YEAST = new GeneticCode("yeast", "Yeast Mitochondrial",  "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 3),
+            MOLD_PROTOZOAN_MT = new GeneticCode("moldProtozoanMitochondrial", "Mold Protozoan Mitochondrial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 4),
             MYCOPLASMA = new GeneticCode("mycoplasma", "Mycoplasma", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            INVERTEBRATE_MT = new GeneticCode("invertebrateMitochondrial", "Invertebrate Mitochondrial", "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            CILIATE = new GeneticCode("ciliate", "Ciliate", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF"),
-            ECHINODERM_MT = new GeneticCode("echinodermMitochondrial", "Echinoderm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            EUPLOTID_NUC = new GeneticCode("euplotidNuclear", "Euplotid Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF"),
-            BACTERIAL = new GeneticCode("bacterial", "Bacterial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
-            ALT_YEAST = new GeneticCode("alternativeYeast", "Alternative Yeast", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF"),
-            ASCIDIAN_MT = new GeneticCode("ascidianMitochondrial", "Ascidian Mitochondrial", "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            FLATWORM_MT = new GeneticCode("flatwormMitochondrial", "Flatworm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF"),
-            BLEPHARISMA_NUC = new GeneticCode("blepharismaNuclear", "Blepharisma Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF");
+            INVERTEBRATE_MT = new GeneticCode("invertebrateMitochondrial", "Invertebrate Mitochondrial", "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 5),
+            CILIATE = new GeneticCode("ciliate", "Ciliate", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF", 6),
+            ECHINODERM_MT = new GeneticCode("echinodermMitochondrial", "Echinoderm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 9),
+            EUPLOTID_NUC = new GeneticCode("euplotidNuclear", "Euplotid Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF", 10),
+            BACTERIAL = new GeneticCode("bacterial", "Bacterial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 11),
+            ALT_YEAST = new GeneticCode("alternativeYeast", "Alternative Yeast", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 12),
+            ASCIDIAN_MT = new GeneticCode("ascidianMitochondrial", "Ascidian Mitochondrial", "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 13),
+            FLATWORM_MT = new GeneticCode("flatwormMitochondrial", "Flatworm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF", 14),
+            BLEPHARISMA_NUC = new GeneticCode("blepharismaNuclear", "Blepharisma Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF", 15);
 
     private static final List<GeneticCode> GENETIC_CODES_LIST = Collections.unmodifiableList(Arrays.asList(
             UNIVERSAL, VERTEBRATE_MT, YEAST, MOLD_PROTOZOAN_MT, MYCOPLASMA, INVERTEBRATE_MT,
@@ -59,7 +59,7 @@ public final class GeneticCode {
     }
 
     public static GeneticCode[] getGeneticCodesArray() {
-        return GENETIC_CODES_LIST.toArray(new GeneticCode[0]);
+        return GENETIC_CODES_LIST.toArray(new GeneticCode[GENETIC_CODES_LIST.size()]);
     }
 
     /**
@@ -68,16 +68,24 @@ public final class GeneticCode {
      * @deprecated use {@link #getGeneticCodes()} instead
      */
     @Deprecated
-    public static final GeneticCode[] GENETIC_CODES = GENETIC_CODES_LIST.toArray(new GeneticCode[0]);
+    public static final GeneticCode[] GENETIC_CODES = GENETIC_CODES_LIST.toArray(new GeneticCode[GENETIC_CODES_LIST.size()]);
 
+    private int ncbiTranslationTableNumber;
     private final Set<CodonState> startCodons;
     private final String name, description, codeTable;
 
     /**
-     * Same as {@link #GeneticCode(String, String, String, java.util.Set)}(name, description, codeTable, DEFAULT_START_CODONS.
+     * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, -1, DEFAULT_START_CODONS).
      */
     private GeneticCode(String name, String description, String codeTable) {
-        this(name, description, codeTable, DEFAULT_START_CODONS);
+        this(name, description, codeTable, -1, DEFAULT_START_CODONS);
+    }
+
+    /**
+     * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, ncbiTranslationTableNumber, DEFAULT_START_CODONS).
+     */
+    private GeneticCode(String name, String description, String codeTable, int ncbiTranslationTableNumber) {
+        this(name, description, codeTable, ncbiTranslationTableNumber, DEFAULT_START_CODONS);
     }
 
     /**
@@ -88,14 +96,16 @@ public final class GeneticCode {
      *        each character representing the translation of one triplet, with the triplet translations being in the order
      *        AAA, AAC, AAG, AAT, ACA etc. (i.e. first codon position is most significant, and nucleotides come in the
      *        order A, C, G, T) (Note: This is not the order used by the Genbank website).
+     * @param ncbiTranslationTableNumber the number used by NCBI to represent this genetic code or -1 if none. Eg. 1 = Standard...
      * @param startCodons Set of start codons (defaults to ATG only).
      *        Note that 23% of E.Coli are not ATG (see http://en.wikipedia.org/wiki/Start_codon).
      *        See also http://www.biomatters.com/userforum/comments.php?DiscussionID=177
      */
-    private GeneticCode(final String name, final String description, final String codeTable, Set<CodonState> startCodons) {
+    private GeneticCode(final String name, final String description, final String codeTable, int ncbiTranslationTableNumber, Set<CodonState> startCodons) {
         this.name = name;
         this.description = description;
         this.codeTable = codeTable;
+        this.ncbiTranslationTableNumber = ncbiTranslationTableNumber;
         this.startCodons = startCodons;
 
         Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
@@ -364,7 +374,13 @@ public final class GeneticCode {
 		return count;
 	}
 
-
+    /**
+     *
+     * @return the number used by NCBI to represent this genetic code or -1 if none. Eg. 1 = Standard...
+     */
+    public int getNcbiTranslationTableNumber() {
+        return ncbiTranslationTableNumber;
+    }
 
     /**
      * Same as getDescription() (so that GeneticCode objects can be used e.g. in a JComboBox).
