@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.trees.treeviewer.TreeViewer;
+import jebl.evolution.graphs.Node;
 import org.virion.jam.components.RealNumberField;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -201,11 +202,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         return preferredWidth;
     }
 
-    public double getPreferredHeight() {
+    public double getPreferredHeight(Graphics2D g, TreePane item) {
         return preferredHeight;
     }
 
-    public double getHeightBound() {
+    public double getHeightBound(Graphics2D g, TreePane item) {
         return preferredHeight + yOffset;
     }
 
@@ -219,21 +220,6 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         firePainterChanged();
     }
 
-    public void setForeground(Paint foreground) {
-        this.foreground = foreground;
-        firePainterChanged();
-    }
-
-    public void setBackground(Paint background) {
-        this.background = background;
-        firePainterChanged();
-    }
-
-    public void setBorder(Paint borderPaint, Stroke borderStroke) {
-        this.borderPaint = borderPaint;
-        this.borderStroke = borderStroke;
-        firePainterChanged();
-    }
 
     public void setLineWeight(float weight) {
         this.scaleBarStroke = new BasicStroke(weight, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
@@ -361,10 +347,6 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
 
     private boolean visible = true;
 
-    private Paint foreground = Color.BLACK;
-    private Paint background = null;
-    private Paint borderPaint = null;
-    private Stroke borderStroke = null;
     private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 
     private Font scaleFont;

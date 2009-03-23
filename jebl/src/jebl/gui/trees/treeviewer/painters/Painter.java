@@ -5,6 +5,8 @@ import org.virion.jam.controlpanels.ControlsProvider;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
+import jebl.evolution.graphs.Node;
+
 
 /**
  * A painter draws a particular decoration onto the tree within a
@@ -38,11 +40,17 @@ public interface Painter<T> extends ControlsProvider {
     void paint(Graphics2D g2, T item, Justification justification, Rectangle2D bounds);
 
     double getWidth(Graphics2D g2, T item);
-    double getPreferredHeight();
-    double getHeightBound();
+    double getPreferredHeight(Graphics2D g2, T item);
+    double getHeightBound(Graphics2D g2, T item);
 
     void addPainterListener(PainterListener listener);
     void removePainterListener(PainterListener listener);
 
     void setPaintAsMirrorImage(boolean paintAsMirrorImage);
+
+    void setForeground(Paint foreground);
+    void setBackground(Paint background);
+    void setBorder(Paint borderPaint, Stroke borderStroke);
+
+
 }

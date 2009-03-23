@@ -25,7 +25,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
     private Rectangle2D minBounds = null;
     // when size for node lable is to be taken from another node, known to be larger
     private Node nodeSizeReference;
-    private BasicLabelPainter painter;
+    private Painter<Node> painter;
     private int defaultSize;
     private int curSize;
     private Painter.Justification taxonLabelJustification;
@@ -38,6 +38,13 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
                                   Rectangle2D labelBounds, AffineTransform transform, int priority,
                                   Node nodeSizeReference, BasicLabelPainter painter,
                                   String dtype) {
+        this(tree, node, taxonLabelJustification, labelBounds, transform, priority, nodeSizeReference, (Painter<Node>)painter, dtype);
+    }
+
+    TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
+                                  Rectangle2D labelBounds, AffineTransform transform, int priority,
+                                  Node nodeSizeReference, Painter<Node> painter,
+                                  String dtype) {
         super(node, labelBounds, transform, priority);
 
         defaultBounds = labelBounds;
@@ -45,7 +52,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         //this.node = node;
         this.taxonLabelJustification = taxonLabelJustification;
         this.painter = painter;
-        curSize = defaultSize = (int)painter.getFontSize();
+        curSize = defaultSize = painter instanceof BasicLabelPainter ? (int)((BasicLabelPainter)painter).getFontSize() : TreeViewerUtilities.DEFAULT_FONT.getSize();
 
         //save = new AffineTransform(transform);
 
@@ -64,14 +71,20 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
             } else {
                 // set it up
                 // do it more effciently, share between all
-                float s = painter.getFontSize();
-                painter.setFontSize(size, false);
+                float s = 1.0f;
+                if(painter instanceof BasicLabelPainter) {
+                    BasicLabelPainter basicPainter = (BasicLabelPainter)painter;
+                    s = basicPainter.getFontSize();
+                    basicPainter.setFontSize(size, false);
+                }
                 painter.calibrate(g2);
-                newBounds = new Rectangle2D.Double(0.0, 0.0, painter.getWidth(g2, nodeSizeReference), painter.getPreferredHeight());
+                newBounds = new Rectangle2D.Double(0.0, 0.0, painter.getWidth(g2, nodeSizeReference), painter.getPreferredHeight(g2, nodeSizeReference));
                 if( size == getMinSize() ) {
                     minBounds = newBounds;
                 }
-                painter.setFontSize(s, false);
+                if(painter instanceof BasicLabelPainter) {
+                    ((BasicLabelPainter)painter).setFontSize(s, false);
+                }
                 painter.calibrate(g2);
             }        
 
@@ -110,21 +123,31 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         AffineTransform oldTransform = g2.getTransform();
 
         g2.transform(transform);
-        float s = painter.getFontSize();
-        if( painter.setFontSize(curSize, false) ) {
-            painter.calibrate(g2);
+        float s = 1.0f;
+        if(painter instanceof BasicLabelPainter) {
+            BasicLabelPainter basicPainter = (BasicLabelPainter)painter;
+            s = basicPainter.getFontSize();
+            if( basicPainter.setFontSize(curSize, false) ) {
+                painter.calibrate(g2);
+            }
         }
         painter.setForeground(foreground);
         painter.paint(g2, node, taxonLabelJustification, bounds);
 
-        if( painter.setFontSize(s, false) ) {
-            painter.calibrate(g2);
+        if(painter instanceof BasicLabelPainter) {
+            BasicLabelPainter basicPainter = (BasicLabelPainter)painter;
+            if( basicPainter.setFontSize(s, false) ) {
+                basicPainter.calibrate(g2);
+            }
         }
         g2.setTransform(oldTransform);
     }
 
     public int getMinSize() {
-        return Math.min((int)painter.getFontMinSize(), defaultSize);
+        if(painter instanceof BasicLabelPainter) {
+            return Math.min((int)((BasicLabelPainter)painter).getFontMinSize(), defaultSize);
+        }
+        return 2;
     }
 
     public int getMaxSize() {

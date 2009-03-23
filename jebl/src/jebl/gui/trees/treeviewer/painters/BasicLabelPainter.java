@@ -28,9 +28,6 @@ import java.text.SimpleDateFormat;
  */
 public class BasicLabelPainter extends AbstractPainter<Node> {
 
-    public static final String TAXON_NAMES = "Names";
-    public static final String NODE_HEIGHTS = "Node Heights";
-    public static final String BRANCH_LENGTHS = "Substitutions per Site";
 
     final String fontMinSizePrefKey;
     final String fontSizePrefKey;
@@ -178,11 +175,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return null;
     }
 
-    private String getFormattedValue(double d){
-        if(d == 0)
-            return "0";
-        return formatter.getFormattedValue(d);
-    }
 
     public float getFontSize() {
         return defaultFontSize;
@@ -252,11 +244,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return 0.0;
     }
 
-    public double getPreferredHeight() {
+    public double getPreferredHeight(Graphics2D g2, Node item) {
         return preferredHeight;
     }
 
-    public double getHeightBound() {
+    public double getHeightBound(Graphics2D g2, Node item) {
         return preferredHeight + yOffset;
     }
 
@@ -287,28 +279,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return false;
     }
 
-    private void setSignificantDigits(int digits) {
-        assert formatter != null;
-        
-        formatter.setSignificantFigures(digits);
-        firePainterChanged();
-    }
-
-    public void setForeground(Paint foreground) {
-        this.foreground = foreground;
-        //firePainterChanged(); ssh: commented out because if we set the colour during a paint we end up with an endless loop of paints...
-    }
-
-    public void setBackground(Paint background) {
-        this.background = background;
-        //firePainterChanged();
-    }
-
-    public void setBorder(Paint borderPaint, Stroke borderStroke) {
-        this.borderPaint = borderPaint;
-        this.borderStroke = borderStroke;
-        firePainterChanged();
-    }
 
     public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
         final Font oldFont = g2.getFont();
@@ -573,10 +543,6 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private final String title;
 
-    private Paint foreground = Color.BLACK;
-    private Paint background = null;
-    private Paint borderPaint = null;
-    private Stroke borderStroke = null;
 
     private Font taxonLabelFont;
     private Font taxonExponentFont;

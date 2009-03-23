@@ -10,6 +10,8 @@ import java.awt.*;
  */
 public class TreeViewerUtilities {
 
+    public static final Font DEFAULT_FONT = new Font("sansserif", Font.PLAIN, 12);
+
     public static Font fontFromString(String fontRepresentation) {
         String[] attributes = fontRepresentation.split(":");
         if(attributes.length != 4) {

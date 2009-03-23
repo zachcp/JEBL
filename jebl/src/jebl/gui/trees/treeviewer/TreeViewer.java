@@ -21,6 +21,7 @@ import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer.painters.TaxonLabelPainter;
 import jebl.gui.trees.treeviewer.treelayouts.PolarTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RadialTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
@@ -252,9 +253,10 @@ public class TreeViewer extends JPanel implements Printable {
 
         treePane.setTree(tree, null);
 
-        BasicLabelPainter taxonLabelPainter =
-                new BasicLabelPainter("Tip Labels", tree, BasicLabelPainter.PainterIntent.TIP, defaultLabelSize);
-        taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
+//        BasicLabelPainter taxonLabelPainter =
+//                new BasicLabelPainter("Tip Labels", tree, BasicLabelPainter.PainterIntent.TIP, defaultLabelSize);
+//        taxonLabelPainter.setAttribute(BasicLabelPainter.TAXON_NAMES);
+        TaxonLabelPainter taxonLabelPainter = new TaxonLabelPainter(tree);
         treePane.setTaxonLabelPainter(taxonLabelPainter);
 
         BasicLabelPainter nodeLabelPainter =
