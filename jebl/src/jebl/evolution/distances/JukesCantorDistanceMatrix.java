@@ -54,13 +54,16 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
                 final double weight = pattern.getWeight();
 
-                if(!state1.isGap() && !state2.isGap())
-                    noGapsPairFound = true;
 
-                if (!state1.isAmbiguous() && !state2.isAmbiguous()) {
-                    if(state1 != state2)
-                        sumDistance += weight;
+                // ignore any ambiguous states or gaps
+                if( state1.isAmbiguous() || state2.isAmbiguous() ) {
+                    continue;
+                } else {
+                    noGapsPairFound = true;
                 }
+
+                if(state1 != state2)
+                    sumDistance += weight;
                 sumWeight += weight;
             }
 
