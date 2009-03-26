@@ -56,11 +56,10 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
 
                 // ignore any ambiguous states or gaps
-                if( state1.isAmbiguous() || state2.isAmbiguous() ) {
+                if( state1.isAmbiguous() || state2.isAmbiguous() || state1.isGap() || state2.isGap()) {
                     continue;
-                } else {
-                    noGapsPairFound = true;
                 }
+                noGapsPairFound = true;
 
                 if(state1 != state2)
                     sumDistance += weight;
@@ -69,7 +68,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
             if(!noGapsPairFound)
                 throw new CannotBuildDistanceMatrixException("It is not possible to compute the Jukes-Cantor genetic distance " +
-                        "for these sequences because at least one pair of sequences do not overlap in the alignment.");
+                        "for these sequences because at least one pair of sequences do not overlap (or have only ambiguities in common) in the alignment.");
 
             distance = sumDistance / sumWeight;
 
