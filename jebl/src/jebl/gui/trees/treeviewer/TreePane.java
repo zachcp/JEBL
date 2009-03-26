@@ -1800,7 +1800,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if(element.getCurrentSize() < size){
                 size = element.getCurrentSize();
                 //taxonLabelPainter.setFontSize(size, false);
-                calibrated = false;
+                //calibrated = false;
             }
         }
         for(TreeDrawableElement element : taxonLabels){
