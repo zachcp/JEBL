@@ -427,7 +427,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setTaxonLabelPainter(BasicLabelPainter taxonLabelPainter) {
-        setTaxonLabelPainter(taxonLabelPainter);   
+        setTaxonLabelPainter((Painter<Node>)taxonLabelPainter);   
     }
 
     public void setTaxonLabelPainter(Painter<Node> taxonLabelPainter) {
