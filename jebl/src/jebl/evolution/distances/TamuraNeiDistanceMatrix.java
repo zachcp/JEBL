@@ -90,8 +90,7 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             }
 
             if(! noGapsPairFound ) {
-                throw new CannotBuildDistanceMatrixException("It is not possible to compute the Tamura-Nei genetic distance " +
-                        "for these sequences because at least one pair of sequences do not overlap in the alignment.");
+                throw new CannotBuildDistanceMatrixException("Tamura-Nei", getTaxonName(taxon1), getTaxonName(taxon2));
             }
 
             // Unfortuanetly adjusting number of sites for Purine/Pyrimidine may turn the other into negative - so
@@ -136,6 +135,10 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
             return MAX_DISTANCE;
         }
 
+
+        private String getTaxonName(int index) {
+            return alignment.getSequenceList().get(index).getTaxon().getName();
+        }
 
         /**
          * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false

@@ -132,8 +132,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             }
 
             if(!noGapsPairFound)
-                throw new CannotBuildDistanceMatrixException("It is not possible to compute the HKY genetic distance " +
-                    "for these sequences because at least one pair of sequences do not overlap in the alignment.");
+                throw new CannotBuildDistanceMatrixException("HKY", getTaxonName(taxon1), getTaxonName(taxon2));
 
             if( sumWeight <= 0.0 ) {
                 return MAX_DISTANCE;
@@ -168,6 +167,10 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
                 return Math.min(distance, MAX_DISTANCE);
             }
             return MAX_DISTANCE;
+        }
+        
+        private static String getTaxonName(int index) {
+            return alignment.getSequenceList().get(index).getTaxon().getName();
         }
 
 

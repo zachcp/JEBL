@@ -67,8 +67,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
             }
 
             if(!noGapsPairFound)
-                throw new CannotBuildDistanceMatrixException("It is not possible to compute the Jukes-Cantor genetic distance " +
-                        "for these sequences because at least one pair of sequences do not overlap (or have only ambiguities in common) in the alignment.");
+                throw new CannotBuildDistanceMatrixException("Jukes-Cantor", getTaxonName(taxon1), getTaxonName(taxon2), true);
 
             distance = sumDistance / sumWeight;
 
@@ -107,6 +106,10 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
 
             int dimension = alignment.getTaxa().size();
             return BasicDistanceMatrix.buildDistancesMatrix(this,dimension,useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable,progress);
+        }
+
+        private String getTaxonName(int index) {
+            return alignment.getSequenceList().get(index).getTaxon().getName();
         }
     }
 }
