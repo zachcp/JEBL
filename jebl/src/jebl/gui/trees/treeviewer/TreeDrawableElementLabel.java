@@ -38,7 +38,11 @@ public abstract class TreeDrawableElementLabel extends TreeDrawableElement {
     }
     
     public Rectangle2D getBounds() {
-        return getLableShape().getBounds();
+        Rectangle oldBounds = getLableShape().getBounds();
+        if(oldBounds == null) {
+            return null;
+        }
+        return new Rectangle2D.Double(oldBounds.getX(), oldBounds.getY() + 0.15*oldBounds.getHeight(), oldBounds.getWidth(), 0.6* oldBounds.getHeight());
     }
 
     private Shape getLableShape() {
