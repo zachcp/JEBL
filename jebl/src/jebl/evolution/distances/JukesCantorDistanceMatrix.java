@@ -67,7 +67,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
             }
 
             if(!noGapsPairFound)
-                throw new CannotBuildDistanceMatrixException("Jukes-Cantor", getTaxonName(taxon1), getTaxonName(taxon2), true);
+                throw new CannotBuildDistanceMatrixException("Jukes-Cantor", getTaxonName(taxon1), getTaxonName(taxon2));
 
             distance = sumDistance / sumWeight;
 

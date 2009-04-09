@@ -5,14 +5,11 @@ package jebl.evolution.distances;
  * @version $Id$
  */
 public class CannotBuildDistanceMatrixException extends IllegalArgumentException {
-    public CannotBuildDistanceMatrixException(String matrix, String taxon1, String taxon2){
-       this(matrix, taxon1, taxon2, false);
-    }
 
-    public CannotBuildDistanceMatrixException(String matrix, String taxon1, String taxon2, boolean mayBeAmbiguities){
+    public CannotBuildDistanceMatrixException(String matrix, String taxon1, String taxon2){
         super("It is not possible to compute the " + matrix + " genetic distance for these sequences " +
                 "because at least one pair of sequences (" + taxon1 + " and " + taxon2 + ") do not overlap "
-                + (mayBeAmbiguities? "(or have only ambiguities in common)": "") +  "in the alignment.");
+                + "(or have only ambiguities in common) in the alignment.");
     }
 
     public CannotBuildDistanceMatrixException(String msg){
