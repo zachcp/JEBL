@@ -4,8 +4,10 @@ import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
+import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.graphs.Node;
 import jebl.gui.trees.treeviewer.TreeViewerUtilities;
+import jebl.gui.trees.treeviewer.TreeViewer;
 
 /**
  * @author Steven Stones-Havas
@@ -248,8 +251,6 @@ public class TaxonLabelPainter extends AbstractPainter<Node>{
 
             panel.addComponentWithLabel("Display:", attributeBox);
 
-            panel.addLabel("Set font sizes in the toolbar above");
-
             final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
             panel.addComponentWithLabel("Significant Digits:", significantDigitSpinner);
             significantDigitSpinner.addChangeListener(new ChangeListener(){
@@ -260,6 +261,11 @@ public class TaxonLabelPainter extends AbstractPainter<Node>{
                     firePainterChanged();
                 }
             });
+
+            Icon infoIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/info16.png");
+            JLabel infoLabel = new JLabel("Set font sizes in the toolbar above", infoIcon, JLabel.CENTER);
+            infoLabel.setBorder(new EmptyBorder(5,0,5,0));
+            panel.addSpanningComponent(infoLabel);
 
             controls = new Controls("Tip Labels", panel, true, true, visibleCheckBox);
             
