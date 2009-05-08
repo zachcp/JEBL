@@ -516,7 +516,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         String[] valuesToTest = new String[]{
             "Consensus support(%)",
             "Clade Support",
-            "bootstrap proportion"
+            "bootstrap proportion",
+            "Posterior Probability"
         };
         List<String> attributesList = Arrays.asList(getAttributes());
         for(String s : valuesToTest) {
