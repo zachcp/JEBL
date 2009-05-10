@@ -29,7 +29,7 @@
         <condition property="isMac">
             <os family="mac"/>
         </condition>
-        <javac source="1.5" srcdir="${src}" destdir="${build}" debug="true">
+        <javac source="1.5" srcdir="${src}" target="1.5" destdir="${build}" debug="true">
             <include name="org/**/*"/>
             <exclude name="org/**/maconly/*" unless = "isMac"/>
         </javac>
@@ -57,7 +57,7 @@
         <condition property="isMac">
             <os family="mac"/>
         </condition>
-        <javac source="1.5" srcdir="${src}" destdir="${build-mac-only}">
+        <javac source="1.5" srcdir="${src}" target="1.5" destdir="${build-mac-only}">
             <include name="org/**/maconly/*"/>
         </javac>
     </target>
@@ -86,7 +86,7 @@
 
     <target name="compile-jebl" depends="init">
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac source="1.5" srcdir="${src}" destdir="${build}" debug="true">
+        <javac source="1.5" srcdir="${src}" destdir="${build}" debug="true" target="1.5">
             <include name="jebl/**/*"/>
         </javac>
         <copy todir="${build}">
