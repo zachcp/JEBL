@@ -22,11 +22,7 @@ public abstract class State implements Comparable {
         this.name = name;
         this.stateCode = stateCode;
 
-        // TT: is there any reason why instead of the next three lines we don't just say 
-        // this.ambiguities = Collections.singleton(this)  ?
-        List<State> ambiguities = new ArrayList<State>();
-        ambiguities.add(this);
-        this.ambiguities = Collections.unmodifiableSortedSet(new TreeSet<State>(ambiguities));
+        this.ambiguities = Collections.singleton(this);
         this.index = index;
     }
 
