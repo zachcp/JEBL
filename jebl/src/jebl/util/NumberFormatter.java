@@ -115,7 +115,7 @@ public class NumberFormatter {
 		decimalFormat.setMinimumFractionDigits(numFractionDigits);
         String labelString = decimalFormat.format(value);
         //remove trailing zeros (we can't trust the formatter to do this)
-        while(labelString.charAt(labelString.length()-1) == '0'){
+        while(labelString.contains(".") && labelString.charAt(labelString.length()-1) == '0'){
             labelString = labelString.substring(0, labelString.length()-1);
         }
         if (labelString.endsWith(".")) {

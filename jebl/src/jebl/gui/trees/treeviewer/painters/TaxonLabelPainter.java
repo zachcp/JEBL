@@ -31,11 +31,10 @@ import jebl.gui.trees.treeviewer.TreeViewer;
  *          <p/>
  *          Created on 24/03/2009 11:35:41 AM
  */
-public class TaxonLabelPainter extends AbstractPainter<Node>{
+public class TaxonLabelPainter extends BasicLabelPainter{
 
     private static final Preferences PREFS = Preferences.userNodeForPackage(TaxonLabelPainter.class);
 
-    private RootedTree tree;
     private Set<String> attributes;
     private Controls controls;
     private boolean visible;
@@ -43,8 +42,7 @@ public class TaxonLabelPainter extends AbstractPainter<Node>{
 
 
     public TaxonLabelPainter(RootedTree tree) {
-
-        this.tree = tree;
+        super("Tip Labels", tree, PainterIntent.TIP);
 
         //populate the attributes list
         attributes = new LinkedHashSet();
@@ -68,7 +66,7 @@ public class TaxonLabelPainter extends AbstractPainter<Node>{
 
     }
 
-    private String getLabel(Node node){
+    public String getLabel(Node node){
         String prefix = " ";
         String suffix = " ";
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
@@ -253,14 +251,16 @@ public class TaxonLabelPainter extends AbstractPainter<Node>{
 
             final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
             panel.addComponentWithLabel("Significant Digits:", significantDigitSpinner);
-            significantDigitSpinner.addChangeListener(new ChangeListener(){
+            ChangeListener sigFigListener = new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     Integer value = (Integer) significantDigitSpinner.getValue();
                     formatter.setSignificantFigures(value);
                     PREFS.putInt("Tip Labels_sigDigits", value);
                     firePainterChanged();
                 }
-            });
+            };
+            significantDigitSpinner.addChangeListener(sigFigListener);
+            sigFigListener.stateChanged(null);
 
             Icon infoIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/info16.png");
             JLabel infoLabel = new JLabel("Set font sizes in the toolbar above", infoIcon, JLabel.CENTER);

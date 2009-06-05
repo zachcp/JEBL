@@ -222,7 +222,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         g2.setFont(taxonLabelFont);
 
         final FontMetrics fm = g2.getFontMetrics();
-        preferredHeight = fm.getHeight();
+        preferredHeight = fm.getHeight()-5;
 
         yOffset = (float)fm.getAscent();
 
@@ -553,10 +553,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private boolean visible = true;
 
-    private NumberFormatter formatter = null;
     private boolean hasNumericAttributes = false;
 
-    private Tree tree;
+    protected RootedTree tree;
     protected String attribute;
     protected String[] attributes;
 }
