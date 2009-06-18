@@ -1,7 +1,9 @@
 package jebl.util;
 
 import jebl.math.MachineAccuracy;
+import org.virion.jam.util.SimpleListener;
 
+import java.awt.*;
 import java.io.File;
 import java.util.List;
 
@@ -222,5 +224,20 @@ public final class CompositeProgressListener extends ProgressListener {
         } else {
             return listener;
         }
+    }
+
+    @Override
+    public void addFeedbackAction(String label, SimpleListener listener) {
+        this.listener.addFeedbackAction(label, listener);
+    }
+
+    @Override
+    public void removeFeedbackAction(String label) {
+        this.listener.removeFeedbackAction(label);
+    }
+
+    @Override
+    protected void _setImage(Image image) {
+        this.listener._setImage(image);
     }
 }
