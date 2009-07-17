@@ -212,18 +212,27 @@ public class BasicAlignment implements Alignment {
 	     * @return the most frequent state
 	     */
 	    public State getMostFrequentState() {
-		    int maxCount = 0;
-		    State mostFrequentState = null;
-		    int[] counts = new int[sequenceType.getStateCount()];
-		    for (State state : states) {
-				counts[state.getIndex()] += 1;
-			    if (counts[state.getIndex()] > maxCount) {
-				    maxCount = counts[state.getIndex()];
-				    mostFrequentState = state;
-			    }
-		    }
-		    return mostFrequentState;
+            return getMostFrequentState(false);
 	    }
+
+        /**
+         * Get the most frequent state in this pattern.
+         * @param includeAmbiguous whether ambiguous states and gaps are included
+         * @return the most frequent state
+         */
+        public State getMostFrequentState(boolean includeAmbiguous) {
+            int maxCount = 0;
+            State mostFrequentState = null;
+            int[] counts = new int[sequenceType.getStateCount()];
+            for (State state : states) {
+                counts[state.getIndex()] += 1;
+                if ((includeAmbiguous || !state.isAmbiguous()) && counts[state.getIndex()] > maxCount) {
+                    maxCount = counts[state.getIndex()];
+                    mostFrequentState = state;
+                }
+            }
+            return mostFrequentState;
+        }
 
 	    public double getStateFrequency(State state) {
 		    double count = 0;
