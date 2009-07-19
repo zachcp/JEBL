@@ -39,7 +39,7 @@ public final class Taxon implements Attributable, Comparable {
      * @param name the name of the taxon
      */
     private Taxon(String name, TaxonomicLevel taxonomicLevel) {
-        this.name = name.intern(); // Intern to make the String isn't a substring
+        this.name = new String(name); // To avoid the Java string.substring "memory leak" where a substring holds a reference to the parent superstring. This line previously used String.intern() instead but that is bad because Strings are interned into the Java perm-gen memory space which is quite limited in size, and lead to OutOfMemory errors when I had plenty of free memory
         // which references the original string's characters 
         this.taxonomicLevel = taxonomicLevel;
     }
