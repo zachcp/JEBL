@@ -81,11 +81,11 @@ public final class CompositeProgressListener extends ProgressListener {
      * @param numberOfEvenlyWeightedSubTasks the number of evenly weighted sub-tasks.
      */
     public CompositeProgressListener(ProgressListener listener, int numberOfEvenlyWeightedSubTasks) {
-        if (numberOfEvenlyWeightedSubTasks<=0) {
+        if (numberOfEvenlyWeightedSubTasks<0) {
             throw new IllegalArgumentException("numberOfEvenlyWeightedSubTasks="+numberOfEvenlyWeightedSubTasks+" but it must be >=0");
         }
         numOperations = numberOfEvenlyWeightedSubTasks;
-        taskFractionIfTasksAreEvenlyWeighted = 1.0/numberOfEvenlyWeightedSubTasks;
+        taskFractionIfTasksAreEvenlyWeighted = numberOfEvenlyWeightedSubTasks>0?1.0/numberOfEvenlyWeightedSubTasks:1.0;
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
         } else {
@@ -110,6 +110,9 @@ public final class CompositeProgressListener extends ProgressListener {
      * of every subtask including the first.
      */
     public void beginSubtask() {
+        if (numOperations==0) {
+            throw new IllegalStateException("This operation has no subtasks");
+        }
         currentSubTaskMessage = "";
         if (!beganFirstSubTask) {
             beganFirstSubTask = true;
