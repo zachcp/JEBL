@@ -203,4 +203,51 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
         protected void _setIndeterminateProgress() {
         }
     }
+
+    /**
+     * A decorator progress listener which delegates all method calls to an internal progress listener.
+     */
+    public static class Wrapper extends ProgressListener {
+
+        private final ProgressListener internalProgressListener;
+
+        /**
+         *
+         * @param internalProgressListener progress listener that all method calls are forwarded to.
+         */
+        public Wrapper(ProgressListener internalProgressListener) {
+            this.internalProgressListener = internalProgressListener;
+        }
+
+        protected void _setProgress(double fractionCompleted) {
+            internalProgressListener._setProgress(fractionCompleted);
+        }
+
+        protected void _setIndeterminateProgress() {
+            internalProgressListener._setIndeterminateProgress();
+        }
+
+        protected void _setMessage(String message) {
+            internalProgressListener._setMessage(message);
+        }
+
+        public boolean isCanceled() {
+            return internalProgressListener.isCanceled();
+        }
+
+        @Override
+        protected void _setImage(Image image) {
+            internalProgressListener._setImage(image);
+        }
+
+        @Override
+        public void addFeedbackAction(String label, SimpleListener listener) {
+            internalProgressListener.addFeedbackAction(label, listener);
+        }
+
+        @Override
+        public void removeFeedbackAction(String label) {
+            internalProgressListener.removeFeedbackAction(label);
+        }
+    }
 }
