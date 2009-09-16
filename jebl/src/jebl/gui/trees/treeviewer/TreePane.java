@@ -1248,7 +1248,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //                    else{
 //                        e.setForeground(Color.black);
 //                    }
-                    e.draw(g2, clipOffscreenShapes ? viewport : null);
+                    Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
+                    if(flipTree && viewRect != null) {
+                        viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
+                    }
+                    e.draw(g2, viewRect);
                 }
             }
         }

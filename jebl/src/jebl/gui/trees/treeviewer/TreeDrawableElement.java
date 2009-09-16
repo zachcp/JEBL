@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class TreeDrawableElement {
     final protected Node node;
     protected Paint foreground;
+    private static final boolean dontSetOverlappingVisibility = false;
 
     TreeDrawableElement(Node  node) {
         this.node = node;
@@ -76,14 +77,14 @@ public abstract class TreeDrawableElement {
 
     protected abstract void drawIt(Graphics2D g2);
 
-    public final void draw(Graphics2D g2, JViewport vp) {
+    public final void draw(Graphics2D g2, Shape viewRect) {
         boolean doit = true;
-        if( vp != null ) {
+        if( viewRect != null ) {
             final Rectangle2D d = getBounds();
 //            final Point viewPosition = vp.getViewPosition();
 //            final Rectangle rectangle = vp.getBounds();
 //            rectangle.translate(viewPosition.x, viewPosition.y);
-            doit = vp.getViewRect().intersects(d);
+            doit = viewRect.intersects(d);
         }
         if( doit ) {
             drawIt(g2);
@@ -123,6 +124,9 @@ public abstract class TreeDrawableElement {
     static int prints = 0;
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
+        if(dontSetOverlappingVisibility) {
+            return;
+        }
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
 
         // get variance of each "axis of projection" (x y and distance-from origin) and element maximum along each
