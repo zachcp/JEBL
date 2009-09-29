@@ -4,7 +4,10 @@ import org.virion.jam.mac.Utils;
 import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -124,7 +127,6 @@ public class SearchPanel extends JPanel {
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					clearSearchText();
-					checkSearchTextEmpty();
 				}
 			});
 		}
@@ -243,9 +245,12 @@ public class SearchPanel extends JPanel {
 		listeners.clear();
 	}
 
-	private void clearSearchText() {
+	public void clearSearchText() {
 		searchText.setText("");
 		searchTextChanged();
+        if (!searchText.hasFocus()) {
+            checkSearchTextEmpty();
+        }
 	}
 
 	private void fireSearchStarted() {
