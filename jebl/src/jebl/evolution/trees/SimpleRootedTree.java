@@ -757,6 +757,31 @@ final public class SimpleRootedTree implements RootedTree {
                     public double getLength() {
                         return length;
                     }
+
+                    @Override
+                    public void setAttribute(String name, Object value) {
+                        SimpleRootedNode.this.setAttribute(name, value);
+                    }
+
+                    @Override
+                    public Object getAttribute(String name) {
+                        return SimpleRootedNode.this.getAttribute(name);
+                    }
+
+                    @Override
+                    public void removeAttribute(String name) {
+                        SimpleRootedNode.this.removeAttribute(name);
+                    }
+
+                    @Override
+                    public Set<String> getAttributeNames() {
+                        return SimpleRootedNode.this.getAttributeNames();
+                    }
+
+                    @Override
+                    public Map<String, Object> getAttributeMap() {
+                        return SimpleRootedNode.this.getAttributeMap();
+                    }
                 };
             }
 
