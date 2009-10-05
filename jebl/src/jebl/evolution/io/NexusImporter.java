@@ -1168,11 +1168,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					}
 
                     for (String comment : comments) {
-                        if (Character.toUpperCase(comment.charAt(0)) == 'U') { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
+
+                       if (comment.toUpperCase().equals("U")) { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
                             isUnrooted = true;
                         } else if (comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) { // if '[W number]' (MrBayes), set weight attribute
                             tree.setAttribute("weight", Float.valueOf(comment.substring(2)));
-						} else {
+						} else if(!comment.toUpperCase().equals("R")) {
 							try {
 								parseMetaCommentPairs(comment, tree);
 							} catch(ImportException.BadFormatException e) {

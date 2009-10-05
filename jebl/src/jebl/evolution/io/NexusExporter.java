@@ -163,7 +163,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // Before 2008-05-05 we incorrectly inserted it before the treeName.
             builder.append(isRooted && !rtree.conceptuallyUnrooted() ? "[&R] " : "[&U] ");
 
-            appendAttributes(rtree, treeNameAttributeKey, builder);
+            appendAttributes(rtree, exportExcludeKeys, builder);
 
             appendTree(rtree, rtree.getRootNode(), builder);
             builder.append(";");
@@ -349,7 +349,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         }
     }
 
-    private StringBuilder appendAttributes(Attributable item, String excludeKey, StringBuilder builder) {
+    private StringBuilder appendAttributes(Attributable item, String[] excludeKeys, StringBuilder builder) {
 	    if (!writeMetaComments) {
 		    return builder;
 	    }
@@ -359,7 +359,15 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // we should replace the explicit check for name by something more general.
             // Like a reserved character at the start (here &). however we have to worry about backward
             // compatibility so no change yet with name.
-            if( (excludeKey == null || !key.equals(excludeKey)) && !key.startsWith("&") ) {
+            boolean exclude = false;
+            if(excludeKeys != null) {
+                for(String eKey : excludeKeys) {
+                    if(eKey.equals(key)) {
+                        exclude = true;
+                    }
+                }
+            }
+            if( !exclude && !key.startsWith("&") ) {
                 if (first) {
                     builder.append("[&");
                     first = false;
@@ -413,6 +421,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     public static final String treeNameAttributeKey = "name";
+    public static final String[] exportExcludeKeys = new String[] {treeNameAttributeKey, "R", "U"};
 
     static public boolean isGeneratedTreeName(String name) {
         return name != null && name.matches("tree_[0-9]+");
