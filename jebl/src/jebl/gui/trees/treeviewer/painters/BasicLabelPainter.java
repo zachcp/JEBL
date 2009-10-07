@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.painters;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.TransformedRootedTree;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -92,7 +93,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 break;
             }
             case BRANCH: {
-                wantBranchesIfPossible = true;
+                wantBranchesIfPossible = !(tree instanceof TransformedRootedTree);
                 addNodeAttributes = tree.conceptuallyUnrooted();
                 break;
             }

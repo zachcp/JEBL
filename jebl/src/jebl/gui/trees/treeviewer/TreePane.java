@@ -742,6 +742,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             transformCheck.setSelected(transformBranches);
             if (!originalTree.hasLengths()) {
                 transformCheck.setEnabled(false);
+                transformCheck.setSelected(false);
+                transformBranches = false;
             }
 
             final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
