@@ -232,11 +232,9 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 }
             });
 
-            final JComboBox attributeBox = new JComboBox(attributes.toArray(new String[attributes.size()]));
+            String[] attributesArray = attributes.toArray(new String[attributes.size()]);
+            final JComboBox attributeBox = new JComboBox(attributesArray);
             String prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES);
-            if(attribute.contains(prefsValue)) {
-                attributeBox.setSelectedItem(prefsValue);
-            }
             attributeBox.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     String attr = (String) attributeBox.getSelectedItem();
@@ -245,6 +243,11 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     firePainterChanged();
                 }
             });
+            for(int i=0; i < attributesArray.length; i++) {
+                if(prefsValue.equals(attributesArray[i])) {
+                    attributeBox.setSelectedIndex(i);
+                }
+            }
 
 
             panel.addComponentWithLabel("Display:", attributeBox);
