@@ -641,14 +641,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         Set<Node> nodes = new HashSet<Node>();
 
         //todo: this allows clicking on node/branch labels to select nodes.  At this point this behaviour is considered undesirable
-        /*for( TreeDrawableElement e : treeElements ) {
+        for( TreeDrawableElement e : treeElements ) {
             Node node = e.getNode();
             if( node != null ) {
                 if( e.hit(g2, rect) ) {
                     nodes.add(node);
                 }
             }
-        }*/
+        }
 
 //        for (Node node : tree.getExternalNodes()) {
 //            //  incorrect - some lables may have been reduced in size
