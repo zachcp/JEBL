@@ -1551,7 +1551,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             treeScale = xScale;
         }
 
-        assert treeScale > 0;
+        if(treeScale < 0) {
+            treeScale = 0;
+        }
+
+//        assert treeScale > 0;
 
         // Create the overall transform
         transform = new AffineTransform();
@@ -2001,8 +2005,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     origin = Math.max(origin, l);
                 }
             }
-            assert scale > 0 : scale + " " + nit;
-            assert origin >= 0.0 : origin + " " + nit;
+            if(scale < 0) {
+                scale = 0;
+            }
+            if(origin < 0) {
+                origin = 0;
+            }
+            //assert scale > 0 : scale + " " + nit;
+            //assert origin >= 0.0 : origin + " " + nit;
             double[] r = {origin, scale};
             return r;
         }
