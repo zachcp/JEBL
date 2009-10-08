@@ -260,19 +260,15 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             float minDx = Float.MAX_VALUE;
 
             for( final Node child : children) {
-                final Point2D childPoint = nodePoints.get(child);
-
-                // start point
-                final float x0 = (float) x;
-
-                // end point
-                final double cx = childPoint.getX();
-                final float x1 = (float) cx;
-                
-                minDx = Math.min(minDx,((x1 - x0) * (float) (1-xProportion)));
+                float dx = getDxForNode(x, child);
+                minDx = Math.min(minDx, dx);
             }
 
             for( final Node child : children ) {
+                float dx = minDx;
+                if(dx == 0) {
+                    dx = getDxForNode(x, child);
+                }
 
                 final Point2D childPoint = nodePoints.get(child);
 
@@ -288,7 +284,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 final double yChild = childPoint.getY();
                 final float y1 = (float) yChild;
 
-                float x2 = x0 + minDx;
+                float x2 = x0 + dx;
                 float y2 = y0 + ((y1 - y0) * (float) yProportion);
 
                 branchPath.moveTo(x0, y0);
@@ -342,6 +338,20 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         nodePoints.put(node, nodePoint);
 
         return nodePoint;
+    }
+
+    private float getDxForNode(double xPosition, Node child) {
+        final Point2D childPoint = nodePoints.get(child);
+
+        // start point
+        final float x0 = (float) xPosition;
+
+        // end point
+        final double cx = childPoint.getX();
+        final float x1 = (float) cx;
+
+        float dx = (x1 - x0) * (float) (1 - xProportion);
+        return dx;
     }
 
     public boolean smallSubTree(Node node, AffineTransform transform) {
