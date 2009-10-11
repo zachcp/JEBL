@@ -26,8 +26,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -750,7 +750,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     PREFS.putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
-                    setBranchTransform(transformCheck.isSelected(), (TransformedRootedTree.Transform) combo1.getSelectedItem());
+                    final TransformedRootedTree.Transform transform = (TransformedRootedTree.Transform) combo1.getSelectedItem();
+                    if (transform != null) {
+                        setBranchTransform(transformCheck.isSelected(), transform);
+                    }
                 }
             });
             int index = PREFS.getInt(branchTransformTypePREFSkey, 0);
