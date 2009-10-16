@@ -1165,25 +1165,28 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 					if (last != ';') {
 						throw new ImportException.BadFormatException("Expecting ';' after tree, '" + treeName + "', TREE command of TREES block");
-					}
+                    }
 
                     for (String comment : comments) {
-
-                       if (comment.toUpperCase().equals("U")) { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
+                        String commentName = comment;
+                        if (commentName.contains("=")) {
+                            commentName = commentName.substring(0, commentName.indexOf("="));
+                        }
+                        if (commentName.toUpperCase().equals("U")) { // [&U] unrooted meta comment, see tree_rest, root in http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
                             isUnrooted = true;
                         } else if (comment.matches("^W\\s+[\\+\\-]?[\\d\\.]+")) { // if '[W number]' (MrBayes), set weight attribute
                             tree.setAttribute("weight", Float.valueOf(comment.substring(2)));
-						} else if(!comment.toUpperCase().equals("R")) {
-							try {
-								parseMetaCommentPairs(comment, tree);
-							} catch(ImportException.BadFormatException e) {
-								// set generic comment attribute
-								tree.setAttribute("comment", comment);
-							}
-						}
-					}
+                        } else if(!commentName.toUpperCase().equals("R")) {
+                            try {
+                                parseMetaCommentPairs(comment, tree);
+                            } catch(ImportException.BadFormatException e) {
+                                // set generic comment attribute
+                                tree.setAttribute("comment", comment);
+                            }
+                        }
+                    }
 
-					tree.setConceptuallyUnrooted(isUnrooted);
+                    tree.setConceptuallyUnrooted(isUnrooted);
 
 				} catch (EOFException e) {
 					// If we reach EOF we may as well return what we have?
