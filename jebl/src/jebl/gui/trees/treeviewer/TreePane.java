@@ -746,14 +746,24 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 transformBranches = false;
             }
 
-            final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values());
+            final JComboBox combo1 = new JComboBox(TransformedRootedTree.Transform.values()) {
+                @Override
+                public void setSelectedIndex(int anIndex) {
+                    //GEN-7724: Java 6 under mac os: if a JComboBox contains items that are not Strings it will deselect if you click
+                    //the already selected index, meaning null is selected and index -1 is selected. We prevent this here because you
+                    //shouldn't have a combo box with nothing selected
+                    if (anIndex == -1 && !isEditable()) {
+                        System.err.println("Prevented index -1 from being selected in GComboBox");
+                        return;
+                    }
+                    super.setSelectedIndex(anIndex);
+                }
+            };
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     PREFS.putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
                     final TransformedRootedTree.Transform transform = (TransformedRootedTree.Transform) combo1.getSelectedItem();
-                    if (transform != null) {
-                        setBranchTransform(transformCheck.isSelected(), transform);
-                    }
+                    setBranchTransform(transformCheck.isSelected(), transform);
                 }
             });
             int index = PREFS.getInt(branchTransformTypePREFSkey, 0);
@@ -786,7 +796,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             orderBranches = PREFS.getBoolean(orderBranchesPREFSkey, orderBranches);
             checkBox2.setSelected(orderBranches);
 
-            final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values());
+            final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values()) {
+                @Override
+                public void setSelectedIndex(int anIndex) {
+                    //GEN-7724: Java 6 under mac os: if a JComboBox contains items that are not Strings it will deselect if you click
+                    //the already selected index, meaning null is selected and index -1 is selected. We prevent this here because you
+                    //shouldn't have a combo box with nothing selected
+                    if (anIndex == -1 && !isEditable()) {
+                        System.err.println("Prevented index -1 from being selected in GComboBox");
+                        return;
+                    }
+                    super.setSelectedIndex(anIndex);
+                }
+            };
             combo2.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     if(orderBranches){
