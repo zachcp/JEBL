@@ -55,9 +55,26 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
         }
     }
 
+    private static String getNotEnoughMemoryMessage(long memoryRequired) {
+        return "Not enough memory to build distance matrix. " + String.format("%,d", memoryRequired / 1000 / 1000) + " MB required";
+    }
+
     private static double[][] getDistances(List<Sequence> seqs, PairwiseAligner aligner, TreeBuilderFactory.DistanceModel model, final ProgressListener progressListener) throws CannotBuildDistanceMatrixException {
         final int n = seqs.size();
-        double [][] d = new double[n][n];
+        double [][] d;
+
+        final long memoryRequired = ((long)n)*n*8;
+        if (n>100) {
+            final long maxMemory = Runtime.getRuntime().maxMemory();
+            if (memoryRequired>maxMemory) {
+                throw new CannotBuildDistanceMatrixException(getNotEnoughMemoryMessage(memoryRequired));
+            }
+        }
+        try {
+            d = new double[n][n];
+        } catch (OutOfMemoryError e) {
+            throw new CannotBuildDistanceMatrixException(getNotEnoughMemoryMessage(memoryRequired));
+        }
 
         CompoundAlignmentProgressListener compoundProgress = new CompoundAlignmentProgressListener(progressListener,(n * (n - 1)) / 2);
 

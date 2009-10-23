@@ -22,6 +22,7 @@ class Profile {
     private boolean automaticallyCalculatedAlphabetSize = false;
     private Map<Integer, String> paddedSequences = new HashMap<Integer, String>();
     private boolean supportsFreeEndGaps=false;
+    private boolean isImmutable = false;
 
     public String getSequence(int sequenceNumber) {
         return paddedSequences.get(sequenceNumber);
@@ -44,11 +45,40 @@ class Profile {
      *
      * @param sequenceNumber
      * @param sequence
+     * @see #createImmutableProfile(int, String)
      */
     public Profile(int sequenceNumber,String sequence) {
         this(calculateAlphabetSize(new String[] {sequence}));
         addSequence(sequenceNumber,sequence);
         automaticallyCalculatedAlphabetSize = true;
+    }
+
+    /**
+     * Just like {@link jebl.evolution.align.Profile#Profile(int, String)} except that the create profile is immutable.
+     * An immutable profile uses significantly less memory than a mutable profile.
+     * 
+     * @return an immutable profile.
+     */
+    public static Profile createImmutableProfile(int sequenceNumber, String sequence) {
+        final int alphabetSize = calculateAlphabetSize(new String[]{sequence});
+        Profile profile = new Profile(alphabetSize);
+        profile.isImmutable = true;
+        profile.automaticallyCalculatedAlphabetSize = true;
+        profile.sequenceCount=1;
+        sequence = sequence.toUpperCase();
+        profile.paddedSequences.put(sequenceNumber, sequence);
+        int length = sequence.length();
+        profile.profile = new ProfileCharacter[length];
+        for (int i = 0; i < length; i++) {
+            profile.profile[i]= ProfileCharacter.getImmutableProfileCharacter(sequence.charAt(i));
+        }
+        return profile;
+    }
+
+    private void assertMutable() {
+        if (isImmutable) {
+            throw new IllegalArgumentException("This profile is immutable");
+        }
     }
 
     public Profile(Alignment alignment, int alphabetSize) {
@@ -90,6 +120,7 @@ class Profile {
     }
 
     void addSequence(int sequenceNumber,String sequence) {
+        assertMutable();
         sequence=sequence.toUpperCase();
         if (automaticallyCalculatedAlphabetSize)
             throw new IllegalStateException("if the constructor 'public Profile(int sequenceNumber,String sequence)'  is used, it's not safe to add new sequences");
@@ -111,6 +142,7 @@ class Profile {
     }
 
     public void remove(Profile remove) {
+        assertMutable();
         int size = length();
         assert(size == remove.length());
         for (int i = 0; i < size; i++) {
@@ -129,6 +161,7 @@ class Profile {
     that are all gap characters in the remaining sequences profiled.
     */
     private void trim() {
+        assertMutable();
         int gapCount = 0;
         int count = 0;
         for (ProfileCharacter character : profile) {

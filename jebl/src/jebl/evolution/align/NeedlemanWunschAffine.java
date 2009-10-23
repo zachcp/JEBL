@@ -59,7 +59,7 @@ public class NeedlemanWunschAffine extends AlignAffine {
     public void doAlignment(String sequence1, String sequence2, int startType, int endType) {
         this.seq1 = sequence1;
         this.seq2 = sequence2;
-        doAlignment(new Profile(0, sequence1), new Profile(0, sequence2), 0, 0, sequence1.length(), sequence2.length(), startType, endType);
+        doAlignment(Profile.createImmutableProfile(0, sequence1),Profile.createImmutableProfile(0, sequence2), 0, 0, sequence1.length(), sequence2.length(), startType, endType);
 
     }
 

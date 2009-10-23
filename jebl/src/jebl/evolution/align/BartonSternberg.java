@@ -132,7 +132,7 @@ public class BartonSternberg implements MultipleAligner {
         String[] sequencesWithoutGaps = new String[numSequences];
         for (int i = 0; i < numSequences; i++) {
             sequencesWithoutGaps[i] = Align.stripIllegalCharacters(sourceSequences.get(i).getString(), scores.getAlphabet(), false);
-            sequenceProfilesWithoutGaps[i] = new Profile(i, sequencesWithoutGaps[i]);
+            sequenceProfilesWithoutGaps[i] = Profile.createImmutableProfile(i, sequencesWithoutGaps[i]);
         }
 
         int treeWork = refineOnly ? 0 : (fastGuide ? numSequences : numSequences*(numSequences - 1)/2);

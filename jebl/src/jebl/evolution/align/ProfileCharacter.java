@@ -23,16 +23,59 @@ public class ProfileCharacter {
     private int totalCharacters;
     private boolean calculatedGapFraction=false;
     private  float gapFraction;
+    private boolean isImmutable = false;
 
     public ProfileCharacter(int alphabetSize) {
-        if (alphabetSize < 0) { // Arguably we could use <= 0 here?
+        if (alphabetSize < 0) {
             throw new IllegalArgumentException("Expected a nonnegative alphabet size, got " + alphabetSize);
         }
         characters = new char[alphabetSize +1];
         count = new int[alphabetSize +1];
     }
 
+    private static int MAX_CHAR = 128;
+    private static ProfileCharacter immutableCharacters[] = new ProfileCharacter[MAX_CHAR];
+    static {
+        for (char c = 0; c < MAX_CHAR; c++) {
+            immutableCharacters[c]=createImmutableProfileCharacter(c);
+        }
+    }
+
+    private static ProfileCharacter createImmutableProfileCharacter(char c) {
+        ProfileCharacter pc = new ProfileCharacter(0);
+        pc.totalCharacters = 1;
+        pc.characters[0]=c;
+        pc.count[0]=1;
+        pc.totalCharacters = 1;
+        pc.numberOfUniqueCharacters = 1;
+        pc.gapFraction(); // Force it to be calculated now to avoid threading issues later
+        return pc;
+    }
+
+    /**
+     * An immutable ProfileCharacter that uses less memory than a mutable profile character.
+     * The same immtuable ProfileCharacter may also be returned from other calls to this method.
+     * @param character the single character to wrap in a profile.
+     * @return an immutable ProfileCharacter
+     */
+    public static ProfileCharacter getImmutableProfileCharacter(char character) {
+        if (character>=0 && character<MAX_CHAR) {
+            return immutableCharacters[character];
+        }
+        else {
+            return createImmutableProfileCharacter(character);
+        }
+    }
+
+
+    private void assertMutable() {
+        if (isImmutable) {
+            throw new IllegalArgumentException("This profile is immutable");
+        }
+    }
+
     public void addCharacter(char character, int increment) {
+        assertMutable();
         calculatedGapFraction = false;
         totalCharacters += increment;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
@@ -46,6 +89,7 @@ public class ProfileCharacter {
     }
 
     private void removeCharacter(char character, int increment) {
+        assertMutable();
         calculatedGapFraction = false;
         totalCharacters -= increment;
         for (int i = 0; i < numberOfUniqueCharacters; i++) {
@@ -63,18 +107,21 @@ public class ProfileCharacter {
     }
 
     public void addProfileCharacter(ProfileCharacter character) {
+        assertMutable();
         for (int j = 0; j < character.numberOfUniqueCharacters; j++) {
             addCharacter(character.characters[j], character.count[j]);
         }
     }
 
     public void removeProfileCharacter(ProfileCharacter character) {
+        assertMutable();
         for (int j = 0; j < character.numberOfUniqueCharacters; j++) {
             removeCharacter(character.characters[j], character.count[j]);
         }
     }
 
     public void addGaps(int count) {
+        assertMutable();
         addCharacter('-', count);
     }
 
@@ -152,6 +199,7 @@ public class ProfileCharacter {
     }
 
     public void clear() {
+        assertMutable();
         numberOfUniqueCharacters= 0;
         totalCharacters= 0;
     }

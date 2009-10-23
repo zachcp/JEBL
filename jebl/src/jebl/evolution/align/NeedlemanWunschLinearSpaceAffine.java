@@ -73,9 +73,14 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private int allocatedm = -1;
 
     public void allocateMatrices(int n, int m) {
+        if (n>m) throw new IllegalStateException("n="+n+" m="+m);
+        if (n>=RECURSION_THRESHOLD) throw new IllegalStateException("n="+n);
         //first time running this alignment. Create all new matrices.
         if (n > allocatedn || m > allocatedm) {
             n = maxi(n, allocatedn + 5);
+            if (n >= RECURSION_THRESHOLD) {
+                n = RECURSION_THRESHOLD - 1; // No need to over-allocate past the limit of what this value can be.
+            }
             m = maxi(m, allocatedm + 5);
             allocatedn = n;
             allocatedm = m;
@@ -117,8 +122,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 //        prepareAlignment (sq1,sq2);
         //we initialise the following arrays here rather than in prepareAlignment
         //so that we do not have to create them again during recursion.
-        Profile profile1 = new Profile(0, sq1);
-        Profile profile2 = new Profile(0, sq2);
+        Profile profile1 = Profile.createImmutableProfile(0, sq1);
+        Profile profile2 = Profile.createImmutableProfile(0, sq2);
         AlignmentResult[] results = doAlignment(profile1, profile2, progress, scoreOnly);
         matchResult = new String[2];
         if (cancelled) return;
@@ -128,6 +133,28 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
     public void doAlignment(String sq1, String sq2, ProgressListener progress) {
         doAlignment(sq1, sq2, progress, false);
+    }
+
+    /**
+     * @return the number of bytes required per residue in the longest sequence to be alignned.
+     */
+    public static long getMemoryRequiredForAlignment(int maximumSequenceLength) {
+        long memoryRequiredPerBase=0;
+//        Bi = new int[3][n + 1][m + 1];
+//        Bj = new int[3][n + 1][m + 1];
+//        Bk = new int[3][n + 1][m + 1];
+        memoryRequiredPerBase+=3*3*(RECURSION_THRESHOLD)*4; // for the above arrays which get allocated in allocateMatrices. 3 arrays, 3 entries per array, ( n can be at most RECURSION_THRESHOLD-1), 4 bytes per primitive
+
+
+//        F = new float[3][2][ maximum + 1];
+//        C = new int [3] [ 2] [maximum + 1];
+//        Ctype = new int [3] [3] [maximum + 1];
+        memoryRequiredPerBase+=3*6*4; // for the above arrays which get allocated in the following method. 3 arrays, 6 entries per array, 4 bytes per primitive
+
+//        Bi = new int[3][n + 1][m + 1];
+//        Bj = new int[3][n + 1][m + 1];
+//        Bk = new int[3][n + 1][m + 1];
+        return memoryRequiredPerBase*(maximumSequenceLength+1);
     }
 
     // todo: return null when progress canceled, and document and handle this behaviour
