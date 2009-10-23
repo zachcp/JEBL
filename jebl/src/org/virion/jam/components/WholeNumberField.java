@@ -25,17 +25,25 @@ public class WholeNumberField extends JTextField
 
     protected static char MINUS_CHAR = '-';
     protected EventListenerList changeListeners = new EventListenerList();
-    protected int min;
-    protected int max;
+    protected long min;
+    protected long max;
     protected boolean range_check = false;
     protected boolean range_checked = false;
 
     public WholeNumberField() {
-        super();
+        this(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public WholeNumberField(int min, int max) {
-        this();
+        super();
+        this.min = min;
+        this.max = max;
+        range_check = true;
+        this.addFocusListener(this);
+    }
+
+    public WholeNumberField(long min, long max) {
+        super();
         this.min = min;
         this.max = max;
         range_check = true;
@@ -49,14 +57,12 @@ public class WholeNumberField extends JTextField
         if (range_check && !range_checked) {
             range_checked = true;
             try {
-                int value = (Integer.valueOf(getText())).intValue();
+                long value = Long.valueOf(getText());
                 if (value < min || value > max) {
                     errorMsg();
-                    return;
                 }
             } catch (NumberFormatException e) {
                 errorMsg();
-                return;
             }
         }
     }
@@ -81,6 +87,16 @@ public class WholeNumberField extends JTextField
         setText(Integer.toString(value));
     }
 
+    public void setValue(long value) {
+        if (range_check) {
+            if (value < min || value > max) {
+                errorMsg();
+                return;
+            }
+        }
+        setText(Long.toString(value));
+    }
+
     public Integer getValue() {
         try {
             return new Integer(getText());
@@ -89,10 +105,26 @@ public class WholeNumberField extends JTextField
         }
     }
 
+    public Long getLongValue() {
+        try {
+            return new Long(getText());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public Integer getValue(int default_value) {
         Integer value = getValue();
         if (value == null)
-            return new Integer(default_value);
+            return default_value;
+        else
+            return value;
+    }
+
+    public Long getValue(long default_value) {
+        Long value = getLongValue();
+        if (value == null)
+            return default_value;
         else
             return value;
     }
