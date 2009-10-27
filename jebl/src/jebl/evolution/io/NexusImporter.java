@@ -667,13 +667,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		List<Sequence> sequences = new ArrayList<Sequence>();
 
 		if (isInterleaved) {
-			List<String> sequencesData = new ArrayList<String>(taxonCount);
+			List<StringBuilder> sequencesData = new ArrayList<StringBuilder>(taxonCount);
 			List<Taxon> taxons =  new ArrayList<Taxon>();
 			List<Taxon> taxList =  (taxonList != null) ? taxonList : taxons;
 
 			int[] charsRead = new int[taxonCount];
 			for (int i = 0; i < taxonCount; i++) {
-				sequencesData.add("");
+				sequencesData.add(new StringBuilder());
 				charsRead[i] = 0;
 			}
 			//throw new ImportException.UnparsableDataException("At present, interleaved data is not parsable");
@@ -730,7 +730,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     readCount += seqString.length();
 					charsRead[sequenceIndex] += seqString.length();
 
-					sequencesData.set(sequenceIndex, sequencesData.get(sequenceIndex).concat(seqString));
+					sequencesData.get(sequenceIndex).append(seqString);
 					if (i == 0) {
 						firstSequence = seqString;
 					}
