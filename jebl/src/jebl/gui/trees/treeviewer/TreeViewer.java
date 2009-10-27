@@ -47,9 +47,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.prefs.Preferences;
 
 /**
@@ -134,6 +134,8 @@ public class TreeViewer extends JPanel implements Printable {
         });
 
         JScrollPane scrollPane = new JScrollPane(treePane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(15);
         scrollPane.setMinimumSize(new Dimension(150, 150));
         treePane.setViewPort(scrollPane.getViewport());
 
