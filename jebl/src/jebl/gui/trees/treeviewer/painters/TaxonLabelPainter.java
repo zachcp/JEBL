@@ -40,6 +40,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     private boolean visible;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "\\|";
+    private static final String[] attributesToNotDisplay = new String[] {"nodeColor", "labelFont"};
 
 
     public TaxonLabelPainter(RootedTree tree) {
@@ -51,7 +52,15 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         attributes.add(NODE_HEIGHTS);
         for(Node n : tree.getNodes()) {
             if(tree.isExternal(n)) { //only get attributes from tip nodes
-                attributes.addAll(n.getAttributeNames());
+                stop:                  
+                for(String s : n.getAttributeNames()) {
+                    for(int i=0; i < attributesToNotDisplay.length; i++) {
+                        if(attributesToNotDisplay[i].equals(s)) {
+                            continue stop;
+                        }
+                    }
+                    attributes.add(s);
+                }
             }
         }
 
