@@ -10,9 +10,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
@@ -38,7 +38,8 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     private Set<String> attributes;
     private Controls controls;
     private boolean visible;
-    private String attribute = TAXON_NAMES;
+    private String[] selectedAttributes = new String[] {TAXON_NAMES};
+    private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "\\|";
 
 
     public TaxonLabelPainter(RootedTree tree) {
@@ -67,19 +68,34 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     }
 
     public String getLabel(Node node){
+        List<String> attributeValues = new ArrayList<String>();
+        for(String s : selectedAttributes) {
+            String value = getLabel(node, s);
+            if(value != null) {
+                attributeValues.add(value);
+            }
+        }
+
+        if(attributeValues.size() == 0) {
+            return null;
+        }
+        return join(", ", attributeValues);
+    }
+
+    public String getLabel(Node node, String attributeName){
         String prefix = " ";
         String suffix = " ";
-        if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
+        if (attributeName.equalsIgnoreCase(TAXON_NAMES)) {
             return prefix+tree.getTaxon(node).getName()+suffix;
         }
 
-        if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
+        if (attributeName.equalsIgnoreCase(NODE_HEIGHTS) ) {
             return prefix+getFormattedValue(tree.getHeight(node))+suffix;
-        } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
+        } else if (attributeName.equalsIgnoreCase(BRANCH_LENGTHS) ) {
             return prefix+getFormattedValue(tree.getLength(node))+suffix;
         }
 
-        final Object value = node.getAttribute(attribute);
+        final Object value = node.getAttribute(attributeName);
         if (value != null) {
             if (value instanceof Double) {
                 return prefix+formatter.getFormattedValue((Double) value)+suffix;
@@ -232,25 +248,49 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 }
             });
 
-            String[] attributesArray = attributes.toArray(new String[attributes.size()]);
-            final JComboBox attributeBox = new JComboBox(attributesArray);
-            String prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES);
-            attributeBox.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent itemEvent) {
-                    String attr = (String) attributeBox.getSelectedItem();
-                    attribute = attr;
-                    PREFS.put("Tip Labels_whatToDisplay", attribute);
+            final String[] attributesArray = attributes.toArray(new String[attributes.size()]);
+            final JList attributeBox = new JList(attributesArray);
+            String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split(SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
+            attributeBox.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    int[] selectedIndicies = attributeBox.getSelectedIndices();
+                    ArrayList<String> selectedAttributes = new ArrayList<String>();
+                    for(int i=0; i < selectedIndicies.length; i++) {
+                        selectedAttributes.add(attributesArray[selectedIndicies[i]]);
+                    }
+                    TaxonLabelPainter.this.selectedAttributes = selectedAttributes.toArray(new String[selectedAttributes.size()]);
+                    PREFS.put("Tip Labels_whatToDisplay", join(SELECTED_FIELDS_SERIALIZATION_SEPARATOR,selectedAttributes));
                     firePainterChanged();
                 }
             });
+            List<Integer> selectedIndicies = new ArrayList<Integer>();
             for(int i=0; i < attributesArray.length; i++) {
-                if(prefsValue.equals(attributesArray[i])) {
-                    attributeBox.setSelectedIndex(i);
+                for(int j=0; j < prefsValue.length; j++) {
+                    if(prefsValue[j].equals(attributesArray[i])) {
+                        //attributeBox.setSelectedIndex(i);
+                        selectedIndicies.add(i);
+                    }
                 }
+            }
+            if(selectedIndicies.size() > 0) { //shouldn't really need to do this check but what the hell...
+                int[] selectedIndiciesArray = new int[selectedIndicies.size()];
+                for(int i=0; i < selectedIndicies.size(); i++) {
+                    selectedIndiciesArray[i] = selectedIndicies.get(i);
+                }
+                attributeBox.setSelectedIndices(selectedIndiciesArray);
             }
 
 
-            panel.addComponentWithLabel("Display:", attributeBox);
+            JScrollPane attributesScroller = new JScrollPane(attributeBox){
+                @Override
+                public Dimension getPreferredSize() {
+                    //todo: I want to make the min size of the scrollpane just big enough to display 3 items, but it seems that they initialise with a preferred size of 0
+                    //Component testComponent = attributeBox.getCellRenderer().getListCellRendererComponent(attributeBox, attributesArray[0], 0, false, false);
+                    Insets insets = getBorder().getBorderInsets(this);
+                    return new Dimension(super.getPreferredSize().width+getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height+ insets.top+insets.bottom, 50));
+                }
+            };
+            panel.addComponentWithLabel("Display:", attributesScroller);
 
             final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
             panel.addComponentWithLabel("Significant Digits:", significantDigitSpinner);
@@ -277,6 +317,17 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
 
         return controlsList;
+    }
+
+    private String join(String separator, Collection<String> items) {
+        StringBuilder builder = new StringBuilder();
+        for (Iterator<String> it = items.iterator(); it.hasNext();) {
+            builder.append(it.next());
+            if(it.hasNext()) {
+                builder.append(separator);
+            }
+        }
+        return builder.toString();
     }
 
     public void setSettings(ControlsSettings settings) {}
