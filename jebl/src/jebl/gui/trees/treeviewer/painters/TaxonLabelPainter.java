@@ -281,12 +281,15 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     }
                 }
             }
-            if(selectedIndicies.size() > 0) { //shouldn't really need to do this check but what the hell...
+            if(selectedIndicies.size() > 0) {
                 int[] selectedIndiciesArray = new int[selectedIndicies.size()];
                 for(int i=0; i < selectedIndicies.size(); i++) {
                     selectedIndiciesArray[i] = selectedIndicies.get(i);
                 }
                 attributeBox.setSelectedIndices(selectedIndiciesArray);
+            }
+            else {
+                attributeBox.setSelectedIndex(0);
             }
 
 
