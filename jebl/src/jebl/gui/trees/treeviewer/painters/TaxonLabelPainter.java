@@ -1,5 +1,9 @@
 package jebl.gui.trees.treeviewer.painters;
 
+import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
+import jebl.gui.trees.treeviewer.TreeViewer;
+import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -8,22 +12,17 @@ import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.graphs.Node;
-import jebl.gui.trees.treeviewer.TreeViewerUtilities;
-import jebl.gui.trees.treeviewer.TreeViewer;
 
 /**
  * @author Steven Stones-Havas
@@ -39,7 +38,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     private Controls controls;
     private boolean visible;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
-    private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "\\|";
+    private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
     private static final String[] attributesToNotDisplay = new String[] {"nodeColor", "labelFont"};
 
 
@@ -259,7 +258,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
             final String[] attributesArray = attributes.toArray(new String[attributes.size()]);
             final JList attributeBox = new JList(attributesArray);
-            String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split(SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
+            String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     int[] selectedIndicies = attributeBox.getSelectedIndices();
@@ -299,7 +298,8 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     //todo: I want to make the min size of the scrollpane just big enough to display 3 items, but it seems that they initialise with a preferred size of 0
                     //Component testComponent = attributeBox.getCellRenderer().getListCellRendererComponent(attributeBox, attributesArray[0], 0, false, false);
                     Insets insets = getBorder().getBorderInsets(this);
-                    return new Dimension(super.getPreferredSize().width+getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height+ insets.top+insets.bottom, 50));
+                    int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
+                    return new Dimension(super.getPreferredSize().width+getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height+ insets.top+insets.bottom, maximumHeight));
                 }
             };
             panel.addComponentWithLabel("Display:", attributesScroller);
