@@ -34,34 +34,14 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     private static final Preferences PREFS = Preferences.userNodeForPackage(TaxonLabelPainter.class);
 
-    private Set<String> attributes;
     private Controls controls;
     private boolean visible;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
-    private static final String[] attributesToNotDisplay = new String[] {"nodeColor", "labelFont"};
 
 
     public TaxonLabelPainter(RootedTree tree) {
         super("Tip Labels", tree, PainterIntent.TIP);
-
-        //populate the attributes list
-        attributes = new LinkedHashSet();
-        attributes.add(TAXON_NAMES);
-        attributes.add(NODE_HEIGHTS);
-        for(Node n : tree.getNodes()) {
-            if(tree.isExternal(n)) { //only get attributes from tip nodes
-                stop:                  
-                for(String s : n.getAttributeNames()) {
-                    for(int i=0; i < attributesToNotDisplay.length; i++) {
-                        if(attributesToNotDisplay[i].equals(s)) {
-                            continue stop;
-                        }
-                    }
-                    attributes.add(s);
-                }
-            }
-        }
 
         visible = PREFS.getBoolean("Tip Labels_isopoen", true);
     }
@@ -256,15 +236,14 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 }
             });
 
-            final String[] attributesArray = attributes.toArray(new String[attributes.size()]);
-            final JList attributeBox = new JList(attributesArray);
+            final JList attributeBox = new JList(attributes);
             String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     int[] selectedIndicies = attributeBox.getSelectedIndices();
                     ArrayList<String> selectedAttributes = new ArrayList<String>();
                     for(int i=0; i < selectedIndicies.length; i++) {
-                        selectedAttributes.add(attributesArray[selectedIndicies[i]]);
+                        selectedAttributes.add(attributes[selectedIndicies[i]]);
                     }
                     TaxonLabelPainter.this.selectedAttributes = selectedAttributes.toArray(new String[selectedAttributes.size()]);
                     PREFS.put("Tip Labels_whatToDisplay", join(SELECTED_FIELDS_SERIALIZATION_SEPARATOR,selectedAttributes));
@@ -272,9 +251,9 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 }
             });
             List<Integer> selectedIndicies = new ArrayList<Integer>();
-            for(int i=0; i < attributesArray.length; i++) {
+            for(int i=0; i < attributes.length; i++) {
                 for(int j=0; j < prefsValue.length; j++) {
-                    if(prefsValue[j].equals(attributesArray[i])) {
+                    if(prefsValue[j].equals(attributes[i])) {
                         //attributeBox.setSelectedIndex(i);
                         selectedIndicies.add(i);
                     }

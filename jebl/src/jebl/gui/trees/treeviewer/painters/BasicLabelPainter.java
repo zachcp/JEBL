@@ -2,7 +2,6 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.TransformedRootedTree;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -36,6 +35,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private final PainterIntent intent;
     private int consensusSupportIndex;
     private boolean containsConsensusSupport;
+    protected static final String[] attributesToNotDisplay = new String[] {"nodeColor", "labelFont", "size", "first residues"};
 
     private final String isOpenKey;
 
@@ -78,13 +78,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             case TIP: {
                 sources.add(TAXON_NAMES);
                 wantHeightsIfPossible = true;
-                for (Node node : tree.getExternalNodes() ) {
-                    for(String s : node.getAttributeNames()){
-                        if(!s.equalsIgnoreCase("size") && !s.equalsIgnoreCase("first residues"))
-                            names.add(s);
-                    }
-                    //names.addAll(node.getAttributeNames());
-                }
+                addNodeAttributes = true;
                 break;
             }
             case NODE: {
@@ -100,8 +94,18 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         }
 
         if( addNodeAttributes ) {
-            for( Node node : tree.getInternalNodes() ) {
-                names.addAll(node.getAttributeNames());
+            for(Node n : tree.getNodes()) {
+                if(tree.isExternal(n)) { //only get attributes from tip nodes
+                    aroundTheAttributeNamesLoop:
+                    for(String s : n.getAttributeNames()) {
+                        for(int i=0; i < attributesToNotDisplay.length; i++) {
+                            if(attributesToNotDisplay[i].equals(s)) {
+                                continue aroundTheAttributeNamesLoop;
+                            }
+                        }
+                        names.add(s);
+                    }
+                }
             }
         }
 
