@@ -18,56 +18,56 @@ import jebl.util.ProgressListener;
 public class F84DistanceMatrix extends BasicDistanceMatrix {
 
     public F84DistanceMatrix(Alignment alignment, ProgressListener progress) {
-        super(alignment.getTaxa(), Initialaizer.getDistances(alignment, progress));
+        super(alignment.getTaxa(), new Initialaizer().getDistances(alignment, progress));
     }
 
     public F84DistanceMatrix(Alignment alignment) {
-        super(alignment.getTaxa(), Initialaizer.getDistances(alignment, null));
+        super(alignment.getTaxa(), new Initialaizer().getDistances(alignment, null));
     }
 
     static class Initialaizer {
 
-    //
-    // Private stuff
-    //
-    private static final double MAX_DISTANCE = 1000.0;
-    private static Alignment alignment;
+        //
+        // Private stuff
+        //
+        private static final double MAX_DISTANCE = 1000.0;
+        private Alignment alignment;
 
-	/**
-	 * Calculate a pairwise distance
-	 */
-	static private double calculatePairwiseDistance(int taxon1, int taxon2) {
+        /**
+         * Calculate a pairwise distance
+         */
+        private double calculatePairwiseDistance(int taxon1, int taxon2) {
 
-        double[] total = new double [4];
-        double[] transversions = new double [4];
+            double[] total = new double [4];
+            double[] transversions = new double [4];
 
-        for( Pattern pattern : alignment.getPatterns() ) {
-            State state1 = pattern.getState(taxon1);
-            State state2 = pattern.getState(taxon2);
+            for( Pattern pattern : alignment.getPatterns() ) {
+                State state1 = pattern.getState(taxon1);
+                State state2 = pattern.getState(taxon2);
 
-            double weight = pattern.getWeight();
-            if (!state1.isAmbiguous() && !state2.isAmbiguous() ) {
-                total[state1.getIndex()] += weight;
+                double weight = pattern.getWeight();
+                if (!state1.isAmbiguous() && !state2.isAmbiguous() ) {
+                    total[state1.getIndex()] += weight;
 
-                if( Nucleotides.isTransversion(state1, state2) ) {
-                    transversions[state1.getIndex()] += weight;
+                    if( Nucleotides.isTransversion(state1, state2) ) {
+                        transversions[state1.getIndex()] += weight;
+                    }
                 }
             }
-        }
 
-        double totalTransversions = 0.0;
-        for(int i = 0; i < 4; ++i) {
-            if( total[i] > 0 ) {
-                totalTransversions += transversions[i]/total[i];
+            double totalTransversions = 0.0;
+            for(int i = 0; i < 4; ++i) {
+                if( total[i] > 0 ) {
+                    totalTransversions += transversions[i]/total[i];
+                }
             }
+            double expDist = 1.0 - (totalTransversions / 2.0);
+            return expDist > 0 ? -Math.log( expDist) : MAX_DISTANCE;
         }
-        double expDist = 1.0 - (totalTransversions / 2.0);
-        return expDist > 0 ? -Math.log( expDist) : MAX_DISTANCE;
-    }
 
 
-        synchronized static double[][] getDistances(Alignment alignment, ProgressListener progress) {
-            Initialaizer.alignment = alignment;
+        synchronized double[][] getDistances(Alignment alignment, ProgressListener progress) {
+            this.alignment = alignment;
 
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
 

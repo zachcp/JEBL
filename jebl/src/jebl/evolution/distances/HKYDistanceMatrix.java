@@ -90,7 +90,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         //
         // Private stuff
         //
-        private static Alignment alignment;
+        private Alignment alignment;
 
         //used in correction formula
         private double constA, constB, constC;
@@ -169,7 +169,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
             return MAX_DISTANCE;
         }
         
-        private static String getTaxonName(int index) {
+        private String getTaxonName(int index) {
             return alignment.getSequenceList().get(index).getTaxon().getName();
         }
 
@@ -177,7 +177,7 @@ public class HKYDistanceMatrix extends BasicDistanceMatrix {
         double[][] getDistances(Alignment alignment, ProgressListener progress , boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
                 throws CannotBuildDistanceMatrixException
         {
-            Initializer.alignment = alignment;
+            this.alignment = alignment;
 
             // ASK Alexei
             final int stateCount = alignment.getSequenceType().getCanonicalStateCount();
