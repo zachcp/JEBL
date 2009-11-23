@@ -94,7 +94,17 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         }
 
         if( addNodeAttributes ) {
-            for(Node n : tree.getNodes()) {
+            Set<Node> nodes;
+            switch( intent ) {
+            case TIP: {
+                nodes = tree.getExternalNodes();
+                break;
+            }
+            default : {
+                nodes = tree.getInternalNodes();
+            }
+        }
+            for(Node n : nodes) {
                 if(tree.isExternal(n)) { //only get attributes from tip nodes
                     aroundTheAttributeNamesLoop:
                     for(String s : n.getAttributeNames()) {
