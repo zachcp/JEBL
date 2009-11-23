@@ -16,11 +16,11 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Rectangle2D;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  * @author Andrew Rambaut
@@ -96,25 +96,23 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         if( addNodeAttributes ) {
             Set<Node> nodes;
             switch( intent ) {
-            case TIP: {
-                nodes = tree.getExternalNodes();
-                break;
+                case TIP: {
+                    nodes = tree.getExternalNodes();
+                    break;
+                }
+                default : {
+                    nodes = tree.getInternalNodes();
+                }
             }
-            default : {
-                nodes = tree.getInternalNodes();
-            }
-        }
             for(Node n : nodes) {
-                if(tree.isExternal(n)) { //only get attributes from tip nodes
-                    aroundTheAttributeNamesLoop:
-                    for(String s : n.getAttributeNames()) {
-                        for(int i=0; i < attributesToNotDisplay.length; i++) {
-                            if(attributesToNotDisplay[i].equals(s)) {
-                                continue aroundTheAttributeNamesLoop;
-                            }
+                aroundTheAttributeNamesLoop:
+                for(String s : n.getAttributeNames()) {
+                    for(int i=0; i < attributesToNotDisplay.length; i++) {
+                        if(attributesToNotDisplay[i].equalsIgnoreCase(s)) {
+                            continue aroundTheAttributeNamesLoop;
                         }
-                        names.add(s);
                     }
+                    names.add(s);
                 }
             }
         }
