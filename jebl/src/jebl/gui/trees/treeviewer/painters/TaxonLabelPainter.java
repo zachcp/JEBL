@@ -236,7 +236,14 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 }
             });
 
-            final JList attributeBox = new JList(attributes);
+            final JList attributeBox = new JList(attributes){
+                @Override
+                public Dimension getPreferredScrollableViewportSize() {
+                    Insets insets = getBorder() != null ? getBorder().getBorderInsets(this) : new Insets(0,0,0,0);
+                    int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
+                    return new Dimension(super.getPreferredSize().width, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight));
+                }
+            };;
             String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -271,19 +278,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             }
 
 
-            JScrollPane attributesScroller = new JScrollPane(attributeBox){
-                @Override
-                public Dimension getPreferredSize() {
-                    //todo: I want to make the min size of the scrollpane just big enough to display 3 items, but it seems that they initialise with a preferred size of 0
-                    //Component testComponent = attributeBox.getCellRenderer().getListCellRendererComponent(attributeBox, attributesArray[0], 0, false, false);
-                    Insets insets = getBorder().getBorderInsets(this);
-                    System.out.println(insets);
-                    int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
-                    Dimension dimensions = new Dimension(super.getPreferredSize().width + getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height + insets.top + insets.bottom, maximumHeight));
-                    System.out.println(dimensions);
-                    return dimensions;
-                }
-            };
+            JScrollPane attributesScroller = new JScrollPane(attributeBox);
             panel.addComponentWithLabel("Display:", attributesScroller);
 
             final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
