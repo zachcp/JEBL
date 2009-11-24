@@ -277,8 +277,11 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     //todo: I want to make the min size of the scrollpane just big enough to display 3 items, but it seems that they initialise with a preferred size of 0
                     //Component testComponent = attributeBox.getCellRenderer().getListCellRendererComponent(attributeBox, attributesArray[0], 0, false, false);
                     Insets insets = getBorder().getBorderInsets(this);
+                    System.out.println(insets);
                     int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
-                    return new Dimension(super.getPreferredSize().width+getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height+ insets.top+insets.bottom, maximumHeight));
+                    Dimension dimensions = new Dimension(super.getPreferredSize().width + getVerticalScrollBar().getWidth(), Math.min(attributeBox.getPreferredSize().height + insets.top + insets.bottom, maximumHeight));
+                    System.out.println(dimensions);
+                    return dimensions;
                 }
             };
             panel.addComponentWithLabel("Display:", attributesScroller);
