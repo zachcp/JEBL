@@ -88,6 +88,19 @@ public final class GeneticCode {
     }
 
     /**
+     * @param NCBITranslationTableNumber the name of the genetic code
+     * @return the genetic code such that {@link #getNcbiTranslationTableNumber()} equals NCBITranslationTableNumber
+     */
+    public static GeneticCode valueOf(int NCBITranslationTableNumber) {
+        for(GeneticCode code : GENETIC_CODES_LIST) {
+            if(code.getNcbiTranslationTableNumber() == NCBITranslationTableNumber){
+                return code;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, -1, DEFAULT_START_CODONS).
      */
     private GeneticCode(String name, String description, String codeTable) {
