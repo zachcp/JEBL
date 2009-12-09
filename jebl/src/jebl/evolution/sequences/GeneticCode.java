@@ -75,6 +75,19 @@ public final class GeneticCode {
     private final String name, description, codeTable;
 
     /**
+     * @param name the name of the genetic code
+     * @return the genetic code such that {@link #getDescription()} equals name
+     */
+    public static GeneticCode valueOf(String name) {
+        for(GeneticCode code : GENETIC_CODES_LIST) {
+            if(code.getDescription().equals(name)){
+                return code;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, -1, DEFAULT_START_CODONS).
      */
     private GeneticCode(String name, String description, String codeTable) {
