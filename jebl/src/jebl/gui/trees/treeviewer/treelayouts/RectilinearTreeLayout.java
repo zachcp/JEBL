@@ -132,6 +132,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             if( !tree.conceptuallyUnrooted() ) {
                 final JSlider slider1 = new JSlider(SwingConstants.HORIZONTAL, 0, slider1max, 0);
                 slider1.setValue((int) (rootLength * slider1max));
+                slider1.setPaintTicks(true);
 
                 // don't make sense without setting spacing
                 //slider1.setPaintTicks(true);

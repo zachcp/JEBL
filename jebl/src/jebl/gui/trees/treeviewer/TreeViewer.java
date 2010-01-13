@@ -96,6 +96,10 @@ public class TreeViewer extends JPanel implements Printable {
     static private String unrootedTreeLayoutPrefKey = "treelayout_unrooted";
     static private String unrootedTreeAllLayoutsAllowedPrefKey = "treelayout_unrooted_allallowed";
 
+    JToggleButton toggle1;
+    JToggleButton toggle2;
+    JToggleButton toggle3;
+
     /**
      * Creates new TreeViewer
      */
@@ -320,9 +324,9 @@ public class TreeViewer extends JPanel implements Printable {
                 Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "rectangularTree.png");
                 Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "polarTree.png");
                 Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "radialTree.png");
-                final JToggleButton toggle1 = new JToggleButton(rectangularTreeIcon);
-                final JToggleButton toggle2 = new JToggleButton(polarTreeIcon);
-                final JToggleButton toggle3 = new JToggleButton(radialTreeIcon);
+                toggle1 = new JToggleButton(rectangularTreeIcon);
+                toggle2 = new JToggleButton(polarTreeIcon);
+                toggle3 = new JToggleButton(radialTreeIcon);
                 toggle1.setToolTipText("Rooted tree layout");
                 toggle2.setToolTipText("Circular tree layout");
                 toggle3.setToolTipText("Unrooted tree layout");
@@ -335,9 +339,15 @@ public class TreeViewer extends JPanel implements Printable {
                 buttonGroup.add(toggle3);
 
                 switch (getDefaultTreeLayoutType()) {
-                    case RECTILINEAR:  toggle1.setSelected(true); break;
-                    case POLAR:        toggle2.setSelected(true); break;
-                    case RADIAL:       toggle3.setSelected(true); break;
+                    case RECTILINEAR:
+                        toggle1.setSelected(true);
+                        break;
+                    case POLAR:
+                        toggle2.setSelected(true);
+                        break;
+                    case RADIAL:
+                        toggle3.setSelected(true);
+                        break;
                 }
 
                 treeViewPanel.add(Box.createHorizontalStrut(0));
@@ -467,7 +477,7 @@ public class TreeViewer extends JPanel implements Printable {
                 controlsList.add(infoControls);
             }
             //infoArea.setText("info");
-            
+
             return controlsList;
         }
 
@@ -506,12 +516,21 @@ public class TreeViewer extends JPanel implements Printable {
         switch (treeLayoutType) {
             case RECTILINEAR:
                 treeLayout = new RectilinearTreeLayout();
+                if(toggle1 != null) {
+                    toggle1.setSelected(true);
+                }
                 break;
             case POLAR:
                 treeLayout = new PolarTreeLayout();
+                if(toggle2 != null) {
+                    toggle2.setSelected(true);
+                }
                 break;
             case RADIAL:
                 treeLayout = new RadialTreeLayout();
+                if(toggle3 != null) {
+                    toggle3.setSelected(true);
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown TreeLayoutType: " + treeLayoutType);

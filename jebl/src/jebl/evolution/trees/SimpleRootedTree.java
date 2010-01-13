@@ -182,9 +182,6 @@ final public class SimpleRootedTree implements RootedTree {
             throw new IllegalArgumentException("Node must be a node in this tree");
         }
         SimpleRootedNode simpleRootedNode= (SimpleRootedNode) node;
-        if (simpleRootedNode.parent!=null) {
-            throw new IllegalArgumentException("Can't remove nodes with a parent");
-        }
         if (!internalNodes.contains(node)) {
             throw new IllegalArgumentException("Not an internal node");
         }
@@ -192,9 +189,68 @@ final public class SimpleRootedTree implements RootedTree {
             rootNode = (SimpleRootedNode) getChildren(node).get(0);
         }
         internalNodes.remove(node);
-        for (Node child : getChildren(node)) {
-            ((SimpleRootedNode) child).setParent(null);
+        SimpleRootedNode parentNode = (SimpleRootedNode)simpleRootedNode.getParent();
+        if(parentNode != null) {
+            parentNode.removeChild(node);
         }
+        for (Node child : getChildren(node)) {
+            ((SimpleRootedNode) child).setParent(parentNode);
+            if(parentNode != null) {
+                parentNode.addChild((SimpleRootedNode) child);
+            }
+        }
+    }
+
+
+    /**
+     * Adds a new node at the midpoint of the edge connecting the given node to its parent.
+     * @param node must be a node in the tree, which has a parent
+     * @return the newly created node
+     */
+    public Node addNode(Node node) {
+        SimpleRootedNode rootedNode = (SimpleRootedNode)node;
+        Edge edge = rootedNode.getEdge();
+        if(edge == null) {
+            throw new IllegalArgumentException("The node must have a parent");
+        }
+        return addNode(edge);
+    }
+
+
+    /**
+     * Adds a new node at the midpoint of the given edge
+     * @param edge
+     * @return the newly created node
+     */
+    public Node addNode(Edge edge) {
+        Node[] edgeNodes = getNodes(edge);
+
+        if(edgeNodes == null) {
+            throw new IllegalArgumentException("The edge must exist on the tree");
+        }
+
+        double edgeLength = edge.getLength();
+
+        SimpleRootedNode parentNode, childNode;
+
+        if(getChildren(edgeNodes[0]).contains(edgeNodes[1])) {
+            parentNode = (SimpleRootedNode)edgeNodes[0];
+            childNode = (SimpleRootedNode)edgeNodes[1];
+        }
+        else {
+            parentNode = (SimpleRootedNode)edgeNodes[1];
+            childNode = (SimpleRootedNode)edgeNodes[0];
+        }
+
+        SimpleRootedNode newNode = new SimpleRootedNode(Arrays.asList(childNode));
+        newNode.setLength(edgeLength/2);
+        newNode.setHeight((childNode.getHeight()+parentNode.getHeight())/2);
+        childNode.setLength(edgeLength/2);
+        childNode.setParent(newNode);
+        parentNode.removeChild(childNode);
+        parentNode.addChild(newNode);
+
+        return newNode;
     }
 
     public void swapNodes(Node n, int i0, int i1) {

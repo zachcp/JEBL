@@ -119,7 +119,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 repaint();
             }
         });
-        if (controlPalette != null) controlPalette.fireControlsChanged();
+        if (controlPalette != null) {
+            controlPalette.fireControlsChanged();
+        }
         calibrated = false;
         invalidate();
         repaint();
