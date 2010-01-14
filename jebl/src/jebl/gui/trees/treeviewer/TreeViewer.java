@@ -99,6 +99,7 @@ public class TreeViewer extends JPanel implements Printable {
     JToggleButton toggle1;
     JToggleButton toggle2;
     JToggleButton toggle3;
+    JCheckBox allowCB;
 
     /**
      * Creates new TreeViewer
@@ -359,7 +360,7 @@ public class TreeViewer extends JPanel implements Printable {
                 optionsPanel.addSpanningComponent(treeViewPanel);
 
                 if( tree.conceptuallyUnrooted() ) {
-                    final JCheckBox allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
+                    allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
                     boolean allow = PREFS.getBoolean(unrootedTreeAllLayoutsAllowedPrefKey, false);
                     allowCB.setSelected(allow);
                     optionsPanel.addSpanningComponent(allowCB);
@@ -516,12 +517,18 @@ public class TreeViewer extends JPanel implements Printable {
         switch (treeLayoutType) {
             case RECTILINEAR:
                 treeLayout = new RectilinearTreeLayout();
+                if(allowCB != null) {
+                    allowCB.setSelected(true);
+                }
                 if(toggle1 != null) {
                     toggle1.setSelected(true);
                 }
                 break;
             case POLAR:
                 treeLayout = new PolarTreeLayout();
+                if(allowCB != null) {
+                    allowCB.setSelected(true);
+                }
                 if(toggle2 != null) {
                     toggle2.setSelected(true);
                 }
