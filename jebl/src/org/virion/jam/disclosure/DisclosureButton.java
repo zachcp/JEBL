@@ -54,6 +54,13 @@ public class DisclosureButton extends JToggleButton {
                 setupIcon();
             }
         });
+        setPreferredSize(new Dimension(width+4,height+4)); // +4 to give 2 pixels each side of it
+    }
+
+    @Override
+    public void setText(String text) {
+        super.setText(text);
+        setPreferredSize(null);
     }
 
     public void addDisclosureListener(DisclosureListener listener) {
@@ -155,10 +162,6 @@ public class DisclosureButton extends JToggleButton {
         while (iter.hasNext()) {
             ((DisclosureListener)iter.next()).closed(this);
         }
-    }
-
-    public Dimension getPreferredSize() {
-        return new Dimension(width+4,height+4); // +4 to give 2 pixels each side of it
     }
 
     private static Icon[] disclosureIcons = null;
