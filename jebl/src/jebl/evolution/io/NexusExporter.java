@@ -17,7 +17,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Export sequences and trees to Nexus format.
@@ -124,13 +123,6 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         exportTrees(trees);
     }
 
-    // The pattern that identifiers in Nexus need to match, see http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
-    // which says: identifier -->
-    //      A token satisfing the regular expression [_\w]+[\d\w\._]*. Note that an single
-    //      _ is considered a valid identifier. In most contexts a single _ means a
-    //      "don't care identifier", simmilar to the _ meaning in prolog.
-    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[_\\w]+[\\d\\w\\._]*");
-
     private void writeTrees(Collection<? extends Tree> trees, boolean checkTaxa) throws IOException {
         int nt = 0;
         for( Tree t : trees ) {
@@ -143,13 +135,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             final Object name = t.getAttribute(treeNameAttributeKey);
 
             ++nt;
-            final String treeName = (name != null) ? name.toString() : "tree_" + nt;
-
-            if (!IDENTIFIER_PATTERN.matcher(treeName).matches()) {
-                // TT: Or should we put a translationList so we can use any name? But that would require more work
-                // and maybe we should not do it until someone complains that their tree names get lost.
-                throw new IllegalArgumentException("Tree name '" + name + "' is not a valid Nexus identifer, i.e. it doesn't match " + IDENTIFIER_PATTERN.pattern());
-            }
+            final String treeName = (name != null) ? NexusImporter.makeIntoAllowableIdentifier(name.toString()) : "tree_" + nt;
 
             StringBuilder builder = new StringBuilder("\ttree ");
 

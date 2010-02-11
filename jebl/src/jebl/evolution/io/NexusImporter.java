@@ -1034,6 +1034,20 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return new BasicDistanceMatrix(taxonList, distances);
 	}
 
+    // http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar says:
+    // identifier -->
+    //      A token satisfing the regular expression [_\w]+[\d\w\._]*. Note that an single
+    //      _ is considered a valid identifier. In most contexts a single _ means a
+    //      "don't care identifier", simmilar to the _ meaning in prolog.
+    // however, this regex seems to have been written by someone that didn't know that \w included _0-9
+    // and I think they meant [_a-zA-Z]+[\w\.]*
+    public static String makeIntoAllowableIdentifier(String identifier) {
+        identifier = identifier.replaceAll("[^\\w\\.]", "_");
+        if (!Pattern.compile("[_a-zA-Z]").matcher(identifier.substring(0, 1)).matches()) {
+            identifier = "_" + identifier;
+        }
+        return identifier;
+    }
 
 	/**
 	 * Reads a 'TREES' block.
@@ -1133,7 +1147,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     helper.clearLastMetaComment();
                 }
 
-				final String treeName = helper.readToken( "=;" );
+				final String treeName = makeIntoAllowableIdentifier(helper.readToken( "=;" ));
 
 				if (helper.getLastDelimiter() != '=') {
 					throw new ImportException.BadFormatException("Missing label for tree '" + treeName + "' or missing '=' in TREE command of TREES block");
