@@ -3,6 +3,7 @@ package jebl.gui.trees.treeviewer.painters;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
+import jebl.evolution.taxa.Taxon;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -105,8 +106,15 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 }
             }
             for(Node n : nodes) {
+                Set<String> attributeNames = new LinkedHashSet<String>();
+                attributeNames.addAll(n.getAttributeNames());
+                final Taxon nodeTaxon = tree.getTaxon(n);
+                if(nodeTaxon != null) {
+                    attributeNames.addAll(nodeTaxon.getAttributeNames());
+                }
+
                 aroundTheAttributeNamesLoop:
-                for(String s : n.getAttributeNames()) {
+                for(String s : attributeNames) {
                     for(int i=0; i < attributesToNotDisplay.length; i++) {
                         if(attributesToNotDisplay[i].equalsIgnoreCase(s)) {
                             continue aroundTheAttributeNamesLoop;
@@ -170,7 +178,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             }
         }
 
-        final Object value = node.getAttribute(attribute);
+        Object value = node.getAttribute(attribute);
+        final Taxon nodeTaxon = tree.getTaxon(node);
+        if(value == null && nodeTaxon != null) {
+            value = nodeTaxon.getAttribute(attribute);
+        }
         if (value != null) {
             if (value instanceof Double) {
                 return prefix+formatter.getFormattedValue((Double) value)+suffix;

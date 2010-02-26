@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.taxa.Taxon;
 import jebl.gui.trees.treeviewer.TreeViewer;
 import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -83,7 +84,11 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             return prefix+getFormattedValue(tree.getLength(node))+suffix;
         }
 
-        final Object value = node.getAttribute(attributeName);
+        Object value = node.getAttribute(attributeName);
+        final Taxon nodeTaxon = tree.getTaxon(node);
+        if(value == null && nodeTaxon != null) {
+            value = nodeTaxon.getAttribute(attributeName);
+        }
         if (value != null) {
             if (value instanceof Double) {
                 return prefix+formatter.getFormattedValue((Double) value)+suffix;
