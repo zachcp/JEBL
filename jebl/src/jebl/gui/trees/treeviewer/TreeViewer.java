@@ -368,9 +368,7 @@ public class TreeViewer extends JPanel implements Printable {
                     allowCB.addChangeListener(new ChangeListener() {
                         public void stateChanged(ChangeEvent e) {
                             final boolean s = allowCB.isSelected();
-                            toggle1.setEnabled(s);
-                            toggle2.setEnabled(s);
-                            toggle3.setEnabled(s);
+
                             PREFS.putBoolean(unrootedTreeAllLayoutsAllowedPrefKey, s);
                             if (!s) {
                                 setAndStoreTreeLayoutType(TreeLayoutType.RADIAL);
@@ -379,6 +377,9 @@ public class TreeViewer extends JPanel implements Printable {
                                 toggle2.setSelected(false);
                                 toggle3.setSelected(true);
                             }
+                            toggle1.setEnabled(s);
+                            toggle2.setEnabled(s);
+                            toggle3.setEnabled(s);
                             fireChangeListeners();
                         }
                     } );
