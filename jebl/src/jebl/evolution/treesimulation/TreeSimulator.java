@@ -31,15 +31,14 @@ public class TreeSimulator {
 
 	/**
 	 * A constructor for a given number of taxa, all sampled at the same time
-	 * @param intervalGenerator
 	 * @param taxonCount
 	 */
-	public TreeSimulator(IntervalGenerator intervalGenerator, String taxonPrefix, int taxonCount) {
-		this(intervalGenerator, taxonPrefix, new int[] { taxonCount }, new double[] { 0.0 } );
+	public TreeSimulator(String taxonPrefix, int taxonCount) {
+		this(taxonPrefix, new int[] { taxonCount }, new double[] { 0.0 } );
 	}
 
-	public TreeSimulator(IntervalGenerator intervalGenerator, String taxonPrefix, double[] samplingTimes) {
-		this.intervalGenerator = intervalGenerator;
+	public TreeSimulator(String taxonPrefix, double[] samplingTimes) {
+//		this.intervalGenerator = intervalGenerator;
 
 		List<Taxon> taxonList = new ArrayList<Taxon>();
 		for (int i = 0; i < samplingTimes.length; i++) {
@@ -51,9 +50,7 @@ public class TreeSimulator {
 		setTaxa(taxonList, "height");
 	}
 
-	public TreeSimulator(IntervalGenerator intervalGenerator, String taxonPrefix, int[] samplingCounts, double[] samplingTimes) {
-		this.intervalGenerator = intervalGenerator;
-
+	public TreeSimulator(String taxonPrefix, int[] samplingCounts, double[] samplingTimes) {
 		List<Taxon> taxonList = new ArrayList<Taxon>();
 		int k =0;
 		for (int i = 0; i < samplingCounts.length; i++) {
@@ -71,11 +68,9 @@ public class TreeSimulator {
 	/**
 	 * A constructor for a given collection of taxa. If the taxa have the attribute given by heightAttributeName then
 	 * this will be used, otherwise a height of 0.0 will be assumed.
-	 * @param intervalGenerator
 	 * @param taxa
 	 */
-	public TreeSimulator(IntervalGenerator intervalGenerator, final Collection<Taxon> taxa, final String heightAttributeName) {
-		this.intervalGenerator = intervalGenerator;
+	public TreeSimulator(final Collection<Taxon> taxa, final String heightAttributeName) {
 		List<Taxon> taxonList = new ArrayList<Taxon>();
 		for (Taxon taxon : taxa) {
 			taxonList.add(taxon);
@@ -104,11 +99,11 @@ public class TreeSimulator {
 		});
 	}
 
-	public RootedTree simulate() {
-		return simulate(false);
+	public RootedTree simulate(IntervalGenerator intervalGenerator) {
+		return simulate(intervalGenerator, false);
 	}
 
-	public RootedTree simulate(boolean medianHeights) {
+	public RootedTree simulate(IntervalGenerator intervalGenerator, boolean medianHeights) {
 		SimpleRootedTree tree = new SimpleRootedTree();
 
 		Node[] tipNodes = new Node[taxa.size()];
@@ -186,7 +181,7 @@ public class TreeSimulator {
 		return node;
 	}
 
-	private final IntervalGenerator intervalGenerator;
+//	private final IntervalGenerator intervalGenerator;
 	private List<Taxon> taxa;
 	private String heightAttributeName;
 
@@ -218,7 +213,7 @@ public class TreeSimulator {
 		constantPopulation.setN0(10);
 
 		IntervalGenerator intervals = new CoalescentIntervalGenerator(exponentialGrowth);
-		TreeSimulator sim = new TreeSimulator(intervals, "tip", samplingTimes);
+		TreeSimulator sim = new TreeSimulator("tip", samplingTimes);
 //		RootedTree tree1 = sim.simulate(true);
 //		RootedTree tree2 = sim.oldSimulate(true);
 //
@@ -245,10 +240,10 @@ public class TreeSimulator {
 			Tree[] trees = new Tree[REPLICATE_COUNT];
 
 			System.err.println("Simulating " + REPLICATE_COUNT + " trees of " + samplingTimes.length + " tips:");
-			System.err.print("[");                                                                                                                      
+			System.err.print("[");
 			for (int i = 0; i < REPLICATE_COUNT; i++) {
 
-				trees[i] = sim.simulate(true);
+				trees[i] = sim.simulate(intervals, true);
 				if (i != 0 && i % 100 == 0) {
 					System.err.print(".");
 				}

@@ -104,7 +104,7 @@ public class CoalescentIntervalGenerator implements IntervalGenerator {
 
         assert(t >= 0.0);
 
-        double solutionAccuracy = 1.0E-15;
+        double solutionAccuracy = 1.0E-8;
         double halfway;
 
         do {

@@ -17,9 +17,10 @@ import jebl.evolution.coalescent.DemographicFunction;
  */
 public class EmpiricalDemographicFunction implements DemographicFunction {
 
-    public EmpiricalDemographicFunction(double[] populationSizes, double[] times) {
+    public EmpiricalDemographicFunction(double[] populationSizes, double[] times, boolean stepwise) {
         this.populationSizes = populationSizes;
         this.times = times;
+        this.stepwise = stepwise;
     }
 
     /**
@@ -34,15 +35,23 @@ public class EmpiricalDemographicFunction implements DemographicFunction {
             return populationSizes[populationSizes.length - 1];
         }
 
-        for (int i = 0; i < times.length; i++) {
-            if (times[i] == t) {
-                return populationSizes[i];
-            } else if (times[i] > t) {
-                // Do linear interpolation. I think this works for both t[x]>t[x-1] and t[x]<t[x-1]
-                double proportion = (t - times[i - 1]) / (times[i] - times[i - 1]);
-                double popSize = populationSizes[i-1] + (proportion*(populationSizes[i] - populationSizes[i - 1]));
+        if (stepwise) {
+            for (int i = 0; i < times.length; i++) {
+                if (times[i] >= t) {
+                    return populationSizes[i];
+                }
+            }
+        } else {
+            for (int i = 0; i < times.length; i++) {
+                if (times[i] == t) {
+                    return populationSizes[i];
+                } else if (times[i] > t) {
+                    // Do linear interpolation. I think this works for both t[x]>t[x-1] and t[x]<t[x-1]
+                    double proportion = (t - times[i - 1]) / (times[i] - times[i - 1]);
+                    double popSize = populationSizes[i-1] + (proportion*(populationSizes[i] - populationSizes[i - 1]));
 
-                return popSize;
+                    return popSize;
+                }
             }
         }
 
@@ -117,4 +126,5 @@ public class EmpiricalDemographicFunction implements DemographicFunction {
 
     private final double[] populationSizes;
     private final double[] times;
+    private final boolean stepwise;
 }
