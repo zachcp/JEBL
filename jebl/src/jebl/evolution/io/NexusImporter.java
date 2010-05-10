@@ -1147,11 +1147,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
                     helper.clearLastMetaComment();
                 }
 
-				final String treeName = makeIntoAllowableIdentifier(helper.readToken( "=;" ));
+                String treeName = helper.readToken( "=;" );
+                if (treeName.length() == 0) {
+                    throw new ImportException("At least one tree has no name");
+                }
+                treeName = makeIntoAllowableIdentifier(treeName);
 
-				if (helper.getLastDelimiter() != '=') {
-					throw new ImportException.BadFormatException("Missing label for tree '" + treeName + "' or missing '=' in TREE command of TREES block");
-				}
+                if (helper.getLastDelimiter() != '=') {
+                    throw new ImportException.BadFormatException("Missing label for tree '" + treeName + "' or missing '=' in TREE command of TREES block");
+                }
 
 				try {
 					if (helper.nextCharacter() != '(') {
