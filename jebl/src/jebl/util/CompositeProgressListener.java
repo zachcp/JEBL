@@ -136,6 +136,9 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     protected void _setProgress(double fractionCompleted) {
+        if (fractionCompleted > 1) {
+            throw new IllegalArgumentException("Progress should be <= 1.  Passed in " + fractionCompleted);
+        }
         currentOperationProgress = fractionCompleted;
         listener._setProgress(baseTime + fractionCompleted * getTaskFraction(currentOperationNum));
     }
@@ -155,7 +158,7 @@ public final class CompositeProgressListener extends ProgressListener {
 
     protected void _setMessage(String message) {
         if (currentSubTaskMessage.length()>0) {
-             message=currentSubTaskMessage+(message.length()>0?": "+message:"");
+            message=currentSubTaskMessage+(message.length()>0?": "+message:"");
             // concatentate the parent message and the sub-task messages. Previous behaviour was
             // just to overwrite the parent sub-task message, but I think this is just wrong.
         }
