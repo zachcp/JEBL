@@ -30,6 +30,12 @@ public class ScoresFactory {
     public static final Pam230 PAM_230 = new Pam230 ();
     public static final Pam240 PAM_240 = new Pam240 ();
     public static final Pam250 PAM_250 = new Pam250 ();
+    public static final AminoAcidScores AMINO_ACID_IDENTITY = new AminoAcidScores(1,0) {
+        @Override
+        public String toString() {
+            return "Identity";
+        }
+    };
     public static final NucleotideScores NUCLEOTIDE_51_PERCENT_SIMILARITY = new NucleotideScores("51% similarity", 5.0f, -3.0f);
     public static final NucleotideScores NUCLEOTIDE_65_PERCENT_SIMILARITY = new NucleotideScores("65% similarity", 5.0f, -4.0f);
     public static final NucleotideScores NUCLEOTIDE_70_PERCENT_SIMILARITY = new NucleotideScores("70% similarity (IUB)", 5 * 1.0f, 5 * -0.9f);
@@ -112,7 +118,9 @@ public class ScoresFactory {
                 BLOSUM_85, BLOSUM_90, PAM_100, PAM_110, PAM_120,
                 PAM_130, PAM_140, PAM_150, PAM_160, PAM_170,
                 PAM_180, PAM_190, PAM_200, PAM_210, PAM_220,
-                PAM_230, PAM_240, PAM_250};
+                PAM_230, PAM_240, PAM_250,
+                AMINO_ACID_IDENTITY,
+        };
     }
     public static NucleotideScores[] getAvailableNucleotideScores () {
         return new NucleotideScores[] {
@@ -125,7 +133,6 @@ public class ScoresFactory {
 
                 NUCLEOTIDE_70_PERCENT_SIMILARITY,
 
-               // new NucleotideScores("93% similarity, Transition/Transversion", 5*1, 5*-1, 5*-5, 0),
 
               //  new NucleotideScores("88% similarity", 5.0f, -7.2810419984342278f),
                 NUCLEOTIDE_93_PERCENT_SIMILARITY,
@@ -133,7 +140,8 @@ public class ScoresFactory {
 
 //                new NucleotideScores("Assembly", 10.0f, -9.0f),
 
-/*                new NucleotideScores("Identity",1,0, 0, 0),*/
+                new NucleotideScores("Transition/Transversion", 5, 1, -4, 0, true),
+                new NucleotideScores("Identity",1,0, 0),
 
                 /*,new Hamming()*/};
     }
