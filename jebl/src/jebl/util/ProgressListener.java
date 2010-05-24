@@ -32,6 +32,14 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
      * @return true if the user has requested that this operation be canceled.
      */
     public final boolean setProgress(double fractionCompleted) {
+//        System.out.println("setProgress "+fractionCompleted);
+        if (fractionCompleted<0)
+            assert false:"Progress must be >=0 but got "+fractionCompleted;
+        if (fractionCompleted > 1.0000001) { // Allow 1.0000001 to handle rounding errors
+            assert false:"Progress must be <=1 but got "+fractionCompleted;
+        }
+        if (fractionCompleted>1)
+            fractionCompleted = 1;
         _setProgress(fractionCompleted);
         return isCanceled();
     }

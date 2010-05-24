@@ -4,6 +4,7 @@ import jebl.evolution.distances.*;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.TreeBuilderFactory;
+import jebl.util.CompositeProgressListener;
 import jebl.util.ProgressListener;
 
 import java.util.ArrayList;
@@ -76,28 +77,29 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
             throw new CannotBuildDistanceMatrixException(getNotEnoughMemoryMessage(memoryRequired));
         }
 
-        CompoundAlignmentProgressListener compoundProgress = new CompoundAlignmentProgressListener(progressListener,(n * (n - 1)) / 2);
+        CompositeProgressListener compositeProgressListener = new CompositeProgressListener(progressListener,n*(n-1));
 
         for(int i = 0; i < n; ++i) {
             for(int j = i+1; j < n; ++j) {
-                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), compoundProgress.getMinorProgress());
-                compoundProgress.incrementSectionsCompleted(1);
-                if(compoundProgress.isCanceled()) return d;
+                compositeProgressListener.beginSubtask();
+                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), compositeProgressListener);
+                if(progressListener.isCanceled()) return d;
 
+                compositeProgressListener.beginSubtask();
                 BasicDistanceMatrix matrix;
                 switch( model ) {
                     case F84:
-                        matrix = new F84DistanceMatrix(result.alignment, progressListener);
+                        matrix = new F84DistanceMatrix(result.alignment, compositeProgressListener);
                         break;
                     case HKY:
-                        matrix = new HKYDistanceMatrix(result.alignment, progressListener);
+                        matrix = new HKYDistanceMatrix(result.alignment, compositeProgressListener);
                         break;
                     case TamuraNei:
-                        matrix = new TamuraNeiDistanceMatrix(result.alignment, progressListener);
+                        matrix = new TamuraNeiDistanceMatrix(result.alignment, compositeProgressListener);
                         break;
                     case JukesCantor:
                     default:
-                        matrix = new JukesCantorDistanceMatrix(result.alignment, progressListener);
+                        matrix = new JukesCantorDistanceMatrix(result.alignment, compositeProgressListener);
                 }
                 d[i][j] = matrix.getDistances()[0][1];
                 d[j][i] = d[i][j];

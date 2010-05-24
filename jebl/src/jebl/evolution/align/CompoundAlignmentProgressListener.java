@@ -37,6 +37,7 @@ class CompoundAlignmentProgressListener  {
 
     private ProgressListener minorProgress = new ProgressListener() {
         protected void _setProgress(double fractionCompleted) {
+            assert fractionCompleted>=0 && fractionCompleted<=1;
 //            System.out.println("progress =" + fractionCompleted+ " sections =" + sectionsCompleted+ "/" + totalSections);
             double totalProgress = (sectionsCompleted + fractionCompleted*sectionSize) / totalSections;
             // if( totalProgress > 1.0 )  System.out.println(totalProgress);

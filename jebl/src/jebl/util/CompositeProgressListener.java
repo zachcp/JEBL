@@ -136,8 +136,16 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     protected void _setProgress(double fractionCompleted) {
-        if (fractionCompleted > 1) {
-            throw new IllegalArgumentException("Progress should be <= 1.  Passed in " + fractionCompleted);
+        if (fractionCompleted > 1.0000001) { // Allow 1.0000001 to handle rounding errors
+            assert false:"Progress should be <= 1.  Passed in " + fractionCompleted;
+        }
+        if (fractionCompleted>1)
+            fractionCompleted = 1;
+        if (fractionCompleted<currentOperationProgress) {
+            assert false:"Progress shouldn't go backwards. Went from "+currentOperationProgress+" to "+fractionCompleted;
+        }
+        if (fractionCompleted<0) {
+            assert false:"Progress must be >=0 but got "+fractionCompleted;
         }
         currentOperationProgress = fractionCompleted;
         listener._setProgress(baseTime + fractionCompleted * getTaskFraction(currentOperationNum));
