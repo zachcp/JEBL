@@ -102,6 +102,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         currentProgress += value;
         if (progress != null) {
             double fraction = ((double) currentProgress) / totalProgress;
+            if (fraction>1)
+                fraction = 1; // In most cases the estimate of the totalProgress is fairly accurate. But if the recursion doesn't split near the halfway point which it occasionally won't a bit more work will be required. In this rare case just cap the progress at 1
             cancelled = progress.setProgress(fraction);
         }
         return cancelled;
