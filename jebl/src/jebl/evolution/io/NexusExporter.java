@@ -311,7 +311,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             if( tree.hasLengths() ) {
                 builder.append(':');
-                builder.append(tree.getLength(node));
+                builder.append(roundDouble(tree.getLength(node), 6));
             }
         } else {
             builder.append('(');
@@ -329,10 +329,17 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // whet it is present.
             if (parent != null) {
                 if (tree.hasLengths()) {
-                    builder.append(":").append(tree.getLength(node));
+                    builder.append(":").append(roundDouble(tree.getLength(node), 6));
                 }
             }
         }
+    }
+
+    public static double roundDouble(double value, int decimalPlace) {
+        double power_of_ten = 1;
+        while (decimalPlace-- > 0)
+            power_of_ten *= 10.0;
+        return Math.round(value * power_of_ten) / power_of_ten;
     }
 
     private StringBuilder appendAttributes(Attributable item, String[] excludeKeys, StringBuilder builder) {
