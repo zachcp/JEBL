@@ -21,6 +21,8 @@ import java.util.List;
 /**
  * Export sequences and trees to Nexus format.
  *
+ * @author Andrew Rambaut
+ * @author Alexei Drummond
  * @author Joseph Heled
  *
  * @version $Id$
