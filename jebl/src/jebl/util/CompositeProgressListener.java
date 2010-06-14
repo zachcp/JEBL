@@ -246,6 +246,11 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     @Override
+    public void addFeedbackAction(String label, String description, SimpleListener listener) {
+        this.listener.addFeedbackAction(label, description, listener);
+    }
+
+    @Override
     public void removeFeedbackAction(String label) {
         this.listener.removeFeedbackAction(label);
     }

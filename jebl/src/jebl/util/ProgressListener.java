@@ -126,6 +126,13 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
     }
 
     /**
+     * Equivalent to {@link #addFeedbackAction(String, String, org.virion.jam.util.SimpleListener) addFeedbackAction(label,"",listener)}
+     */
+    public void addFeedbackAction(String label, SimpleListener listener) {
+
+    }
+
+    /**
      * Adds an action that can choose to provide feedback. For example,
      * an operation may choose to provide a "Skip to next step" button
      * alongside the cancel button. There is no requirement that a
@@ -136,8 +143,8 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
      * @param listener a listener to be notified when the user chooses to invoke
      *                 this action
      */
-    public void addFeedbackAction(String label, SimpleListener listener) {
-
+    public void addFeedbackAction(String label, String description, SimpleListener listener) {
+        addFeedbackAction(label, listener);
     }
 
     /**
@@ -251,6 +258,11 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
         @Override
         public void addFeedbackAction(String label, SimpleListener listener) {
             internalProgressListener.addFeedbackAction(label, listener);
+        }
+
+        @Override
+        public void addFeedbackAction(String label, String description, SimpleListener listener) {
+            internalProgressListener.addFeedbackAction(label, description, listener);
         }
 
         @Override
