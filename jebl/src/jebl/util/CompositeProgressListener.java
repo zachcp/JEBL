@@ -177,6 +177,11 @@ public final class CompositeProgressListener extends ProgressListener {
         return listener.isCanceled();
     }
 
+    /**
+     * Increments the progress of the current sub task by this much. Using this method is generally a bad idea. Use {@link #setProgress(double)} instead.
+     * @param fractionCompletedDiff the amount ot increase the current progress by between 0 and 1.
+     * @return true if canceled.
+     */
     public boolean addProgress(double fractionCompletedDiff) {
         return setProgress(currentOperationProgress + fractionCompletedDiff);
     }
