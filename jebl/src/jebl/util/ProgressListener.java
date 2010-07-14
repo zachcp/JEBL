@@ -58,6 +58,19 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
     }
 
     /**
+     * Same as calling {@link #setProgress(double) setProgress(((double)currentStep)/numberOfSteps)}
+     * @param currentStep between 0 and numberOfSteps inclusive
+     * @param numberOfSteps the total number of steps. Must be greater than 0.
+     * @return true if the user has requested that this operation be canceled.
+     */
+    public final boolean setProgress(long currentStep, long numberOfSteps) {
+        if (numberOfSteps<=0) throw new IllegalArgumentException("numberOfSteps="+numberOfSteps);
+        if (currentStep<0 || currentStep>numberOfSteps)  throw new IllegalArgumentException("currentStep must be between 0 and numberOfSteps inclusive.");
+        double progress  = ((double)currentStep)/numberOfSteps;
+        return setProgress(progress);
+    }
+
+    /**
      * Marks the operation as completed; same as {@link #setProgress(double) setProgress(1.0)}.
      * @return true if the user has requested that this operation be canceled.
      */
