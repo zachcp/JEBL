@@ -166,7 +166,14 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
 
     }
 
+    /**
+     * Sets a title associated with whatever is being done. This will not necessarily even be presented to the user,
+     * but typically will be presented as the title of a progress window.
+     * @param title the title of a progress window (if any). Must not be null.
+     */
+    public void setTitle(String title) {
 
+    }
 
     /**
      * This method is a hook called from {@link #setMessage} to allow subclasses a
@@ -278,6 +285,11 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
         @Override
         public void removeFeedbackAction(String label) {
             internalProgressListener.removeFeedbackAction(label);
+        }
+
+        @Override
+        public void setTitle(String title) {
+            internalProgressListener.setTitle(title);
         }
     }
 }

@@ -261,6 +261,11 @@ public final class CompositeProgressListener extends ProgressListener {
     }
 
     @Override
+    public void setTitle(String title) {
+        this.listener.setTitle(title);
+    }
+
+    @Override
     protected void _setImage(Image image) {
         this.listener._setImage(image);
     }
