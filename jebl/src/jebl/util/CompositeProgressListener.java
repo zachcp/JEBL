@@ -1,6 +1,7 @@
 package jebl.util;
 
 import jebl.math.MachineAccuracy;
+import org.virion.jam.util.SimpleListener;
 
 import java.awt.*;
 import java.io.File;
