@@ -483,7 +483,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return branchLabelPainter;
     }
 
-    public void setScaleBarPainter(Painter<TreePane> scaleBarPainter) {
+    public void setScaleBarPainter(ScaleBarPainter scaleBarPainter) {
         if (this.scaleBarPainter != null) {
             this.scaleBarPainter.removePainterListener(this);
         }
@@ -499,7 +499,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
-    public Painter<TreePane> getScaleBarPainter() {
+    public ScaleBarPainter getScaleBarPainter() {
         return scaleBarPainter;
     }
 
@@ -1102,6 +1102,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         drawTree(g2, drawNodes, clipOffscreenShapes, drawOnlyVisibleElements, false, width, height);
     }
 
+    public Rectangle2D getScaleBarBounds() {
+        return scaleBarBounds;
+    }
+
     /**
      *
      * @param g2 the graphics to draw on to
@@ -1304,7 +1308,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
     }
 
-    private void calibrate(Graphics2D g2, double width, double height) {
+    public void calibrate(Graphics2D g2, double width, double height) {
         long start = System.currentTimeMillis();
 
         // First of all get the bounds for the unscaled tree
@@ -1888,7 +1892,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.viewport = viewport;
     }
 
-    TreeLayout getTreeLayout() {
+    public TreeLayout getTreeLayout() {
         return treeLayout;
     }
 
@@ -2133,7 +2137,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Painter<Node> nodeLabelPainter = null;
     private Painter<Node> branchLabelPainter = null;
 
-    private Painter<TreePane> scaleBarPainter = null;
+    private ScaleBarPainter scaleBarPainter = null;
     private Rectangle2D scaleBarBounds = null;
 
     private Stroke branchLineStroke = new BasicStroke(1.0F);
