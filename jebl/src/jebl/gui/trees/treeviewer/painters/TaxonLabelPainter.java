@@ -37,6 +37,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     private Controls controls;
     private boolean visible;
+    private int maxChars = 50;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
 
@@ -71,17 +72,27 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return join(", ", attributeValues);
     }
 
+    public String limitString(String value) {
+        if(value == null) {
+            return value;
+        }
+        if(value.length() > maxChars) {
+            value = value.substring(0, maxChars)+"...";
+        }
+        return value;
+    }
+
     public String getLabel(Node node, String attributeName){
         String prefix = " ";
         String suffix = " ";
         if (attributeName.equalsIgnoreCase(TAXON_NAMES)) {
-            return prefix+tree.getTaxon(node).getName()+suffix;
+            return prefix+limitString(tree.getTaxon(node).getName())+suffix;
         }
 
         if (attributeName.equalsIgnoreCase(NODE_HEIGHTS) ) {
-            return prefix+getFormattedValue(tree.getHeight(node))+suffix;
+            return prefix+limitString(getFormattedValue(tree.getHeight(node)))+suffix;
         } else if (attributeName.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-            return prefix+getFormattedValue(tree.getLength(node))+suffix;
+            return prefix+limitString(getFormattedValue(tree.getLength(node)))+suffix;
         }
 
         Object value = node.getAttribute(attributeName);
@@ -97,7 +108,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
                 return  prefix+format.format((Date)value)+suffix;
             }
-            String s = value.toString();
+            String s = limitString(value.toString());
             //limit node labels to 15 chars (plus ...)
             //if(s.length() > 15)
             //    return s.substring(0,15)+"...";
@@ -298,6 +309,19 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             };
             significantDigitSpinner.addChangeListener(sigFigListener);
             sigFigListener.stateChanged(null);
+
+            final JSpinner maxCharsDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_maxChars", maxChars), 2, 100, 1));
+            panel.addComponentWithLabel("Max Chars:", maxCharsDigitSpinner);
+            ChangeListener maxCharListener = new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    Integer value = (Integer) maxCharsDigitSpinner.getValue();
+                    maxChars = value;
+                    PREFS.putInt("Tip Labels_maxChars", value);
+                    firePainterChanged();
+                }
+            };
+            maxCharsDigitSpinner.addChangeListener(maxCharListener);
+            maxCharListener.stateChanged(null);
 
             Icon infoIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/info16.png");
             JLabel infoLabel = new JLabel("Set font sizes in the toolbar above", infoIcon, JLabel.CENTER);
