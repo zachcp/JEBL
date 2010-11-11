@@ -37,7 +37,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     private Controls controls;
     private boolean visible;
-    private int maxChars = 50;
+    private int maxChars = 30;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
 
