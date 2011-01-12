@@ -42,6 +42,7 @@ public class MultipleTreeViewer extends TreeViewer {
         this.trees = new ArrayList<Tree>();
         trees.add(tree);
         setCurrentTree(tree);
+        treesChanged();
     }
 
     private int labelSize = 6;
@@ -55,10 +56,28 @@ public class MultipleTreeViewer extends TreeViewer {
     public void setTrees(Collection<? extends Tree> trees, int defaultLabelSize) {
         this.trees = new ArrayList<Tree>(trees);
         labelSize = defaultLabelSize;
-        super.setTree(this.trees.get(0), defaultLabelSize);
+        setCurrentTree(this.trees.get(0));
+        treesChanged();
+    }
+
+    private boolean updatingCombo = false;
+
+    private void treesChanged() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updatingCombo = true;
+                currentTreeCombo.removeAllItems();
+                for (String name : getTreeNames(trees)) {
+                    currentTreeCombo.addItem(name);
+                }
+                currentTreeCombo.setSelectedIndex(currentTree);
+                updatingCombo = false;
+            }
+        });
     }
 
     private void setCurrentTree(Tree tree) {
+        currentTree = trees.indexOf(tree);
         super.setTree(tree, labelSize);
     }
 
@@ -84,22 +103,15 @@ public class MultipleTreeViewer extends TreeViewer {
             if (controls == null) {
                 OptionsPanel optionsPanel = new OptionsPanel();
 
-                final Vector<String> names = new Vector<String>();
-                for( int i = 0; i < trees.size(); i ++) {
-                    Tree tree = trees.get(i);
-                    final Object oname = tree.getAttribute(NexusExporter.treeNameAttributeKey);
-                    final String indexString = "" + (i + 1) + "/" + trees.size();
-                    final String name = oname == null ? indexString : oname.toString() + " (" + indexString + ")";
-
-                    names.add(name);
-                }
-                final JComboBox currentTreeCombo = new JComboBox(names);
+                currentTreeCombo = new JComboBox(getTreeNames(trees));
                 currentTreeCombo.setMaximumRowCount(24);
                 currentTreeCombo.addItemListener(new ItemListener() {
                     public void itemStateChanged(ItemEvent e) {
+                        if (updatingCombo) {
+                            return;
+                        }
                         trees.set(currentTree, treePane.getTree());
-                        currentTree = names.indexOf((String)currentTreeCombo.getSelectedItem()) ;
-                        setCurrentTree(trees.get(currentTree) );
+                        setCurrentTree(trees.get(currentTreeCombo.getSelectedIndex()));
                         //this is here becasue the selection clears when we change trees, and we
                         //want to refresh the toolbar
                         treePane.clearSelection();
@@ -124,5 +136,19 @@ public class MultipleTreeViewer extends TreeViewer {
         private Controls controls = null;
     };
 
+    private static Vector<String> getTreeNames(List<Tree> trees) {
+        final Vector<String> names = new Vector<String>();
+        for( int i = 0; i < trees.size(); i ++) {
+            Tree tree = trees.get(i);
+            final Object oname = tree.getAttribute(NexusExporter.treeNameAttributeKey);
+            final String indexString = "" + (i + 1) + "/" + trees.size();
+            final String name = oname == null ? indexString : oname.toString() + " (" + indexString + ")";
+
+            names.add(name);
+        }
+        return names;
+    }
+
     private List<Tree> trees = null;
+    private JComboBox currentTreeCombo;
 }
