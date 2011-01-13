@@ -409,7 +409,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         }
 
         if (value instanceof String) {
-            return builder.append("\"").append(value).append("\"");
+            return builder.append("\"").append(((String)value).replace("\"", "'")).append("\"");
         }
 
         return builder.append(value);
