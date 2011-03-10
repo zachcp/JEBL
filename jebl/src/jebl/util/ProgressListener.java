@@ -3,6 +3,7 @@ package jebl.util;
 import org.virion.jam.util.SimpleListener;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * @author Matt Kearse
@@ -23,7 +24,7 @@ import java.awt.*;
  * Any object may exhibit undefined behaviour when dealing with a ProgressListener 
  * that is not fulfilling this contract.
  */
-public abstract class ProgressListener implements Cancelable { // TT: Should we let ProgressListener implement Cancelable or shouldn't we?
+public abstract class ProgressListener implements Cancelable {
     /**
      * @param fractionCompleted a number between 0 and 1 inclusive
      * representing the fraction of the operation completed.
@@ -290,6 +291,125 @@ public abstract class ProgressListener implements Cancelable { // TT: Should we 
         @Override
         public void setTitle(String title) {
             internalProgressListener.setTitle(title);
+        }
+    }
+
+    /**
+     * Splits a progress listener into a number of separate progress listeners. Each returned progress listener may
+     * independently set their progress and the total progress set by all returned progress listeners is summed
+     * and forwarded to progressListener.
+     * <p/>
+     * Also consider using {@link CompositeProgressListener} which is easier to use in most situations
+     * <p/>
+     * The returned progress listeners are not thread safe.
+     * @param progressListener the parent progress listener to forward the sum of the returned progress listeners to.
+     * @param numberOfEvenlyWeightedPartialTasks the number of evenly weighted progress listeners to split it into.
+     * @return numberOfEvenlyWeightedPartialTasks evenly weighted progress listeners.
+     */
+    public static java.util.List<ProgressListener> createSplitProgress(ProgressListener progressListener, int numberOfEvenlyWeightedPartialTasks) {
+        java.util.List<ProgressListener> progressListeners = new ArrayList<ProgressListener>(numberOfEvenlyWeightedPartialTasks);
+        double [] totalProgress = new double[1];
+        double singleWeight = 1.0/numberOfEvenlyWeightedPartialTasks;
+        for (int i = 0; i < numberOfEvenlyWeightedPartialTasks; i++) {
+            progressListeners.add(new PartialProgress(totalProgress, singleWeight, progressListener));
+        }
+        return progressListeners;
+    }
+
+    /**
+     * Splits a progress listener into a number of separate progress listeners weighted according to partialWeights.
+     * Each returned progress listener may
+     * independently set their progress and the total progress set by all returned progress listeners is summed
+     * and forwarded to progressListener.
+     * <p/>
+     * Also consider using {@link CompositeProgressListener} which is easier to use in most situations
+     * <p/>
+     * The returned progress listeners are not thread safe.
+     * @param progressListener the parent progress listener to forward the sum of the returned progress listeners to.
+     * @param partialWeights the relative partial weights of the progress listeners to return. This weights do not need to sum to 1.0.
+     * @return partialWeights.length weighted progress listeners.
+     */
+    public static java.util.List<ProgressListener> createSplitProgress(ProgressListener progressListener, double... partialWeights) {
+        double totalWeight = 0;
+        for (double partialWeight : partialWeights) {
+            totalWeight+=partialWeight;
+        }
+        double[] normalizedWeights = new double[partialWeights.length];
+        for (int i = 0; i < partialWeights.length; i++) {
+            normalizedWeights[i]=partialWeights[i]/totalWeight;
+        }
+        return createSplitProgressForNormalizedWeights(progressListener, normalizedWeights);
+    }
+
+    /**
+     * @param progressListener a progress listener returned from a previous call to {@link #createSplitProgress(ProgressListener, double...)}
+     * @return the current progress for the given progress listener which must have been returned from a previous call to {@link #createSplitProgress(ProgressListener, double...)}
+     */
+    public static double getSplitProgress(ProgressListener progressListener) {
+        if (progressListener instanceof PartialProgress) {
+            PartialProgress partialProgress = (PartialProgress) progressListener;
+            return partialProgress.thisProgressSoFar;
+        }
+        else {
+            throw new IllegalArgumentException("progressListener was not returned from SplitProgress");
+        }
+    }
+
+    private static java.util.List<ProgressListener> createSplitProgressForNormalizedWeights(ProgressListener progressListener, double[] partialWeightsWhichSumTo1) {
+        java.util.List<ProgressListener> progressListeners = new ArrayList<ProgressListener>(partialWeightsWhichSumTo1.length);
+        double [] totalProgress = new double[1];
+        for (double splitWeight : partialWeightsWhichSumTo1) {
+            progressListeners.add(new PartialProgress(totalProgress, splitWeight, progressListener));
+        }
+        return progressListeners;
+    }
+
+    private static class PartialProgress extends ProgressListener {
+        final double [] totalProgress; // We use this 1 element array rather than an AtomcReference<Double> to improve performance by avoiding unnecessary sychronzation
+        final double thisWeight;
+        double thisProgressSoFar;
+        double thisWeightedProgressSoFar;
+        final ProgressListener fullProgressListener;
+
+        private PartialProgress(double[] totalProgress, double thisWeight, ProgressListener fullProgressListener) {
+            this.totalProgress = totalProgress;
+            this.thisWeight = thisWeight;
+            this.fullProgressListener = fullProgressListener;
+        }
+
+        protected void _setProgress(double fractionCompleted) {
+            if (fractionCompleted<0 || fractionCompleted>1.001) { // We allow going a little over 1.0 due to double accuracy issues when summing lots of partial weights (e.g. I got 1.0000000000000002) once.
+                assert false:"FractionComplete="+fractionCompleted;
+            }
+            if (fractionCompleted>1.0)
+                fractionCompleted = 1.0;
+            if (fractionCompleted< thisProgressSoFar) {
+                assert false:"Progress went backwards from "+ thisProgressSoFar +" to "+fractionCompleted;
+            }
+            thisProgressSoFar = fractionCompleted;
+            double weightedProgress = thisWeight * fractionCompleted;
+            double newWeightedProgress = weightedProgress - thisWeightedProgressSoFar;
+            thisWeightedProgressSoFar = weightedProgress;
+            totalProgress[0]+=newWeightedProgress;
+            double fullProgress = totalProgress[0];
+            if (fullProgress<0 || fullProgress>1.001) {
+                throw new IllegalStateException("fullProgress="+fullProgress);
+            }
+            if (fullProgress>1.0)
+                fullProgress = 1.0;
+            fullProgressListener.setProgress(fullProgress);
+        }
+
+        protected void _setIndeterminateProgress() {
+            // Ignored since just because 1 part wants indeterminate progress, doesn't mean they all should.
+        }
+
+        protected void _setMessage(String message) {
+            fullProgressListener.setMessage(message);
+        }
+
+        public boolean isCanceled() {
+            return fullProgressListener.isCanceled();
         }
     }
 }

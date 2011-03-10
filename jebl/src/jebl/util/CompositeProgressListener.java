@@ -24,6 +24,8 @@ import java.util.List;
  * Alternatively, instead of calling {@link #beginNextSubtask()} after each subtask (except the last),
  * you can instead call {@link #beginSubtask()} before each subtask (including the first).
  * <p/>
+ * For situations where you need to report progress from multiple sources simultaneously to progress listeners
+ * that forward to a single parent progress listener, see {@link ProgressListener#createSplitProgress(ProgressListener, int)}
  *
  * @author Tobias Thierer
  * @version $Id$
