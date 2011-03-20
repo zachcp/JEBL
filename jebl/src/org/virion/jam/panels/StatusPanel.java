@@ -173,7 +173,12 @@ public class StatusPanel extends JPanel implements StatusListener {
         if (workingStatusIcons == null) return;
         listener.actionPerformed(null);
 
-        timer = new javax.swing.Timer(100, listener);
+        timer = new javax.swing.Timer(100, listener) {
+            @Override
+            public String toString() {
+                return "StatusPanelTimer";
+            }
+        };
         timer.setCoalesce(true);
         timer.start();
     }

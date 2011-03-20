@@ -110,7 +110,12 @@ public class SlideOpenPanel extends JPanel {
 	}
 
 	private void startAnimation() {
-		timer = new Timer(animationSpeed, listener);
+		timer = new Timer(animationSpeed, listener) {
+            @Override
+            public String toString() {
+                return "SlideOpenPanelAnimationTimer";
+            }
+        };
 		timer.setRepeats(true);
 		timer.setCoalesce(false);
 		timer.start();

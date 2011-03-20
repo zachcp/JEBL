@@ -94,7 +94,12 @@ public class DisclosureButton extends JToggleButton {
     private void startAnimation() {
         if (disclosureIcons == null) return;
 
-        timer = new Timer(animationSpeed, listener);
+        timer = new Timer(animationSpeed, listener) {
+            @Override
+            public String toString() {
+                return "DisclosureButtonAnimationTimer";
+            }
+        };
         timer.setCoalesce(false);
         timer.start();
     }
