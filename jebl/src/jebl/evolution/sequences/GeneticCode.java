@@ -24,31 +24,72 @@ import java.util.*;
 
 public final class GeneticCode {
     private final Map<CodonState, AminoAcidState> translationMap;
+    private final Map<CodonState, AminoAcidState> firstCodonTranslationMap;
 
-    private static final CodonState DEFAULT_START_CODON = Codons.getState("ATG");
-    private static final Set<CodonState> DEFAULT_START_CODONS = Collections.singleton(DEFAULT_START_CODON);
+    private static int[] ncbiToJeblTranslationIndex;
+    static {
+        ncbiToJeblTranslationIndex = new int[64];
+        for(int i=0;i<4;i++) {
+            for(int j=0;j<4;j++) {
+                for(int k=0;k<4;k++) {
+                    int ncbiIndex = i*16+j*4+k;
+                    int jeblIndex=ncbiToJeblNucleotideIndex(i)*16+ncbiToJeblNucleotideIndex(j)*4+ncbiToJeblNucleotideIndex(k);
+                    ncbiToJeblTranslationIndex[ncbiIndex]=jeblIndex;
+                }
+            }
+        }
+    }
+
+    private static int ncbiToJeblNucleotideIndex(int nucleotideIndex) {
+        if (nucleotideIndex==0)
+            return 3;//T
+        if (nucleotideIndex==1)
+            return 1;//C
+        if (nucleotideIndex==2)
+            return 0;//A
+        if (nucleotideIndex==3)
+            return 2;//G
+        throw new IllegalArgumentException();
+    }
 
     public static final GeneticCode
-            UNIVERSAL = new GeneticCode("universal", "Standard", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 1),
-            VERTEBRATE_MT = new GeneticCode("vertebrateMitochondrial", "Vertebrate Mitochondrial", "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 2),
-            YEAST = new GeneticCode("yeast", "Yeast Mitochondrial",  "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 3),
-            MOLD_PROTOZOAN_MT = new GeneticCode("moldProtozoanMitochondrial", "Mold Protozoan Mitochondrial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 4),
-            MYCOPLASMA = new GeneticCode("mycoplasma", "Mycoplasma", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF"),
-            INVERTEBRATE_MT = new GeneticCode("invertebrateMitochondrial", "Invertebrate Mitochondrial", "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 5),
-            CILIATE = new GeneticCode("ciliate", "Ciliate", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF", 6),
-            ECHINODERM_MT = new GeneticCode("echinodermMitochondrial", "Echinoderm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 9),
-            EUPLOTID_NUC = new GeneticCode("euplotidNuclear", "Euplotid Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF", 10),
-            BACTERIAL = new GeneticCode("bacterial", "Bacterial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 11),
-            ALT_YEAST = new GeneticCode("alternativeYeast", "Alternative Yeast", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 12),
-            ASCIDIAN_MT = new GeneticCode("ascidianMitochondrial", "Ascidian Mitochondrial", "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 13),
-            FLATWORM_MT = new GeneticCode("flatwormMitochondrial", "Flatworm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF", 14),
-            BLEPHARISMA_NUC = new GeneticCode("blepharismaNuclear", "Blepharisma Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF", 15);
+            UNIVERSAL = new GeneticCode("universal", "Standard", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 1, reorderTranslation("---M---------------M---------------M----------------------------")),
+            VERTEBRATE_MT = new GeneticCode("vertebrateMitochondrial", "Vertebrate Mitochondrial", "KNKNTTTT*S*SMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 2,reorderTranslation("--------------------------------MMMM---------------M------------")),
+            YEAST = new GeneticCode("yeast", "Yeast Mitochondrial",  "KNKNTTTTRSRSMIMIQHQHPPPPRRRRTTTTEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 3,reorderTranslation("----------------------------------MM----------------------------")),
+            MOLD_PROTOZOAN_MT = new GeneticCode("moldProtozoanMitochondrial", "Mold Protozoan Mitochondrial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 4,reorderTranslation("--MM---------------M------------MMMM---------------M------------")),
+            MYCOPLASMA = new GeneticCode("mycoplasma", "Mycoplasma", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF",-1,reorderTranslation("--MM---------------M------------MMMM---------------M------------")), // this code isn't defined at NCBI, so I used table 4 translations from http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi which has Mycoplasma in it's name. I guess those 2 tables were merged at some point
+            INVERTEBRATE_MT = new GeneticCode("invertebrateMitochondrial", "Invertebrate Mitochondrial", "KNKNTTTTSSSSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 5,reorderTranslation("---M----------------------------MMMM---------------M------------")),
+            CILIATE = new GeneticCode("ciliate", "Ciliate", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVQYQYSSSS*CWCLFLF", 6,reorderTranslation("-----------------------------------M----------------------------")),
+            ECHINODERM_MT = new GeneticCode("echinodermMitochondrial", "Echinoderm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 9,reorderTranslation("-----------------------------------M---------------M------------")),
+            EUPLOTID_NUC = new GeneticCode("euplotidNuclear", "Euplotid Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSCCWCLFLF", 10,reorderTranslation("-----------------------------------M----------------------------")),
+            BACTERIAL = new GeneticCode("bacterial", "Bacterial", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 11,reorderTranslation("---M---------------M------------MMMM---------------M------------")),
+            ALT_YEAST = new GeneticCode("alternativeYeast", "Alternative Yeast", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLSLEDEDAAAAGGGGVVVV*Y*YSSSS*CWCLFLF", 12,reorderTranslation("-------------------M---------------M----------------------------")),
+            ASCIDIAN_MT = new GeneticCode("ascidianMitochondrial", "Ascidian Mitochondrial", "KNKNTTTTGSGSMIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*Y*YSSSSWCWCLFLF", 13,reorderTranslation("---M------------------------------MM---------------M------------")),
+            FLATWORM_MT = new GeneticCode("flatwormMitochondrial", "Flatworm Mitochondrial", "NNKNTTTTSSSSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVYY*YSSSSWCWCLFLF", 14,reorderTranslation("-----------------------------------M----------------------------")),
+            BLEPHARISMA_NUC = new GeneticCode("blepharismaNuclear", "Blepharisma Nuclear", "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVV*YQYSSSS*CWCLFLF", 15,reorderTranslation("-----------------------------------M----------------------------")),
+            CHLOROPHYCEAN_MITOCHONDRIAL = new GeneticCode("chlorophyceanMitochondrial", "Chlorophycean Mitochondrial", reorderTranslation("FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 16,reorderTranslation("-----------------------------------M----------------------------")),
+            TREMATODE_MITOCHONDRIAL = new GeneticCode("trematodeMitochondrial", "Trematode Mitochondrial", reorderTranslation("FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG"), 21,reorderTranslation("-----------------------------------M---------------M------------")),
+            SCENEDESMUS_OBLIQUUS_MITOCHONDRIAL = new GeneticCode("scenedesmusObliquusMitochondrial", "Scenedesmus Obliquus Mitochondrial", reorderTranslation("FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 22,reorderTranslation("-----------------------------------M----------------------------")),
+            THRAUSTOCHYTRIUM_MITOCHONDRIAL = new GeneticCode("thraustochytriumMitochondrial", "Thraustochytrium Mitochondrial", reorderTranslation("FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 23,reorderTranslation("--------------------------------M--M---------------M------------"));
 
     private static final List<GeneticCode> GENETIC_CODES_LIST = Collections.unmodifiableList(Arrays.asList(
             UNIVERSAL, VERTEBRATE_MT, YEAST, MOLD_PROTOZOAN_MT, MYCOPLASMA, INVERTEBRATE_MT,
             CILIATE, ECHINODERM_MT, EUPLOTID_NUC, BACTERIAL, ALT_YEAST, ASCIDIAN_MT,
-            FLATWORM_MT, BLEPHARISMA_NUC
+            FLATWORM_MT, BLEPHARISMA_NUC,CHLOROPHYCEAN_MITOCHONDRIAL,TREMATODE_MITOCHONDRIAL,SCENEDESMUS_OBLIQUUS_MITOCHONDRIAL,THRAUSTOCHYTRIUM_MITOCHONDRIAL
     ));
+
+    private static String reorderTranslation(String translation) {
+        // jebls ordering of nucleotides is different to that used by NCBI at http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+        char[] result = new char[64];
+        if (translation.length()!=64)
+            throw new IllegalArgumentException();
+
+        for(int i=0;i<64;i++) {
+            int jeblIndex = ncbiToJeblTranslationIndex[i];
+            result[jeblIndex]=translation.charAt(i);
+        }
+        return new String(result);
+    }
 
     /**
      * Returns an iterable that allows you to iterate over all the standard genetic codes
@@ -101,20 +142,6 @@ public final class GeneticCode {
     }
 
     /**
-     * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, -1, DEFAULT_START_CODONS).
-     */
-    private GeneticCode(String name, String description, String codeTable) {
-        this(name, description, codeTable, -1, DEFAULT_START_CODONS);
-    }
-
-    /**
-     * Same as {@link #GeneticCode(String, String, String, int, java.util.Set)}(name, description, codeTable, ncbiTranslationTableNumber, DEFAULT_START_CODONS).
-     */
-    private GeneticCode(String name, String description, String codeTable, int ncbiTranslationTableNumber) {
-        this(name, description, codeTable, ncbiTranslationTableNumber, DEFAULT_START_CODONS);
-    }
-
-    /**
      * Constructs a new GeneticCode.
      * @param name Name of the genetic code (from GENBANK)
      * @param description Description of the genetic code (from GENBANK)
@@ -123,32 +150,45 @@ public final class GeneticCode {
      *        AAA, AAC, AAG, AAT, ACA etc. (i.e. first codon position is most significant, and nucleotides come in the
      *        order A, C, G, T) (Note: This is not the order used by the Genbank website).
      * @param ncbiTranslationTableNumber the number used by NCBI to represent this genetic code or -1 if none. Eg. 1 = Standard...
-     * @param startCodons Set of start codons (defaults to ATG only).
-     *        Note that 23% of E.Coli are not ATG (see http://en.wikipedia.org/wiki/Start_codon).
-     *        See also http://www.biomatters.com/userforum/comments.php?DiscussionID=177
      */
-    private GeneticCode(final String name, final String description, final String codeTable, int ncbiTranslationTableNumber, Set<CodonState> startCodons) {
+    private GeneticCode(final String name, final String description, final String codeTable, int ncbiTranslationTableNumber, String firstCodonTranslationTable) {
         this.name = name;
         this.description = description;
         this.codeTable = codeTable;
         this.ncbiTranslationTableNumber = ncbiTranslationTableNumber;
-        this.startCodons = startCodons;
-
-        Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
 
         if (codeTable.length() != 64) {
             throw new IllegalArgumentException("Code Table length does not match number of codon states");
         }
 
+        this.translationMap = createTranslationMap(codeTable);
+        this.startCodons = new HashSet<CodonState>();
+        StringBuilder fullFirstCodonTranslationMap = new StringBuilder();
+        for(int i=0;i<firstCodonTranslationTable.length();i++) {
+            char c = firstCodonTranslationTable.charAt(i);
+            if (c !='-') {
+                fullFirstCodonTranslationMap.append(c);
+                CodonState state = Codons.getState(i);
+                startCodons.add(state);
+            }
+            else {
+                fullFirstCodonTranslationMap.append(codeTable.charAt(i));
+            }
+        }
+        this.firstCodonTranslationMap = createTranslationMap(fullFirstCodonTranslationMap.toString());
+    }
+
+    private static Map<CodonState, AminoAcidState> createTranslationMap(String codeTable) {
+        Map<CodonState, AminoAcidState> translationMap = new TreeMap<CodonState, AminoAcidState>();
         for (int i = 0; i < codeTable.length(); i++) {
             CodonState codonState = Codons.CANONICAL_STATES[i];
-            AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i+1));
+            AminoAcidState aminoAcidState = AminoAcids.getState(codeTable.substring(i, i + 1));
             translationMap.put(codonState, aminoAcidState);
         }
         translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
         translationMap.put(Codons.getUnknownState(), AminoAcids.getUnknownState());
-
-        this.translationMap = Collections.unmodifiableMap(translationMap);
+        translationMap = Collections.unmodifiableMap(translationMap);
+        return translationMap;
     }
 
     /**
@@ -176,27 +216,45 @@ public final class GeneticCode {
         return codeTable;
     }
 
+    /**
+     * equivalent to {@link #getTranslation(CodonState, boolean) getTranslation(codonState,false)}
+     */
+    public AminoAcidState getTranslation(CodonState codonState) {
+        return getTranslation(codonState, false);
+    }
 	/**
 	 * Returns the state associated with AminoAcid represented by codonState.
 	 * Note that the state is the canonical state (generated combinatorially)
+     * @param isFirstCodon true to get the translation if these nucleotides are the first codon in a CDS (for some codons at the start of the CDS, they will translate to M even though they would translate to something different if in the middle of the CDS)
 	 * @see AminoAcids
 	 * @see Codons
 	 * @return '?' if codon unknown
 	 */
-	public AminoAcidState getTranslation(CodonState codonState) {
+	public AminoAcidState getTranslation(CodonState codonState, boolean isFirstCodon) {
         //System.out.println(codonState.getCode());
-        return translationMap.get(codonState);
+        if (isFirstCodon)
+            return firstCodonTranslationMap.get(codonState);
+        else
+            return translationMap.get(codonState);
 	}
 
+    /**
+     * equivalent to {@link #getTranslation(NucleotideState, NucleotideState, NucleotideState, boolean) getTranslation(nucleotide1,nucleotide2,nucleotide3,false)}
+     */
+    public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3){
+        return getTranslation(nucleotide1, nucleotide2, nucleotide3, false);
+    }
     /**
 	 * Returns the state associated with AminoAcid represented by the three nucleotides.
 	 * If one or more of the nucleotides are ambiguous, and all combinations translate to the
      * same protein, then this method will return that protein
+     * @param isFirstCodon true to get the translation if these nucleotides are the first codon in a CDS (for some codons at the start of the CDS, they will translate to M even though they would translate to something different if in the middle of the CDS)
 	 * @see AminoAcids
 	 * @see Codons
 	 * @return '?' if codon unknown
 	 */
-    public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3){
+    public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
+        Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         CodonState translateState = null;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
 			translateState = Codons.GAP_STATE;
@@ -225,15 +283,23 @@ public final class GeneticCode {
     }
 
     /**
+     * Equivalent to {@link #getTranslation(String, boolean) getTranslation(nucleotides, false)}
+	 */
+    public AminoAcidState getTranslation(String nucleotides) {
+        return getTranslation(nucleotides, false);
+    }
+
+    /**
 	 * Returns the state associated with AminoAcid represented by the three nucleotides.
 	 * If one or more of the nucleotides are ambiguous, and all combinations translate to the
      * same protein, then this method will return that protein
      * @param nucleotides a string consisting of exactly 3 residues in any case.
+     * @param isFirstCodon true to get the translation if these nucleotides are the first codon in a CDS (for some codons at the start of the CDS, they will translate to M even though they would translate to something different if in the middle of the CDS)
 	 * @see AminoAcids
 	 * @see Codons
 	 * @return '?' if codon unknown
 	 */
-    public AminoAcidState getTranslation(String nucleotides) {
+    public AminoAcidState getTranslation(String nucleotides, boolean isFirstCodon) {
         if (nucleotides.length()!=3) throw new IllegalArgumentException("getTranslation requires a nucleotide triplet. (given "+nucleotides.length()+" characters)");
         NucleotideState n1=Nucleotides.getState(nucleotides.charAt(0));
         NucleotideState n2=Nucleotides.getState(nucleotides.charAt(1));
@@ -247,7 +313,7 @@ public final class GeneticCode {
         if (n3==null) {
             n3=Nucleotides.UNKNOWN_STATE;
         }
-        return getTranslation(n1,n2,n3);
+        return getTranslation(n1,n2,n3, isFirstCodon);
     }
 
     /**
