@@ -32,6 +32,13 @@ public class Utils {
 	}
 
     /**
+     * @deprecated use {@link #translate(State[], GeneticCode, boolean)} instead
+     */
+    @Deprecated public static AminoAcidState[] translate(final State[] states, GeneticCode geneticCode) {
+        return translate(states, geneticCode, false);
+    }
+
+    /**
      * Translates each of a given sequence of {@link NucleotideState}s or {@link CodonState}s
      * to the {@link AminoAcidState} corresponding to it under the given genetic code.
      *
@@ -42,9 +49,10 @@ public class Utils {
      * @param states States to translate; must all be of the same type, either NucleotideState
      *        or CodonState.
      * @param geneticCode
+     * @param translateFirstCodonUsingFirstCodonTable each genetic code specifies a set of codons which get translated as M if they are the first codon even though they normally wouldn't translate as an M when occurring elsewhere a coding region. If this parameter is true the first codon will be translated using this alternative translation table for the genetic code.
      * @return
      */
-    public static AminoAcidState[] translate(final State[] states, GeneticCode geneticCode) {
+    public static AminoAcidState[] translate(final State[] states, GeneticCode geneticCode, boolean translateFirstCodonUsingFirstCodonTable) {
         if (states == null) throw new NullPointerException("States array is null");
         if (states.length == 0) return new AminoAcidState[0];
 
@@ -53,13 +61,13 @@ public class Utils {
             for (int i = 0; i < translation.length; i++) {
                 translation[i] = geneticCode.getTranslation((NucleotideState)states[i * 3],
                                                             (NucleotideState)states[(i * 3) + 1],
-                                                            (NucleotideState)states[(i * 3) + 2]);
+                                                            (NucleotideState)states[(i * 3) + 2], i==0 && translateFirstCodonUsingFirstCodonTable);
             }
             return translation;
         } else if (states[0] instanceof CodonState) {
             AminoAcidState[] translation = new AminoAcidState[states.length];
             for (int i = 0; i < translation.length; i++) {
-                translation[i] = geneticCode.getTranslation((CodonState)states[i]);
+                translation[i] = geneticCode.getTranslation((CodonState)states[i], i==0 && translateFirstCodonUsingFirstCodonTable);
             }
             return translation;
         } else {
@@ -89,7 +97,7 @@ public class Utils {
     }
 
     private static String reverseComplement(final String nucleotideSequence, boolean removeGaps) {
-        boolean predominantlyRNA = isPredominantlyRNA(nucleotideSequence,-1);
+        boolean predominantlyRNA = isPredominantlyRNA(nucleotideSequence, -1);
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         if( removeGaps ) {
             seq = new GaplessSequence(seq);
@@ -143,34 +151,33 @@ public class Utils {
      *
      * @param nucleotideSequence nucleotide sequence to translate
      * @param geneticCode        genetic code to use for the translation
+     * @param translateFirstCodonUsingFirstCodonTable each genetic code specifies a set of codons which get translated as M if they are the first codon even though they normally wouldn't translate as an M when occurring elsewhere a coding region. If this parameter is true the first codon will be translated using this alternative translation table for the genetic code.
      * @return A string with length nucleotideSequence.length() / 3 (rounded
      *         down), the translation of <code>nucleotideSequence</code> with
      *         the given genetic code
      */
-    public static String translateCharSequence(final CharSequence nucleotideSequence, GeneticCode geneticCode) {
+    public static String translateCharSequence(final CharSequence nucleotideSequence, GeneticCode geneticCode, boolean translateFirstCodonUsingFirstCodonTable) {
         Sequence seq = new BasicSequence(SequenceType.NUCLEOTIDE, Taxon.getTaxon("x"), nucleotideSequence);
         seq = new GaplessSequence(seq);
         State[] states = seq.getStates();
 
-        states = translate(states, geneticCode);
+        states = translate(states, geneticCode, translateFirstCodonUsingFirstCodonTable);
         seq = new BasicSequence(SequenceType.AMINO_ACID, Taxon.getTaxon("x"), states);
         return seq.getString();
     }
 
     /**
-     * A wrapper for {@link #translateCharSequence(CharSequence,GeneticCode)}
-     * that takes a nucleotide sequence as a String only rather than a
-     * CharSequence. This is to preserve backwards compatibility with
-     * existing compiled code.
-     *
-     * @param nucleotideSequence nucleotide sequence string to translate
-     * @param geneticCode        genetic code to use for the translation
-     * @return A string with length nucleotideSequence.length() / 3 (rounded
-     *         down), the translation of <code>nucleotideSequence</code> with
-     *         the given genetic code
+     * @deprecated use {@link #translateCharSequence(CharSequence, GeneticCode, boolean)} instead
      */
-    public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
-        return translateCharSequence(nucleotideSequence, geneticCode);
+    @Deprecated public static String translateCharSequence(final CharSequence nucleotideSequence, GeneticCode geneticCode) {
+        return translateCharSequence(nucleotideSequence, geneticCode, false);
+    }
+
+    /**
+     * @deprecated use {@link #translateCharSequence(CharSequence, GeneticCode, boolean)} instead
+     */
+    @Deprecated public static String translate(final String nucleotideSequence, GeneticCode geneticCode) {
+        return translateCharSequence(nucleotideSequence, geneticCode, false);
     }
 
     public static State[] stripGaps(final State[] sequence) {
