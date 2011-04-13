@@ -39,6 +39,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -51,6 +52,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 /**
  * @author Andrew Rambaut
@@ -427,6 +430,14 @@ public class TreeViewer extends JPanel implements Printable {
                         setVerticalExpansion(((double) value) / 100.0);
                         PREFS.putInt(expansionValuePrefKey, value);
                         fireChangeListeners();
+                    }
+                });
+                verticalExpansionSlider.addPropertyChangeListener(new PropertyChangeListener(){
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if(evt.getPropertyName().equals("enabled") && evt.getNewValue() instanceof Boolean) {
+                            final int value = verticalExpansionSlider.getValue();
+                            setVerticalExpansion(((Boolean)evt.getNewValue()) ? ((double) value) / 100.0 : 0.0);
+                        }
                     }
                 });
 
