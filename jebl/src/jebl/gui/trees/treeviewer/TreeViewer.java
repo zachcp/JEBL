@@ -362,13 +362,14 @@ public class TreeViewer extends JPanel implements Printable {
                 treeViewPanel.add(Box.createHorizontalStrut(0));
                 optionsPanel.addSpanningComponent(treeViewPanel);
 
+                ChangeListener checkboxListener = null;
                 if( tree.conceptuallyUnrooted() ) {
                     allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
                     boolean allow = PREFS.getBoolean(unrootedTreeAllLayoutsAllowedPrefKey, false);
                     allowCB.setSelected(allow);
                     optionsPanel.addSpanningComponent(allowCB);
                     //allowCB.setToolTipText("Enable all layouts for unrooted trees");
-                    allowCB.addChangeListener(new ChangeListener() {
+                    checkboxListener = new ChangeListener() {
                         public void stateChanged(ChangeEvent e) {
                             final boolean s = allowCB.isSelected();
 
@@ -385,7 +386,8 @@ public class TreeViewer extends JPanel implements Printable {
                             toggle3.setEnabled(s);
                             fireChangeListeners();
                         }
-                    } );
+                    };
+                    allowCB.addChangeListener(checkboxListener);
 
                     toggle1.setEnabled(allow);
                     toggle2.setEnabled(allow);
@@ -471,6 +473,9 @@ public class TreeViewer extends JPanel implements Printable {
                 });
 
                 controls = new Controls("General", optionsPanel, true);
+                if(checkboxListener != null) {
+                    checkboxListener.stateChanged(null);
+                }
             }
 
             controlsList.add(controls);
@@ -489,6 +494,7 @@ public class TreeViewer extends JPanel implements Printable {
                 infoControls.setVisible(infoIsVisible);
                 controlsList.add(infoControls);
             }
+
             //infoArea.setText("info");
 
             return controlsList;
