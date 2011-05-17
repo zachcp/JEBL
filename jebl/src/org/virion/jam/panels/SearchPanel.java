@@ -47,7 +47,7 @@ public class SearchPanel extends JPanel {
 			});
 			searchText.putClientProperty("JTextField.Search.CancelAction", new AbstractAction() {
 				public void actionPerformed(ActionEvent e) {
-					clearSearchText();
+					clearSearchTextAndFireClearIfAlreadyEmpty();
 				}
 			});
 			add(searchText, BorderLayout.CENTER);
@@ -128,7 +128,7 @@ public class SearchPanel extends JPanel {
 
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					clearSearchText();
+					clearSearchTextAndFireClearIfAlreadyEmpty();
 				}
 			});
 		}
@@ -177,6 +177,11 @@ public class SearchPanel extends JPanel {
 						clearSearchText();
 					}
 				}
+                if (searchTextEmpty) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+						escapePressedWhenEmptyListeners.fire();
+					}
+                }
 				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 					if (comboBox != null) {
 						int index = comboBox.getSelectedIndex();
@@ -244,6 +249,7 @@ public class SearchPanel extends JPanel {
 	}
 
     private SimpleListenerManager returnPressedListeners = new SimpleListenerManager();
+    private SimpleListenerManager escapePressedWhenEmptyListeners = new SimpleListenerManager();
 
     /**
      * Adds a listener to be notified when return/enter is pressed in the text field
@@ -253,9 +259,24 @@ public class SearchPanel extends JPanel {
         returnPressedListeners.add(simpleListener);
     }
 
+    /**
+     * Adds a listener to be notified when Esc is pressed (or the clear button is pressed) in the text field when it is already empty.
+     * @param simpleListener the listener.
+     */
+    public void addEscapePressedWhenEmptyListener(SimpleListener simpleListener) {
+        escapePressedWhenEmptyListeners.add(simpleListener);
+    }
+
 	public void removeAllDataSourceListeners() {
 		listeners.clear();
 	}
+
+	private void clearSearchTextAndFireClearIfAlreadyEmpty() {
+        boolean isEmpty = searchText.getText().equals("");
+        clearSearchText();
+        if (isEmpty)
+            escapePressedWhenEmptyListeners.fire();
+    }
 
 	public void clearSearchText() {
 		searchText.setText("");
