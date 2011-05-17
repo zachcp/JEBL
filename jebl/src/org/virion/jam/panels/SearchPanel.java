@@ -2,6 +2,8 @@ package org.virion.jam.panels;
 
 import org.virion.jam.mac.Utils;
 import org.virion.jam.util.IconUtils;
+import org.virion.jam.util.SimpleListener;
+import org.virion.jam.util.SimpleListenerManager;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -170,6 +172,7 @@ public class SearchPanel extends JPanel {
 						if (!continuousSearch) {
 							fireSearchStarted();
 						}
+                        returnPressedListeners.fire();
 					} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						clearSearchText();
 					}
@@ -240,6 +243,15 @@ public class SearchPanel extends JPanel {
 		return searchText.requestFocusInWindow();
 	}
 
+    private SimpleListenerManager returnPressedListeners = new SimpleListenerManager();
+
+    /**
+     * Adds a listener to be notified when return/enter is pressed in the text field
+     * @param simpleListener the listener.
+     */
+    public void addReturnPressedListener(SimpleListener simpleListener) {
+        returnPressedListeners.add(simpleListener);
+    }
 
 	public void removeAllDataSourceListeners() {
 		listeners.clear();
