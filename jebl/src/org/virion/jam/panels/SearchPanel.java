@@ -217,6 +217,9 @@ public class SearchPanel extends JPanel {
 			searchText.setForeground(Color.lightGray);
 			searchText.setText(SearchPanel.this.emptyLabel);
 		}
+        else {
+            searchText.setForeground(Color.black);
+        }
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -365,6 +368,12 @@ public class SearchPanel extends JPanel {
     @Override
     public boolean isFocusOwner() {
         return searchText.isFocusOwner();
+    }
+
+    public void setSearchText(String filterText) {
+        searchTextEmpty = false;
+        searchText.setText(filterText);
+        checkSearchTextEmpty();
     }
 }
 
