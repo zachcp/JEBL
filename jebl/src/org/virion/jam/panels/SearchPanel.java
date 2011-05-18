@@ -47,7 +47,7 @@ public class SearchPanel extends JPanel {
 			});
 			searchText.putClientProperty("JTextField.Search.CancelAction", new AbstractAction() {
 				public void actionPerformed(ActionEvent e) {
-					clearSearchTextAndFireClearIfAlreadyEmpty();
+					clearSearchText();
 				}
 			});
 			add(searchText, BorderLayout.CENTER);
@@ -111,6 +111,7 @@ public class SearchPanel extends JPanel {
 			cancelButton.setOpaque(false);
 			// this is required on Windows XP platform -- untested on Macintosh
 			cancelButton.setContentAreaFilled(false);
+            cancelButton.setVisible(false);
 
 			JPanel cancelPanel = new JPanel();
 			cancelPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
@@ -128,7 +129,7 @@ public class SearchPanel extends JPanel {
 
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					clearSearchTextAndFireClearIfAlreadyEmpty();
+					clearSearchText();
 				}
 			});
 		}
@@ -172,12 +173,15 @@ public class SearchPanel extends JPanel {
 						if (!continuousSearch) {
 							fireSearchStarted();
 						}
-                        returnPressedListeners.fire();
+                        if ((e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK)!=0)
+                            shiftReturnPressedListeners.fire();
+                        else
+                            returnPressedListeners.fire();
 					} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						clearSearchText();
 					}
 				}
-                if (searchTextEmpty) {
+                else {
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						escapePressedWhenEmptyListeners.fire();
 					}
@@ -220,6 +224,12 @@ public class SearchPanel extends JPanel {
         if (findButton != null) {
             findButton.setEnabled(enabled);
         }
+        if (searchText!=null) {
+            searchText.setEnabled(enabled);
+        }
+        if (cancelButton!=null) {
+            cancelButton.setEnabled(enabled);
+        }
     }
 
 	public void setToolTipText(String text) {
@@ -249,6 +259,7 @@ public class SearchPanel extends JPanel {
 	}
 
     private SimpleListenerManager returnPressedListeners = new SimpleListenerManager();
+    private SimpleListenerManager shiftReturnPressedListeners = new SimpleListenerManager();
     private SimpleListenerManager escapePressedWhenEmptyListeners = new SimpleListenerManager();
 
     /**
@@ -257,6 +268,14 @@ public class SearchPanel extends JPanel {
      */
     public void addReturnPressedListener(SimpleListener simpleListener) {
         returnPressedListeners.add(simpleListener);
+    }
+
+    /**
+     * Adds a listener to be notified when shift-return/enter is pressed in the text field
+     * @param simpleListener the listener.
+     */
+    public void addShiftReturnPressedListener(SimpleListener simpleListener) {
+        shiftReturnPressedListeners.add(simpleListener);
     }
 
     /**
@@ -270,13 +289,6 @@ public class SearchPanel extends JPanel {
 	public void removeAllDataSourceListeners() {
 		listeners.clear();
 	}
-
-	private void clearSearchTextAndFireClearIfAlreadyEmpty() {
-        boolean isEmpty = searchText.getText().equals("");
-        clearSearchText();
-        if (isEmpty)
-            escapePressedWhenEmptyListeners.fire();
-    }
 
 	public void clearSearchText() {
 		searchText.setText("");
@@ -349,6 +361,11 @@ public class SearchPanel extends JPanel {
 			}
 		}
 	}
+
+    @Override
+    public boolean isFocusOwner() {
+        return searchText.isFocusOwner();
+    }
 }
 
 
