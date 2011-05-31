@@ -126,6 +126,7 @@ public interface StatusProvider {
                 overrideProviders.add(provider);
                 overrideListeners.add(listener);
             }
+            listener.statusChanged(provider.getStatus(), provider.getStatusText());
         }
 
         public void removeOverrideProvider(StatusProvider provider) {
