@@ -66,6 +66,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
     private ProgressListener progress;
     private long totalProgress;
     private long currentProgress;
+    private long lastReportedProgress;
     private boolean cancelled;
 
     int[][][] Bi, Bj, Bk;
@@ -100,7 +101,8 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
 
     private boolean addProgress(long value) {
         currentProgress += value;
-        if (progress != null) {
+        if (progress != null && currentProgress>=lastReportedProgress+10000) {
+            lastReportedProgress = currentProgress;
             double fraction = ((double) currentProgress) / totalProgress;
             if (fraction>1)
                 fraction = 1; // In most cases the estimate of the totalProgress is fairly accurate. But if the recursion doesn't split near the halfway point which it occasionally won't a bit more work will be required. In this rare case just cap the progress at 1
@@ -182,6 +184,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
         totalProgress = ((long) n) * m * 2;
 //        System.out.println("total =" + totalProgress + "," +n+ "," +m);
         currentProgress = 0;
+        lastReportedProgress = 0;
         cancelled = false;
         int maximumResultLength = m + n;
         AlignmentResult result1 = new AlignmentResult(maximumResultLength);
