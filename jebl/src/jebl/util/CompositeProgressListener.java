@@ -5,6 +5,7 @@ import org.virion.jam.util.SimpleListener;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -144,7 +145,7 @@ public final class CompositeProgressListener extends ProgressListener {
         if (fractionCompleted>1)
             fractionCompleted = 1;
         if (fractionCompleted<currentOperationProgress) {
-            assert false:"Progress shouldn't go backwards. Went from "+currentOperationProgress+" to "+fractionCompleted;
+            assert false:"Progress shouldn't go backwards. Went from "+currentOperationProgress+" to "+fractionCompleted+" on progress listener with weights="+ Arrays.toString(taskFractions);
         }
         if (fractionCompleted<0) {
             assert false:"Progress must be >=0 but got "+fractionCompleted;
