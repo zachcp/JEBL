@@ -97,6 +97,7 @@ public class SearchPanel extends JPanel {
 			findPanel.add(findButton);
 
 			searchText = new JTextField(emptyLabel);
+            searchText.setOpaque(false);
 //	    searchText.putClientProperty("Quaqua.TextField.style", "search");
 			searchText.setForeground(Color.lightGray);
 			searchText.setBorder(null);
@@ -229,6 +230,7 @@ public class SearchPanel extends JPanel {
         }
         if (searchText!=null) {
             searchText.setEnabled(enabled);
+            setBackground(searchText.getBackground());
         }
         if (cancelButton!=null) {
             cancelButton.setEnabled(enabled);
