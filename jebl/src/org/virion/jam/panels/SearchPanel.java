@@ -319,7 +319,7 @@ public class SearchPanel extends JPanel {
 
 	private ArrayList listeners = new ArrayList();
 	private boolean searchTextEmpty = true;
-	private final String emptyLabel;
+	private String emptyLabel;
 	private boolean continuousSearch;
 	private final JButton findButton;
 	private final JTextField searchText;
@@ -331,7 +331,12 @@ public class SearchPanel extends JPanel {
 		return comboBox;
 	}
 
-	public void setComboBox(JComboBox comboBox) {
+    public void setEmptyLabel(String emptyLabel) {
+        this.emptyLabel = emptyLabel;
+        checkSearchTextEmpty();
+    }
+
+    public void setComboBox(JComboBox comboBox) {
 		this.comboBox = comboBox;
 		if (comboBox != null) {
 			comboBox.addItemListener(new ItemListener() {
