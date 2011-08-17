@@ -333,7 +333,8 @@ public class SearchPanel extends JPanel {
 
     public void setEmptyLabel(String emptyLabel) {
         this.emptyLabel = emptyLabel;
-        checkSearchTextEmpty();
+        if (!searchText.hasFocus()) 
+            checkSearchTextEmpty();
     }
 
     public void setComboBox(JComboBox comboBox) {
