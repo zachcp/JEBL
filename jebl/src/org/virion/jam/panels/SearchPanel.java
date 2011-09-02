@@ -231,6 +231,9 @@ public class SearchPanel extends JPanel {
         }
         if (searchText!=null) {
             searchText.setEnabled(enabled);
+            if(!System.getProperty("os.name").startsWith("Mac OS")) {
+                setBackground(searchText.getBackground());
+            }
         }
         if (cancelButton!=null) {
             cancelButton.setEnabled(enabled);
