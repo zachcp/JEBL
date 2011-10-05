@@ -50,11 +50,6 @@ public final class CompositeProgressListener extends ProgressListener {
      */
     public CompositeProgressListener(ProgressListener listener, double ... operationDuration) {
         numOperations = operationDuration.length;
-        if (numOperations == 0) {
-            // Give a slightly more helpful message in this special case (would
-            // otherwise be caught by the totalTime != 0.0 test below as well)
-            throw new IllegalArgumentException("Composite operation must have > 0 subtasks");
-        }
         if (listener == null) {
             this.listener = ProgressListener.EMPTY;
         } else {
@@ -70,7 +65,7 @@ public final class CompositeProgressListener extends ProgressListener {
             }
             totalTime += d;
         }
-        if (MachineAccuracy.same(totalTime, 0.0)) { // will always be the case if numOperations == 0
+        if (numOperations != 0 && MachineAccuracy.same(totalTime, 0.0)) { // will always be the case if numOperations == 0
             throw new IllegalArgumentException("There must be at least one subtask that takes > 0 time");
         }
         for (int i = 0; i < numOperations; i++) {
@@ -151,14 +146,22 @@ public final class CompositeProgressListener extends ProgressListener {
             assert false:"Progress must be >=0 but got "+fractionCompleted;
         }
         currentOperationProgress = fractionCompleted;
-        listener._setProgress(baseTime + fractionCompleted * getTaskFraction(currentOperationNum));
+        if (numOperations == 0) {
+            if (fractionCompleted == 1) {
+                // setComplete() is allowed when no subtasks.
+                listener._setProgress(1.0);
+            } else {
+                throw new IllegalStateException("This operation has no subtasks");
+            }
+        } else {
+            listener._setProgress(baseTime + fractionCompleted * getTaskFraction(currentOperationNum));
+        }
     }
 
     private double getTaskFraction(int operationNum) {
         if (taskFractions ==null) {
             return taskFractionIfTasksAreEvenlyWeighted;
-        }
-        else {
+        } else {
             return taskFractions[operationNum];
         }
     }
