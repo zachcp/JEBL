@@ -77,34 +77,45 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
             throw new CannotBuildDistanceMatrixException(getNotEnoughMemoryMessage(memoryRequired));
         }
 
-        CompositeProgressListener compositeProgressListener = new CompositeProgressListener(progressListener,n*(n-1));
+        CompositeProgressListener compositeProgressListener = new CompositeProgressListener(progressListener,getProgressIncrements(n));
 
         for(int i = 0; i < n; ++i) {
+            compositeProgressListener.beginSubtask();
+            CompositeProgressListener subComposite = new CompositeProgressListener(compositeProgressListener, (n - (i + 1))*2);
             for(int j = i+1; j < n; ++j) {
-                compositeProgressListener.beginSubtask();
-                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), compositeProgressListener);
+                subComposite.beginSubtask();
+                PairwiseAligner.Result result = aligner.doAlignment(seqs.get(i), seqs.get(j), subComposite);
                 if(progressListener.isCanceled()) return d;
 
-                compositeProgressListener.beginSubtask();
+                subComposite.beginSubtask();
                 BasicDistanceMatrix matrix;
                 switch( model ) {
                     case F84:
-                        matrix = new F84DistanceMatrix(result.alignment, compositeProgressListener);
+                        matrix = new F84DistanceMatrix(result.alignment, subComposite);
                         break;
                     case HKY:
-                        matrix = new HKYDistanceMatrix(result.alignment, compositeProgressListener);
+                        matrix = new HKYDistanceMatrix(result.alignment, subComposite);
                         break;
                     case TamuraNei:
-                        matrix = new TamuraNeiDistanceMatrix(result.alignment, compositeProgressListener);
+                        matrix = new TamuraNeiDistanceMatrix(result.alignment, subComposite);
                         break;
                     case JukesCantor:
                     default:
-                        matrix = new JukesCantorDistanceMatrix(result.alignment, compositeProgressListener);
+                        matrix = new JukesCantorDistanceMatrix(result.alignment, subComposite);
                 }
                 d[i][j] = matrix.getDistances()[0][1];
                 d[j][i] = d[i][j];
             }
         }
         return d;
+    }
+
+    private static double[] getProgressIncrements(int n) {
+        double[] increments = new double[n];
+        for (int i = 0; i < n; ++i) {
+            int increment = n - i;
+            increments[i] = increment;
+        }
+        return increments;
     }
 }
