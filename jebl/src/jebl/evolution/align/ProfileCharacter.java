@@ -25,6 +25,19 @@ public class ProfileCharacter {
     private  float gapFraction;
     private boolean isImmutable = false;
 
+    /**
+     *
+     * @param alphabetSize the number of distinct characters in the alphabet (e.g. 20 for amino acids)
+     * @return an estimate of the amount of memory used per character in a profile created during alignment
+     */
+    public static int getMemoryUsagePerProfileCharacter(int alphabetSize) {
+        int minimumObjectSize = 16;
+        return
+                (2+4)*alphabetSize + // the contents of the characters and count arrays
+                minimumObjectSize*3+ // the character, count array objects and this object
+                20;
+    }
+
     public ProfileCharacter(int alphabetSize) {
         if (alphabetSize < 0) {
             throw new IllegalArgumentException("Expected a nonnegative alphabet size, got " + alphabetSize);
