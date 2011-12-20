@@ -102,7 +102,7 @@ public class NewickImporter implements TreeImporter {
         while (hasTree()) {
             final Tree t = importNextTree();
             if( t != null ) {
-              trees.add(t);
+                trees.add(t);
             }
         }
 
@@ -139,10 +139,23 @@ public class NewickImporter implements TreeImporter {
         }
 
         if (helper.getLastDelimiter() == ':') {
-            double length = helper.readDouble(",():;");
+            double length;
+            String token = helper.readToken(",():;");
+            int openSquareBracketIndex = token.indexOf("[");
+            int closeSquareBracketIndex = openSquareBracketIndex == -1? -1: token.indexOf("]", openSquareBracketIndex);
+            if (closeSquareBracketIndex != -1) {
+                // it has an appended bootstrap value
+                branch.setAttribute("label", NexusImporter.parseValue(token.substring(openSquareBracketIndex + 1, closeSquareBracketIndex)));
+                token = token.substring(0, openSquareBracketIndex);
+            }
+            try {
+                length = Double.parseDouble(token);
+            } catch (NumberFormatException nfe) {
+                throw new ImportException("Number format error: " + nfe.getMessage());
+            }
             tree.setLength(branch, length);
         } else {
-        	tree.setLength(branch, 1.0);
+            tree.setLength(branch, 1.0);
         }
 
         return branch;
@@ -181,8 +194,8 @@ public class NewickImporter implements TreeImporter {
         final Node node = tree.createInternalNode(children);
 
         try {
-          // find the next delimiter
-          String token = helper.readToken(":(),;");
+            // find the next delimiter
+            String token = helper.readToken(":(),;");
 
             if (token.length() > 0) {
                 node.setAttribute("label", NexusImporter.parseValue(token));
@@ -215,7 +228,7 @@ public class NewickImporter implements TreeImporter {
         try {
             return tree.createExternalNode(Taxon.getTaxon(label));
         } catch (IllegalArgumentException e) {
-           throw new ImportException.DuplicateTaxaException(e.getMessage());
+            throw new ImportException.DuplicateTaxaException(e.getMessage());
         }
     }
 }
