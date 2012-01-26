@@ -283,6 +283,37 @@ public final class GeneticCode {
     }
 
     /**
+     * Similar to {@link #getTranslation(NucleotideState, NucleotideState, NucleotideState, boolean)}
+     * except instead of returning ambiguous states we return all possible translations when the ambiguities are resolbes
+     * same protein, then this method will return that protein
+     * @param isFirstCodon true to get the translation if these nucleotides are the first codon in a CDS (for some codons at the start of the CDS, they will translate to M even though they would translate to something different if in the middle of the CDS)
+     * @return all possible translations
+     */
+   public Set<AminoAcidState> getTranslations(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
+        Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
+        if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
+			return Collections.singleton(AminoAcids.GAP_STATE);
+		}
+
+		if (nucleotide1.isAmbiguous() || nucleotide2.isAmbiguous() || nucleotide3.isAmbiguous()) {
+            Set<AminoAcidState> states = new LinkedHashSet<AminoAcidState>();
+            for(State a : nucleotide1.getCanonicalStates()){
+                for(State b : nucleotide2.getCanonicalStates()){
+                    for(State c : nucleotide3.getCanonicalStates()){
+                        CodonState thisDisambiguation = Codons.getState(a.getCode() + b.getCode() + c.getCode());
+                        states.add(translationMap.get(thisDisambiguation));
+                    }
+                }
+            }
+            return states;
+        } else {
+            String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
+            CodonState translateState = Codons.getState(code);
+            return Collections.singleton(translationMap.get(translateState));
+        }
+    }
+
+    /**
      * Equivalent to {@link #getTranslation(String, boolean) getTranslation(nucleotides, false)}
 	 */
     public AminoAcidState getTranslation(String nucleotides) {
