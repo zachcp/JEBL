@@ -6,10 +6,8 @@ import java.awt.*;
 import java.util.*;
 
 /**
- * @author Matt Kearse
- *
- * @version $Id$
- *
+ * Provides feedback on the progress of an operation and allows the operation to be cancelled part way through.
+ * <p/>
  * ProgressListener guarantees the following contract:
  *
  *   A call to any of the methods setProgress(), setMessage(), isCanceled() and
@@ -23,6 +21,9 @@ import java.util.*;
  *
  * Any object may exhibit undefined behaviour when dealing with a ProgressListener 
  * that is not fulfilling this contract.
+ * @author Matt Kearse
+ * @version $Id$
+ *
  */
 public abstract class ProgressListener implements Cancelable {
     /**
