@@ -217,7 +217,8 @@ public class SearchPanel extends JPanel {
 		}
 		if (searchTextEmpty) {
 			searchText.setForeground(Color.lightGray);
-			searchText.setText(SearchPanel.this.emptyLabel);
+            if (!searchText.getText().equals(SearchPanel.this.emptyLabel))
+			    searchText.setText(SearchPanel.this.emptyLabel);
 		}
         else {
             searchText.setForeground(Color.black);
