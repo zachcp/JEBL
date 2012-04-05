@@ -176,9 +176,9 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                                 return sequences;
                             }
                         } catch (InterruptedException e) {
-                            illegalCharacterPolicyForThisImport.set(IllegalCharacterPolicy.abort);
+                            throw new RuntimeException(e);
                         } catch (InvocationTargetException e) {
-                            illegalCharacterPolicyForThisImport.set(IllegalCharacterPolicy.abort);
+                            throw new RuntimeException(e);
                         }
                     }
                     switch (illegalCharacterPolicyForThisImport.get()) {
