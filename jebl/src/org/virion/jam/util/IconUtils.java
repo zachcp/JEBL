@@ -38,7 +38,7 @@ public class IconUtils {
         else {
             // must show message dialog in the event dispatch thread, otherwise can crash
             try {
-                EventQueue.invokeAndWait(new Runnable() {
+                Utils.invokeAndWait(new Runnable() {
                     public void run() {
                         JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
 

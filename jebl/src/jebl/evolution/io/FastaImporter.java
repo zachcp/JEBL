@@ -162,7 +162,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                     final String errorMessage = "Illegal sequence characters encountered on or before line " + helper.getLineNumber() + ".";
                     if (illegalCharacterPolicyForThisImport.get().equals(IllegalCharacterPolicy.askUser)) {
                         try {
-                            SwingUtilities.invokeAndWait(new Runnable() {
+                            org.virion.jam.util.Utils.invokeAndWait(new Runnable() {
                                 public void run() {
                                     IllegalCharacterPolicy[] options = {IllegalCharacterPolicy.abort, IllegalCharacterPolicy.strip};
                                     int choice = JOptionPane.showOptionDialog(null,errorMessage +  " What do you want to do?", "Illegal characters in sequences",
@@ -171,7 +171,7 @@ public class FastaImporter implements SequenceImporter, ImmediateSequenceImporte
                                 }
                             });
 
-                            if (illegalCharacterPolicyForThisImport.equals(IllegalCharacterPolicy.abort)) {
+                            if (illegalCharacterPolicyForThisImport.get().equals(IllegalCharacterPolicy.abort)) {
                                 // user was presented warning and chose to abort -> abort without an exception
                                 return sequences;
                             }

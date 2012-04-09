@@ -11,6 +11,9 @@ package org.virion.jam.util;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InvocationEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Utils {
 
@@ -88,5 +91,64 @@ public class Utils {
             t.printStackTrace();
         }
         return envVars.getProperty(name);
+    }
+
+    /**
+     * Equivalent to {@link javax.swing.SwingUtilities#invokeAndWait(Runnable)}
+     * except it correctly handles spurious wake ups which can cause the method to
+     * return before the runnable has completed.
+     * <br><br>
+     * Causes <code>runnable</code> to have its <code>run</code>
+     * method called in the dispatch thread of
+     * {@link Toolkit#getSystemEventQueue the system EventQueue}.
+     * This will happen after all pending events are processed.
+     * The call blocks until this has happened.  This method
+     * will throw an Error if called from the event dispatcher thread.
+     *
+     * @param runnable  the <code>Runnable</code> whose <code>run</code>
+     *                  method should be executed
+     *                  synchronously on the <code>EventQueue</code>
+     * @exception       InterruptedException  if any thread has
+     *                  interrupted this thread
+     * @exception java.lang.reflect.InvocationTargetException  if a throwable is thrown
+     *                  when running <code>runnable</code>
+     */
+    public static void invokeAndWait(final Runnable runnable)
+            throws InterruptedException, InvocationTargetException {
+
+        if (EventQueue.isDispatchThread()) {
+            throw new Error("Cannot call invokeAndWait from the event dispatcher thread");
+        }
+
+        class AWTInvocationLock {}
+        final Object lock = new AWTInvocationLock();
+
+        final AtomicBoolean done = new AtomicBoolean(false);
+        Runnable r = new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } finally {
+                    done.set(true);
+                }
+            }
+        };
+
+        InvocationEvent event =
+                new InvocationEvent(Toolkit.getDefaultToolkit(), r, lock,
+                        true);
+
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (lock) {
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
+            while (!done.get()) {
+                lock.wait();
+            }
+        }
+
+        Throwable eventThrowable = event.getThrowable();
+        if (eventThrowable != null) {
+            throw new InvocationTargetException(eventThrowable);
+        }
     }
 }
