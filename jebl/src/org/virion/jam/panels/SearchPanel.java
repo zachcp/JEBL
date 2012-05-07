@@ -92,10 +92,10 @@ public class SearchPanel extends JPanel {
 			// this is required on Windows XP platform -- untested on Macintosh
 			findButton.setContentAreaFilled(false);
 
-			JPanel findPanel = new JPanel();
-			findPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
-			findPanel.setOpaque(false);
-			findPanel.add(findButton);
+            JPanel findPanel = new JPanel(new BorderLayout());
+            findPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+            findPanel.setOpaque(false);
+            findPanel.add(findButton, BorderLayout.WEST);
 
 			searchText = new JTextField(emptyLabel);
             searchText.setOpaque(false);
@@ -115,10 +115,10 @@ public class SearchPanel extends JPanel {
 			cancelButton.setContentAreaFilled(false);
             cancelButton.setVisible(false);
 
-			JPanel cancelPanel = new JPanel();
+			JPanel cancelPanel = new JPanel(new BorderLayout());
 			cancelPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 			cancelPanel.setOpaque(false);
-			cancelPanel.add(cancelButton);
+			cancelPanel.add(cancelButton, BorderLayout.EAST);
 
 			add(findPanel, BorderLayout.WEST);
 			add(searchText, BorderLayout.CENTER);
@@ -126,7 +126,7 @@ public class SearchPanel extends JPanel {
 
 			setBackground(searchText.getBackground());
 			setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.gray));
-			setPreferredSize(new Dimension(120, 24));
+			setPreferredSize(new Dimension(120, 20));
 
 
 			cancelButton.addActionListener(new ActionListener() {
