@@ -387,6 +387,7 @@ public class SearchPanel extends JPanel {
         searchText.setText(filterText);
         checkSearchTextEmpty();
     }
+
 }
 
 
