@@ -210,6 +210,8 @@ public class SearchPanel extends JPanel {
 		});
 	}
 
+    private boolean updatingWatermark = false;
+
 	private void checkSearchTextEmpty() {
 		String text = searchText.getText().trim();
 		if (text.length() == 0) {
@@ -217,8 +219,11 @@ public class SearchPanel extends JPanel {
 		}
 		if (searchTextEmpty) {
 			searchText.setForeground(Color.lightGray);
-            if (!searchText.getText().equals(SearchPanel.this.emptyLabel))
+            if (!searchText.getText().equals(SearchPanel.this.emptyLabel)) {
+                updatingWatermark = true;
 			    searchText.setText(SearchPanel.this.emptyLabel);
+                updatingWatermark = false;
+            }
 		}
         else {
             searchText.setForeground(Color.black);
@@ -270,6 +275,10 @@ public class SearchPanel extends JPanel {
     private SimpleListenerManager returnPressedListeners = new SimpleListenerManager();
     private SimpleListenerManager shiftReturnPressedListeners = new SimpleListenerManager();
     private SimpleListenerManager escapePressedWhenEmptyListeners = new SimpleListenerManager();
+
+    public JTextField getSearchTextField() {
+        return searchText;
+    }
 
     /**
      * Adds a listener to be notified when return/enter is pressed in the text field
@@ -354,6 +363,8 @@ public class SearchPanel extends JPanel {
 	}
 
 	private void searchTextChanged() {
+        if (updatingWatermark)
+            return;
 		if (searchText.isFocusOwner())
 			searchTextEmpty = searchText.getText().length() == 0;
 		fireSearchTextChanged();
@@ -376,6 +387,13 @@ public class SearchPanel extends JPanel {
 			}
 		}
 	}
+
+    public String getSearchText() {
+        if (searchTextEmpty)
+            return "";
+        else
+            return searchText.getText();
+    }
 
     @Override
     public boolean isFocusOwner() {
