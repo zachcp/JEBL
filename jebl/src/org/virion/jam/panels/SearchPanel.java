@@ -105,6 +105,7 @@ public class SearchPanel extends JPanel {
 
 			cancelButton = new JButton(stopIcon);
 			cancelButton.setRolloverEnabled(true);
+            cancelButton.setFocusable(false);
 			cancelButton.setRolloverIcon(stopRolloverIcon);
 			cancelButton.setPressedIcon(stopPressedIcon);
 			cancelButton.setPreferredSize(new Dimension(stopIcon.getIconWidth(), stopIcon.getIconHeight()));
@@ -224,9 +225,15 @@ public class SearchPanel extends JPanel {
 			    searchText.setText(SearchPanel.this.emptyLabel);
                 updatingWatermark = false;
             }
+            if (cancelButton != null) {
+                cancelButton.setVisible(false);
+            }
 		}
         else {
             searchText.setForeground(Color.black);
+            if (cancelButton != null) {
+                cancelButton.setVisible(true);
+            }
         }
 	}
 
