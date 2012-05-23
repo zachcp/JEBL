@@ -27,10 +27,14 @@ public class SearchPanel extends JPanel {
 	}
 
 	public SearchPanel(final String emptyLabel, final JPopupMenu popup, final boolean searchAsYouType) {
+        this(emptyLabel, popup, searchAsYouType, true);
+    }
+
+	public SearchPanel(final String emptyLabel, final JPopupMenu popup, final boolean searchAsYouType, boolean allowMacOsxNativeSearchBox) {
 
 		this.continuousSearch = searchAsYouType;
 
-		if (Utils.isMacOSX() && (Utils.getMacOSXVersion().startsWith("10.5") || Utils.getMacOSXVersion().startsWith("10.6") ||
+		if (allowMacOsxNativeSearchBox && Utils.isMacOSX() && (Utils.getMacOSXVersion().startsWith("10.5") || Utils.getMacOSXVersion().startsWith("10.6") ||
                 Utils.getMacOSXVersion().startsWith("10.7"))) {
 			// Mac OS X 10.5 implements a search text box natively...
 			this.emptyLabel = "";
