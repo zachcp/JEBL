@@ -346,6 +346,10 @@ public class ImportHelper {
                 if (delimiters.indexOf(ch) != -1) {
                     lastDelimiter = readCharacter();
                 }
+            } else if (nSites == maxSites && delimiters.indexOf(lastDelimiter) == -1) {
+                String residue = sequenceType == SequenceType.NUCLEOTIDE? "base": "residue";
+                throw new ImportException("After " + nSites + " " + residue + "s, expected end of sequence but next " + residue +
+                        " was " + lastDelimiter + ". Is sequence the wrong length?");
             }
         } catch (EOFException e) {
             // We catch an EOF and return the sequences we have so far
