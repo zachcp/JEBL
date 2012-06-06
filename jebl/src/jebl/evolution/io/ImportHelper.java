@@ -9,12 +9,17 @@
 
 package jebl.evolution.io;
 
+import jebl.evolution.sequences.NucleotideState;
+import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
 import jebl.util.ProgressListener;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -228,7 +233,7 @@ public class ImportHelper {
         return readLine(true);
     }
 
-   public void readSequence(StringBuilder sequence, SequenceType sequenceType,
+    public void readSequence(StringBuilder sequence, SequenceType sequenceType,
                              String delimiters, int maxSites,
                              String gapCharacters, String missingCharacters,
                              String matchCharacters, String matchSequence) throws IOException, ImportException {
@@ -319,8 +324,28 @@ public class ImportHelper {
                         //sequence.append(matchSequence.charAt(n));
                     } else {
                         //sequence.append(ch);
+
+                        if ('{' == ch) {
+                            //TreeBase indicate ambiguities like this. eg {AG} indicates an R
+                            Set<State> states = new HashSet<State>();
+                            char c = read();
+                            while (c != '}') {
+                                NucleotideState state = Nucleotides.getState(c);
+                                if (state == null) {
+                                    throw new ImportException("Unrecognized ambiguity state: " + c);
+                                }
+                                states.add(state);
+                                c = read();
+                            }
+                            for (State state: Nucleotides.getStates()) {
+                                if (state.getCanonicalStates().equals(states)) {
+                                    ch = state.getCode().charAt(0);
+                                    break;
+                                }
+                            }
+                        }
                         if (!ByteBuilder.isCharacterAscii(ch) && builder instanceof ByteBuilder) {
-                             // ByteBuilder can't cope with non-ascii characters, so switch to using a StringBuilder (might use more memory)
+                            // ByteBuilder can't cope with non-ascii characters, so switch to using a StringBuilder (might use more memory)
                             // We can't just throw an ImportException because as of 2008-02-27 the policy in JEBL
                             // sequences is to silently replace invalid characters with '?' if the sequenceType is != null
                             // (Geneious' FastaImporterTest.testInvalidCharacters() depends on this).                            
@@ -583,12 +608,12 @@ public class ImportHelper {
      * @throws java.io.IOException
      */
     protected void skipComments(char delimiter) throws IOException {
-       skipComments(delimiter, false);
+        skipComments(delimiter, false);
     }
 
     /**
      * Skips over any comments. The opening comment delimiter is passed.
-     * @param delimiter 
+     * @param delimiter
      * @param gobbleStrings
      * @throws java.io.IOException
      */
@@ -627,7 +652,7 @@ public class ImportHelper {
                         if( inString == null ) {
                             inString = ch;
                         } else if( inString == ch ) {
-                          inString = null;
+                            inString = null;
                         }
                     }
                 }
@@ -736,7 +761,7 @@ public class ImportHelper {
      * This method has been introduced because this class previously skipped over consecutive comments and discarded all
      * but the last. This method returns all comments that have been read over since {@link #clearLastMetaComment()}
      * was last called.
-     * 
+     *
      * @return List of previously read comments (since clearLastMetaComment was called), never null but may be empty.
      * @see #clearLastMetaComment()
      */
