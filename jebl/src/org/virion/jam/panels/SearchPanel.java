@@ -218,6 +218,8 @@ public class SearchPanel extends JPanel {
     private boolean updatingWatermark = false;
 
 	private void checkSearchTextEmpty() {
+        if (searchText.hasFocus())
+            return;
 		String text = searchText.getText().trim();
 		if (text.length() == 0) {
 			searchTextEmpty = true;
@@ -322,9 +324,7 @@ public class SearchPanel extends JPanel {
 	public void clearSearchText() {
 		searchText.setText("");
 		searchTextChanged();
-        if (!searchText.hasFocus()) {
-            checkSearchTextEmpty();
-        }
+        checkSearchTextEmpty();
 	}
 
 	private void fireSearchStarted() {
@@ -357,8 +357,7 @@ public class SearchPanel extends JPanel {
 
     public void setEmptyLabel(String emptyLabel) {
         this.emptyLabel = emptyLabel;
-        if (!searchText.hasFocus()) 
-            checkSearchTextEmpty();
+        checkSearchTextEmpty();
     }
 
     public void setComboBox(JComboBox comboBox) {
