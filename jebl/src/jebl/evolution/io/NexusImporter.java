@@ -1076,7 +1076,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		Map<String, Taxon> translationList = new HashMap<String, Taxon>();
 
 		String token = helper.readToken(";");
-        while (!Arrays.asList("TRANSLATE", "TREE").contains(token.toUpperCase())) {
+        while (!Arrays.asList("TRANSLATE", "TREE", "UTREE").contains(token.toUpperCase())) {
             token = helper.readToken(";");
         }
 
