@@ -12,6 +12,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.FontRenderContext;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -101,10 +102,25 @@ public class SearchPanel extends JPanel {
             findPanel.setOpaque(false);
             findPanel.add(findButton, BorderLayout.WEST);
 
-			searchText = new JTextField(emptyLabel);
+			searchText = new JTextField() {
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    if (paintWatermark && SearchPanel.this.emptyLabel.length()>0 && searchText.getText().equals("")) {
+                        if (Utils.isMacOSX()) {
+                            g = getGraphics();
+                        }
+                        Rectangle bounds = getBounds();
+                        g.setColor(Color.lightGray);
+                        g.setFont(getFont());
+                        int fontHeight = (int)g.getFont().getStringBounds("A", new FontRenderContext(null, false, false)).getHeight();
+                        int y = (int)(bounds.getHeight() / 2 + fontHeight / 2);
+                        final FontMetrics metrics = g.getFontMetrics(getFont());
+                        g.drawString(SearchPanel.this.emptyLabel, 5, y - metrics.getDescent()/2-1);
+                    }
+                }
+            };
             searchText.setOpaque(false);
 //	    searchText.putClientProperty("Quaqua.TextField.style", "search");
-			searchText.setForeground(Color.lightGray);
 			searchText.setBorder(null);
 
 			cancelButton = new JButton(stopIcon);
@@ -143,14 +159,13 @@ public class SearchPanel extends JPanel {
 
 		searchText.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
-				if (searchTextEmpty) {
-					searchText.setText("");
-					searchText.setForeground(Color.black);
-				}
+                paintWatermark = false;
+                searchText.repaint();
 			}
 
 			public void focusLost(FocusEvent e) {
-				checkSearchTextEmpty();
+                paintWatermark = true;
+                searchText.repaint();
 			}
 		});
 
@@ -215,28 +230,17 @@ public class SearchPanel extends JPanel {
 		});
 	}
 
-    private boolean updatingWatermark = false;
-
 	private void checkSearchTextEmpty() {
-        if (searchText.hasFocus())
-            return;
 		String text = searchText.getText().trim();
 		if (text.length() == 0) {
 			searchTextEmpty = true;
 		}
 		if (searchTextEmpty) {
-			searchText.setForeground(Color.lightGray);
-            if (!searchText.getText().equals(SearchPanel.this.emptyLabel)) {
-                updatingWatermark = true;
-			    searchText.setText(SearchPanel.this.emptyLabel);
-                updatingWatermark = false;
-            }
             if (cancelButton != null) {
                 cancelButton.setVisible(false);
             }
 		}
         else {
-            searchText.setForeground(Color.black);
             if (cancelButton != null) {
                 cancelButton.setVisible(true);
             }
@@ -348,6 +352,7 @@ public class SearchPanel extends JPanel {
 	private final JButton findButton;
 	private final JTextField searchText;
 	private final JButton cancelButton;
+    private boolean paintWatermark = true;
 
 	private JComboBox comboBox;
 
@@ -373,10 +378,7 @@ public class SearchPanel extends JPanel {
 	}
 
 	private void searchTextChanged() {
-        if (updatingWatermark)
-            return;
-		if (searchText.isFocusOwner())
-			searchTextEmpty = searchText.getText().length() == 0;
+        searchTextEmpty = searchText.getText().length() == 0;
 		fireSearchTextChanged();
 	}
 
