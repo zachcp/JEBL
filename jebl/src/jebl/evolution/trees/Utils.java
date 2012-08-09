@@ -275,6 +275,14 @@ public final class Utils {
 		return dist;
 	}
 
+    /**
+     * @param tree
+     * @return true if this is a RootedTree which is not conceptually unrooted
+     */
+    public static boolean isRooted(Tree tree) {
+        return tree instanceof RootedTree && !((RootedTree)tree).conceptuallyUnrooted();
+    }
+
 	/**
 	 * Return a rooted tree from any tree.
 	 * <p/>
