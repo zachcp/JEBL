@@ -82,7 +82,7 @@ public class FitchParsimony implements ParsimonyCriterion {
 	 * a set of character patterns on a tree. This only does the first pass of the
 	 * Fitch algorithm so it does not store ancestral state reconstructions.
 	 *
-	 * @param tree a tree object to reconstruct the characters on
+	 * @param tree a tree object to reconstruct the characters on.  Must be a RootedTree.
 	 * @return number of parsimony siteScores
 	 */
 	public double[] getSiteScores(Tree tree) {
@@ -117,6 +117,11 @@ public class FitchParsimony implements ParsimonyCriterion {
 		return siteScores;
 	}
 
+    /**
+     *
+     * @param tree a tree object to reconstruct the characters on.   Must be a RootedTree.
+     * @return
+     */
 	public double getScore(Tree tree) {
 
 		getSiteScores(tree);
@@ -136,7 +141,7 @@ public class FitchParsimony implements ParsimonyCriterion {
 	 * called with the same tree and patterns then only the first call will reconstruct the states and each
 	 * subsequent call will return the stored states.
 	 *
-	 * @param tree a tree object to reconstruct the characters on
+	 * @param tree a tree object to reconstruct the characters on.   Must be a RootedTree.
 	 * @param node the node of the tree
 	 * @return an array containing the reconstructed states for this node
 	 */
