@@ -104,7 +104,7 @@ public class TreeBuilderFactory {
 
         switch (method) {
             case GREEDY:
-                return new GreedyRootedConsensusTreeBuilder(trees, supportThreshold);
+                return new GreedyUnrootedConsensusTreeBuilder(trees, null, supportThreshold);
             case MRCAC:
                 return new MRCACConsensusTreeBuilder(trees, supportThreshold);
             default:
