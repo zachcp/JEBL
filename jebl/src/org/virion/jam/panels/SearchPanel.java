@@ -36,7 +36,7 @@ public class SearchPanel extends JPanel {
 		this.continuousSearch = searchAsYouType;
 
 		if (allowMacOsxNativeSearchBox && Utils.isMacOSX() && (Utils.getMacOSXVersion().startsWith("10.5") || Utils.getMacOSXVersion().startsWith("10.6") ||
-                Utils.getMacOSXVersion().startsWith("10.7"))) {
+                Utils.getMacOSXVersion().startsWith("10.7") || Utils.getMacOSXVersion().startsWith("10.8"))) {
 			// Mac OS X 10.5 implements a search text box natively...
 			this.emptyLabel = "";
 
