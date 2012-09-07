@@ -1,9 +1,9 @@
 package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
-import jebl.evolution.taxa.Taxon;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -29,6 +29,11 @@ import java.util.prefs.Preferences;
  */
 public class BasicLabelPainter extends AbstractPainter<Node> {
 
+    private static final List<String> consensusSupportAtrributeNames = Arrays.asList(
+            "Consensus support(%)",
+            "Clade Support",
+            "bootstrap proportion",
+            "Posterior Probability");
 
     final String fontMinSizePrefKey;
     final String fontSizePrefKey;
@@ -121,6 +126,17 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                         }
                     }
                     names.add(s);
+                }
+            }
+        }
+
+        if (intent == PainterIntent.BRANCH) {
+            Set<Node> nodes = tree.getInternalNodes();
+            for (Node node : nodes) {
+                for (String consensusSupportAtrributeName : consensusSupportAtrributeNames) {
+                    if (node.getAttribute(consensusSupportAtrributeName) != null) {
+                        names.add(consensusSupportAtrributeName);
+                    }
                 }
             }
         }
@@ -412,7 +428,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 optionsPanel.addComponent(showTextCHeckBox);
             }
 
-            visible = PREFS.getBoolean(isOpenKey, containsConsensusSupport || intent == PainterIntent.TIP);
+            visible = PREFS.getBoolean(isOpenKey, (intent == PainterIntent.BRANCH && containsConsensusSupport) || intent == PainterIntent.TIP);
             showTextCHeckBox.setSelected(visible);
 
             showTextCHeckBox.addChangeListener(new ChangeListener() {
@@ -436,7 +452,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 }
             });
 
-            final String whatToDisplay = PREFS.get(whatPrefKey, consensusSupportIndex >= 0 ? attributes[consensusSupportIndex] : null);
+            String def = null;
+            if (intent == PainterIntent.BRANCH && consensusSupportIndex >= 0) {
+                def = attributes[consensusSupportIndex];
+            }
+            final String whatToDisplay = PREFS.get(whatPrefKey, def);
             if( whatToDisplay != null ) {
                 int i = Arrays.asList(attributes).indexOf(whatToDisplay);
                 if( i >= 0 ) {
@@ -537,15 +557,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private int getConsensusSupportIndex() {
 
-        //we can put other names that represent consensus support here as we discover them
-        String[] valuesToTest = new String[]{
-            "Consensus support(%)",
-            "Clade Support",
-            "bootstrap proportion",
-            "Posterior Probability"
-        };
         List<String> attributesList = Arrays.asList(getAttributes());
-        for(String s : valuesToTest) {
+        for(String s : consensusSupportAtrributeNames) {
             int index = attributesList.indexOf(s);
             if(index >= 0) {
                 return index;
@@ -554,6 +567,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return -1;
     }
 
+    public boolean isConsensusSupportAttribute() {
+        return consensusSupportAtrributeNames.contains(attribute);
+    }
 
     public void setSettings(ControlsSettings settings) {
     }

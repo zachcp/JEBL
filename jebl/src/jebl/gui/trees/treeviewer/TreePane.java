@@ -12,6 +12,7 @@ import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.painters.PainterListener;
 import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -1775,7 +1776,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     // move to middle of branch - since the move is before the rotation
                     // and center label by moving an extra half width of label
                     final double direction = just == Painter.Justification.RIGHT ? 1 : -1;
-                    labelTransform.translate(-labelWidth/2 + -direction * xScale * branchLength / 2, -5 - labelHeight/2);
+                    if (treeLayout instanceof RectilinearTreeLayout && branchLabelPainter instanceof BasicLabelPainter && ((BasicLabelPainter)branchLabelPainter).isConsensusSupportAttribute()) {
+                        labelTransform.translate(-labelWidth + -direction * xScale * branchLength, -5 - labelHeight/2);
+                    } else {
+                        labelTransform.translate(-labelWidth/2 + -direction * xScale * branchLength/2, -5 - labelHeight/2);
+                    }
 
                     if( preElementDrawCode ) {
                         // Store the transformed bounds in the map for use when selecting  (not anymore JH)
