@@ -350,7 +350,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 	    }
 
         boolean first = true;
-        for( String key : item.getAttributeNames() ) {
+        for( String key : new HashSet<String>(item.getAttributeNames()) ) {
             key = key.replace("\"", "'");
             // we should replace the explicit check for name by something more general.
             // Like a reserved character at the start (here &). however we have to worry about backward
