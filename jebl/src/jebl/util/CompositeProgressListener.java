@@ -96,7 +96,10 @@ public final class CompositeProgressListener extends ProgressListener {
         double[] lengths = new double[n];
         int i =0;
         for (File file : files) {
-            lengths[i++] = (double) file.length();
+            long length = file.length();
+            if (length<=0)
+                length = 1;
+            lengths[i++] = (double) length;
         }
         return new CompositeProgressListener(listener, lengths);
     }
