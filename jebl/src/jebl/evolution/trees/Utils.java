@@ -259,14 +259,15 @@ public final class Utils {
         private final List<Node> nodesAdjacentToChild;
         private final Tree tree;
         private final Node parentNode;
-        private final Node childNodes;
+        private final Node childNode;
         private int indexOfFirstUnpushedNode;
         private double maxDist = 0;
+        private double overrideMaxDist = 0;
 
         private NodePair(Tree tree, Node parentNode, Node childNode) {
             this.tree = tree;
             this.parentNode = parentNode;
-            this.childNodes = childNode;
+            this.childNode = childNode;
             this.nodesAdjacentToChild = tree.getAdjacencies(childNode);
             this.indexOfFirstUnpushedNode = 0;
         }
@@ -277,15 +278,29 @@ public final class Utils {
 
         private double getMaxDist() throws Graph.NoEdgeException {
             assert finished();
-            return tree.getEdgeLength(childNodes, parentNode) + maxDist;
+            if (overrideMaxDist != 0) {
+                return overrideMaxDist;
+            }
+            return tree.getEdgeLength(childNode, parentNode) + maxDist;
         }
 
         private void addMaxDist(double maxDist) {
+            assert overrideMaxDist == 0;
             this.maxDist = Math.max(this.maxDist, maxDist);
         }
 
         private Node getNextNode() {
             return nodesAdjacentToChild.get(indexOfFirstUnpushedNode++);
+        }
+
+        HashPair<Node> geHashPair() {
+            return new HashPair<Node>(parentNode, childNode);
+        }
+
+        public void setFinishedMaxDist(double dist) {
+            assert overrideMaxDist == 0;
+            indexOfFirstUnpushedNode = nodesAdjacentToChild.size();
+            overrideMaxDist = dist;
         }
     }
 
@@ -319,17 +334,6 @@ public final class Utils {
             this.tree = tree;
         }
         private double calculate(Node node, Node adjacentNode) throws Graph.NoEdgeException {
-            HashPair<Node> pair = new HashPair<Node>(node, adjacentNode);
-            Double cached = cache.get(pair);
-            if (cached != null) {
-                return cached;
-            }
-            double result = _calculate(node, adjacentNode);
-            cache.put(pair, result);
-            return result;
-        }
-
-        private double _calculate(Node node, Node adjacentNode) throws Graph.NoEdgeException {
             NodePairStack stack = new NodePairStack();
             stack.push(new NodePair(tree, node, adjacentNode));
             while (true) {
@@ -339,14 +343,20 @@ public final class Utils {
                     if (stack.isEmpty()) {
                         return maxDist;
                     }
+                    cache.put(current.geHashPair(), maxDist);
                     current = stack.pop();
                     current.addMaxDist(maxDist);
                 }
                 // now we are at a node that still has something to process
                 stack.push(current); // start by putting current back on
                 Node next = current.getNextNode();
-                NodePair nodePair = new NodePair(tree, current.childNodes, next);
+                NodePair nodePair = new NodePair(tree, current.childNode, next);
                 if (!next.equals(current.parentNode)) {
+                    Double distance = cache.get(nodePair.geHashPair());
+                    if (distance != null) {
+                        nodePair.setFinishedMaxDist(distance);
+                        // we'll still push it, just so it can get popped immediately next time through.
+                    }
                     stack.push(nodePair);
                 }
             }
