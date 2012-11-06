@@ -11,6 +11,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.HashPair;
 
 import java.util.*;
 
@@ -312,13 +313,24 @@ public final class Utils {
 
     private static class PathLengthCalculator {
         private final Tree tree;
-        private NodePairStack stack = new NodePairStack();
+        private Map<HashPair<Node>, Double> cache = new HashMap<HashPair<Node>, Double>();
 
         PathLengthCalculator(Tree tree){
             this.tree = tree;
         }
-
         private double calculate(Node node, Node adjacentNode) throws Graph.NoEdgeException {
+            HashPair<Node> pair = new HashPair<Node>(node, adjacentNode);
+            Double cached = cache.get(pair);
+            if (cached != null) {
+                return cached;
+            }
+            double result = _calculate(node, adjacentNode);
+            cache.put(pair, result);
+            return result;
+        }
+
+        private double _calculate(Node node, Node adjacentNode) throws Graph.NoEdgeException {
+            NodePairStack stack = new NodePairStack();
             stack.push(new NodePair(tree, node, adjacentNode));
             while (true) {
                 NodePair current = stack.pop();
@@ -361,13 +373,13 @@ public final class Utils {
     public static RootedTree rootTheTree(Tree tree) {
         // If already rooted, do nothing
         if (tree instanceof RootedTree) {
-            return (RootedTree) tree;
+ //           return (RootedTree) tree;
         }
 
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
         if (d2.size() == 1) {
-            return new RootedFromUnrooted(tree, d2.iterator().next(), true);
+ //           return new RootedFromUnrooted(tree, d2.iterator().next(), true);
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
@@ -413,9 +425,10 @@ public final class Utils {
             Node direction = null;
 
             // locate one terminal node of longest path
+            PathLengthCalculator pathLengthCalculator = new PathLengthCalculator(tree);
             for (Node e : tree.getExternalNodes()) {
                 for (Node n : tree.getAdjacencies(e)) {
-                    final double d = new PathLengthCalculator(tree).calculate(e, n);
+                    final double d = pathLengthCalculator.calculate(e, n);
                     if (d > maxDistance) {
                         maxDistance = d;
                         current = e;
@@ -439,7 +452,7 @@ public final class Utils {
                 Node next = null;
                 for (Node n : tree.getAdjacencies(direction)) {
                     if (n == current) continue;
-                    final double d = new PathLengthCalculator(tree).calculate(direction, n);
+                    final double d = pathLengthCalculator.calculate(direction, n);
                     if (d > maxDistance) {
                         maxDistance = d;
                         next = n;
