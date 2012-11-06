@@ -383,13 +383,13 @@ public final class Utils {
     public static RootedTree rootTheTree(Tree tree) {
         // If already rooted, do nothing
         if (tree instanceof RootedTree) {
- //           return (RootedTree) tree;
+            return (RootedTree) tree;
         }
 
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
         if (d2.size() == 1) {
- //           return new RootedFromUnrooted(tree, d2.iterator().next(), true);
+            return new RootedFromUnrooted(tree, d2.iterator().next(), true);
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
