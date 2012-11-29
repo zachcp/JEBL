@@ -132,22 +132,19 @@ public class BasicAlignment implements Alignment {
     private void constructPatterns() {
         patterns.clear();
 
-        State[][] seqs = new State[sequences.size()][];
-        int i = 0;
         int maxLen = 0;
-        for (Sequence seq : getSequenceList()) {
-            seqs[i] = seq.getStates();
-            if (seqs[i].length > maxLen) {
-                maxLen = seqs[i].length;
+        List<Sequence> sequences = getSequenceList();
+        for (Sequence seq : sequences) {
+            if (seq.getLength() > maxLen) {
+                maxLen = seq.getLength();
             }
-            i++;
         }
 
         for (int j = 0; j < maxLen; j++) {
             List<State> states = new ArrayList<State>();
-            for (i = 0; i < seqs.length; i++) {
-                if (j < seqs[i].length) {
-                    states.add(seqs[i][j]);
+            for (Sequence seq : sequences) {
+                if (j < seq.getLength()) {
+                    states.add(seq.getState(j));
                 } else {
                     states.add(sequenceType.getGapState());
                 }
