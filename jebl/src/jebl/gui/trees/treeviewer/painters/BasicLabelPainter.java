@@ -236,7 +236,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public void setVisible(boolean visible) {
         this.visible = visible;
         firePainterChanged();
-        PREFS.putBoolean(isOpenKey, visible);
+        getPrefs().putBoolean(isOpenKey, visible);
     }
 
 //    public void calibrate(Graphics2D g2, Node item) {
@@ -294,8 +294,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     public void resetFontSizes(boolean fire) {
-        float fontSize = PREFS.getFloat(fontSizePrefKey, defaultFontSize);
-        float minFontSize = PREFS.getFloat(fontMinSizePrefKey, defaultMinFontSize);
+        float fontSize = getPrefs().getFloat(fontSizePrefKey, defaultFontSize);
+        float minFontSize = getPrefs().getFloat(fontMinSizePrefKey, defaultMinFontSize);
         setFontSize(fontSize, fire);
         setFontMinSize(minFontSize, fire);
     }
@@ -414,7 +414,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         // nothing to do
     }
 
-    private static Preferences PREFS = Preferences.userNodeForPackage(BasicLabelPainter.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(BasicLabelPainter.class);
+    }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
 
@@ -428,7 +430,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 optionsPanel.addComponent(showTextCHeckBox);
             }
 
-            visible = PREFS.getBoolean(isOpenKey, (intent == PainterIntent.BRANCH && containsConsensusSupport) || intent == PainterIntent.TIP);
+            Preferences prefs = getPrefs();
+            visible = prefs.getBoolean(isOpenKey, (intent == PainterIntent.BRANCH && containsConsensusSupport) || intent == PainterIntent.TIP);
             showTextCHeckBox.setSelected(visible);
 
             showTextCHeckBox.addChangeListener(new ChangeListener() {
@@ -448,7 +451,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 public void itemStateChanged(ItemEvent itemEvent) {
                     String attribute = (String) combo1.getSelectedItem();
                     setAttribute(attribute);
-                    PREFS.put(whatPrefKey, attribute);
+                    getPrefs().put(whatPrefKey, attribute);
                 }
             });
 
@@ -456,7 +459,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             if (intent == PainterIntent.BRANCH && consensusSupportIndex >= 0) {
                 def = attributes[consensusSupportIndex];
             }
-            final String whatToDisplay = PREFS.get(whatPrefKey, def);
+            final String whatToDisplay = prefs.get(whatPrefKey, def);
             if( whatToDisplay != null ) {
                 int i = Arrays.asList(attributes).indexOf(whatToDisplay);
                 if( i >= 0 ) {
@@ -473,7 +476,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //fontSizeSpinner.setEnabled(selected);
 
 
-            final float fontsize = PREFS.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
+            final float fontsize = prefs.getFloat(fontSizePrefKey, taxonLabelFont.getSize());
             setFontSize(fontsize, false);
             fontSizeSpinner.setValue((double)fontsize);
 
@@ -487,7 +490,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             //label1.setEnabled(selected);
             //fontSizeSpinner.setEnabled(selected);
 
-            final float size = PREFS.getFloat(fontMinSizePrefKey, 8);
+            final float size = prefs.getFloat(fontMinSizePrefKey, 8);
             setFontMinSize(size, false);
 
             final JSpinner fontMinSizeSpinner = new JSpinner(new SpinnerNumberModel(defaultMinFontSize, 0.01, 48, 1));
@@ -509,7 +512,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
                     setFontMinSize(minSize, true);
                     setFontSize(size, true);
-                    PREFS.putFloat(fontSizePrefKey, size);
+                    getPrefs().putFloat(fontSizePrefKey, size);
                 }
             });
 
@@ -522,7 +525,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                     }
                     setFontMinSize(size, true);
                     setFontSize(maxSize, true);
-                    PREFS.putFloat(fontMinSizePrefKey, size);
+                    getPrefs().putFloat(fontMinSizePrefKey, size);
                 }
             });
             //-------------------------
@@ -534,7 +537,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 //  digitsSpinner.setEnabled(selected);
 
                 final String digitsPrefKey = getTitle() + "_sigDigits";
-                final int digits = PREFS.getInt(digitsPrefKey, defaultDigits);
+                final int digits = prefs.getInt(digitsPrefKey, defaultDigits);
                 setSignificantDigits(digits);
                 digitsSpinner.setValue(digits);
 
@@ -542,7 +545,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                     public void stateChanged(ChangeEvent changeEvent) {
                         final int digits = (Integer)digitsSpinner.getValue();
                         setSignificantDigits(digits);
-                        PREFS.putInt(digitsPrefKey, digits);
+                        getPrefs().putInt(digitsPrefKey, digits);
                     }
                 });
             }

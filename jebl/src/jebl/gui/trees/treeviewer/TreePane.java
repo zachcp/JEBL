@@ -152,7 +152,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             this.orderBranches = orderBranches;
             this.branchOrdering = branchOrdering;
             setupTree();
-            PREFS.getBoolean(orderBranchesPREFSkey, orderBranches);
+            getPrefs().getBoolean(orderBranchesPREFSkey, orderBranches);
         }
     }
 
@@ -161,7 +161,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             this.transformBranches = transformBranches;
             this.branchTransform = branchTransform;
             setupTree();
-            PREFS.putBoolean(transformBanchesPREFSkey, transformBranches);
+            getPrefs().putBoolean(transformBanchesPREFSkey, transformBranches);
         }
     }
 
@@ -185,7 +185,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             this.showingRootBranch = showingRootBranch;
             calibrated = false;
             repaint();
-            PREFS.putBoolean(showRootPREFSkey, showingRootBranch);
+            getPrefs().putBoolean(showRootPREFSkey, showingRootBranch);
         }
     }
 
@@ -194,7 +194,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         setTreeAttributesForAutoExpansion();
         //calibrated = false;
         repaint();
-        PREFS.putBoolean(autoExPREFSkey, auto);
+        getPrefs().putBoolean(autoExPREFSkey, auto);
     }
 
     public boolean isShowingTaxonCallouts() {
@@ -518,7 +518,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( ((BasicStroke)branchLineStroke).getLineWidth() != weight ) {
             branchLineStroke = new BasicStroke(weight);
             selectionStroke = new BasicStroke(Math.max(weight + 4.0F, weight * 1.5F), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-            PREFS.putFloat(branchWeightPREFSkey, weight);
+            getPrefs().putFloat(branchWeightPREFSkey, weight);
             return true;
         }
         return false;
@@ -720,6 +720,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         controlsList.addAll(treeLayout.getControls(detachPrimaryCheckbox));
 
         if (controls == null) {
+            Preferences prefs = getPrefs();
             OptionsPanel optionsPanel = new OptionsPanel();
 
             flipCheck = new JCheckBox("Flip the tree horizontally");
@@ -728,19 +729,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             transformCheck = new JCheckBox("Transform branches");
             optionsPanel.addComponent(transformCheck);
 
-            flipTree = PREFS.getBoolean(flipTreePREFSkey, flipTree);
+            flipTree = prefs.getBoolean(flipTreePREFSkey, flipTree);
             flipCheck.setSelected(flipTree);
 
             flipCheck.addChangeListener(new ChangeListener(){
                 public void stateChanged(ChangeEvent e) {
                     flipTree = flipCheck.isSelected();
 
-                    PREFS.putBoolean(flipTreePREFSkey, flipTree);
+                    getPrefs().putBoolean(flipTreePREFSkey, flipTree);
                     repaint();
                 }
             });
 
-            transformBranches = PREFS.getBoolean(transformBanchesPREFSkey, transformBranches);
+            transformBranches = prefs.getBoolean(transformBanchesPREFSkey, transformBranches);
 
             transformCheck.setSelected(transformBranches);
             if (!originalTree.hasLengths()) {
@@ -764,12 +765,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             };
             combo1.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
-                    PREFS.putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
+                    getPrefs().putInt(branchTransformTypePREFSkey, combo1.getSelectedIndex());
                     final TransformedRootedTree.Transform transform = (TransformedRootedTree.Transform) combo1.getSelectedItem();
                     setBranchTransform(transformCheck.isSelected(), transform);
                 }
             });
-            int index = PREFS.getInt(branchTransformTypePREFSkey, 0);
+            int index = prefs.getInt(branchTransformTypePREFSkey, 0);
             if(index >= combo1.getItemCount()) { //added to stop dodgy values from preferences causing crashes
                 index = combo1.getItemCount()-1;
             }
@@ -786,7 +787,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     label1.setEnabled(selected);
                     combo1.setEnabled(selected);
                     if (scaleBarPainter instanceof ScaleBarPainter) {
-                        ((ScaleBarPainter)scaleBarPainter).setEnabled(!selected);
+                        ((ScaleBarPainter) scaleBarPainter).setEnabled(!selected);
                     }
 
                     setBranchTransform(selected, (TransformedRootedTree.Transform) combo1.getSelectedItem());
@@ -796,7 +797,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             final JCheckBox checkBox2 = new JCheckBox("Order branches");
             optionsPanel.addComponent(checkBox2);
 
-            orderBranches = PREFS.getBoolean(orderBranchesPREFSkey, orderBranches);
+            orderBranches = prefs.getBoolean(orderBranchesPREFSkey, orderBranches);
             checkBox2.setSelected(orderBranches);
 
             final JComboBox combo2 = new JComboBox(SortedRootedTree.BranchOrdering.values()) {
@@ -814,13 +815,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             };
             combo2.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent itemEvent) {
-                    if(orderBranches){
+                    if (orderBranches) {
                         setBranchOrdering(true, (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
-                        PREFS.putInt(branchOrderingPREFSkey,combo2.getSelectedIndex());
+                        getPrefs().putInt(branchOrderingPREFSkey, combo2.getSelectedIndex());
                     }
                 }
             });
-            combo2.setSelectedIndex(PREFS.getInt(branchOrderingPREFSkey,0));
+            combo2.setSelectedIndex(prefs.getInt(branchOrderingPREFSkey, 0));
 
             final JLabel label2 = optionsPanel.addComponentWithLabel("Ordering:", combo2);
             label2.setEnabled(checkBox2.isSelected());
@@ -833,7 +834,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     setBranchOrdering(checkBox2.isSelected(),
                             (SortedRootedTree.BranchOrdering) combo2.getSelectedItem());
-                    PREFS.putBoolean(orderBranchesPREFSkey, orderBranches);
+                    getPrefs().putBoolean(orderBranchesPREFSkey, orderBranches);
                 }
             });
 
@@ -841,7 +842,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 final JCheckBox checkBox3 = new JCheckBox("Show Root Branch");
                 optionsPanel.addComponent(checkBox3);
 
-                showingRootBranch = PREFS.getBoolean(showRootPREFSkey, isShowingRootBranch());
+                showingRootBranch = prefs.getBoolean(showRootPREFSkey, isShowingRootBranch());
                 checkBox3.setSelected(showingRootBranch);
                 checkBox3.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
@@ -855,7 +856,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             final JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Float(1.0), new Float(0.01), new Float(48), new Float(1.0)));
 
-            final float weight = PREFS.getFloat(branchWeightPREFSkey, 1.0F);
+            final float weight = prefs.getFloat(branchWeightPREFSkey, 1.0F);
             setBranchLineWeightValues(weight);
             spinner.setValue(weight);
 
@@ -870,7 +871,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             autoEx.setToolTipText("Automatically contract subtrees when there is not enough space on-screen");
             optionsPanel.addComponent(autoEx);
 
-            autoExpantion = PREFS.getBoolean(autoExPREFSkey, false);
+            autoExpantion = prefs.getBoolean(autoExPREFSkey, false);
             autoEx.setSelected(autoExpantion);
             autoEx.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
@@ -884,12 +885,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             final JCheckBox subTreeShowJB = new JCheckBox("Show selected subtree only");
             subTreeShowJB.setToolTipText("Only the selected part of the tree is shown");
-            viewSubtree = PREFS.getBoolean(viewSubtreePREFSkey, false);
+            viewSubtree = prefs.getBoolean(viewSubtreePREFSkey, false);
             subTreeShowJB.setSelected(viewSubtree);
             subTreeShowJB.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     final boolean b = subTreeShowJB.isSelected();
-                    PREFS.putBoolean(viewSubtreePREFSkey, subTreeShowJB.isSelected());
+                    getPrefs().putBoolean(viewSubtreePREFSkey, subTreeShowJB.isSelected());
                     if( viewSubtree != b ) {
                         viewSubtree = b;
                         calibrated = false;
@@ -2189,5 +2190,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private String autoExPREFSkey = "autoExpansion";
     private String viewSubtreePREFSkey = "viewSubtree";
     private String branchWeightPREFSkey = "branchWeight";
-    private static Preferences PREFS = Preferences.userNodeForPackage(TreePane.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(TreePane.class);
+    }
 }

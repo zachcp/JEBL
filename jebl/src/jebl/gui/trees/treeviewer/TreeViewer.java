@@ -39,10 +39,11 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -52,8 +53,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
 /**
  * @author Andrew Rambaut
@@ -176,7 +175,7 @@ public class TreeViewer extends JPanel implements Printable {
         } else {
             add(controlPalette.getPanel(), BorderLayout.EAST);
         }
-        setTreeLayoutType(TreeLayoutType.values()[PREFS.getInt(rootedTreeLayoutPrefKey, TreeLayoutType.RECTILINEAR.ordinal())]);
+        setTreeLayoutType(TreeLayoutType.values()[getPrefs().getInt(rootedTreeLayoutPrefKey, TreeLayoutType.RECTILINEAR.ordinal())]);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
@@ -202,12 +201,12 @@ public class TreeViewer extends JPanel implements Printable {
         boolean isRooted = !tree.conceptuallyUnrooted();
         TreeLayoutType defaultLayout = (isRooted ? TreeLayoutType.RECTILINEAR : TreeLayoutType.RADIAL);
         String layoutPrefKey = currentTreeLayoutPrefKey();
-        return TreeLayoutType.values()[PREFS.getInt(layoutPrefKey, defaultLayout.ordinal())];
+        return TreeLayoutType.values()[getPrefs().getInt(layoutPrefKey, defaultLayout.ordinal())];
     }
 
     protected void setDefaultTreeLayoutType(TreeLayoutType treeLayoutType) {
         String layoutPrefKey = currentTreeLayoutPrefKey();
-        PREFS.putInt(layoutPrefKey, treeLayoutType.ordinal());
+        getPrefs().putInt(layoutPrefKey, treeLayoutType.ordinal());
     }
 
     private void fireChangeListeners(){
@@ -297,7 +296,9 @@ public class TreeViewer extends JPanel implements Printable {
         return controlPalette;
     }
 
-    private static Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(TreeViewer.class);
+    }
 
 //    private JTextArea infoArea = null;
     private boolean infoIsVisible = false;
@@ -363,9 +364,10 @@ public class TreeViewer extends JPanel implements Printable {
                 optionsPanel.addSpanningComponent(treeViewPanel);
 
                 ChangeListener checkboxListener = null;
+                Preferences prefs = getPrefs();
                 if( tree.conceptuallyUnrooted() ) {
                     allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
-                    boolean allow = PREFS.getBoolean(unrootedTreeAllLayoutsAllowedPrefKey, false);
+                    boolean allow = getPrefs().getBoolean(unrootedTreeAllLayoutsAllowedPrefKey, false);
                     allowCB.setSelected(allow);
                     optionsPanel.addSpanningComponent(allowCB);
                     //allowCB.setToolTipText("Enable all layouts for unrooted trees");
@@ -373,7 +375,7 @@ public class TreeViewer extends JPanel implements Printable {
                         public void stateChanged(ChangeEvent e) {
                             final boolean s = allowCB.isSelected();
 
-                            PREFS.putBoolean(unrootedTreeAllLayoutsAllowedPrefKey, s);
+                            getPrefs().putBoolean(unrootedTreeAllLayoutsAllowedPrefKey, s);
                             if (!s) {
                                 setAndStoreTreeLayoutType(TreeLayoutType.RADIAL);
                                 setExpansion();
@@ -401,7 +403,7 @@ public class TreeViewer extends JPanel implements Printable {
                 zoomSlider.setPaintLabels(true);
 
                 final String zoomValuePrefKey = "zoomvalue";
-                final int zoomValue = PREFS.getInt(zoomValuePrefKey, 0);
+                final int zoomValue = prefs.getInt(zoomValuePrefKey, 0);
                 zoomSlider.setValue(zoomValue);
                 zoom = ((double) zoomValue) / 100.0;
                 zoomPending = true;
@@ -410,7 +412,7 @@ public class TreeViewer extends JPanel implements Printable {
                     public void stateChanged(ChangeEvent changeEvent) {
                         final int value = zoomSlider.getValue();
                         setZoom(((double) value) / 100.0);
-                        PREFS.putInt(zoomValuePrefKey, value);
+                        getPrefs().putInt(zoomValuePrefKey, value);
                         fireChangeListeners();
                     }
                 });
@@ -422,7 +424,7 @@ public class TreeViewer extends JPanel implements Printable {
                 verticalExpansionSlider.setPaintLabels(true);
 
                 final String expansionValuePrefKey = "vzoomvalue";
-                final int expansionValue = PREFS.getInt(expansionValuePrefKey, 0);
+                final int expansionValue = prefs.getInt(expansionValuePrefKey, 0);
                 verticalExpansionSlider.setValue(expansionValue);
                 verticalExpansion = ((double)expansionValue) / 100.0;
 
@@ -430,7 +432,7 @@ public class TreeViewer extends JPanel implements Printable {
                     public void stateChanged(ChangeEvent changeEvent) {
                         final int value = verticalExpansionSlider.getValue();
                         setVerticalExpansion(((double) value) / 100.0);
-                        PREFS.putInt(expansionValuePrefKey, value);
+                        getPrefs().putInt(expansionValuePrefKey, value);
                         fireChangeListeners();
                     }
                 });
