@@ -11,8 +11,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,9 @@ import java.util.prefs.Preferences;
  */
 public class PolarTreeLayout extends AbstractTreeLayout {
 
-    private static final Preferences prefs = Preferences.userNodeForPackage(PolarTreeLayout.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(PolarTreeLayout.class);
+    }
 
     public enum TaxonLabelPosition {
         FLUSH,
@@ -35,6 +35,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
     @Override
     public void setTree(Tree tree) {
         super.setTree(tree);
+        Preferences prefs = getPrefs();
         if(tree != null) {
             setAngularRange(prefs.getDouble("polar_angle_range", 360.0));
             if( ! this.tree.conceptuallyUnrooted() ) {
@@ -107,7 +108,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                         double value = slider1.getValue()-180;
                         setRootAngle(value);
                         System.out.println(rootAngle);
-                        prefs.putDouble("polar_root_angle", rootAngle);
+                        getPrefs().putDouble("polar_root_angle", rootAngle);
                     }
                 });
                 optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);
@@ -121,7 +122,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                     public void stateChanged(ChangeEvent changeEvent) {
                         double value = slider2.getValue();
                         setRootLength(value / 10000.0);
-                        prefs.putDouble("polar_root_length", rootLength);
+                        getPrefs().putDouble("polar_root_length", rootLength);
                     }
                 });
                 optionsPanel.addComponentWithLabel("Root Length:", slider2, true);
@@ -136,7 +137,7 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 public void stateChanged(ChangeEvent changeEvent) {
                     double value = 360.0 - slider3.getValue();
                     setAngularRange(value);
-                    prefs.putDouble("polar_angle_range", value);
+                    getPrefs().putDouble("polar_angle_range", value);
                 }
             });
             optionsPanel.addComponentWithLabel("Angle Range:", slider3, true);

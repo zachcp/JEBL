@@ -2,7 +2,6 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.trees.treeviewer.TreeViewer;
-import jebl.evolution.graphs.Node;
 import org.virion.jam.components.RealNumberField;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -253,7 +252,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
     }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
-        final Preferences PREFS = Preferences.userNodeForPackage(TreeViewer.class);       
+        Preferences prefs = getPrefs();
         List<Controls> controlsList = new ArrayList<Controls>();
 
         if (controls == null) {
@@ -278,11 +277,11 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
                     Double value = text1.getValue();
                     if (value != null) {
                         setScaleRange(value);
-                        PREFS.putDouble("scalebar_scaleRange",value);
+                        getPrefs().putDouble("scalebar_scaleRange", value);
                     }
                 }
             });
-            text1.setText(PREFS.getDouble("scalebar_scaleRange",0.0));
+            text1.setText(prefs.getDouble("scalebar_scaleRange", 0.0));
             final JLabel label1 = optionsPanel.addComponentWithLabel("Scale Range:", text1, true);
 
             final JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(defaultFontSize, 0.01, 48.0, 1.0));
@@ -290,10 +289,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             spinner1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     setFontSize(((Double) spinner1.getValue()).floatValue());
-                    PREFS.putDouble("scalebar_fontSize",(Double)spinner1.getValue());
+                    getPrefs().putDouble("scalebar_fontSize", (Double) spinner1.getValue());
                 }
             });
-            spinner1.setValue(PREFS.getDouble("scalebar_fontSize",defaultFontSize));
+            spinner1.setValue(prefs.getDouble("scalebar_fontSize", defaultFontSize));
             final JLabel label2 = optionsPanel.addComponentWithLabel("Font Size:", spinner1);
 
             final JSpinner spinner2 = new JSpinner(new SpinnerNumberModel(1.0, 0.01, 48.0, 1.0));
@@ -301,10 +300,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             spinner2.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     setLineWeight(((Double) spinner2.getValue()).floatValue());
-                    PREFS.putDouble("scalebar_lineWeight",(Double)spinner2.getValue());
+                    getPrefs().putDouble("scalebar_lineWeight", (Double) spinner2.getValue());
                 }
             });
-            spinner2.setValue(PREFS.getDouble("scalebar_lineWeight",1));
+            spinner2.setValue(prefs.getDouble("scalebar_lineWeight",1));
             final JLabel label3 = optionsPanel.addComponentWithLabel("Line Weight:", spinner2);
 
             final boolean isSelected = showScaleBarCB.isSelected();
@@ -335,6 +334,10 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         controlsList.add(controls);
 
         return controlsList;
+    }
+
+    private Preferences getPrefs() {
+        return Preferences.userNodeForPackage(TreeViewer.class);
     }
 
     public void setSettings(ControlsSettings settings) {

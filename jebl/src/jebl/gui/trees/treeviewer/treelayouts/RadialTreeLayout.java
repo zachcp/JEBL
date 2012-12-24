@@ -2,8 +2,8 @@ package jebl.gui.trees.treeviewer.treelayouts;
 
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Utils;
 import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -27,7 +27,9 @@ import java.util.prefs.Preferences;
  */
 public class RadialTreeLayout extends AbstractTreeLayout {
 
-    private static final Preferences prefs = Preferences.userNodeForPackage(RadialTreeLayout.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(RadialTreeLayout.class);
+    }
 
     public AxisType getXAxisType() {
         return AxisType.CONTINUOUS;
@@ -231,7 +233,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
      public void setTree(Tree tree) {
         super.setTree(tree);
         if(tree != null) {
-            setRootAngle(prefs.getDouble("radial_root_angle", 180.0));
+            setRootAngle(getPrefs().getDouble("radial_root_angle", 180.0));
         }
     }
 
@@ -251,7 +253,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
                 public void stateChanged(ChangeEvent changeEvent) {
                     int value = slider1.getValue() - 180;
                     setRootAngle(value);
-                    prefs.putDouble("radial_root_angle", value);
+                    getPrefs().putDouble("radial_root_angle", value);
                 }
             });
             optionsPanel.addComponentWithLabel("Root Angle:", slider1, true);

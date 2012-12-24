@@ -122,7 +122,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     }
 
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
-        final Preferences prefs = Preferences.userNodeForPackage(TreeViewer.class);
+        Preferences prefs = getPrefs();
         List<Controls> controlsList = new ArrayList<Controls>();
 
         if (controls == null) {
@@ -142,7 +142,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                     public void stateChanged(ChangeEvent changeEvent) {
                         double value = slider1.getValue();
                         setRootLength(value / slider1max);
-                        prefs.putInt("root length",slider1.getValue());
+                        getPrefs().putInt("root length",slider1.getValue());
                     }
                 });
                 slider1.setValue(prefs.getInt("root length",0));
@@ -159,7 +159,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                 public void stateChanged(ChangeEvent changeEvent) {
                     double value = 1.0 - (((double) slider2.getValue()) / slider2max);
                     setBranchCurveProportion(value, value);
-                    prefs.putInt("tree curvature",slider2.getValue());
+                    getPrefs().putInt("tree curvature",slider2.getValue());
                 }
             });
             slider2.setValue(prefs.getInt("tree curvature",0));
@@ -172,7 +172,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
             checkBox1.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
                     setAlignTaxonLabels(checkBox1.isSelected());
-                    prefs.putBoolean("align taxon labels",checkBox1.isSelected());
+                    getPrefs().putBoolean("align taxon labels",checkBox1.isSelected());
                 }
             });
 
@@ -184,6 +184,10 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         controlsList.add(controls);
 
         return controlsList;
+    }
+
+    private Preferences getPrefs() {
+        return Preferences.userNodeForPackage(TreeViewer.class);
     }
 
     public void setSettings(ControlsSettings settings) {

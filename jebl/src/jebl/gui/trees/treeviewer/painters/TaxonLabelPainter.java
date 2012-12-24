@@ -1,8 +1,8 @@
 package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.RootedTree;
 import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
 import jebl.gui.trees.treeviewer.TreeViewer;
 import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -33,7 +33,9 @@ import java.util.prefs.Preferences;
  */
 public class TaxonLabelPainter extends BasicLabelPainter{
 
-    private static final Preferences PREFS = Preferences.userNodeForPackage(TaxonLabelPainter.class);
+    private static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(TaxonLabelPainter.class);
+    }
 
     private Controls controls;
     private boolean visible;
@@ -45,7 +47,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     public TaxonLabelPainter(RootedTree tree) {
         super("Tip Labels", tree, PainterIntent.TIP);
 
-        visible = PREFS.getBoolean("Tip Labels_isopoen", true);
+        visible = getPrefs().getBoolean("Tip Labels_isopoen", true);
     }
 
 
@@ -247,7 +249,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             visibleCheckBox.addChangeListener(new ChangeListener(){
                 public void stateChanged(ChangeEvent e) {
                     visible = visibleCheckBox.isSelected();
-                    PREFS.putBoolean("Tip Labels_isopoen", visible);
+                    getPrefs().putBoolean("Tip Labels_isopoen", visible);
                     firePainterChanged();
                 }
             });
@@ -260,7 +262,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     return new Dimension(super.getPreferredSize().width, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight));
                 }
             };;
-            String[] prefsValue = PREFS.get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
+            String[] prefsValue = getPrefs().get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     int[] selectedIndicies = attributeBox.getSelectedIndices();
@@ -269,7 +271,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                         selectedAttributes.add(attributes[selectedIndicies[i]]);
                     }
                     TaxonLabelPainter.this.selectedAttributes = selectedAttributes.toArray(new String[selectedAttributes.size()]);
-                    PREFS.put("Tip Labels_whatToDisplay", join(SELECTED_FIELDS_SERIALIZATION_SEPARATOR,selectedAttributes));
+                    getPrefs().put("Tip Labels_whatToDisplay", join(SELECTED_FIELDS_SERIALIZATION_SEPARATOR, selectedAttributes));
                     firePainterChanged();
                 }
             });
@@ -297,26 +299,26 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             JScrollPane attributesScroller = new JScrollPane(attributeBox);
             panel.addComponentWithLabel("Display:", attributesScroller);
 
-            final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
+            final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(getPrefs().getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
             panel.addComponentWithLabel("Significant Digits:", significantDigitSpinner);
             ChangeListener sigFigListener = new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     Integer value = (Integer) significantDigitSpinner.getValue();
                     formatter.setSignificantFigures(value);
-                    PREFS.putInt("Tip Labels_sigDigits", value);
+                    getPrefs().putInt("Tip Labels_sigDigits", value);
                     firePainterChanged();
                 }
             };
             significantDigitSpinner.addChangeListener(sigFigListener);
             sigFigListener.stateChanged(null);
 
-            final JSpinner maxCharsDigitSpinner = new JSpinner(new SpinnerNumberModel(PREFS.getInt("Tip Labels_maxChars", maxChars), 2, 100, 1));
+            final JSpinner maxCharsDigitSpinner = new JSpinner(new SpinnerNumberModel(getPrefs().getInt("Tip Labels_maxChars", maxChars), 2, 100, 1));
             panel.addComponentWithLabel("Max Chars:", maxCharsDigitSpinner);
             ChangeListener maxCharListener = new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     Integer value = (Integer) maxCharsDigitSpinner.getValue();
                     maxChars = value;
-                    PREFS.putInt("Tip Labels_maxChars", value);
+                    getPrefs().putInt("Tip Labels_maxChars", value);
                     firePainterChanged();
                 }
             };
