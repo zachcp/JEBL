@@ -58,7 +58,7 @@ public class BasicAlignment implements Alignment {
      * @return a set containing all the sequences in this alignment.
      */
     public Set<Sequence> getSequences() {
-        return new HashSet<Sequence>(sequences.values());
+        return new LinkedHashSet<Sequence>(sequences.values());
     }
 
     public List<Sequence> getSequenceList() {
@@ -155,7 +155,7 @@ public class BasicAlignment implements Alignment {
 
     private SequenceType sequenceType = null;
     private List<Taxon> taxonList = new ArrayList<Taxon>();
-    private Map<Taxon, Sequence> sequences = new HashMap<Taxon, Sequence>();
+    private Map<Taxon, Sequence> sequences = new LinkedHashMap<Taxon, Sequence>();
     private List<Pattern> patterns = new ArrayList<Pattern>();
 
     private class BasicPattern implements Pattern {

@@ -145,6 +145,9 @@ public final class Taxon implements Attributable, Comparable {
      * @return the taxon
      */
     public static Taxon getTaxon(String name) {
+        if (true) {
+            return new Taxon(name);
+        }
         if (name == null) {
             throw new IllegalArgumentException("Illegal null string for taxon name");
         }
@@ -198,6 +201,12 @@ public final class Taxon implements Attributable, Comparable {
 		return name.compareTo(((Taxon)o).getName());
 	}
 
+    public boolean equals(Object t) {
+        if (t instanceof Taxon) {
+            return name.equals(((Taxon)t).getName());
+        }
+        return false;
+    }
 
     public boolean equals(Taxon t) {
 	    return name.equals(t.getName());
