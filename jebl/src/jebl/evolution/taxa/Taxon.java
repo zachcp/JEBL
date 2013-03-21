@@ -137,6 +137,19 @@ public final class Taxon implements Attributable, Comparable {
     private static AtomicInteger taxaCreatedSinceLastPurge = new AtomicInteger(0);
     private static AtomicLong lastPurgeTime = new AtomicLong(0);
 
+    private static boolean taxonNamesUnique = false;
+
+    /**
+     * Set this to true if you want successive calls to {@link #getTaxon(String)} to return the same object.
+     * This means that if you add attributes to a taxon, when you request the taxon with the same name again later,
+     * it will have those same attributes.
+     * This was the default behaviour in the geneious_6_0_5 tag and earlier.
+     * @param taxonNamesUnique
+     */
+    public static void setTreatingTaxonsNamesAsUnique(boolean taxonNamesUnique) {
+        Taxon.taxonNamesUnique = taxonNamesUnique;
+    }
+
     /**
      * A static method that returns a Taxon object with the given name. If this has
      * already been created then the same instance will be returned.
@@ -145,7 +158,7 @@ public final class Taxon implements Attributable, Comparable {
      * @return the taxon
      */
     public static Taxon getTaxon(String name) {
-        if (true) {
+        if (!taxonNamesUnique) {
             return new Taxon(name);
         }
         if (name == null) {
