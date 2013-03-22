@@ -33,6 +33,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             "Consensus support(%)",
             "Clade Support",
             "bootstrap proportion",
+            "Bootstrap proportion",
             "Posterior Probability");
 
     final String fontMinSizePrefKey;
