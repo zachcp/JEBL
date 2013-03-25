@@ -687,7 +687,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					String token = helper.readToken();
 
 					int sequenceIndex;
-					Taxon taxon = Taxon.getTaxon(token);
+					Taxon taxon = getTaxonCalled(taxList, token);
 					if (firstLoop) {
 						if (taxonList != null ) {
 							sequenceIndex = taxonList.indexOf(taxon);
@@ -766,7 +766,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			for (int i = 0; i < taxonCount; i++) {
 				String token = helper.readToken();
 
-				Taxon taxon = Taxon.getTaxon(token);
+				Taxon taxon = getTaxonCalled(taxonList, token);
 
 				if (taxonList != null && !taxonList.contains(taxon)) {
 					// taxon not found in taxon list...
@@ -809,8 +809,12 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return sequences;
 	}
 
+    private Taxon getTaxonCalled(List<Taxon> taxList, String token) {
+        return taxList == null? Taxon.getTaxon(token): taxList.get(taxList.indexOf(Taxon.getTaxon(token)));
+    }
 
-	/**
+
+    /**
 	 * Reads a 'TAXA' block.
 	 */
 	private List<Taxon> readTaxaBlock() throws ImportException, IOException {
@@ -1099,7 +1103,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					throw new ImportException.BadFormatException("Expecting ',' or ';' after taxon label in TRANSLATE command of TREES block");
 				}
 
-				Taxon taxon = Taxon.getTaxon(token3);
+				Taxon taxon = getTaxonCalled(taxonList, token);
 
 				if (taxonList != null && !taxonList.contains(taxon)) {
 					// taxon not found in taxon list...
