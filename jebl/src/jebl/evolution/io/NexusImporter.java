@@ -858,6 +858,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
      */
     static void parseAndClearMetaComments(Attributable item, ImportHelper importHelper) throws ImportException.BadFormatException {
         for (String meta : importHelper.getMetaComments()) {
+            System.out.println("temp for debugging: meta: " + meta);
             // A meta-comment which should be in the form:
             // \[&label[=value][,label[=value]>[,/..]]\]
             parseMetaCommentPairs(meta, item);
