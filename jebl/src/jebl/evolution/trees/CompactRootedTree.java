@@ -27,6 +27,7 @@ import java.util.*;
  *
  */
 public class CompactRootedTree extends AttributableImp implements RootedTree {
+    private static final int MASK = Integer.MIN_VALUE;
     /**
      * Array of all nodes.
      *
@@ -46,13 +47,13 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      *  Index of parent node of x is parent[x].
      *  For the example tree, this would be (- 0 0 2 2 3 3)
      */
-    short[] parent;
+    int[] parent;
 
     /**
      *  Decendents of node x start at sons[x]
      *  For the example tree, this would be (1 - 3 5 - - -)
      */
-    short[] sons;
+    int[] sons;
 
     /**
      * Number of Decendents of node x is noSons[x]
@@ -61,9 +62,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      * Actually the above is true only for internal nodes. External nodes contain an index into
      * the taxa array indicating where the taxon for this node is stored. A 1 bit is added at the most
      * significant place to separate internal from external nodes. So in fact the array would look like
-     * that (2 0x8000|0 2 2 0x8000|1 0x8000|2 0x8000|3), where taxa[0] holds a's taxon etc.
+     * that (2 MASK|0 2 2 MASK|1 MASK|2 MASK|3), where taxa[0] holds a's taxon etc.
      */
-    short[] noSons;
+    int[] noSons;
 
     /** Tree has node heights information */
     boolean hasHeights;
@@ -102,14 +103,14 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      * attributs for node x are in all.get(x), for tree in all.get(#nodes), and for edges
      * in all.get(#nodes + edge index) (note that edge index always > 0)
      */
-    Map<Short, Map<String, Object> > all = null;
+    Map<Integer, Map<String, Object> > all = null;
 
     /**
      * Test if attribute map exists for index
      * @param index
      * @return true if map exists
      */
-    private boolean hasAttributeMap(short index) {
+    private boolean hasAttributeMap(int index) {
         return all != null && all.get(index) != null;
     }
 
@@ -119,9 +120,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      * @param index
      * @return attribute map
      */
-    private Map<String, Object> aMap(short index) {
+    private Map<String, Object> aMap(int index) {
         if( all == null ) {
-            all = new LinkedHashMap<Short, Map<String, Object>>();
+            all = new LinkedHashMap<Integer, Map<String, Object>>();
         }
 
         Map<String, Object> map = all.get(index);
@@ -137,9 +138,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
      */
     private class SimpleRootedNode extends AttributableImp implements Node {
         // Index of node in tree nodes array.
-        private short index;
+        private int index;
 
-        SimpleRootedNode(short index) {
+        SimpleRootedNode(int index) {
             this.index = index;
         }
 
@@ -162,8 +163,8 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     // Number of decendents.
     private int nSons(int index) {
         // Take care of external node bit.
-        final short n = noSons[index];
-        if( (n & 0x8000) == 0) {
+        final int n = noSons[index];
+        if( (n & MASK) == 0) {
           return n;
         }
         return 0;
@@ -175,14 +176,14 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         *
         * As a consequence, index > 0 always.
         */
-       private short index;
+       private int index;
 
-        SimpleRootedEdge(short index) {
+        SimpleRootedEdge(int index) {
             this.index = index;
         }
 
         Map<String, Object> getExistingMap() {
-            final short i = (short)(nodes.length + index);
+            final int i = nodes.length + index;
             if( hasAttributeMap(i) ) {
                 return aMap(i);
             }
@@ -190,7 +191,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         }
 
         Map<String, Object> getMap() {
-            return aMap((short)(nodes.length + index));
+            return aMap(nodes.length + index);
         }
 
         public double getLength() {
@@ -208,9 +209,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
         final int nNodes = t.getNodes().size();
         nodes = new SimpleRootedNode[nNodes];
-        parent = new short[nNodes];
-        sons = new short[nNodes];
-        noSons = new short[nNodes];
+        parent = new int[nNodes];
+        sons = new int[nNodes];
+        noSons = new int[nNodes];
         heights = new double[nNodes];
         hasHeights = t.hasHeights();
         hasLengths = t.hasLengths();
@@ -236,7 +237,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         while( level.size() > 0 ) {
             nlevel.clear();
             for( Node n : level ) {
-                short ns = (short) t.getChildren(n).size();
+                int ns =  t.getChildren(n).size();
 
                 if( hasHeights ) {
                     heights[iNode] = t.getHeight(n);
@@ -244,10 +245,10 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
                     heights[iNode] = ((iNode == 0) ? 0.0 : t.getLength(n));
                 }
 
-                nodes[iNode] = new SimpleRootedNode((short)iNode);
-                sons[iNode] = ns > 0 ? (short)decendentslStart : 0;
+                nodes[iNode] = new SimpleRootedNode(iNode);
+                sons[iNode] = ns > 0 ? decendentslStart : 0;
                 for(int l = 0; l < ns; ++l) {
-                    parent[decendentslStart + l] = (short)iNode;
+                    parent[decendentslStart + l] = iNode;
                 }
 
                 decendentslStart += ns;
@@ -256,7 +257,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
                     // external, set taxon and mark it.
                     assert t.isExternal(n);
                     taxa[nTax] = t.getTaxon(n);
-                    ns = (short)(0x8000 | nTax);
+                    ns = MASK | nTax;
                     ++nTax;
                 }
                 noSons[iNode] = ns;
@@ -350,7 +351,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     public Set<Node> getExternalNodes() {
         Set<Node> n = new LinkedHashSet<Node>();
         for(int i = 0; i < nodes.length; ++i) {
-            if( (noSons[i] & 0x8000) != 0 ) {
+            if( (noSons[i] & MASK) != 0 ) {
                 n.add(nodes[i]);
             }
         }
@@ -361,7 +362,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     public Set<Node> getInternalNodes() {
         Set<Node> n = new LinkedHashSet<Node>();
         for(int i = 0; i < nodes.length; ++i) {
-            if( (noSons[i] & 0x8000) == 0 ) {
+            if( (noSons[i] & MASK) == 0 ) {
                 n.add(nodes[i]);
             }
         }
@@ -391,9 +392,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Taxon getTaxon(Node node) {
-        final short index = ((SimpleRootedNode) node).index;
-        if( (noSons[index] & 0x8000) != 0 ) {
-            return taxa[noSons[index] & 0x7FFF];
+        final int index = ((SimpleRootedNode) node).index;
+        if( (noSons[index] & MASK) != 0 ) {
+            return taxa[noSons[index] & MASK - 1];
         }
         return null;
     }
@@ -406,7 +407,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     public Node getNode(Taxon taxon) {
         int i = Arrays.asList(taxa).indexOf(taxon);
         for(int k = 0; k < nodes.length; ++k) {
-            if( noSons[k] == (short)(0x8000 | i) ) {
+            if( noSons[k] == (MASK | i) ) {
                 return nodes[k];
             }
         }
@@ -424,12 +425,12 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     public List<Edge> getEdges(Node node) {
         List<Edge> e = new ArrayList<Edge>();
-        final short index = ((SimpleRootedNode) node).index;
+        final int index = ((SimpleRootedNode) node).index;
         if( index != 0 ) {
             e.add(establishEdge(index));
         }
         for(int n = 0; n < nSons(index); ++n) {
-            final short sindex = (short) (sons[index] + n);
+            final int sindex = sons[index] + n;
             e.add(establishEdge(sindex));
         }
         return e;
@@ -437,9 +438,9 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     public List<Node> getAdjacencies(Node node) {
         List<Node> adjacencies = new ArrayList<Node>();
-        final short index = ((SimpleRootedNode) node).index;
+        final int index = ((SimpleRootedNode) node).index;
         final int nSon = nSons(index);
-        final short sonStart = sons[index];
+        final int sonStart = sons[index];
         for(int n = 0; n <  nSon; ++n) {
             adjacencies.add( nodes[sonStart + n] );
         }
@@ -449,7 +450,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
         return adjacencies;
     }
 
-    private Edge establishEdge(short index) {
+    private Edge establishEdge(int index) {
         if( edges == null ) {
             edges = new SimpleRootedEdge[nodes.length];
         }
@@ -460,8 +461,8 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public Edge getEdge(Node node1, Node node2) throws NoEdgeException {
-        short index1 = ((SimpleRootedNode) node1).index;
-        short index2 = ((SimpleRootedNode) node2).index;
+        int index1 = ((SimpleRootedNode) node1).index;
+        int index2 = ((SimpleRootedNode) node2).index;
         // make index1 the parent of index2
         if( parent[index1] == index2 ) {
             index2 = index1;
@@ -474,8 +475,8 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     public double getEdgeLength(Node node1, Node node2) throws NoEdgeException {
-        final short index1 = ((SimpleRootedNode) node1).index;
-        final short index2 = ((SimpleRootedNode) node2).index;
+        final int index1 = ((SimpleRootedNode) node1).index;
+        final int index2 = ((SimpleRootedNode) node2).index;
         if( ! (parent[index1] == index2 || parent[index2] == index1) ) {
             throw new NoEdgeException();
         }
@@ -484,7 +485,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     public Node[] getNodes(Edge edge) {
         Node[] ns = new Node[2];
-        final short index = ((SimpleRootedEdge) edge).index;
+        final int index = ((SimpleRootedEdge) edge).index;
         ns[0] = nodes[index];
         ns[1] = nodes[parent[index]];
 
@@ -497,7 +498,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
     public Set<Edge> getEdges() {
         for(int k = 1; k < nodes.length; ++k) {
-            establishEdge((short)k);
+            establishEdge(k);
         }
         return new LinkedHashSet<Edge>( Arrays.asList(edges));
     }
@@ -517,7 +518,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     Map<String, Object> getExistingMap() {
-        final short index = (short) nodes.length;
+        final int index =  nodes.length;
         if( hasAttributeMap(index) ) {
             return aMap(index);
         }
@@ -525,7 +526,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
     }
 
     Map<String, Object> getMap() {
-        final short index = (short) nodes.length;
+        final int index = nodes.length;
         return aMap(index);
     }
 }

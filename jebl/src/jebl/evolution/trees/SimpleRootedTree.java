@@ -140,10 +140,9 @@ final public class SimpleRootedTree implements RootedTree {
      * @return the created node reference
      */
     public Node createExternalNode(Taxon taxon) {
-        if( getTaxa().contains(taxon) ) {
+        if( externalNodes.keySet().contains(taxon) ) {
             throw new IllegalArgumentException("duplicate taxon "+taxon.getName());
         }
-
         SimpleRootedNode node = new SimpleRootedNode(taxon);
         externalNodes.put(taxon, node);
         return node;
@@ -382,7 +381,6 @@ final public class SimpleRootedTree implements RootedTree {
     public Set<Node> getInternalNodes() {
         return new LinkedHashSet<Node>(internalNodes);
     }
-
     /**
      * @return the set of taxa associated with the external
      *         nodes of this tree. The size of this set should be the
