@@ -16,9 +16,6 @@ import java.util.*;
  *     per node/edge memory.
  *
  * Limitations:
- *    - Maximun of 2^16 nodes and 2^15 external nodes. This should not be a problem with the current
- *      sizes of phlogenetic trees we currently handle.
- *
  *    - Some of the accessors are slower, typically the ones getting all nodes, all edges, all internal
  *      nodes etc. Traversing the tree and handling attributes speed should be fine (compared to SimpkeRootedTree)
  *
