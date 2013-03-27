@@ -1111,7 +1111,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					throw new ImportException.BadFormatException("Expecting ',' or ';' after taxon label in TRANSLATE command of TREES block");
 				}
 
-				Taxon taxon = getTaxonCalled(taxonList, token);
+				Taxon taxon = getTaxonCalled(taxonList, token3);
 
 				if (taxonList != null && !taxonList.contains(taxon)) {
 					// taxon not found in taxon list...
