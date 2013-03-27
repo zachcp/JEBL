@@ -2,7 +2,6 @@ package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -16,7 +15,6 @@ import java.util.List;
 public abstract class TreeDrawableElement {
     final protected Node node;
     protected Paint foreground;
-    private static final boolean dontSetOverlappingVisibility = false;
 
     TreeDrawableElement(Node  node) {
         this.node = node;
@@ -124,8 +122,8 @@ public abstract class TreeDrawableElement {
     static int prints = 0;
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
-        if(dontSetOverlappingVisibility) {
-            return;
+        if(elements.size() > Short.MAX_VALUE) {
+            return; // this method has terrible performance on large data sets
         }
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
 
