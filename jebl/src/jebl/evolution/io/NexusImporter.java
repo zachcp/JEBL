@@ -810,7 +810,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	}
 
     private Taxon getTaxonCalled(List<Taxon> taxList, String token) {
-        return taxList == null? Taxon.getTaxon(token): taxList.get(taxList.indexOf(Taxon.getTaxon(token)));
+        if (taxList == null) {
+            return Taxon.getTaxon(token);
+        }else {
+            int index = taxList.indexOf(Taxon.getTaxon(token));
+            if (index == -1) {
+                return Taxon.getTaxon(token);
+            }
+            return taxList.get(index);
+        }
     }
 
 
