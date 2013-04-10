@@ -367,4 +367,8 @@ public class BartonSternberg implements MultipleAligner {
     public double getScore() {
         return aligner.getScore();
     }
+
+    public NeedlemanWunschLinearSpaceAffine getPairwiseAligner() {
+        return aligner;
+    }
 }
