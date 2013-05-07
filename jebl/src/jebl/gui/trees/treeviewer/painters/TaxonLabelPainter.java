@@ -110,6 +110,12 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
                 return  prefix+format.format((Date)value)+suffix;
             }
+            if (value instanceof Object[]) {
+                Object[] _value = (Object[])value;
+                if (_value.length == 2 && _value[0] instanceof Double && _value[1] instanceof Double) {
+                    return String.format("%.6f - %.6f", (Double)_value[0], (Double)_value[1]);
+                }
+            }
             String s = limitString(value.toString());
             //limit node labels to 15 chars (plus ...)
             //if(s.length() > 15)
