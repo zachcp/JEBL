@@ -77,7 +77,9 @@ public final class SimpleTree implements Tree {
      * @param length
      */
     public void setEdgeLength(final Node node1, final Node node2, final double length) {
-        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1) && length >= 0;
+        assert getAdjacencies(node1).contains(node2) && getAdjacencies(node2).contains(node1);
+        if (length<0)
+            System.out.println("Tree has edge of length "+length+"! This could be a bug, although there are algorithms such as FastTree that can generate trees with negative branch lengths (which means it is a noisy estimate of the branch length) in rare situations.");
 
         final Edge edge = new SimpleEdge(node1, node2, length);
 
