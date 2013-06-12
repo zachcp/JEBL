@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 public class NewickImporter implements TreeImporter {
     private final ImportHelper helper;
     private boolean unquotedLabels;
+    private String internalNodeLabel = "label";
 
     /**
      * Constructor
@@ -31,6 +32,14 @@ public class NewickImporter implements TreeImporter {
     public NewickImporter(Reader reader, boolean unquotedLabels) {
         helper = new ImportHelper(reader);
         this.unquotedLabels = unquotedLabels;
+    }
+
+    /**
+     *
+     * @param internalNodeLabel the label to give to values attached to internal nodes.
+     */
+    public void setInternalNodeLabel(String internalNodeLabel) {
+        this.internalNodeLabel = internalNodeLabel;
     }
 
     /**
@@ -198,7 +207,7 @@ public class NewickImporter implements TreeImporter {
             String token = helper.readToken(":(),;");
 
             if (token.length() > 0) {
-                node.setAttribute("label", NexusImporter.parseValue(token));
+                node.setAttribute(internalNodeLabel, NexusImporter.parseValue(token));
             }
 
             // If there is a metacomment before the branch length indicator (:), then it is a node attribute
