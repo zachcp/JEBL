@@ -121,8 +121,14 @@ public final class SimpleTree implements Tree {
         Node h;
         if( source.isExternal(node) ) {
             h = createExternalNode(source.getTaxon(node));
+            for (Map.Entry<String, Object> entry : node.getAttributeMap().entrySet()) {
+                h.setAttribute(entry.getKey(), entry.getValue());
+            }
         } else {
             h = createInternalNode(new ArrayList<Node>() );
+            for (Map.Entry<String, Object> entry : node.getAttributeMap().entrySet()) {
+                h.setAttribute(entry.getKey(), entry.getValue());
+            }
         }
 
         final List<Node> adjacencies = source.getAdjacencies(node);
