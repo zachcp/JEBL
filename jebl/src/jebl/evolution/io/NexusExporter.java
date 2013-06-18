@@ -29,6 +29,7 @@ import java.util.List;
  */
 
 public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
+    private boolean replaceSpacesInNamesWithUnderscores = false;
 
 	public NexusExporter(Writer writer) {
 		this(writer, true);
@@ -58,6 +59,10 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      */
     public void exportAlignment(Alignment alignment) throws IOException {
     	exportSequences(alignment.getSequences());
+    }
+
+    public void setReplaceSpacesInNamesWithUnderscores(boolean replaceSpacesInNamesWithUnderscores) {
+        this.replaceSpacesInNamesWithUnderscores = replaceSpacesInNamesWithUnderscores;
     }
 
     /**
@@ -250,6 +255,8 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      */
     private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
         String name = taxon.getName();
+        if (replaceSpacesInNamesWithUnderscores)
+            name = name.replace(' ','_');
         if (!name.matches(nameRegex)) {
             // JEBL way of quoting the quote character
             name = name.replace("\'", "\'\'");
