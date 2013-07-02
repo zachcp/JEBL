@@ -265,7 +265,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                 public Dimension getPreferredScrollableViewportSize() {
                     Insets insets = getBorder() != null ? getBorder().getBorderInsets(this) : new Insets(0,0,0,0);
                     int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
-                    return new Dimension(super.getPreferredSize().width, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight));
+                    return new Dimension(super.getPreferredSize().width+1, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight)); // +1 seems to stop ugly horizontal scroll bars showing up
                 }
             };;
             String[] prefsValue = getPrefs().get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
@@ -303,6 +303,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
 
             JScrollPane attributesScroller = new JScrollPane(attributeBox);
+            attributesScroller.setMinimumSize(attributesScroller.getPreferredSize()); // Work around that stupid Java 'feature' where if an objects preferred size is bigger than the space available, it sets it to its minimum size!
             panel.addComponentWithLabel("Display:", attributesScroller);
 
             final JSpinner significantDigitSpinner = new JSpinner(new SpinnerNumberModel(getPrefs().getInt("Tip Labels_sigDigits", formatter.getSignificantFigures()), 2, 14, 1));
