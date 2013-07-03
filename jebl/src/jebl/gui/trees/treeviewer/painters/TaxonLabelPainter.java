@@ -46,7 +46,6 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     public TaxonLabelPainter(RootedTree tree) {
         super("Tip Labels", tree, PainterIntent.TIP);
-
         visible = getPrefs().getBoolean("Tip Labels_isopoen", true);
     }
 
