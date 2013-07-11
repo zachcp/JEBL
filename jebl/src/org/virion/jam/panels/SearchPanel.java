@@ -34,6 +34,7 @@ public class SearchPanel extends JPanel {
 	public SearchPanel(final String emptyLabel, final JPopupMenu popup, final boolean searchAsYouType, boolean allowMacOsxNativeSearchBox) {
 
 		this.continuousSearch = searchAsYouType;
+        setLayout(new BorderLayout(0, 0));
 
 		if (allowMacOsxNativeSearchBox && Utils.isMacOSX() && (Utils.getMacOSXVersion().startsWith("10.5") || Utils.getMacOSXVersion().startsWith("10.6") ||
                 Utils.getMacOSXVersion().startsWith("10.7") || Utils.getMacOSXVersion().startsWith("10.8"))) {
@@ -67,7 +68,6 @@ public class SearchPanel extends JPanel {
 			Icon stopRolloverIcon = IconUtils.getIcon(SearchPanel.class, "images/search/stopRollover.png");
 			Icon stopPressedIcon = IconUtils.getIcon(SearchPanel.class, "images/search/stopPressed.png");
 
-			setLayout(new BorderLayout(0, 0));
 
 			if (popup != null) {
 				popup.getSelectionModel().setSelectedIndex(0);
