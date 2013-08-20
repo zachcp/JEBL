@@ -151,7 +151,7 @@ public final class GeneticCode {
      *        order A, C, G, T) (Note: This is not the order used by the Genbank website).
      * @param ncbiTranslationTableNumber the number used by NCBI to represent this genetic code or -1 if none. Eg. 1 = Standard...
      */
-    private GeneticCode(final String name, final String description, final String codeTable, int ncbiTranslationTableNumber, String firstCodonTranslationTable) {
+    public GeneticCode(final String name, final String description, final String codeTable, int ncbiTranslationTableNumber, String firstCodonTranslationTable) {
         this.name = name;
         this.description = description;
         this.codeTable = codeTable;
