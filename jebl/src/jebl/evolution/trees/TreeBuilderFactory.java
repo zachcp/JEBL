@@ -27,7 +27,12 @@ public class TreeBuilderFactory {
     /**
      * Supported pairwise distance methods
      */
-    public static enum DistanceModel { JukesCantor, F84, HKY, TamuraNei }
+    public static enum DistanceModel { JukesCantor, F84, HKY, TamuraNei,
+        /**
+         * Sets the distance to 1/Math.max(1,alignmentScore). So alignments with a much higher score will have distances closer to 0.
+         * This is often preferable to using the other models which often ignore gaps and are biased towards shorter aligned regions and so fail badly when used on alignments with free end gaps
+         */
+        AlignmentScore }
 
     /**
      * Supported consensus methods.

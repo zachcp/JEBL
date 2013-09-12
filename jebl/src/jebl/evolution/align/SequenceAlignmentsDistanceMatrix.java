@@ -88,22 +88,29 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
                 if(progressListener.isCanceled()) return d;
 
                 subComposite.beginSubtask();
-                BasicDistanceMatrix matrix;
-                switch( model ) {
-                    case F84:
-                        matrix = new F84DistanceMatrix(result.alignment, subComposite);
-                        break;
-                    case HKY:
-                        matrix = new HKYDistanceMatrix(result.alignment, subComposite);
-                        break;
-                    case TamuraNei:
-                        matrix = new TamuraNeiDistanceMatrix(result.alignment, subComposite);
-                        break;
-                    case JukesCantor:
-                    default:
-                        matrix = new JukesCantorDistanceMatrix(result.alignment, subComposite);
+                double distance;
+                if (model== TreeBuilderFactory.DistanceModel.AlignmentScore) {
+                    distance = 1/Math.max(1,result.score);
                 }
-                d[i][j] = matrix.getDistances()[0][1];
+                else {
+                    BasicDistanceMatrix matrix;
+                    switch( model ) {
+                        case F84:
+                            matrix = new F84DistanceMatrix(result.alignment, subComposite);
+                            break;
+                        case HKY:
+                            matrix = new HKYDistanceMatrix(result.alignment, subComposite);
+                            break;
+                        case TamuraNei:
+                            matrix = new TamuraNeiDistanceMatrix(result.alignment, subComposite);
+                            break;
+                        case JukesCantor:
+                        default:
+                            matrix = new JukesCantorDistanceMatrix(result.alignment, subComposite);
+                    }
+                    distance = matrix.getDistances()[0][1];
+                }
+                d[i][j] = distance;
                 d[j][i] = d[i][j];
             }
         }
