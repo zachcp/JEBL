@@ -33,7 +33,7 @@ public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {
     {
         super(getTaxa(seqs), getDistances(seqs, aligner, model, progress));
         boolean isProtein = seqs.get(0).getSequenceType().getCanonicalStateCount() > 4;
-        if (model != TreeBuilderFactory.DistanceModel.JukesCantor && isProtein) {
+        if (model != TreeBuilderFactory.DistanceModel.JukesCantor && model != TreeBuilderFactory.DistanceModel.AlignmentScore && isProtein) {
             throw new IllegalArgumentException("Model " + model + " does not support protein sequences");
         }
     }
