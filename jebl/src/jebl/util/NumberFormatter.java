@@ -42,7 +42,7 @@ public class NumberFormatter {
 		this.sf = sf;
 		this.dp = -1;
 
-		upperCutoff = Math.pow(10,sf-1);
+		upperCutoff = Math.pow(10,sf); // e.g. with 2sf, large numbers must exceed 100 to be displayed in scientific format
 		cutoffTable = new double[sf];
 		long num = 10;
 		for (int i = 0; i < cutoffTable.length; i++) {
