@@ -91,8 +91,8 @@ public class CladeHeightMetric implements RootedTreeMetric {
 		if (tm == null) {
 			List<Taxon> taxa = new ArrayList<Taxon>(tree1.getTaxa());
 
-			if (!tree2.getTaxa().equals(taxa))
-			tm = new HashMap<Taxon, Integer>();
+			if (!new ArrayList<Taxon>(tree2.getTaxa()).equals(taxa))
+			    tm = new HashMap<Taxon, Integer>();
 			for (int i = 0; i < taxa.size(); i++) {
 				tm.put(taxa.get(i), i);
 			}
