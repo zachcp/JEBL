@@ -15,6 +15,7 @@ import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.TransformedRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
@@ -234,6 +235,7 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     public void setTree(Tree inTree, int defaultLabelSize) {
+        if (inTree instanceof TransformedRootedTree) inTree = ((TransformedRootedTree) inTree).getSource();
         final boolean isRooted = (inTree instanceof RootedTree);
         if (isRooted) {
             tree = (RootedTree) inTree;
