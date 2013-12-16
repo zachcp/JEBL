@@ -11,6 +11,7 @@ public class NeedlemanWunsch extends AlignSimple {
     private int curr = 1;
     private float maxScore = 0;
 
+
     public NeedlemanWunsch(Scores sub, float d) {
         super(sub, d);
     }
