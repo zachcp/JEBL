@@ -87,6 +87,7 @@ public class SearchPanel extends JPanel {
 					}
 				});
 			}
+            findButton.setFocusable(false);
 
 			findButton.setPreferredSize(new Dimension(findButton.getIcon().getIconWidth(),
 					findButton.getIcon().getIconHeight()));
