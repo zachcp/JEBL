@@ -1010,7 +1010,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         calibrated = false;
         setDoubleBuffered(false);
 
-        drawTree(g2, false, false, true, true, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+        drawTree(g2, false, false, true, true, pageFormat.getImageableWidth(), pageFormat.getImageableHeight(), true);
 
         setDoubleBuffered(true);
         calibrated = false;
@@ -1101,7 +1101,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param height the height of the tree
      */
     public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, double width, double height) {
-        drawTree(g2, drawNodes, clipOffscreenShapes, drawOnlyVisibleElements, false, width, height);
+        drawTree(g2, drawNodes, clipOffscreenShapes, drawOnlyVisibleElements, false, width, height, false);
     }
 
     public Rectangle2D getScaleBarBounds() {
@@ -1116,8 +1116,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param drawOnlyVisibleElements tries to stop elements overlapping by not drawing some of them if true
      * @param width the width of the tree
      * @param height the height of the tree
+     * @param isPrinting if drawTree is called in order to print the tree
      */
-    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, boolean drawAllNodeMarkers, double width, double height) {
+    public void drawTree(Graphics2D g2, boolean drawNodes, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements, boolean drawAllNodeMarkers, double width, double height, boolean isPrinting) {
 
         if(flipTree) {
             g2.scale(-1.0,1);
@@ -1160,9 +1161,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final boolean alignedTaxa = treeLayout.alignTaxa();
 
         Node nodeUnderMouse = null;
-        Node[] result = getNodeAt(mouseLocation);
-        if(result != null) {
-            nodeUnderMouse = result[0];
+        if (!isPrinting) {
+            Node[] result = getNodeAt(mouseLocation);
+            if(result != null) {
+                nodeUnderMouse = result[0];
+            }
         }
 
         for (Node node : externalNodes) {
