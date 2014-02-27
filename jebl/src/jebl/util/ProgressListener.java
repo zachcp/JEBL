@@ -413,4 +413,31 @@ public abstract class ProgressListener implements Cancelable {
             return fullProgressListener.isCanceled();
         }
     }
+
+    /**
+     * Creates a ProgressListener that delegates its {@link #isCanceled()} method to the provided Cancelable and
+     * does nothing for all other methods
+     * @param cancelable the cancelable to delegate {@link jebl.util.ProgressListener#isCanceled()} to
+     * @return a ProgressListener that delegates its {@link #isCanceled()} method to the provided Cancelable
+     */
+    public static ProgressListener forCancelable(final Cancelable cancelable) {
+        return new ProgressListener() {
+            @Override
+            protected void _setProgress(double fractionCompleted) {
+            }
+
+            @Override
+            protected void _setIndeterminateProgress() {
+            }
+
+            @Override
+            protected void _setMessage(String message) {
+            }
+
+            @Override
+            public boolean isCanceled() {
+                return cancelable.isCanceled();
+            }
+        };
+    }
 }
