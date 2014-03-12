@@ -362,11 +362,12 @@ public class MostProbableTopology {
 
         // collect candidates
         final List<Info> candidates = new ArrayList<Info>();
+        int numberOfCandidateTrees = 0;
 
         //final int th = threshold > 0 ? (int)(threshold * nTrees) : 1;
         final int th = (int)(threshold * nTrees);
 
-        while (queue.peek() != null && candidates.size() <= th && !(max > 0 && candidates.size() >= max) ) {
+        while (queue.peek() != null && numberOfCandidateTrees <= th && !(max > 0 && numberOfCandidateTrees >= max) ) {
             Map.Entry<String, TopologyEntry> e = queue.poll();
             final MostProbableTopology.TopologyEntry info = e.getValue();
 
@@ -383,9 +384,10 @@ public class MostProbableTopology {
             }
 
             candidates.add(candidate);
+            numberOfCandidateTrees += info.count;
             final Tree tree1 = candidate.getTree();
             tree1.setAttribute("Frequency", (100.0 * info.count) / nTrees);
-            tree1.setAttribute(NexusExporter.treeNameAttributeKey, "topology_" + candidates.size());
+            tree1.setAttribute(NexusExporter.treeNameAttributeKey, "topology_" + numberOfCandidateTrees);
         }
 
         // Now go over the set of trees, and for each node/edge record the value in all
