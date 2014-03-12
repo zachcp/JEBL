@@ -438,7 +438,7 @@ public class MostProbableTopology {
 
     // "Standard" string representation
     private String standardTopologyRepresentation(Tree t) {
-        if( t instanceof RootedTree ) {
+        if( Utils.isRooted(t) ) {
             final RootedTree r = (RootedTree) t;
             return standardTop(r, r.getRootNode());
         }
