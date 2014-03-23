@@ -70,13 +70,36 @@ public final class GeneticCode {
             CHLOROPHYCEAN_MITOCHONDRIAL = new GeneticCode("chlorophyceanMitochondrial", "Chlorophycean Mitochondrial", reorderTranslation("FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 16,reorderTranslation("-----------------------------------M----------------------------")),
             TREMATODE_MITOCHONDRIAL = new GeneticCode("trematodeMitochondrial", "Trematode Mitochondrial", reorderTranslation("FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG"), 21,reorderTranslation("-----------------------------------M---------------M------------")),
             SCENEDESMUS_OBLIQUUS_MITOCHONDRIAL = new GeneticCode("scenedesmusObliquusMitochondrial", "Scenedesmus Obliquus Mitochondrial", reorderTranslation("FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 22,reorderTranslation("-----------------------------------M----------------------------")),
-            THRAUSTOCHYTRIUM_MITOCHONDRIAL = new GeneticCode("thraustochytriumMitochondrial", "Thraustochytrium Mitochondrial", reorderTranslation("FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 23,reorderTranslation("--------------------------------M--M---------------M------------"));
+            THRAUSTOCHYTRIUM_MITOCHONDRIAL = new GeneticCode("thraustochytriumMitochondrial", "Thraustochytrium Mitochondrial", reorderTranslation("FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 23,reorderTranslation("--------------------------------M--M---------------M------------")),
+            PTEROBRANCHIA_MITOCHONDRIAL = new GeneticCode("pterobranchiaMitochondrial", "Pterobranchia Mitochondrial", reorderTranslation("FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG"), 24,reorderTranslation("---M---------------M---------------M---------------M------------")),
+            CANDIDATE_DIVISION_SR1_AND_GRACILIBACTERIA = new GeneticCode("candidateDivisionSR1andGracilibacteria", "Candidate Division SR1 and Gracilibacteria", reorderTranslation("FFLLSSSSYY**CCGWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"), 25,reorderTranslation("---M-------------------------------M---------------M------------"));
 
     private static final List<GeneticCode> GENETIC_CODES_LIST = Collections.unmodifiableList(Arrays.asList(
             UNIVERSAL, VERTEBRATE_MT, YEAST, MOLD_PROTOZOAN_MT, MYCOPLASMA, INVERTEBRATE_MT,
             CILIATE, ECHINODERM_MT, EUPLOTID_NUC, BACTERIAL, ALT_YEAST, ASCIDIAN_MT,
-            FLATWORM_MT, BLEPHARISMA_NUC,CHLOROPHYCEAN_MITOCHONDRIAL,TREMATODE_MITOCHONDRIAL,SCENEDESMUS_OBLIQUUS_MITOCHONDRIAL,THRAUSTOCHYTRIUM_MITOCHONDRIAL
+            FLATWORM_MT, BLEPHARISMA_NUC,CHLOROPHYCEAN_MITOCHONDRIAL,TREMATODE_MITOCHONDRIAL,SCENEDESMUS_OBLIQUUS_MITOCHONDRIAL,THRAUSTOCHYTRIUM_MITOCHONDRIAL,
+            PTEROBRANCHIA_MITOCHONDRIAL,CANDIDATE_DIVISION_SR1_AND_GRACILIBACTERIA
     ));
+
+    private static List<GeneticCode> customGeneticCodes = Collections.emptyList();
+
+    public static List<GeneticCode> getCustomGeneticCodes() {
+        return Collections.unmodifiableList(customGeneticCodes);
+    }
+
+    public static void setCustomGeneticCodes(List<GeneticCode> geneticCodes) {
+        customGeneticCodes = new ArrayList<GeneticCode>(geneticCodes);
+    }
+
+    private static List<GeneticCode> getGeneticCodesList() {
+        List<GeneticCode> geneticCodes = new ArrayList<GeneticCode>(GENETIC_CODES_LIST);
+        geneticCodes.addAll(getCustomGeneticCodes());
+        return geneticCodes;
+    }
+
+    public static List<GeneticCode> getStandardGeneticCodes() {
+        return GENETIC_CODES_LIST;
+    }
 
     private static String reorderTranslation(String translation) {
         // jebls ordering of nucleotides is different to that used by NCBI at http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
@@ -96,11 +119,11 @@ public final class GeneticCode {
      * @return An iterable over the genetic codes
      */
     public static Iterable<GeneticCode> getGeneticCodes() {
-        return GENETIC_CODES_LIST;
+        return getGeneticCodesList();
     }
 
     public static GeneticCode[] getGeneticCodesArray() {
-        return GENETIC_CODES_LIST.toArray(new GeneticCode[GENETIC_CODES_LIST.size()]);
+        return getGeneticCodesList().toArray(new GeneticCode[getGeneticCodesList().size()]);
     }
 
     /**
@@ -113,14 +136,14 @@ public final class GeneticCode {
 
     private int ncbiTranslationTableNumber;
     private final Set<CodonState> startCodons;
-    private final String name, description, codeTable;
+    private final String name, description, codeTable, firstCodonTranslationTable;
 
     /**
      * @param name the name of the genetic code
      * @return the genetic code such that {@link #getDescription()} equals name
      */
     public static GeneticCode valueOf(String name) {
-        for(GeneticCode code : GENETIC_CODES_LIST) {
+        for(GeneticCode code : getGeneticCodesList()) {
             if(code.getDescription().equals(name)){
                 return code;
             }
@@ -155,6 +178,7 @@ public final class GeneticCode {
         this.name = name;
         this.description = description;
         this.codeTable = codeTable;
+        this.firstCodonTranslationTable = firstCodonTranslationTable;
         this.ncbiTranslationTableNumber = ncbiTranslationTableNumber;
 
         if (codeTable.length() != 64) {
@@ -214,6 +238,15 @@ public final class GeneticCode {
      */
     public String getCodeTable() {
         return codeTable;
+    }
+
+    /**
+     * Returns a length-64 string that for each nucleotide triplet contains the single-character
+     * amino acid code (see {@link AminoAcids} to which that triplet is translated in this genetic code when it occurs as the first codon
+     * @return the string passed to the constructor as the <code>firstCodonTranslationTable</code> argument.
+     */
+    public String getCodeTableForFirstCodon() {
+        return firstCodonTranslationTable;
     }
 
     /**
