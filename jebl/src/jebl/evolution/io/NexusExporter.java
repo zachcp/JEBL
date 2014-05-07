@@ -95,18 +95,27 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             writer.println("\tmatrix");
             int maxRowLength = interleave ? MAX_ROW_LENGTH : maxLength;
+
+            List<Taxon> taxons = new ArrayList<Taxon>();
+            List<String> sequenceStrings = new ArrayList<String>();
+            List<SequenceType> sequenceTypes = new ArrayList<SequenceType>();
+            for (Sequence sequence : sequences) {
+                taxons.add(sequence.getTaxon());
+                sequenceStrings.add(sequence.getString());
+                sequenceTypes.add(sequence.getSequenceType());
+            }
+
             for(int n=0; n < Math.ceil((double)maxLength/maxRowLength); n++){
-                for (Sequence sequence : sequences) {
-                    if( sequence.getSequenceType() != seqType ) {
+                for (int i=0; i<sequenceStrings.size(); i++) {
+                    if( sequenceTypes.get(i) != seqType ) {
                         throw new IllegalArgumentException("SequenceTypes of sequences in collection do not match");
                     }
                     StringBuilder builder = new StringBuilder("\t");
-                    appendTaxonName(sequence.getTaxon(), builder);
-                    String sequenceString = sequence.getString();
-                    builder.append("\t").append(sequenceString.subSequence(n*maxRowLength, Math.min((n+1)*maxRowLength, sequenceString.length())));
-                    int shortBy = Math.min(Math.min(n*maxRowLength, maxLength) - sequence.getLength(),  maxRowLength);
+                    appendTaxonName(taxons.get(i), builder);
+                    builder.append("\t").append(sequenceStrings.get(i).subSequence(n*maxRowLength, Math.min((n+1)*maxRowLength, sequenceStrings.get(i).length())));
+                    int shortBy = Math.min(Math.min(n*maxRowLength, maxLength) - sequenceStrings.get(i).length(),  maxRowLength);
                     if (shortBy > 0) {
-                        for (int i = 0; i < shortBy; i++) {
+                        for (int j = 0; j < shortBy; j++) {
                             builder.append(seqType.getGapState().getCode());
                         }
                     }
