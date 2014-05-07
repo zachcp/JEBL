@@ -26,7 +26,7 @@ public final class Nucleotides {
     public static final String NAME = "nucleotide";
 
     public static final int CANONICAL_STATE_COUNT = 4;
-    public static final int STATE_COUNT = 17;
+    public static final int STATE_COUNT = 18;
 
     public static final NucleotideState A_STATE = new NucleotideState("Adenine", "A", 0);
     public static final NucleotideState C_STATE = new NucleotideState("Cytosine", "C", 1);
@@ -52,6 +52,7 @@ public final class Nucleotides {
 
     public static final NucleotideState UNKNOWN_STATE = new NucleotideState("Unknown base", "?", 15, new NucleotideState[] {A_STATE, C_STATE, G_STATE, T_STATE});
     public static final NucleotideState GAP_STATE = new NucleotideState("Gap", "-", 16, new NucleotideState[] {A_STATE, C_STATE, G_STATE, T_STATE});
+    public static final NucleotideState I_STATE = new NucleotideState("Inosine", "I", 17, new NucleotideState[] {A_STATE, G_STATE, T_STATE}); // Inosine binds with A, C, U, so treat is as A, G, or T
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
     // and will become private in the future. Use {@link #getCanonicalStates} instead.
@@ -67,7 +68,7 @@ public final class Nucleotides {
         A_STATE, C_STATE, G_STATE, T_STATE,
         R_STATE, Y_STATE, M_STATE, W_STATE,
         S_STATE, K_STATE, B_STATE, D_STATE,
-        H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
+        H_STATE, V_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE, I_STATE
     };
 
     // Making an array public allows a client to modify its contents. Deprecating on 2007-10-10
@@ -77,7 +78,7 @@ public final class Nucleotides {
             T_STATE, G_STATE, C_STATE, A_STATE,
             Y_STATE, R_STATE, K_STATE, W_STATE,
             S_STATE, M_STATE, V_STATE, H_STATE,
-            D_STATE, B_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE
+            D_STATE, B_STATE, N_STATE, UNKNOWN_STATE, GAP_STATE, UNKNOWN_STATE // Not sure on this last one. Probably it doesn't matter since nobody should complement Inosine, but if they do, making it clear we don't know the answer seems best
     };
 
     public static NucleotideState getComplementaryState(NucleotideState state) {
