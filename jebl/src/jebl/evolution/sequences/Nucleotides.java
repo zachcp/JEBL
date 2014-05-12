@@ -78,7 +78,7 @@ public final class Nucleotides {
             T_STATE, G_STATE, C_STATE, A_STATE,
             Y_STATE, R_STATE, K_STATE, W_STATE,
             S_STATE, M_STATE, V_STATE, H_STATE,
-            D_STATE, B_STATE, N_STATE, UNKNOWN_STATE,  // Not sure on this last one. Probably it doesn't matter since nobody should complement Inosine, but if they do, making it clear we don't know the answer seems best
+            D_STATE, B_STATE, N_STATE, H_STATE,
             UNKNOWN_STATE, GAP_STATE
     };
 
