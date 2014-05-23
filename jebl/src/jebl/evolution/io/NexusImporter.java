@@ -1182,7 +1182,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 					helper.clearLastMetaComment();
 
 					tree = new SimpleRootedTree();
-					readInternalNode(tree);
+					//readInternalNode(tree);
+                    readTree(tree);
 
 					// save name as attribute
                     if( ! NexusExporter.isGeneratedTreeName(treeName) )  {
@@ -1242,6 +1243,102 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			return null;
 		}
 	}
+
+    /* Made up with code from readBranch and readInternalNode. These other methods provide
+     * a recursive approach to reading the tree while this method doesn't use recursion.
+     *
+     * Wherever readInternalNode is used it can be swapped with readTree and the result
+     * should be the same.
+     * */
+    private Node readTree(SimpleRootedTree tree) throws IOException, ImportException {
+
+        /*  Simulate a stack. The stack will have as many layers as the tree has levels.
+         * As we go down the tree structure we will add layers to the stack and as we
+         * return up the branch we will remove layers from the stack. */
+        Deque<List<Node>> children = new ArrayDeque<List<Node>>();
+        children.push(new ArrayList<Node>());   // start with one layer
+
+        Node child;
+        int openBrackets = 0; // keep track of how many open brackets we have read
+        String token = "";
+
+        // read the opening '('
+        helper.readCharacter();
+        openBrackets++;
+        helper.clearLastMetaComment(); // might not need this
+
+        do {
+            while (helper.nextCharacter() == '(') {
+                helper.readCharacter();
+                openBrackets++;
+                children.push(new ArrayList<Node>());
+            }
+
+            child = readExternalNode(tree);
+            children.peek().add(child);
+
+            if (helper.getLastDelimiter() == ':') {
+                final double length = helper.readDouble(",():;");
+                tree.setLength(child, length);
+            }
+
+            // If there is a metacomment after the branch length indicator (:), then it is a branch attribute
+            // however, in the present implementation, this simply gets added to the node attributes.
+            parseAndClearMetaComments(tree.getParentEdge(child), helper);
+
+            while (helper.getLastDelimiter() == ')') {
+                if (--openBrackets == 0) break;
+
+                Node branch = tree.createInternalNode(children.pop());
+
+                // read the closing ')'
+                if (openBrackets > 0) {
+                    /* From what I understand from the nexus grammar after a closing bracket
+                     * there should always be a ':' character. */
+                    token = helper.readToken(":,();");
+
+                    // if there is a token before the branch length, treat it as a node label
+                    // and store it as an attribute of the node...
+                    if (token.length() > 0) {
+                        branch.setAttribute("label", parseValue(token));
+                    }
+
+                    if (helper.getLastDelimiter() == ':') {
+                        final double length = helper.readDouble(",():;");
+                        tree.setLength(branch, length);
+                    } /* else: maybe issue an invalid document warning? */
+
+                    parseAndClearMetaComments(tree.getParentEdge(branch), helper);
+                }
+
+                if (children.isEmpty())
+                    children.push(new ArrayList<Node>());
+
+                children.peek().add(branch);
+            }
+
+        } while (helper.getLastDelimiter()==',' && openBrackets > 0);
+
+        if (helper.getLastDelimiter() != ')') {
+            throw new ImportException.BadFormatException("Missing closing ')' in tree");
+        }
+
+        Node node = tree.createInternalNode(children.pop());
+
+        // find the next delimiter
+        token = helper.readToken(":(),;").trim();
+
+        // if there is a token before the branch length, treat it as a node label
+        // and store it as an attribute of the node...
+        if (token.length() > 0) {
+            node.setAttribute("label", parseValue(token));
+        }
+
+        // If there is a metacomment before the branch length indicator (:), then it is a node attribute
+        parseAndClearMetaComments(node, helper);
+
+        return node;
+    }
 
 	/**
 	 * Reads a branch in. This could be a node or a tip (calls readNode or readTip
