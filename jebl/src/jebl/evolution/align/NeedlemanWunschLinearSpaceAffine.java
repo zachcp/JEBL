@@ -362,7 +362,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                         cm[1][j] = cy[0][j - 1];
                         cmtype[1][j] = cytype[0][j - 1];
                     } else {
-                        throw new Error("NWAffine 1");
+                        throw new Error("NWAffine 1. Probably caused by memory corruption. val="+val+" a="+a+" b="+b+" c="+c+" max="+max(a,b,c));
                     }
                 }
 
@@ -417,7 +417,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                         cx[1][j] = cy[0][j];
                         cxtype[1][j] = cytype[0][j];
                     } else {
-                        throw new Error("NWAffine 2");
+                        throw new Error("NWAffine 2. Probably caused by memory corruption. val="+val+" a="+a+" b="+b+" c="+c+" max="+max(a,b,c));
                     }
                 }
 
@@ -472,7 +472,7 @@ public class NeedlemanWunschLinearSpaceAffine extends AlignLinearSpaceAffine imp
                         cy[1][j] = cx[1][j - 1];
                         cytype[1][j] = cxtype[1][j - 1];
                     } else {
-                        throw new Error("NWAffine 3");
+                        throw new Error("NWAffine 3. Probably caused by memory corruption. val="+val+" a="+a+" b="+b+" c="+c+" max="+max(a,b,c));
                     }
                 }
 
