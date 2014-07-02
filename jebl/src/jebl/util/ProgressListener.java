@@ -63,8 +63,10 @@ public abstract class ProgressListener implements Cancelable {
      * @return true if the user has requested that this operation be canceled.
      */
     public final boolean setProgress(long currentStep, long numberOfSteps) {
-        if (numberOfSteps<=0) throw new IllegalArgumentException("numberOfSteps="+numberOfSteps);
-        if (currentStep<0 || currentStep>numberOfSteps)  throw new IllegalArgumentException("currentStep must be between 0 and numberOfSteps inclusive. Got "+currentStep+" of "+numberOfSteps);
+        if (numberOfSteps<=0)
+            throw new IllegalArgumentException("numberOfSteps="+numberOfSteps);
+        if (currentStep<0 || currentStep>numberOfSteps)
+            throw new IllegalArgumentException("currentStep must be between 0 and numberOfSteps inclusive. Got "+currentStep+" of "+numberOfSteps);
         double progress  = ((double)currentStep)/numberOfSteps;
         return setProgress(progress);
     }
