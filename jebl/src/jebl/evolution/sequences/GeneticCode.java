@@ -12,6 +12,7 @@ package jebl.evolution.sequences;
 import jebl.util.MaybeBoolean;
 
 import java.util.*;
+import java.util.prefs.Preferences;
 
 /**
  * A set of standard genetic codes.
@@ -549,4 +550,24 @@ public final class GeneticCode {
     public String toString() {
         return getDescription();
     }
+
+    /**
+     * @return the default genetic code to use
+     */
+    public static GeneticCode getDefaultGeneticCode() {
+        String defaultValue = Preferences.userNodeForPackage(GeneticCode.class).get("defaultGeneticCode", "");
+        GeneticCode defaultGeneticCode = GeneticCode.valueOf(defaultValue);
+        if (defaultGeneticCode==null)
+            defaultGeneticCode = GeneticCode.UNIVERSAL;
+        return defaultGeneticCode;
+    }
+
+    /**
+     * Sets the genetic code to return from future calls to {@link #getDefaultGeneticCode()}
+     * @param geneticCode the genetic code to use
+     */
+    public static void setDefaultGeneticCode(GeneticCode geneticCode) {
+        Preferences.userNodeForPackage(GeneticCode.class).put("defaultGeneticCode", geneticCode.getDescription());
+    }
+
 }
