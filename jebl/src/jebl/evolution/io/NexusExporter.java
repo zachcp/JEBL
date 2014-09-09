@@ -30,8 +30,9 @@ import java.util.List;
 
 public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
     private boolean replaceSpacesInNamesWithUnderscores = false;
+    private char[] replaceCharactersInNamesWithUnderscores;
 
-	public NexusExporter(Writer writer) {
+    public NexusExporter(Writer writer) {
 		this(writer, true);
 	}
 
@@ -63,6 +64,10 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
     public void setReplaceSpacesInNamesWithUnderscores(boolean replaceSpacesInNamesWithUnderscores) {
         this.replaceSpacesInNamesWithUnderscores = replaceSpacesInNamesWithUnderscores;
+    }
+
+    public void setReplaceCharactersInNamesWithUnderscores(String charactersToReplace) {
+        this.replaceCharactersInNamesWithUnderscores = charactersToReplace.toCharArray();
     }
 
     /**
@@ -264,8 +269,15 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      */
     private StringBuilder appendTaxonName(Taxon taxon, StringBuilder builder) {
         String name = taxon.getName();
-        if (replaceSpacesInNamesWithUnderscores)
-            name = name.replace(' ','_');
+        if (replaceSpacesInNamesWithUnderscores) {
+            name = name.replace(' ', '_');
+        }
+        if (replaceCharactersInNamesWithUnderscores!=null) {
+            for (char c : replaceCharactersInNamesWithUnderscores) {
+                name = name.replace(c, '_');
+            }
+        }
+
         if (!name.matches(nameRegex)) {
             // JEBL way of quoting the quote character
             name = name.replace("\'", "\'\'");
