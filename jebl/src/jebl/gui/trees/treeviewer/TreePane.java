@@ -46,6 +46,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public static boolean goBackwards = false;
     public Point mouseLocation = new Point(0,0);
+    private String referenceSequenceName;
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
@@ -1672,13 +1673,18 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     taxonLabelJustifications.put(taxon, just);
                 }
 
+                int priority = 10;
+                Color nodeColor = Color.black;
+                if (referenceSequenceName!=null && referenceSequenceName.equals(taxon.getName())) {
+                    nodeColor = new Color(0, 150,0);
+                    priority = 11; // if there are too many labels to show them all, we prefer to show the reference sequence rather than other sequences
+                }
                 final TreeDrawableElementNodeLabel e =
-                        new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, 10,
+                        new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
                                                          nodeWithLongestTaxon, taxonLabelPainter,
                         null);
 
                 Object colorAttr = node.getAttribute("nodeColor");
-                Color nodeColor = Color.black;
                 if(colorAttr != null){
                     nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
                 }
@@ -1903,6 +1909,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public TreeLayout getTreeLayout() {
         return treeLayout;
+    }
+
+    /**
+     * Set the name of the reference sequence which will be colored green and
+     * preferentially drawn over other labels when there are too many labels to display
+     * @param referenceSequenceName the name of the reference sequence or null for no reference sequence
+     */
+    public void setReferenceSequenceName(String referenceSequenceName) {
+        this.referenceSequenceName = referenceSequenceName;
     }
 
     private class TreeBoundsHelper {
