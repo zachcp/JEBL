@@ -111,7 +111,13 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                     nodes = tree.getInternalNodes();
                 }
             }
+            int nodeCounter = 0;
             for(Node n : nodes) {
+                nodeCounter++;
+                if (n == null) {
+                    String message = String.format("Current %s node (%d out of %d) was null. Tree instance: %s", intent, nodeCounter, nodes.size(), tree.getClass());
+                    throw new IllegalStateException(message);
+                }
                 Set<String> attributeNames = new LinkedHashSet<String>();
                 attributeNames.addAll(n.getAttributeNames());
                 final Taxon nodeTaxon = tree.getTaxon(n);
