@@ -706,7 +706,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 								+ " (expecting " + taxList.get(i).getName() + ")");
 					}
 
-					StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
 
 					helper.readSequenceLine(buffer, sequenceType, ";", gapCharacters, missingCharacters,
 							matchCharacters, firstSequence);
@@ -1534,19 +1534,23 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			return Boolean.valueOf(value);
 		}
 
-		// Attempt to format the value as an integer
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException nfe1) {
-			// not an integer
-		}
+        if (isPossibleInteger(value)) { // check first by calling isPossibleInteger since Exception throwing for non-integer values is very slow
+            // Attempt to format the value as an integer
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException nfe1) {
+                // not an integer
+            }
+        }
 
-		// Attempt to format the value as a double
-		try {
-			return Double.parseDouble(value);
-		} catch (NumberFormatException nfe2) {
-			// not a double
-		}
+        if (isPossibleDouble(value)) { // check first by calling isPossibleInteger since Exception throwing for non-double values is very slow
+            // Attempt to format the value as a double
+            try {
+                return Double.parseDouble(value);
+            } catch (NumberFormatException nfe2) {
+                // not a double
+            }
+        }
 
 		// return the trimmed string
 		return value;
@@ -1564,4 +1568,32 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 	private boolean isInterleaved = false;
 
 	protected final ImportHelper helper;
+
+    public static boolean isPossibleInteger(String s) {
+        int length = s.length();
+        if (length==0)
+            return false;
+        for(int i=0;i< length;i++) {
+            char c = s.charAt(i);
+            if (c>='0' && c<='9')
+                continue;
+            if (i==0 && (c=='+' || c=='-'))
+                continue;
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isPossibleDouble(String s) {
+        int length = s.length();
+        if (length==0)
+            return false;
+        for(int i=0;i< length;i++) {
+            char c = s.charAt(i);
+            if ((c>='0' && c<='9') || c=='.' || c=='e' || c=='E' || c=='+' || c=='-')
+                continue;
+            return false;
+        }
+        return true;
+    }
 }

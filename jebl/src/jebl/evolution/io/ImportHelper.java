@@ -384,7 +384,7 @@ public class ImportHelper {
 
     /**
      * Reads a line of sequence, skipping over any comments and filtering using sequenceType.
-     * @param sequence a StringBuffer into which the sequence is put
+     * @param sequence a StringBuilder into which the sequence is put
      * @param sequenceType the sequenceType of the sequence
      * @param delimiters list of characters that will stop the reading
      * @param gapCharacters list of characters that will be read as gaps
@@ -394,7 +394,7 @@ public class ImportHelper {
      * @throws IOException
      * @throws ImportException
      */
-    public void readSequenceLine(StringBuffer sequence, SequenceType sequenceType,
+    public void readSequenceLine(StringBuilder sequence, SequenceType sequenceType,
                                  String delimiters,
                                  String gapCharacters, String missingCharacters,
                                  String matchCharacters, String matchSequence) throws IOException, ImportException {
@@ -531,7 +531,7 @@ public class ImportHelper {
 
         nextCharacter();
 
-        StringBuffer token = new StringBuffer();
+        StringBuilder token = new StringBuilder();
 
         while (!done) {
             ch = read();
@@ -622,14 +622,14 @@ public class ImportHelper {
         char ch;
         int n=1;
         boolean write = false;
-        StringBuffer meta = null;
+        StringBuilder meta = null;
 
         if (nextCharacter() == writeComment) {
             read();
             write = true;
         } else if (nextCharacter() == metaComment) {
             read();
-            meta = new StringBuffer();
+            meta = new StringBuilder();
         }
 
         lastMetaComment = null;
