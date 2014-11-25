@@ -102,6 +102,7 @@ public class RootedFromUnrooted implements RootedTree {
 		parents.put(root, null);
         setParent(left, root);
         setParent(right, root);
+		// setAttributeIfPresent(attributeMap, root) ?
     }
 
 	public List<Node> getChildren(Node node) {

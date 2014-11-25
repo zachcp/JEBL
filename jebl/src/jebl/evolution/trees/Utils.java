@@ -13,6 +13,7 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.HashPair;
 
+import javax.swing.text.rtf.RTFEditorKit;
 import java.util.*;
 
 /**
@@ -25,6 +26,8 @@ import java.util.*;
 public final class Utils {
     private Utils() { }  // make class uninstantiable
 
+    static boolean includeMetacomments = false;
+
     /**
      * @param tree
      * @return the rooted tree as a newick format string
@@ -34,6 +37,16 @@ public final class Utils {
         toNewick(tree, tree.getRootNode(), buffer);
         buffer.append(";");
         return buffer.toString();
+    }
+
+    /**
+     * @param tree
+     * @param exportWithMetacomments   we'll try to get the bootstrap values included, but then we'll have to safe it as nhx file instead.
+     * @return
+     */
+    public static String toNewick(RootedTree tree, boolean exportWithMetacomments) {
+        includeMetacomments = exportWithMetacomments;
+        return toNewick(tree);
     }
 
 
@@ -55,31 +68,39 @@ public final class Utils {
         return toUniqueNewickByAttribute(tree, tree.getRootNode(), attribute);
     }
 
-//    private static void addMetaComment(Node node, StringBuilder buffer) {
-//        Map<String, Object> map = node.getAttributeMap();
-//        if (map.size() == 0) {
-//            return;
-//        }
-//        buffer.append(" [&");
-//        boolean first = true;
-//        for (Map.Entry<String, Object> o : map.entrySet()) {
-//            if (! first) {
-//                buffer.append(",");
-//            }
-//            first = false;
-//
-//            String val = o.getValue().toString();
-//            // we have no way to quote commas right now, throw them away if inside value.
-//            val = val.replace(',', ' ');
-//            buffer.append(o.getKey()).append("=").append(val);
-//        }
-//        buffer.append("] ");
-//    }
+    /**
+     * Adds a metadata (eg. Bootstrap, Posterior Value) to nodes where it is available.
+     * eg. ((A:0.1,B:0.1)75:0.1,C:0.1); where 0.1 = branch length and 75 = added metadata.
+     * Checks that there is only one such value to append, otherwise skip it.
+     *
+     * @param node
+     * @param buffer
+     */
+    private static void addSimpleMetaComment(Node node, StringBuilder buffer) {
+        Map<String, Object> map = node.getAttributeMap();
+        if (map.size() != 1) {
+            return;
+        }
+        boolean first = true;
+        for (Map.Entry<String, Object> o : map.entrySet()) {
+            if (! first) {
+                buffer.append(",");
+            }
+            first = false;
+
+            String val = o.getValue().toString();
+            // we have no way to quote commas right now, throw them away if inside value.
+            val = val.replace(',', ' ');
+            buffer.append(val);
+        }
+    }
 
 //  Andrew - Comments are not part of the Newick format so should not be included except within
 //  a NEXUS file. I have copied the tree writing code (with metacomments) to NexusExport and
+//  simplified this on to produce the straight Newick format.
 
-    //  simplified this on to produce the straight Newick format.
+//    Jonas - That's true, officially it's not part of newick. But according to Helen and different users most of the programs out there support an 'inofficial newick format with comments'
+//    So let's add them if the user wants to!
 
     private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
         if (tree.isExternal(node)) {
@@ -102,9 +123,10 @@ public final class Utils {
             }
 
             Node parent = tree.getParent(node);
-            // Don't write root length. This is ignored elsewhere and the nexus importer fails
-            // whet it is present.
+            // Write information of the joining parent node.
+            // Don't write root length. This is ignored elsewhere and the nexus importer fails when it is present.
             if (parent != null && tree.hasLengths()) {
+                if (includeMetacomments) addSimpleMetaComment(node, buffer);
                 buffer.append(":").append(tree.getLength(node));
             }
         }
