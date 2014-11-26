@@ -13,7 +13,6 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.HashPair;
 
-import javax.swing.text.rtf.RTFEditorKit;
 import java.util.*;
 
 /**
@@ -26,17 +25,12 @@ import java.util.*;
 public final class Utils {
     private Utils() { }  // make class uninstantiable
 
-    static boolean includeMetacomments = false;
-
     /**
      * @param tree
      * @return the rooted tree as a newick format string
      */
     public static String toNewick(RootedTree tree) {
-        StringBuilder buffer = new StringBuilder();
-        toNewick(tree, tree.getRootNode(), buffer);
-        buffer.append(";");
-        return buffer.toString();
+        return toNewick(tree, false);
     }
 
     /**
@@ -45,8 +39,10 @@ public final class Utils {
      * @return
      */
     public static String toNewick(RootedTree tree, boolean exportWithMetacomments) {
-        includeMetacomments = exportWithMetacomments;
-        return toNewick(tree);
+        StringBuilder buffer = new StringBuilder();
+        toNewick(tree, tree.getRootNode(), buffer, exportWithMetacomments);
+        buffer.append(";");
+        return buffer.toString();
     }
 
 
@@ -102,7 +98,7 @@ public final class Utils {
 //    Jonas - That's true, officially it's not part of newick. But according to Helen and different users most of the programs out there support an 'inofficial newick format with comments'
 //    So let's add them if the user wants to!
 
-    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer) {
+    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer, boolean includeMetacomments) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
@@ -118,7 +114,7 @@ public final class Utils {
             List<Node> children = tree.getChildren(node);
             final int last = children.size() - 1;
             for (int i = 0; i < children.size(); i++) {
-                toNewick(tree, children.get(i), buffer);
+                toNewick(tree, children.get(i), buffer, includeMetacomments);
                 buffer.append(i == last ? ')' : ',');
             }
 
