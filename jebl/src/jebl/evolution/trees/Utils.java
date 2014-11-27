@@ -35,7 +35,7 @@ public final class Utils {
 
     /**
      * @param tree
-     * @param exportWithMetacomments   we'll try to get the bootstrap values included, but then we'll have to safe it as nhx file instead.
+     * @param exportWithMetacomments   we'll try to get the bootstrap values included
      * @return
      */
     public static String toNewick(RootedTree tree, boolean exportWithMetacomments) {
@@ -389,6 +389,10 @@ public final class Utils {
         return tree instanceof RootedTree && !((RootedTree)tree).conceptuallyUnrooted();
     }
 
+    public static RootedTree rootTheTree(Tree tree) {
+        return rootTheTree(tree, true);
+    }
+
     /**
      * Return a rooted tree from any tree.
      * <p/>
@@ -398,16 +402,19 @@ public final class Utils {
      * @param tree to root
      * @return rooted representation
      */
-    public static RootedTree rootTheTree(Tree tree) {
+    public static RootedTree rootTheTree(Tree tree, boolean conceptuallyUnrooted) {
         // If already rooted, do nothing
         if (tree instanceof RootedTree) {
+            if (tree instanceof SimpleRootedTree) {
+                ((SimpleRootedTree) tree).setConceptuallyUnrooted(conceptuallyUnrooted);
+            }
             return (RootedTree) tree;
         }
 
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
         if (d2.size() == 1) {
-            return new RootedFromUnrooted(tree, d2.iterator().next(), true);
+            return new RootedFromUnrooted(tree, d2.iterator().next(), conceptuallyUnrooted);
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
