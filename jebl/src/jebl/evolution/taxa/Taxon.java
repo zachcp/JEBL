@@ -187,8 +187,21 @@ public final class Taxon implements Attributable, Comparable {
         return taxon;
     }
 
+    /**
+     * Creates a copy of this taxon including a _temp_copy stamp appended to the name.
+     * @return a new Taxon instance reflecting the passed in taxon.
+     */
+    public Taxon getTaxonCopy(){
+        Taxon taxonCopy = new Taxon(getName()+"_geneious_temp_copy", getTaxonomicLevel());
+        taxonCopy.setHelper(helper);
+        return taxonCopy;
+    }
+
 	// private members
 
+    private void setHelper(AttributableHelper helper){
+        this.helper = helper;
+    }
 
     /**
      * The name of this taxon.
