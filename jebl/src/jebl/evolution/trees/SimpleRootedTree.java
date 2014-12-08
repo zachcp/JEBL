@@ -423,12 +423,7 @@ final public class SimpleRootedTree implements RootedTree {
     }
 
     public void renameTaxa(Taxon from, Taxon to) {
-        // if there are some conflicts we might have replaced the original node with a copy to preserve it.
-        // Try to get that first, if it's not present we'll get the original one and create a copy of that.
-        SimpleRootedNode node = (SimpleRootedNode)externalNodes.get(from.getTaxonCopy());
-        if (node == null){
-            node = (SimpleRootedNode)externalNodes.get(from);
-        }
+        SimpleRootedNode node = (SimpleRootedNode)externalNodes.get(from);
 
         // TT: The javadoc doesn't specify whether renameTaxa() should fail or silently do nothing
         // if Taxon from doesn't exist. But the code already threw a NullPointerException before (bug 4824),
