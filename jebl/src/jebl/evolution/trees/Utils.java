@@ -723,37 +723,50 @@ public final class Utils {
     }
 
     /**
-     * Checks whether all of the trees passed in have the same taxa sets (ignoring
+     * Checks whether all of the trees passed in have the same external/internal nodes and taxa sets (ignoring
      * order of taxa), and throws an IllegalArgumentException if this is not the case.
      * If no tree or only one tree is passed in, immediately returns without throwing an exception.
      * @param trees Zero or more trees
-     * @throws IllegalArgumentException if not all of the trees have the same taxa
+     * @throws IllegalArgumentException if not all of the trees have the same nodes/taxa
      * @throws NullPointerException if trees is null
      */
-    public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
+    public static void assertAllTreesHaveTheSameProperties(List<? extends Tree> trees) throws IllegalArgumentException {
         if (trees.size() <= 1) {
             return;
         }
         Tree firstTree = trees.get(0);
         final int firstNumExternalNodes = firstTree.getExternalNodes().size();
+        final int firstNumInternalNodes = firstTree.getInternalNodes().size();
         final Set<Taxon> firstTaxa = firstTree.getTaxa();
 
         int currentTreeNumber = 0;
+        String nodesNotEqual = "";
+        String taxaNotEqual = "";
         for (Tree currentTree : trees) {
             currentTreeNumber++;
             final int numExternalNodes = currentTree.getExternalNodes().size();
-            if (numExternalNodes != firstNumExternalNodes || !currentTree.getTaxa().containsAll(firstTaxa)) {
+            final int numInternalNodes = currentTree.getInternalNodes().size();
+            if (numExternalNodes != firstNumExternalNodes) {
+                nodesNotEqual = "Tree 1 has "+firstNumExternalNodes+" external nodes. Tree "+currentTreeNumber+" has "+numExternalNodes+" external nodes.\n";
+            }
+            if (!nodesNotEqual.isEmpty() && numInternalNodes != firstNumInternalNodes) {
+            // if externalNodes are different we want to check whether they might have shifted to internal nodes or whether they're completely lost
+                nodesNotEqual+= "Tree 1 has "+firstNumInternalNodes+" internal nodes. Tree "+currentTreeNumber+" has "+numInternalNodes+" internal nodes.\n";
+            }
+            if (!currentTree.getTaxa().containsAll(firstTaxa)) {
                 Set<Taxon> firstMinusCurrent = setMinus(firstTree.getTaxa(), currentTree.getTaxa()); // Taxa that occur in the first tree but not in currentTree
-                String prefix = "These " + trees.size() + " trees don't all have the same taxa: The following taxa occur in tree ";
-                String suffix=". Tree 1 has "+firstNumExternalNodes+" taxa. Tree "+currentTreeNumber+" has "+numExternalNodes+" taxa. Tree 1 has taxa: "+sort(firstTaxa)+" Tree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa());
-                if (!firstMinusCurrent.isEmpty()) {
-                    // We use human counting in error messages, i.e. we number the trees from 1
-                    throw new IllegalArgumentException(prefix + "1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent) + suffix);
-                } else {
-                    Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
-                    assert !currentMinusFirst.isEmpty();
-                    throw new IllegalArgumentException(prefix+currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst)+ suffix);
-                }
+                assert !firstMinusCurrent.isEmpty();
+                taxaNotEqual = "The following taxa occur in tree 1 but not in tree " + currentTreeNumber + ": " + sort(firstMinusCurrent) +
+                            "\nTree 1 has taxa: "+sort(firstTaxa)+" \nTree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa());
+            }
+            if (!firstTaxa.containsAll(currentTree.getTaxa())) {
+                Set<Taxon> currentMinusFirst = setMinus(currentTree.getTaxa(), firstTree.getTaxa());
+                assert !currentMinusFirst.isEmpty();
+                taxaNotEqual+= "The following taxa occur in tree " + currentTreeNumber + " but not in tree 1: " + sort(currentMinusFirst) +
+                            "\nTree "+currentTreeNumber+" has taxa: "+sort(currentTree.getTaxa())+" \nTree 1 has taxa: "+sort(firstTaxa);
+            }
+            if (!nodesNotEqual.isEmpty() || !taxaNotEqual.isEmpty()) {
+                throw new IllegalArgumentException("These " + trees.size() + " trees don't all have the same properties:\n" + nodesNotEqual + taxaNotEqual + "\n\nWe're dealing with a " + currentTree.getClass().getSimpleName());
             }
         }
     }
