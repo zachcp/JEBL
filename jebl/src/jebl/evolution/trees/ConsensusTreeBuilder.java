@@ -77,7 +77,7 @@ public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilde
 	    this.supportAsPercent = supportInPercent;
         this.nExternalNodes = trees[0].getExternalNodes().size();
         this.taxons = Collections.unmodifiableList(new ArrayList<Taxon>(trees[0].getTaxa()));
-        Utils.assertAllTreesHaveTheSameProperties(Arrays.asList(trees));
+        Utils.assertAllTreesHaveTheSameTaxa(Arrays.asList(trees));
     }
 
     /**

@@ -730,7 +730,7 @@ public final class Utils {
      * @throws IllegalArgumentException if not all of the trees have the same nodes/taxa
      * @throws NullPointerException if trees is null
      */
-    public static void assertAllTreesHaveTheSameProperties(List<? extends Tree> trees) throws IllegalArgumentException {
+    public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
         if (trees.size() <= 1) {
             return;
         }
