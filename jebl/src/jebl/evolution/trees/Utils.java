@@ -723,11 +723,11 @@ public final class Utils {
     }
 
     /**
-     * Checks whether all of the trees passed in have the same external/internal nodes and taxa sets (ignoring
+     * Checks whether all of the trees passed in have the same number of external nodes and taxa sets (ignoring
      * order of taxa), and throws an IllegalArgumentException if this is not the case.
      * If no tree or only one tree is passed in, immediately returns without throwing an exception.
      * @param trees Zero or more trees
-     * @throws IllegalArgumentException if not all of the trees have the same nodes/taxa
+     * @throws IllegalArgumentException if not all of the trees have the same external nodes/taxa
      * @throws NullPointerException if trees is null
      */
     public static void assertAllTreesHaveTheSameTaxa(List<? extends Tree> trees) throws IllegalArgumentException {
@@ -750,7 +750,7 @@ public final class Utils {
                 nodesNotEqual = "Tree 1 has "+firstNumExternalNodes+" external nodes. Tree "+currentTreeNumber+" has "+numExternalNodes+" external nodes.\n";
             }
             if (!nodesNotEqual.isEmpty() && numInternalNodes != firstNumInternalNodes) {
-            // if externalNodes are different we want to check whether they might have shifted to internal nodes or whether they're completely lost
+                // Check internal nodes only if externalNodes are different. We want to check whether they might have shifted to internal nodes or whether they're completely lost
                 nodesNotEqual+= "Tree 1 has "+firstNumInternalNodes+" internal nodes. Tree "+currentTreeNumber+" has "+numInternalNodes+" internal nodes.\n";
             }
             if (!currentTree.getTaxa().containsAll(firstTaxa)) {
