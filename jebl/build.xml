@@ -27,12 +27,12 @@
     <target name="compile-jam" depends="init">
         <!-- Compile the java code from ${jamsrc} into ${build} -->
 
-        <condition property="isMac">
-            <os family="mac"/>
-        </condition>
+        <!-- If something in org/**/maconly/* is changed it has to be build separately (see the -mac-only targets) -->
+        <!-- to include these changes it might be necessary to NOT to exclude the maconly folder-->
+
         <javac source="1.5" srcdir="${src}" target="1.5" destdir="${build}" debug="true">
             <include name="org/**/*"/>
-            <exclude name="org/**/maconly/*" unless = "isMac"/>
+            <exclude name="org/**/maconly/*"/>
         </javac>
 
         <!-- Utils.class was getting included in jebl.jar    -->
