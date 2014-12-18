@@ -26,7 +26,7 @@ final public class SimpleRootedTree implements RootedTree {
      * @param tree a rooted tree
      */
     public SimpleRootedTree(RootedTree tree) {
-        createNodes(tree, tree.getRootNode());
+        this(tree, null);
     }
 
     /**
@@ -113,7 +113,7 @@ final public class SimpleRootedTree implements RootedTree {
      */
     public Node createNodes(Tree tree, Node parent, Node child) throws NoEdgeException {
 
-        Node newNode = null;
+        Node newNode;
         if (tree.isExternal(child)) {
             newNode = createExternalNode(tree.getTaxon(child));
         } else {
