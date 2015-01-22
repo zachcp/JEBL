@@ -12,6 +12,7 @@ import jebl.evolution.trees.Utils;
 import jebl.util.Attributable;
 
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -51,7 +52,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) {
 		this.writeMetaComments = writeMetaComments;
         this.interleave = interleave;
-        this.writer = new PrintWriter(writer);
+        this.writer = new PrintWriter(new BufferedWriter(writer));
         this.writer.println("#NEXUS");
     }
 
@@ -129,6 +130,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
                 writer.println();
             }
             writer.println(";\nend;");
+            writer.flush();
         }
     }
 
@@ -185,6 +187,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         writer.println("begin trees;");
         writeTrees(trees, true);
         writer.println("end;");
+        writer.flush();
     }
 
     public void exportTreesWithTranslation(Collection<? extends Tree> trees, Map<String, String> t) throws IOException {
@@ -199,6 +202,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
         writeTrees(trees, false);
         writer.println("end;");
+        writer.flush();
     }
 
     public void exportMatrix(final DistanceMatrix distanceMatrix) {
@@ -220,6 +224,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         }
         writer.println(";");
         writer.println("end;");
+        writer.flush();
     }
 
     /**
@@ -242,6 +247,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             writer.println(builder);
         }
         writer.println(";\nend;\n");
+        writer.flush();
     }
 
     final private String nameRegex = "^(\\w|-)+$";
