@@ -72,6 +72,7 @@ public final class AminoAcids {
     public static final AminoAcidState J_STATE = new AminoAcidState("Leucine or Isoleucine", "Xle", "J", 24, new AminoAcidState[]{I_STATE, L_STATE});
     public static final AminoAcidState X_STATE = new AminoAcidState("Unknown amino acid", "Xaa", "X", 25, CANONICAL_STATES);
     public static final AminoAcidState UNKNOWN_STATE = new AminoAcidState("Unknown amino acid", "Xaa", "?", 26, CANONICAL_STATES);
+    public static final AminoAcidState AMBIGUOUS_TRANSLATION_STATE = X_STATE;
     public static final AminoAcidState STOP_STATE = new AminoAcidState("Stop codon", " * ","*", 27);
     public static final AminoAcidState GAP_STATE = new AminoAcidState("Gap",  " - ", "-", 28, CANONICAL_STATES); // This really shouldn't include the canonical states, but I'm scared changing it may break stuff.
 
@@ -165,6 +166,10 @@ public final class AminoAcids {
 
     public static AminoAcidState getUnknownState() {
         return UNKNOWN_STATE;
+    }
+
+    public static AminoAcidState getAmbiguousTranslationState() {
+        return AMBIGUOUS_TRANSLATION_STATE;
     }
 
     public static AminoAcidState getGapState() {

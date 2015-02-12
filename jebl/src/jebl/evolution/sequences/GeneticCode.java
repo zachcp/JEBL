@@ -211,7 +211,7 @@ public final class GeneticCode {
             translationMap.put(codonState, aminoAcidState);
         }
         translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
-        translationMap.put(Codons.getUnknownState(), AminoAcids.getUnknownState());
+        translationMap.put(Codons.getUnknownState(), AminoAcids.getAmbiguousTranslationState());
         translationMap = Collections.unmodifiableMap(translationMap);
         return translationMap;
     }
@@ -289,7 +289,7 @@ public final class GeneticCode {
 	 */
     public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
         if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-            return AminoAcids.UNKNOWN_STATE;
+            return AminoAcids.AMBIGUOUS_TRANSLATION_STATE;
         Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         CodonState translateState = null;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
@@ -327,7 +327,7 @@ public final class GeneticCode {
      */
    public Set<AminoAcidState> getTranslations(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
        if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-           return Collections.singleton(AminoAcids.UNKNOWN_STATE);
+           return Collections.singleton(AminoAcids.AMBIGUOUS_TRANSLATION_STATE);
        Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
 			return Collections.singleton(AminoAcids.GAP_STATE);
