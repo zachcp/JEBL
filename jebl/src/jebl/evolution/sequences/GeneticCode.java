@@ -211,7 +211,8 @@ public final class GeneticCode {
             translationMap.put(codonState, aminoAcidState);
         }
         translationMap.put(Codons.getGapState(), AminoAcids.getGapState());
-        translationMap.put(Codons.getUnknownState(), AminoAcids.getAmbiguousTranslationState());
+        translationMap.put(Codons.getUnknownState(), AminoAcids.UNKNOWN_STATE);
+        translationMap.put(Codons.X_STATE, AminoAcids.X_STATE);
         translationMap = Collections.unmodifiableMap(translationMap);
         return translationMap;
     }
@@ -289,7 +290,7 @@ public final class GeneticCode {
 	 */
     public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
         if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-            return AminoAcids.AMBIGUOUS_TRANSLATION_STATE;
+            return AminoAcids.getUnknownState();
         Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         CodonState translateState = null;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
@@ -305,8 +306,10 @@ public final class GeneticCode {
                         if(translateState == null)
                             translateState = thisDisambiguation;
                         // If different nucleotide disambiguations yield different amino acids, translation is unknown
-                        if(!translationMap.get(translateState).equals(translationMap.get(thisDisambiguation)))
-                            return translationMap.get(Codons.UNKNOWN_STATE);
+                        if(!translationMap.get(translateState).equals(translationMap.get(thisDisambiguation))) {
+                            boolean isQuestionMark = nucleotide1==Nucleotides.UNKNOWN_STATE || nucleotide2==Nucleotides.UNKNOWN_STATE || nucleotide3==Nucleotides.UNKNOWN_STATE;
+                            return translationMap.get(isQuestionMark ? Codons.UNKNOWN_STATE : Codons.X_STATE);
+                        }
                     }
                 }
             }
@@ -327,7 +330,7 @@ public final class GeneticCode {
      */
    public Set<AminoAcidState> getTranslations(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
        if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-           return Collections.singleton(AminoAcids.AMBIGUOUS_TRANSLATION_STATE);
+           return Collections.singleton(AminoAcids.getUnknownState());
        Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
 			return Collections.singleton(AminoAcids.GAP_STATE);

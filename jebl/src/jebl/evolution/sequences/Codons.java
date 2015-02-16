@@ -20,7 +20,7 @@ public final class Codons {
 	public static final String NAME = "codon";
 
     public static final int CANONICAL_STATE_COUNT = 64;
-    public static final int STATE_COUNT = 66;
+    public static final int STATE_COUNT = 67;
 
     public static final CodonState[] CANONICAL_STATES;
     public static final CodonState[] STATES;
@@ -44,6 +44,7 @@ public final class Codons {
 
     public static final CodonState UNKNOWN_STATE = new CodonState("?", "???", 64, CANONICAL_STATES);
     public static final CodonState GAP_STATE = new CodonState("-", "---", 65, CANONICAL_STATES);
+    public static final CodonState X_STATE = new CodonState("X", "NNN", 66, CANONICAL_STATES);
 
     public static int getStateCount() { return STATE_COUNT; }
 
@@ -59,7 +60,8 @@ public final class Codons {
 		}
 
 		if (nucleotide1.isAmbiguous() || nucleotide2.isAmbiguous() || nucleotide3.isAmbiguous()) {
-			return UNKNOWN_STATE;
+            boolean isQuestionMark = nucleotide1==Nucleotides.UNKNOWN_STATE || nucleotide2==Nucleotides.UNKNOWN_STATE || nucleotide3==Nucleotides.UNKNOWN_STATE;
+			return isQuestionMark?UNKNOWN_STATE:X_STATE;
 		}
 
 	    String code = nucleotide1.getCode() + nucleotide2.getCode() + nucleotide3.getCode();
@@ -126,6 +128,7 @@ public final class Codons {
         }
         STATES[64] = UNKNOWN_STATE;
         STATES[65] = GAP_STATE;
+        STATES[66] = X_STATE;
 
         statesByCode = new HashMap<String, CodonState>();
         for (int i = 0; i < STATES.length; i++) {
