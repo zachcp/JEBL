@@ -289,8 +289,6 @@ public final class GeneticCode {
 	 * @return '?' if codon unknown
 	 */
     public AminoAcidState getTranslation(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
-        if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-            return AminoAcids.getUnknownState();
         Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         CodonState translateState = null;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
@@ -329,8 +327,6 @@ public final class GeneticCode {
      * @return all possible translations
      */
    public Set<AminoAcidState> getTranslations(NucleotideState nucleotide1, NucleotideState nucleotide2, NucleotideState nucleotide3, boolean isFirstCodon){
-       if (nucleotide1==Nucleotides.I_STATE || nucleotide2==Nucleotides.I_STATE || nucleotide3==Nucleotides.I_STATE)
-           return Collections.singleton(AminoAcids.getUnknownState());
        Map<CodonState, AminoAcidState> translationMap = isFirstCodon?this.firstCodonTranslationMap:this.translationMap;
         if (nucleotide1.isGap() && nucleotide2.isGap() && nucleotide3.isGap()) {
 			return Collections.singleton(AminoAcids.GAP_STATE);
