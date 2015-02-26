@@ -76,18 +76,26 @@ public class Utils {
     }
 
     /**
+     * Equivalent to {@link #isPredominantlyRNA(CharSequence, int, int, int) isPredominantlyRNA(sequenceString, 0, sequenceString.length(), maximumNonGapsToLookAt)}
+     */
+    public static boolean isPredominantlyRNA(final CharSequence sequenceString, int maximumNonGapsToLookAt) {
+        return isPredominantlyRNA(sequenceString, 0, sequenceString.length(), maximumNonGapsToLookAt);
+    }
+
+    /**
      * Is the given NucleotideSequence predominantly RNA?
      * (i.e the more occurrences of "U" than "T")
      * @param sequenceString the sequence string to inspect to determine if it's RNA
+     * @param minIndexToConsider the minimum 0-based index in sequenceString to look at
+     * @param maxIndexToConsiderExclusive the maximum 0-based index (exclusive) in sequenceString to look at
      * @param maximumNonGapsToLookAt for performance reasons, only look at a maximum of this many non-gap residues in deciding if the sequence is predominantly RNA. Can be -1 or Integer.MAX_VALUE to look at the entire sequence.
      * @return true if the given NucleotideSequence predominantly RNA
      */
-    public static boolean isPredominantlyRNA(final CharSequence sequenceString, int maximumNonGapsToLookAt) {
-        int length = sequenceString.length();
+    public static boolean isPredominantlyRNA(final CharSequence sequenceString, int minIndexToConsider, int maxIndexToConsiderExclusive, int maximumNonGapsToLookAt) {
         int tCount = 0;
         int uCount = 0;
         if (maximumNonGapsToLookAt==-1) maximumNonGapsToLookAt=Integer.MAX_VALUE;
-        for (int i = 0; i < length && maximumNonGapsToLookAt > 0; i++) {
+        for (int i = minIndexToConsider; i < maxIndexToConsiderExclusive && maximumNonGapsToLookAt > 0; i++) {
             char c = sequenceString.charAt(i);
             if (c != '-') maximumNonGapsToLookAt--;
             if (c == 'T' || c == 't') tCount++;
