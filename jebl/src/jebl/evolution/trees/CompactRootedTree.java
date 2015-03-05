@@ -244,10 +244,26 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
 
                 nodes[iNode] = new SimpleRootedNode(iNode);
                 sons[iNode] = ns > 0 ? decendentslStart : 0;
+                // descendentslStart = first child of node; l = currentChildNodes --> iterating over the whole group
+                // (eg. n = 2, dStart = 3, n has 2 children --> parent[(3+0)]=2; parent[(3+1)]=2
                 for(int l = 0; l < ns; ++l) {
+                    if (decendentslStart + l+1 >= parent.length) {
+                        String message = "This tree has more descendants than expected. \n" +
+                                "If there are two operations being performed on this tree simultaneously, this might be what caused the error.\n" +
+                                "If that wasn't the case and to help us resolve this issue, please send the file to us using Help > Contact Support from the menu.\n\n" +
+                                "Trying to assign " + ns + " children to node " + decendentslStart + ", but this tree is supposed to have only " + nNodes + "(="+parent.length+ ") nodes in total.\n" +
+                                "The tree has "+ t.getExternalNodes().size() + " external nodes and " + t.getInternalNodes().size() + " internal nodes\n" +
+                                "Current node " + decendentslStart + " is an " + (t.isExternal(n)?"external":"internal") + " node and has " + ns + " children.\n" +
+                                "Tried to add child " + (l+1) + " (node " + (decendentslStart+l) +"), which is " + (t.isExternal(t.getChildren(n).get(l))?"external":"internal");
+                        for (int node : parent){
+                            message += "\nParent/Child: " + parent[node] + "/" + node;
+                        }
+                        throw new IllegalStateException(message);
+                    }
                     parent[decendentslStart + l] = iNode;
                 }
 
+                // dStart gets set to next 'first' childNode
                 decendentslStart += ns;
 
                 if( ns == 0 ) {
