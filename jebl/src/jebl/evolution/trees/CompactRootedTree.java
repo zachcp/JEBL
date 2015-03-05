@@ -247,7 +247,7 @@ public class CompactRootedTree extends AttributableImp implements RootedTree {
                 // descendentslStart = first child of node; l = currentChildNodes --> iterating over the whole group
                 // (eg. n = 2, dStart = 3, n has 2 children --> parent[(3+0)]=2; parent[(3+1)]=2
                 for(int l = 0; l < ns; ++l) {
-                    if (decendentslStart + l+1 >= parent.length) {
+                    if (decendentslStart + l >= parent.length) {
                         String message = "This tree has more descendants than expected. \n" +
                                 "If there are two operations being performed on this tree simultaneously, this might be what caused the error.\n" +
                                 "If that wasn't the case and to help us resolve this issue, please send the file to us using Help > Contact Support from the menu.\n\n" +
