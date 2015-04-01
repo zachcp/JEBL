@@ -206,7 +206,7 @@ final public class SimpleRootedTree implements RootedTree {
      * @param node must be a node in the tree, which has a parent
      * @return the newly created node
      */
-    public Node addNode(Node node) {
+    public Node addNodeAboveGivenNode(Node node) {
         SimpleRootedNode rootedNode = (SimpleRootedNode)node;
         Edge edge = rootedNode.getEdge();
         if(edge == null) {
