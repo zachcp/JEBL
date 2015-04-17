@@ -16,6 +16,8 @@ import jebl.util.ProgressListener;
  *  Estimation of the Number of Nucleotide Substitutions in
  *  the Control Region of Mitochondrial DNA in Humans and
  *  Chimpanzees. Koichiro Tamura and Masatoshi Nei, 1993
+ *  http://mbe.library.arizona.edu/data/1993/1003/2tamu.pdf
+ *  Alternate description here: http://www.megasoftware.net/mega4/WebHelp/part_iv___evolutionary_analysis/computing_evolutionary_distances/distance_models/nucleotide_substitution_models/heterogeneous_patterns/hc_tamura_nei_distance_heterogeneous_patterns.htm
  *
  * Estimated Distance is d = 2 (pi(A) pi(G) k_R + pi(T) pi(C) k_Y + PI(A)PI(C)) t, where k_R/k_Y are the rates of
  * Purine/Pyrimidine respectivly.
@@ -23,8 +25,9 @@ import jebl.util.ProgressListener;
  * When distances grow large, the formulas break as estimates of number of transition/transversion becomes inconsistent,
  * which results in negative logs. Returning "infinity" is not optimal as it breaks operations such as constructing
  * consensus trees where distances for resampled sequences vary between (say) 2-3 and out "infinity" 10.
- * As a workaround I try to reduce the number of transitions/transversions by the minimum amout which brings the estimates
- * back to a consistent state.
+ * As a workaround I try to reduce the number of transitions/transversions by the minimum amount which brings the estimates
+ * back to a consistent state. If this doesn't work, MAX_DISTANCE is returned, which can result in abnormally high branch
+ * lengths in some cases (see support ticket 11064).
  */
 
 public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
@@ -52,9 +55,9 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
          */
         public double calculatePairwiseDistance(int taxon1, int taxon2) throws CannotBuildDistanceMatrixException {
 
-            double sumTsAG = 0.0;
-            double sumTsCT = 0.0;
-            double sumTv = 0.0;
+            double sumTsAG = 0.0; //sum of transitions of A <-> G
+            double sumTsCT = 0.0; //sum of transitions of C <-> T
+            double sumTv = 0.0; // sum of transversions
             double sumWeight = 0.0;
             boolean noGapsPairFound = false;
 
@@ -93,8 +96,8 @@ public class TamuraNeiDistanceMatrix extends BasicDistanceMatrix {
                 throw new CannotBuildDistanceMatrixException("Tamura-Nei", getTaxonName(taxon1), getTaxonName(taxon2));
             }
 
-            // Unfortuanetly adjusting number of sites for Purine/Pyrimidine may turn the other into negative - so
-            // we iterate untile both estimates are consistent
+            // Unfortunately adjusting number of substitution sites for Purine/Pyrimidine may turn the other into negative - so
+            // we iterate until both estimates are consistent
             while( true ) {
 
                 double P1 = sumTsAG / sumWeight;
