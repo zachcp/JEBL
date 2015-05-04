@@ -1055,11 +1055,13 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
     // and I think they meant [_a-zA-Z]+[\w\.]*
     public static String makeIntoAllowableIdentifier(String identifier) {
         identifier = identifier.replaceAll("[^\\w\\.]", "_");
-        if (!Pattern.compile("[_a-zA-Z]").matcher(identifier.substring(0, 1)).matches()) {
+        if (!allowableIdentifierPatter.matcher(identifier.substring(0, 1)).matches()) {
             identifier = "_" + identifier;
         }
         return identifier;
     }
+
+    private static final Pattern allowableIdentifierPatter = Pattern.compile("[_a-zA-Z]");
 
 	/**
 	 * Reads a 'TREES' block.
@@ -1462,14 +1464,15 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
         }
     }
 
+    private static final Pattern metaCommentPattern = Pattern.compile("(\"[^\"]*\"+|[^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
+
 	static void parseMetaCommentPairs(String meta, Attributable item) throws ImportException.BadFormatException {
 		// This regex should match key=value pairs, separated by commas
 		// This can match the following types of meta comment pairs:
 		// value=number, value="string", value={item1, item2, item3}
         // (label must be quoted if it contains spaces (i.e. "my label"=label)
 
-        Pattern pattern = Pattern.compile("(\"[^\"]*\"+|[^,=\\s]+)\\s*(=\\s*(\\{[^=}]*\\}|\"[^\"]*\"+|[^,]+))?");
-		Matcher matcher = pattern.matcher(meta);
+		Matcher matcher = metaCommentPattern.matcher(meta);
 
 		while (matcher.find()) {
 			String label = matcher.group(1);
