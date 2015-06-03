@@ -27,7 +27,7 @@ public class NewickImporter implements TreeImporter {
     /**
      * Constructor
      * @param reader  tree text
-     * @param unquotedLabels if true, try to read unqouted lables containing spaces
+     * @param unquotedLabels if true, try to read unquoted labels containing spaces
      */
     public NewickImporter(Reader reader, boolean unquotedLabels) {
         helper = new ImportHelper(reader);
@@ -197,26 +197,28 @@ public class NewickImporter implements TreeImporter {
 
         // should have had a closing ')'
         if (helper.getLastDelimiter() != ')') {
-            throw new ImportException.BadFormatException("Missing closing ')' in tree");
+            throw new ImportException.BadFormatException("Expected closing ')' in tree, but instead found '" + (char) helper.getLastDelimiter()
+                    + "'. This could mean there are illegal characters in your Taxon names that were not properly quoted by the exporter of this file.");
         }
 
         final Node node = tree.createInternalNode(children);
 
         try {
-            // find the next delimiter
+            // find the next delimiter, which should be a ':' if there is a value for the last internal node, or ';' for the end of the tree
             String token = helper.readToken(":(),;");
+
+            //Skip past any whitespace that may be in the node attribute string. This is necessary because
+            //helper.readToken() will stop on any white space, and we want to pass white space w/o stopping
+            while(unquotedLabels && Character.isWhitespace(helper.getLastDelimiter())) {
+                token = token + (char) helper.getLastDelimiter() + helper.readToken(":(),;");
+            }
 
             if (token.length() > 0) {
                 node.setAttribute(internalNodeLabel, NexusImporter.parseValue(token));
             }
-
-            // If there is a metacomment before the branch length indicator (:), then it is a node attribute
-            NexusImporter.parseAndClearMetaComments(node, helper);
-
         } catch( EOFException e) {
             // Ok if we just finished
         }
-
         return node;
     }
 
@@ -232,7 +234,7 @@ public class NewickImporter implements TreeImporter {
             label = label + " " + helper.readToken(":(),;");
         }
         if ("".equals(label)) {
-            throw new ImportException.UnknownTaxonException("Emtpy node names are not allowed.");
+            throw new ImportException.UnknownTaxonException("Encountered taxon (external node) with no name.");
         }
         try {
             return tree.createExternalNode(Taxon.getTaxon(label));
