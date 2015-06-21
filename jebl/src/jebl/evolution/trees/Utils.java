@@ -77,18 +77,16 @@ public final class Utils {
         if (map.size() != 1) {
             return;
         }
-        boolean first = true;
-        for (Map.Entry<String, Object> o : map.entrySet()) {
-            if (! first) {
-                buffer.append(",");
-            }
-            first = false;
-
-            String val = o.getValue().toString();
-            // we have no way to quote commas right now, throw them away if inside value.
-            val = val.replace(',', ' ');
-            buffer.append(val);
+        Map.Entry<String, Object> metaComment = map.entrySet().iterator().next();
+        String val = metaComment.getValue().toString();
+        try {
+            Float.parseFloat(val); //If it's not a number, surround it in quotes
+        } catch (NumberFormatException nfe) {
+            val = "'" + val + "'";
         }
+        buffer.append(val);
+
+        
     }
 
 //  Andrew - Comments are not part of the Newick format so should not be included except within
@@ -397,7 +395,7 @@ public final class Utils {
      * Return a rooted tree from any tree.
      * <p/>
      * If tree already rooted, return it. Otherwise if there is a "natuarl root" (i.e. a node of
-     * degree 2) use it as root. Otherwise use an internal node close to the center of the tree as a root.
+     * degree 2) use it as root. Otherwise creates an internal node close to the center of the tree as a root.
      *
      * @param tree to root
      * @return rooted representation

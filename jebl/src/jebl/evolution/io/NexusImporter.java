@@ -23,12 +23,10 @@ import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
 
-import java.awt.*;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1516,16 +1514,6 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 				values[i] = parseValue(elements[i]);
 			}
 			return values;
-		}
-
-		if (value.startsWith("#")) {
-			// I am not sure whether this is a good idea but
-			// I am going to assume that a # denotes an RGB colour
-			try {
-				return Color.decode(value.substring(1));
-			} catch (NumberFormatException nfe1) {
-				// not a colour
-			}
 		}
 
         // A string qouted by the nexus exporter and such

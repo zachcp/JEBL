@@ -198,7 +198,7 @@ public class NewickImporter implements TreeImporter {
         // should have had a closing ')'
         if (helper.getLastDelimiter() != ')') {
             throw new ImportException.BadFormatException("Expected closing ')' in tree, but instead found '" + (char) helper.getLastDelimiter()
-                    + "'. This could mean there are illegal characters in your Taxon names that were not properly quoted by the exporter of this file.");
+                    + "'. This could mean there are illegal characters in your Taxon names that were not properly handled by the exporter of this file.");
         }
 
         final Node node = tree.createInternalNode(children);
@@ -214,12 +214,42 @@ public class NewickImporter implements TreeImporter {
             }
 
             if (token.length() > 0) {
-                node.setAttribute(internalNodeLabel, NexusImporter.parseValue(token));
+                Object value = NexusImporter.parseValue(token);
+                if (isProbablyColorWeExported(value)) {
+                    node.setAttribute("nodeColor", value);
+                } else {
+                    node.setAttribute(internalNodeLabel, value);
+                }
             }
         } catch( EOFException e) {
             // Ok if we just finished
         }
         return node;
+    }
+
+    /**
+     * If a metacomment has the format "int,int,int" it is likely a color Geneious
+     * exported in the first place. We can automatically interpret it and apply the color
+     * to the node.
+     *
+     * @param value
+     * @return true if the value is a string that can be interpreted as a rgb color
+     */
+    private boolean isProbablyColorWeExported(Object value) {
+        if (value instanceof String) {
+            String[] tokens = ((String) value).split(",");
+            if (tokens.length == 3) {
+                for (String token : tokens) {
+                    try {
+                        Float.parseFloat(token);
+                    } catch (NumberFormatException nfe) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
