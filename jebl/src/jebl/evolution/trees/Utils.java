@@ -86,7 +86,7 @@ public final class Utils {
         }
         buffer.append(val);
 
-        
+
     }
 
 //  Andrew - Comments are not part of the Newick format so should not be included except within

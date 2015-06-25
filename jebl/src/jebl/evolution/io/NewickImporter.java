@@ -214,42 +214,12 @@ public class NewickImporter implements TreeImporter {
             }
 
             if (token.length() > 0) {
-                Object value = NexusImporter.parseValue(token);
-                if (isProbablyColorWeExported(value)) {
-                    node.setAttribute("nodeColor", value);
-                } else {
-                    node.setAttribute(internalNodeLabel, value);
-                }
+                node.setAttribute(internalNodeLabel, NexusImporter.parseValue(token));
             }
         } catch( EOFException e) {
             // Ok if we just finished
         }
         return node;
-    }
-
-    /**
-     * If a metacomment has the format "int,int,int" it is likely a color Geneious
-     * exported in the first place. We can automatically interpret it and apply the color
-     * to the node.
-     *
-     * @param value
-     * @return true if the value is a string that can be interpreted as a rgb color
-     */
-    private boolean isProbablyColorWeExported(Object value) {
-        if (value instanceof String) {
-            String[] tokens = ((String) value).split(",");
-            if (tokens.length == 3) {
-                for (String token : tokens) {
-                    try {
-                        Float.parseFloat(token);
-                    } catch (NumberFormatException nfe) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
