@@ -17,10 +17,7 @@ import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.CompactRootedTree;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.*;
 import jebl.util.Attributable;
 
 import java.io.EOFException;
@@ -1525,7 +1522,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 			return Boolean.valueOf(value);
 		}
 
-        if (isPossibleInteger(value)) { // check first by calling isPossibleInteger since Exception throwing for non-integer values is very slow
+        if (Utils.isPossibleInteger(value)) { // check first by calling isPossibleInteger since Exception throwing for non-integer values is very slow
             // Attempt to format the value as an integer
             try {
                 return Integer.parseInt(value);
@@ -1534,7 +1531,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
             }
         }
 
-        if (isPossibleDouble(value)) { // check first by calling isPossibleInteger since Exception throwing for non-double values is very slow
+        if (Utils.isPossibleDouble(value)) { // check first by calling isPossibleInteger since Exception throwing for non-double values is very slow
             // Attempt to format the value as a double
             try {
                 return Double.parseDouble(value);
@@ -1560,31 +1557,4 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
 	protected final ImportHelper helper;
 
-    public static boolean isPossibleInteger(String s) {
-        int length = s.length();
-        if (length==0)
-            return false;
-        for(int i=0;i< length;i++) {
-            char c = s.charAt(i);
-            if (c>='0' && c<='9')
-                continue;
-            if (i==0 && (c=='+' || c=='-'))
-                continue;
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean isPossibleDouble(String s) {
-        int length = s.length();
-        if (length==0)
-            return false;
-        for(int i=0;i< length;i++) {
-            char c = s.charAt(i);
-            if ((c>='0' && c<='9') || c=='.' || c=='e' || c=='E' || c=='+' || c=='-')
-                continue;
-            return false;
-        }
-        return true;
-    }
 }

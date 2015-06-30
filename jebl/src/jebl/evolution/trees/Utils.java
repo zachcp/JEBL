@@ -79,9 +79,9 @@ public final class Utils {
         }
         Map.Entry<String, Object> metaComment = map.entrySet().iterator().next();
         String val = metaComment.getValue().toString();
-        try {
-            Float.parseFloat(val); //If it's not a number, surround it in quotes
-        } catch (NumberFormatException nfe) {
+
+        //May give false positives but only in very rare cases
+        if (!isPossibleDouble(val)) {
             val = "'" + val + "'";
         }
         buffer.append(val);
@@ -269,6 +269,34 @@ public final class Utils {
             }
         }
         return asText(rtree, root, scale);
+    }
+
+    public static boolean isPossibleInteger(String s) {
+        int length = s.length();
+        if (length==0)
+            return false;
+        for(int i=0;i< length;i++) {
+            char c = s.charAt(i);
+            if (c>='0' && c<='9')
+                continue;
+            if (i==0 && (c=='+' || c=='-'))
+                continue;
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isPossibleDouble(String s) {
+        int length = s.length();
+        if (length==0)
+            return false;
+        for(int i=0;i< length;i++) {
+            char c = s.charAt(i);
+            if ((c>='0' && c<='9') || c=='.' || c=='e' || c=='E' || c=='+' || c=='-')
+                continue;
+            return false;
+        }
+        return true;
     }
 
     private static class NodePair {
