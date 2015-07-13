@@ -4,6 +4,7 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
+import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
@@ -42,7 +43,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private final PainterIntent intent;
     private int consensusSupportIndex;
     private boolean containsConsensusSupport;
-    protected static final String[] attributesToNotDisplay = new String[] {"nodeColor", "labelFont", "size", "first residues"};
+    protected static final String[] attributesToNotDisplay = new String[] {TreeViewerUtilities.KEY_NODE_COLOR, TreeViewerUtilities.KEY_LABEL_FONT, "size", "first residues"};
 
     private final String isOpenKey;
 

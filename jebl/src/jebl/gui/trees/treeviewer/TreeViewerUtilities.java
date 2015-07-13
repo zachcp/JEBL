@@ -11,6 +11,8 @@ import java.awt.*;
 public class TreeViewerUtilities {
 
     public static final Font DEFAULT_FONT = new Font("sansserif", Font.PLAIN, 12);
+    public static String KEY_NODE_COLOR = "nodeColor";
+    public static String KEY_LABEL_FONT = "labelFont";
 
     public static Font fontFromString(String fontRepresentation) {
         String[] attributes = fontRepresentation.split(":");

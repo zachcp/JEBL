@@ -30,21 +30,40 @@ public final class Utils {
      * @return the rooted tree as a newick format string
      */
     public static String toNewick(RootedTree tree) {
-        return toNewick(tree, false);
+        return toNewick(tree, null);
     }
 
     /**
+     * This method now deprecated. See {@link #toNewick(RootedTree, List)} for the newer implementation
+     *
      * @param tree
      * @param exportWithMetacomments   we'll try to get the bootstrap values included
      * @return
      */
+    @Deprecated
     public static String toNewick(RootedTree tree, boolean exportWithMetacomments) {
         StringBuilder buffer = new StringBuilder();
-        toNewick(tree, tree.getRootNode(), buffer, exportWithMetacomments);
+        //If exporting with metacomments, but no list of values to ignore was given, pass in empty list
+        toNewick(tree, tree.getRootNode(), buffer, exportWithMetacomments ? new ArrayList<String>() : null);
         buffer.append(";");
         return buffer.toString();
     }
 
+    /**
+     * Convert a tree to a Newick format string representing the tree. If metaCommentKeysToIgnore is not null,
+     * the tree will be exported with metacomment values on the nodes: a max of 1 value and none from the given list
+     * (usually leaves just bootstrap or consensus values).
+     *
+     * @param tree
+     * @param metaCommentKeysToIgnore List of keys of values to ignore when exporting metacomments
+     * @return
+     */
+    public static String toNewick(RootedTree tree, List<String> metaCommentKeysToIgnore) {
+        StringBuilder buffer = new StringBuilder();
+        toNewick(tree, tree.getRootNode(), buffer, metaCommentKeysToIgnore);
+        buffer.append(";");
+        return buffer.toString();
+    }
 
     /**
      * Constructs a unique newick representation of a tree
@@ -67,13 +86,20 @@ public final class Utils {
     /**
      * Adds a metadata (eg. Bootstrap, Posterior Value) to nodes where it is available.
      * eg. ((A:0.1,B:0.1)75:0.1,C:0.1); where 0.1 = branch length and 75 = added metadata.
-     * Checks that there is only one such value to append, otherwise skip it.
+     * We can export at most 1 value, so we pass in a list of keys to ignore (nodeColor, etc)
+     * which hopefully prune the list down to the important value, like a bootstrap or consensus value.
+     * If there are still more than 1, we have to ignore metacomments on this node.
      *
      * @param node
      * @param buffer
      */
-    private static void addSimpleMetaComment(Node node, StringBuilder buffer) {
-        Map<String, Object> map = node.getAttributeMap();
+    private static void addSimpleMetaComment(Node node, StringBuilder buffer, List<String> keysToIgnore) {
+        Map<String, Object> map = new HashMap<String, Object>(node.getAttributeMap());
+        // Remove from our temporary list the keys we don't want to export
+        for (String key : keysToIgnore) {
+            map.remove(key);
+        }
+        //Hopefully there is at most 1 key left, which we export. Usually a bootstrap value
         if (map.size() != 1) {
             return;
         }
@@ -96,7 +122,14 @@ public final class Utils {
 //    Jonas - That's true, officially it's not part of newick. But according to Helen and different users most of the programs out there support an 'inofficial newick format with comments'
 //    So let's add them if the user wants to!
 
-    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer, boolean includeMetacomments) {
+    /**
+     *
+     * @param tree Tree to write to newick format
+     * @param node Node to start the recursive write from. Should be root node for first call
+     * @param buffer String builder to write the tree in to
+     * @param metacommentKeysToIgnore Keys to ignore when writing metacomments. Null to not export with metacomments
+     */
+    private static void toNewick(RootedTree tree, Node node, StringBuilder buffer, List<String> metacommentKeysToIgnore) {
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
@@ -112,7 +145,7 @@ public final class Utils {
             List<Node> children = tree.getChildren(node);
             final int last = children.size() - 1;
             for (int i = 0; i < children.size(); i++) {
-                toNewick(tree, children.get(i), buffer, includeMetacomments);
+                toNewick(tree, children.get(i), buffer, metacommentKeysToIgnore);
                 buffer.append(i == last ? ')' : ',');
             }
 
@@ -120,7 +153,7 @@ public final class Utils {
             // Write information of the joining parent node.
             // Don't write root length. This is ignored elsewhere and the nexus importer fails when it is present.
             if (parent != null && tree.hasLengths()) {
-                if (includeMetacomments) addSimpleMetaComment(node, buffer);
+                if (metacommentKeysToIgnore != null) addSimpleMetaComment(node, buffer, metacommentKeysToIgnore);
                 buffer.append(":").append(tree.getLength(node));
             }
         }

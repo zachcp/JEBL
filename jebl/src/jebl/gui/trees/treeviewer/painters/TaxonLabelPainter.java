@@ -144,7 +144,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         }
 
         g2.setPaint(foreground);
-        Object fontString = item.getAttribute("labelFont");
+        Object fontString = item.getAttribute(TreeViewerUtilities.KEY_LABEL_FONT);
         Font taxonLabelFont = TreeViewerUtilities.DEFAULT_FONT;
         if(fontString != null) {
             try {
@@ -227,7 +227,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     private FontMetrics getCurrentFontMetricsForGraphicsAndNode(Graphics2D g2, Node item) {
         Font oldFont = g2.getFont();
-        Object fontValue = item.getAttribute("labelFont");
+        Object fontValue = item.getAttribute(TreeViewerUtilities.KEY_LABEL_FONT);
         g2.setFont(TreeViewerUtilities.DEFAULT_FONT);
         if(fontValue != null) {
             try {
