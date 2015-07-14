@@ -48,6 +48,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     public Point mouseLocation = new Point(0,0);
     private String referenceSequenceName;
 
+    public final static String collapsedAttributeName = "&collapsed";
+    public final static String visibleAttributeName = "&visible";
+
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
         addMouseMotionListener(new MouseMotionAdapter(){
@@ -348,15 +351,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
-    final private String clpsdName = "&collapsed";
-    final private String visibleAttributeName = "&visible";
-
     private boolean isNodeVisible(Node node) {
         return node.getAttribute(visibleAttributeName) == null;
     }
 
     private boolean isNodeCollapsed(Node node) {
-         return node.getAttribute(clpsdName) != null;
+         return node.getAttribute(collapsedAttributeName) != null;
     }
 
     private void setCladeVisisblty(final Node node, final boolean visible) {
@@ -381,14 +381,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         // no point for non internal nodes
         if( tree.isExternal(selectedNode) ) return;
 
-        final boolean wasCollapsed = selectedNode.getAttribute(clpsdName) != null;
+        final boolean wasCollapsed = selectedNode.getAttribute(collapsedAttributeName) != null;
         if( wasCollapsed )  {
-            selectedNode.removeAttribute(clpsdName);
+            selectedNode.removeAttribute(collapsedAttributeName);
         }
         // node should not be in collapsed mode when calling this
         setCladeVisisblty(selectedNode, wasCollapsed);
         if( !wasCollapsed ) {
-            selectedNode.setAttribute(clpsdName, Boolean.TRUE);
+            selectedNode.setAttribute(collapsedAttributeName, Boolean.TRUE);
         }
         //fireSelectionChanged();
         calibrated = false; // labels visibility may change
@@ -405,14 +405,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     private void setTreeAttributesForAutoExpansion() {
         for( Node node : nodesInOrder ) {
-            node.removeAttribute(clpsdName);
+            node.removeAttribute(collapsedAttributeName);
             node.removeAttribute(visibleAttributeName);
         }
 
         if( autoExpantion ) {
             Set<Node> ignore = new HashSet<Node>();
             for( Node node : nodesInOrder ) {
-                if( !ignore.contains(node) && node.getAttribute(clpsdName + "-auto") != null ) {
+                if( !ignore.contains(node) && node.getAttribute(collapsedAttributeName + "-auto") != null ) {
                     expandContract(node);   // todo problem (repints)
                     ignore.addAll(Utils.getNodes(tree, node));
                 }
@@ -1621,9 +1621,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //                    }
 //                }
 
-                node.removeAttribute(clpsdName + "-auto");
+                node.removeAttribute(collapsedAttributeName + "-auto");
                 if( ! small.contains(node) && treeLayout.smallSubTree(node, transform) ) {
-                    node.setAttribute(clpsdName + "-auto", Boolean.TRUE);
+                    node.setAttribute(collapsedAttributeName + "-auto", Boolean.TRUE);
                     small.addAll(Utils.getNodes(tree, node));
                 }
             }
