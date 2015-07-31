@@ -147,7 +147,14 @@ public class SearchPanel extends JPanel {
 
 			setBackground(searchText.getBackground());
 			setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.gray));
-			setPreferredSize(new Dimension(120, 20));
+			int defaultHeight = 20;
+			int defaultWidth = 120;
+			int actualHeight = (int)getPreferredSize().getHeight();
+			if(actualHeight > defaultHeight){
+				defaultWidth = defaultWidth * actualHeight / defaultHeight;
+				defaultHeight = actualHeight;
+			}
+			setPreferredSize(new Dimension(defaultWidth, defaultHeight));
 
 
 			cancelButton.addActionListener(new ActionListener() {
