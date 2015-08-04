@@ -32,8 +32,9 @@ import java.util.List;
 public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {
     private boolean replaceSpacesInNamesWithUnderscores = false;
     private char[] replaceCharactersInNamesWithUnderscores;
+    private boolean wroteHeader = false;
 
-    public NexusExporter(Writer writer) throws IOException {
+    public NexusExporter(Writer writer) {
 		this(writer, true);
 	}
 
@@ -41,7 +42,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer, boolean writeMetaComments) throws IOException {
+    public NexusExporter(Writer writer, boolean writeMetaComments) {
 		this(writer, writeMetaComments, false);
     }
 
@@ -49,10 +50,19 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) throws IOException {
+    public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) {
 		this.writeMetaComments = writeMetaComments;
         this.interleave = interleave;
         this.writer = new SafePrintWriter(new BufferedWriter(writer));
+    }
+
+    /**
+     * Writes the header if we haven't already done so. ideally we'd just do this in the constructor, but we don't want to break the API by adding IOException to constructor the signature
+     */
+    private void writeHeaderIfNecessary() throws IOException {
+        if (wroteHeader)
+            return;
+        wroteHeader = true;
         this.writer.println("#NEXUS");
     }
 
@@ -75,7 +85,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * export alignment.
      */
     public void exportSequences(Collection<? extends Sequence> sequences) throws IOException, IllegalArgumentException {
-
+        writeHeaderIfNecessary();
         establishSequenceTaxa(sequences);
 
         SequenceType seqType = null;
@@ -147,6 +157,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     private void writeTrees(Collection<? extends Tree> trees, boolean checkTaxa) throws IOException {
+        writeHeaderIfNecessary();
         int nt = 0;
         for( Tree t : trees ) {
             if( checkTaxa && establishTreeTaxa(t) ) {
@@ -182,6 +193,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     public void exportTrees(Collection<? extends Tree> trees) throws IOException {
+        writeHeaderIfNecessary();
         // all trees in a set should have the same taxa
         establishTreeTaxa(trees.iterator().next());
         writer.println("begin trees;");
@@ -191,6 +203,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     public void exportTreesWithTranslation(Collection<? extends Tree> trees, Map<String, String> t) throws IOException {
+        writeHeaderIfNecessary();
         writer.println("begin trees;");
         writer.println("\ttranslate");
         boolean first = true;
@@ -205,7 +218,22 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         writer.flush();
     }
 
-    public void exportMatrix(final DistanceMatrix distanceMatrix) throws IOException {
+    /**
+     * Exports the given distance matrix, throwing a RuntimeException if an underlying IOException occurs. All code should
+     * use {@link #exportMatrixOrThrowIOException(jebl.evolution.distances.DistanceMatrix)} instead.
+     * @param distanceMatrix
+     * @deprecated use {@link #exportMatrixOrThrowIOException(jebl.evolution.distances.DistanceMatrix)} instead
+     */
+    @Deprecated public void exportMatrix(final DistanceMatrix distanceMatrix) {
+        try {
+            exportMatrixOrThrowIOException(distanceMatrix);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void exportMatrixOrThrowIOException(final DistanceMatrix distanceMatrix) throws IOException {
+        writeHeaderIfNecessary();
         final List<Taxon> taxa = distanceMatrix.getTaxa();
         establishTaxa(taxa);
         writer.println("begin distances;");
@@ -232,6 +260,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * @param taxons
      */
     private void setTaxa(Taxon[] taxons) throws IOException {
+        writeHeaderIfNecessary();
         taxa = new HashSet<Taxon>();
 
         writer.println("begin taxa;");

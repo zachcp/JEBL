@@ -17,13 +17,25 @@ import java.util.List;
  */
 public class MEGAExporter implements AlignmentExporter {
     private SafePrintWriter writer;
+    private boolean wroteHeader = false;
+    private String comment;
 
     /**
      *
      * @param writer where export text goes
      */
-    public MEGAExporter(Writer writer, String comment) throws IOException {
+    public MEGAExporter(Writer writer, String comment) {
         this.writer = new SafePrintWriter(writer);
+        this.comment = comment;
+    }
+
+    /**
+     * Writes the header if we haven't already done so. ideally we'd just do this in the constructor, but we don't want to break the API by adding IOException to constructor the signature
+     */
+    private void writeHeaderIfNecessary() throws IOException {
+        if (wroteHeader)
+            return;
+        wroteHeader = true;
         this.writer.println("#mega");
         if( comment != null ) {
             this.writer.println("!" + comment);
@@ -36,7 +48,8 @@ public class MEGAExporter implements AlignmentExporter {
      * @param name the name of the alignment
      * @throws IOException
      */
-    public void exportAlignment(Alignment alignment, String name) throws IOException{
+    public void exportAlignment(Alignment alignment, String name) throws IOException {
+        writeHeaderIfNecessary();
         writer.print("!Title ");
         writer.print(name);
         writer.println(";");
@@ -55,6 +68,7 @@ public class MEGAExporter implements AlignmentExporter {
      * @throws IOException
      */
     public void exportAlignment(Alignment alignment) throws IOException {
+        writeHeaderIfNecessary();
         List<Sequence> seqs = alignment.getSequenceList();
 
         for( Sequence seq : seqs )  {

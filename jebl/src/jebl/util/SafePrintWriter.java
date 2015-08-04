@@ -6,7 +6,6 @@ import java.util.IllegalFormatException;
 import java.util.Locale;
 
 /**
- * /**
  *
  * This class is a duplication of {@link PrintWriter}, but all print, append, format etc methods throw {@link IOException}.
  * That is because all these methods of {@link PrintWriter} do not throw any exceptions, instead they silently suppress the IOException and set a flag that is only available if you call PrintWriter.checkError().
@@ -15,6 +14,7 @@ import java.util.Locale;
  *
  * @author Frank Lee
  *         Created on 28/07/15 2:45 PM
+ * @since This was introduced for Geneious 9.0.0
  */
 public class SafePrintWriter extends Writer {
 
