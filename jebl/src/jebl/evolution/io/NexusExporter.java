@@ -10,11 +10,11 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.util.Attributable;
+import jebl.util.SafePrintWriter;
 
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 import java.util.List;
@@ -33,7 +33,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     private boolean replaceSpacesInNamesWithUnderscores = false;
     private char[] replaceCharactersInNamesWithUnderscores;
 
-    public NexusExporter(Writer writer) {
+    public NexusExporter(Writer writer) throws IOException {
 		this(writer, true);
 	}
 
@@ -41,7 +41,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer, boolean writeMetaComments) {
+    public NexusExporter(Writer writer, boolean writeMetaComments) throws IOException {
 		this(writer, writeMetaComments, false);
     }
 
@@ -49,10 +49,10 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      *
      * @param writer where export text goes
      */
-    public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) {
+    public NexusExporter(Writer writer, boolean writeMetaComments, boolean interleave) throws IOException {
 		this.writeMetaComments = writeMetaComments;
         this.interleave = interleave;
-        this.writer = new PrintWriter(new BufferedWriter(writer));
+        this.writer = new SafePrintWriter(new BufferedWriter(writer));
         this.writer.println("#NEXUS");
     }
 
@@ -205,7 +205,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         writer.flush();
     }
 
-    public void exportMatrix(final DistanceMatrix distanceMatrix) {
+    public void exportMatrix(final DistanceMatrix distanceMatrix) throws IOException {
         final List<Taxon> taxa = distanceMatrix.getTaxa();
         establishTaxa(taxa);
         writer.println("begin distances;");
@@ -231,7 +231,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * Write a new taxa block and record them for later reference.
      * @param taxons
      */
-    private void setTaxa(Taxon[] taxons) {
+    private void setTaxa(Taxon[] taxons) throws IOException {
         taxa = new HashSet<Taxon>();
 
         writer.println("begin taxa;");
@@ -298,7 +298,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * do nothing. If not, write a new taxa block.
      * @param sequences
      */
-    private void establishSequenceTaxa(Collection<? extends Sequence> sequences) {
+    private void establishSequenceTaxa(Collection<? extends Sequence> sequences) throws IOException {
         if( taxa != null && taxa.size() == sequences.size() ) {
             boolean hasAll = true;
             for( Sequence s : sequences ) {
@@ -319,11 +319,11 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
         setTaxa(t.toArray(new Taxon[]{}));
     }
 
-    private boolean establishTreeTaxa(Tree tree) {
+    private boolean establishTreeTaxa(Tree tree) throws IOException {
         return establishTaxa(tree.getTaxa());
     }
 
-    private boolean establishTaxa(Collection<? extends Taxon> ntaxa) {
+    private boolean establishTaxa(Collection<? extends Taxon> ntaxa) throws IOException {
         if( taxa != null && taxa.size() == ntaxa.size()  && taxa.containsAll(ntaxa)) {
             return false;
         }
@@ -458,7 +458,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
     }
 
     private Set<Taxon> taxa = null;
-    protected final PrintWriter writer;
+    protected final SafePrintWriter writer;
 	private boolean writeMetaComments;
     private boolean interleave;
     public static final int MAX_ROW_LENGTH = 60;

@@ -5,9 +5,9 @@ import jebl.evolution.sequences.Sequence;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
+import jebl.util.SafePrintWriter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 
@@ -22,14 +22,14 @@ import java.util.*;
  * @version $Id$
  */
 public class PHYLIPExporter implements AlignmentExporter, TreeExporter {
-    private PrintWriter writer;
+    private SafePrintWriter writer;
 
     /**
      *
      * @param writer where export text goes
      */
     public PHYLIPExporter(Writer writer) {
-        this.writer = new PrintWriter(writer);
+        this.writer = new SafePrintWriter(writer);
     }
 
     private boolean namesUnique(List<String> names) {

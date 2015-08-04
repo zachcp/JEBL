@@ -6,11 +6,10 @@ package jebl.evolution.io;
 
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.taxa.Taxon;
+import jebl.util.SafePrintWriter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.List;
 import java.util.Collection;
 
 /**
@@ -26,7 +25,7 @@ public class FastaExporter implements SequenceExporter {
      * Constructor
      */
     public FastaExporter(Writer writer) {
-        this.writer = new PrintWriter(writer);
+        this.writer = new SafePrintWriter(writer);
     }
 
     /**
@@ -42,5 +41,5 @@ public class FastaExporter implements SequenceExporter {
         }
     }
 
-    private final PrintWriter writer;
+    private final SafePrintWriter writer;
 }

@@ -11,6 +11,9 @@
 
 package jebl.math;
 
+import jebl.util.SafePrintWriter;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -42,7 +45,7 @@ public interface MinimiserMonitor {
         /**
 		 * Creates a MinimiserMonitor that outputs current minimum to a print stream
 		 */
-		public static final MinimiserMonitor createSimpleMonitor(PrintWriter output) {
+		public static final MinimiserMonitor createSimpleMonitor(SafePrintWriter output) {
 			return new Simple(output);
 		}
 		/**
@@ -123,13 +126,17 @@ public interface MinimiserMonitor {
 			}
 		}
 		private static class Simple implements MinimiserMonitor {
-			PrintWriter output_;
-			Simple(PrintWriter output) {
+			SafePrintWriter output_;
+			Simple(SafePrintWriter output) {
 				this.output_ = output;
 			}
 			public void updateProgress(double progress) {		}
 			public void newMinimum(double value, double[] parameterValues, MultivariateFunction mf) {
-				output_.println("New Minimum:"+value);
+				try {
+					output_.println("New Minimum:"+value);
+				} catch (IOException e) {
+					System.err.println("Failed to print New Minimum:" + value + " to simple, since " + e.getMessage());
+				}
 			}
 		}
 		private static class SystemOutput implements MinimiserMonitor {

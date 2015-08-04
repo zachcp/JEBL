@@ -3,6 +3,7 @@ package jebl.evolution.trees;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NexusImporter;
+import jebl.util.SafePrintWriter;
 
 import java.io.*;
 import java.util.*;
@@ -579,13 +580,13 @@ public class CalculateSplitRates {
 			//	calculator.getLongestClock();
 
 //			try {
-			PrintWriter printWriter = new PrintWriter(args[3]);
+			SafePrintWriter printWriter = new SafePrintWriter(args[3]);
 			calculator.writeLongestDwellTimeInfo(printWriter);
 			printWriter.close();
 
 //			}
 
-			printWriter = new PrintWriter(args[4]);
+			printWriter = new SafePrintWriter(args[4]);
 			calculator.writeDensityMap(printWriter);
 			printWriter.close();
 
@@ -605,13 +606,13 @@ public class CalculateSplitRates {
 	public int numTimeBoxes = 100;
 	public double edgeFraction = 0.05;
 
-	private void writeDensityMap(PrintWriter printWriter) {
+	private void writeDensityMap(SafePrintWriter printWriter) throws IOException {
 		densityMap = createDensityMap(numRateBoxes, numTimeBoxes);
 		printWriter.println(densityMap.toString());
 
 	}
 
-	private void writeLongestDwellTimeInfo(PrintWriter printWriter) {
+	private void writeLongestDwellTimeInfo(SafePrintWriter printWriter) throws IOException {
 		printWriter.print("DwellTime\tTreeLength\tProportion\n");
 		for (RootedTree tree : treeList) {
 			Map<Double, Double> map = getClockDwellTimes(tree);

@@ -2,6 +2,7 @@ package jebl.evolution.align;
 
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
+import jebl.util.SafePrintWriter;
 
 import java.io.*;
 
@@ -362,7 +363,7 @@ public class AlignCommand {
 		
 		//print output to logfile
 		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("alignment_log.txt", true));
+			SafePrintWriter pw = new SafePrintWriter(new FileWriter("alignment_log.txt", true));
 			pw.print(outPut + "\n\n");
 			pw.close();
 			System.out.println("result logged in alignment_log.txt.\n");
