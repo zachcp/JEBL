@@ -431,7 +431,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setTaxonLabelPainter(BasicLabelPainter taxonLabelPainter) {
-        setTaxonLabelPainter((Painter<Node>)taxonLabelPainter);   
+        setTaxonLabelPainter((Painter<Node>)taxonLabelPainter);
     }
 
     public void setTaxonLabelPainter(Painter<Node> taxonLabelPainter) {
@@ -518,7 +518,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private boolean setBranchLineWeightValues(float weight) {
         if( ((BasicStroke)branchLineStroke).getLineWidth() != weight ) {
             branchLineStroke = new BasicStroke(weight);
-            selectionStroke = new BasicStroke(Math.max(weight + 4.0F, weight * 1.5F), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
             getPrefs().putFloat(branchWeightPREFSkey, weight);
             return true;
         }
@@ -1026,8 +1025,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return result;
     }
 
-    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers, Node selectedNode) {
-        final Point2D.Double nodeLocation = nodeCoord(node);
+    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers) {
         final boolean isSelected = selectedNodes.contains(node);
         final Paint color = g2.getPaint();
 
@@ -1056,14 +1054,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         Point correctedMouseLocation = flipTree ? new Point(getWidth()-mouseLocation.x, mouseLocation.y) : mouseLocation;
 
         //we want to draw node markers either if they are selected, or if the mouse is close to them
-        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(correctedMouseLocation) && !isSelected && node != selectedNode)
+        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(correctedMouseLocation) && !isSelected)
             return;
 
         //we want them to have the selected colour either if they are selected, or if the mouse is over them
         Paint c = isSelected ? selectionPaint :  Color.LIGHT_GRAY;
-        if(node == selectedNode) {
-            c = isSelected ? highlightedSelectedPaint :  highlightedPaint;
-        }
         g2.setPaint(c);
 
         g2.fill(nodeMarker);
@@ -1161,19 +1156,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         final boolean alignedTaxa = treeLayout.alignTaxa();
 
-        Node nodeUnderMouse = null;
-        if (!isPrinting) {
-            Node[] result = getNodeAt(mouseLocation);
-            if(result != null) {
-                nodeUnderMouse = result[0];
-            }
-        }
-
         for (Node node : externalNodes) {
             if( !isNodeVisible(node) ) continue;
             if( hideNode(node) ) continue;
 
             final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
+
+            if (!g2.getClipBounds().intersects(branchPath.getBounds())) {
+                continue;
+            }
 
             final Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
             g2.setPaint(paint);
@@ -1191,7 +1182,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.draw(branchPath);
 
             if(drawNodes)
-                nodeMarker(g2, node, drawAllNodeMarkers, nodeUnderMouse);
+                nodeMarker(g2, node, drawAllNodeMarkers);
 
             if( preElementDrawCode ) {
                 if (showingTaxonLables) {
@@ -1237,10 +1228,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     if(branchPath == null)
                         continue;
 
+                    if (!g2.getClipBounds().intersects(branchPath.getBounds())) {
+                        continue;
+                    }
+
                     g2.draw(branchPath);
 
                     if(drawNodes)
-                        nodeMarker(g2, node, drawAllNodeMarkers, nodeUnderMouse);
+                        nodeMarker(g2, node, drawAllNodeMarkers);
 
                     if (preElementDrawCode && nodesLables) {
                         final AffineTransform nodeTransform = nodeLabelTransforms.get(node);
@@ -1298,7 +1293,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! hideNode(rootNode) && drawNodes ) {
           g2.setStroke(branchLineStroke);
-          nodeMarker(g2, rootNode, drawAllNodeMarkers, nodeUnderMouse);
+          nodeMarker(g2, rootNode, drawAllNodeMarkers);
         }
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
@@ -2167,10 +2162,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Stroke branchLineStroke = new BasicStroke(1.0F);
     private Stroke collapsedStroke = new BasicStroke(3.0F);
     private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
-    private Stroke selectionStroke = new BasicStroke(6.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
-    private Paint highlightedSelectedPaint = new Color(90, 107, 255);
-    private Paint highlightedPaint = new Color(180, 213, 254);
     private boolean calibrated = false;
 
     // Transform which scales the tree from it's own units to pixles and moves it to center of window
