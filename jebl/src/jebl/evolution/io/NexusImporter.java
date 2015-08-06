@@ -90,7 +90,7 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
      *
      * @param reader
      * @param compactTrees true to import trees as {@link jebl.evolution.trees.CompactRootedTree}, false to use
-     * {@link jebl.evolution.trees.SimpleRootedTree}.
+     * {@link jebl.evolution.trees.SimpleRootedTree}. If unsure, use compact=false because CompactRootedTree is generally not worth it.
      * @param expectedInputLength Expected length of the input in bytes, or 0 if unknown. Used for optimization and tracking
      *                            progress.
      */
@@ -101,7 +101,8 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 
     /**
      * @param reader
-     * @param compactTrees
+     * @param compactTrees true to import trees as {@link jebl.evolution.trees.CompactRootedTree}, false to use
+	 * {@link jebl.evolution.trees.SimpleRootedTree}. If unsure, use compact=false because CompactRootedTree is generally not worth it.
      * @deprecated Use NexusImporter(Reader reader, boolean compactTrees, long expectedInputLength)
      */
     @Deprecated

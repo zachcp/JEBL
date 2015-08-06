@@ -909,9 +909,28 @@ public final class Utils {
      * This method creates an unattached copy of the given rooted tree such that changes to the copied tree do not affect the original tree.
      * @param treeToCopy the tree to copy
      * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
+     * @deprecated use {@link #copyTree(RootedTree, boolean)} instead
      */
-    public static RootedTree copyTree(RootedTree treeToCopy){
-        return new CompactRootedTree(treeToCopy);
+    @Deprecated
+    public static RootedTree copyTree(RootedTree treeToCopy) {
+        return copyTree(treeToCopy, true);
+    }
+
+    /**
+     * This method creates an unattached copy of the given rooted tree such that changes to the copied tree do not
+     * affect the original tree.
+     *
+     * @param treeToCopy the tree to copy
+     * @param compact true to create a CompactRootedTree which uses less memory but is slower, false to use
+     *                SimpleRootedTree. If unsure, use compact=false because CompactRootedTree is generally not worth it.
+     * @return an equivalent tree to treeToCopy (NB this may not be of the same RootedTree subclass as treeToCopy)
+     */
+    public static RootedTree copyTree(RootedTree treeToCopy, boolean compact) {
+        if (compact) {
+            return new CompactRootedTree(treeToCopy);
+        } else {
+            return new SimpleRootedTree(treeToCopy);
+        }
     }
 
     // debug aid - unrooted tree printout - un-comment in emergency

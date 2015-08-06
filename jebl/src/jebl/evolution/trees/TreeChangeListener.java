@@ -11,7 +11,7 @@ public abstract class TreeChangeListener {
     /**
      * The tree has changed. The tree contained in the TreeChangeEvent must not
      * be the original tree. Instead it must be a new instance of a tree,
-     * first cloned using {@link Utils#copyTree(RootedTree)} and {@link Utils#rootTheTree(Tree)}  or {@link Utils#rootTreeAtCenter(Tree)} if necessary
+     * first cloned using {@link Utils#copyTree(RootedTree, boolean)} and {@link Utils#rootTheTree(Tree)}  or {@link Utils#rootTreeAtCenter(Tree)} if necessary
      * before changes are made.
      *
      * @param treeChangeEvent the changed tree.
