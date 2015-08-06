@@ -42,7 +42,7 @@ import java.util.prefs.Preferences;
  * @author Andrew Rambaut
  * @version $Id$
  */
-@SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "ToArrayCallWithZeroLengthArrayArgument"})
+@SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "ToArrayCallWithZeroLengthArrayArgument", "OverlyLongMethod"})
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
     public Point mouseLocation = new Point(0,0);
@@ -581,7 +581,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             result[0] = rootNode;
             return result;
         }
-        List<Node> nodesInOrder = Utils.getNodes(tree, tree.getRootNode());
         for (int i = 0; i < nodesInOrder.size(); i++) {
             if( !isNodeVisible(nodesInOrder.get(i)) ) continue;
             if( hideNode(nodesInOrder.get(i)) ) continue;
@@ -625,7 +624,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     private boolean checkNodeIntersects(Node node, Point point){
-        Shape nodeMarker = getNodeMarker(node, circDiameter);
+        Shape nodeMarker = getNodeMarker(node, circDiameter+6);
         return nodeMarker.contains(point);
     }
 
@@ -1009,7 +1008,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 
         Shape nodeMarker = getNodeMarker(node, circDiameter);
-        Shape nodeMarkerClip = getNodeMarker(node, 7*circDiameter);
 
         if( isNodeCollapsed(node) ) {
            // final Color c = isSelected ? selectionPaint : branch;
@@ -1032,7 +1030,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         Point correctedMouseLocation = flipTree ? new Point(getWidth()-mouseLocation.x, mouseLocation.y) : mouseLocation;
 
         //we want to draw node markers either if they are selected, or if the mouse is close to them
-        if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(correctedMouseLocation) && !isSelected)
+        if(!alwaysDrawNodeMarkers && !isSelected)
             return;
 
         //we want them to have the selected colour either if they are selected, or if the mouse is over them
@@ -1268,9 +1266,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        if( ! hideNode(rootNode) && drawNodes ) {
+        if( ! hideNode(rootNode) && drawNodes) {
           g2.setStroke(branchLineStroke);
           nodeMarker(g2, rootNode, drawAllNodeMarkers);
+        }
+
+        Node[] nodeAt = getNodeAt(mouseLocation);
+        if (nodeAt != null && nodeAt.length > 0 && nodeAt[0] != null) {
+            nodeMarker(g2, nodeAt[0], true);
         }
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
