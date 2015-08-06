@@ -448,32 +448,42 @@ public final class Utils {
         return tree instanceof RootedTree && !((RootedTree)tree).conceptuallyUnrooted();
     }
 
+
+    /**
+     * Get an instance of RootedTree from any other class of Tree. If the input tree is actually an unrooted tree or is
+     * conceptually unrooted, then the returned tree will be conceptually unrooted.
+     * <ul>
+     *     <li>If the tree is already a RootedTree then just return it</li>
+     *     <li>If the tree has a "natuarl root" (a node of degree 2) return a copy of the tree with that as the root</li>
+     *     <li>Otherwise return a copy of the tree rooted at its center (see {@link #rootTreeAtCenter(Tree)}</li>
+     * </ul>
+     *
+     * @param tree the tree to get as a RootedTree, is not modified
+     * @return an instance of RootedTree representing input tree
+     */
     public static RootedTree rootTheTree(Tree tree) {
-        return rootTheTree(tree, true);
+        return rootTheTree(tree, false);
     }
 
     /**
-     * Return a rooted tree from any tree.
-     * <p/>
-     * If tree already rooted, return it. Otherwise if there is a "natuarl root" (i.e. a node of
-     * degree 2) use it as root. Otherwise creates an internal node close to the center of the tree as a root.
-     *
-     * @param tree to root
-     * @return rooted representation
+     * @deprecated use {@link #rootTheTree(Tree)} or {@link #getConceptuallyUnrootedTree(Tree)}
      */
-    public static RootedTree rootTheTree(Tree tree, boolean conceptuallyUnrooted) {
-        // If already rooted, do nothing
+    @Deprecated
+    public static RootedTree rootTheTree(Tree tree, boolean forceConceptuallyUnrooted) {
         if (tree instanceof RootedTree) {
-            if (tree instanceof SimpleRootedTree) {
-                ((SimpleRootedTree) tree).setConceptuallyUnrooted(conceptuallyUnrooted);
+            RootedTree rootedTree = (RootedTree) tree;
+            if (forceConceptuallyUnrooted && !rootedTree.conceptuallyUnrooted()) {
+                SimpleRootedTree treeCopy = new SimpleRootedTree(rootedTree); //to avoid modifying the input
+                treeCopy.setConceptuallyUnrooted(true);
+                return treeCopy;
             }
-            return (RootedTree) tree;
+            return rootedTree;
         }
 
         // If a natural root exists, root there
         Set<Node> d2 = tree.getNodes(2);
         if (d2.size() == 1) {
-            return new RootedFromUnrooted(tree, d2.iterator().next(), conceptuallyUnrooted);
+            return new RootedFromUnrooted(tree, d2.iterator().next(), true);
         }
 
         RootedTree rtree = rootTreeAtCenter(tree);
@@ -499,12 +509,27 @@ public final class Utils {
     }
 
     /**
-     * Root any tree by locating the "center" of tree and adding a new root node at that point
+     * Get a conceptually unrooted instance of RootedTree from any other class of Tree.
+     * <ul>
+     *     <li>If the tree is already a conceptually unrooted RootedTree then just return it</li>
+     *     <li>If the tree is a RootedTree that's not conceptually unrooted then make a copy that is conceptually unrooted and return that</li>
+     *     <li>Otherwise create a new RootedTree copy of the tree with an appropriate root and conceptually unrooted set</li>
+     * </ul>
+     *
+     * @param tree the tree to get as a conceptually unrooted RootedTree, is not modified
+     * @return an instance of RootedTree representing input tree which is conceptually unrooted
+     */
+    public static RootedTree getConceptuallyUnrootedTree(Tree tree) {
+        return rootTheTree(tree, true);
+    }
+
+    /**
+     * Create a rooted copy of any tree by locating the "center" of the tree and adding a new root node at that point.
      * <p/>
      * for any point on the tree x let D(x) = Max{distance between x and t : for all tips t}
      * The "center" c is the point with the smallest distance, i.e. D(c) = min{ D(x) : x in tree }
      *
-     * @param tree to root
+     * @param tree the tree to root, is not modified
      * @return rooted tree
      */
     public static RootedTree rootTreeAtCenter(Tree tree) {
@@ -556,7 +581,7 @@ public final class Utils {
                 direction = next;
             }
         } catch (Graph.NoEdgeException e1) {
-            return null; // serious bug, should not happen
+            throw new RuntimeException(e1); // serious bug, should not happen
         }
     }
 

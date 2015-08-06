@@ -7,7 +7,7 @@ import jebl.evolution.taxa.Taxon;
 import java.util.*;
 
 /**
- * Root an unrooted tree. This class works as a wrapper over any tree to root it. There are two
+ * Root an unrooted tree. This class works as a wrapper over any tree to root it without modifying it. There are two
  * constructors, one which roots the tree at any internal node, the other roots the tree between any two
  * internal nodes. Be aware that rooting between nodes where one of them has less than 3 adjacencies may
  * be problematic when converting back from the Newick format.
