@@ -42,14 +42,15 @@ import java.util.prefs.Preferences;
  * @author Andrew Rambaut
  * @version $Id$
  */
+@SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "ToArrayCallWithZeroLengthArrayArgument"})
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
-    public static boolean goBackwards = false;
     public Point mouseLocation = new Point(0,0);
     private String referenceSequenceName;
 
     public final static String collapsedAttributeName = "&collapsed";
     public final static String visibleAttributeName = "&visible";
+    static final boolean OLD_SCALE_CODE = false;
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
@@ -492,9 +493,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.scaleBarPainter = scaleBarPainter;
         if (this.scaleBarPainter != null) {
             this.scaleBarPainter.addPainterListener(this);
-            if (scaleBarPainter instanceof ScaleBarPainter) {
-                ((ScaleBarPainter)scaleBarPainter).setEnabled(!transformCheck.isSelected());
-            }
+            scaleBarPainter.setEnabled(!transformCheck.isSelected());
         }
         controlPalette.fireControlsChanged();
         calibrated = false;
@@ -622,9 +621,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final Point2D.Double coord = nodeCoord(node);
         final int r = (d-1)/2;
 
-        Shape nodeMarker = new Ellipse2D.Float((float)coord.x - r, (float)coord.y - r, d, d);
-
-        return nodeMarker;
+        return new Ellipse2D.Float((float)coord.x - r, (float)coord.y - r, d, d);
     }
 
     private boolean checkNodeIntersects(Node node, Point point){
@@ -643,7 +640,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         Set<Node> nodes = new HashSet<Node>();
 
-        //todo: this allows clicking on node/branch labels to select nodes.  At this point this behaviour is considered undesirable
         for( TreeDrawableElement e : treeElements ) {
             Node node = e.getNode();
             if( node != null ) {
@@ -697,9 +693,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
-    public void setRuler(double rulerHeight) {
-        this.rulerHeight = rulerHeight;
-    }
+    /**
+     *
+     * @deprecated TreePane doesn't support rulers anymore, calling this method does nothing.
+     */
+    @Deprecated
+    public void setRuler(double rulerHeight) {}
 
     public void scrollPointToVisible(Point point) {
         scrollRectToVisible(new Rectangle(point.x, point.y, 0, 0));
@@ -786,9 +785,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     // only on a real change
                     label1.setEnabled(selected);
                     combo1.setEnabled(selected);
-                    if (scaleBarPainter instanceof ScaleBarPainter) {
-                        ((ScaleBarPainter) scaleBarPainter).setEnabled(!selected);
-                    }
+                    scaleBarPainter.setEnabled(!selected);
 
                     setBranchTransform(selected, (TransformedRootedTree.Transform) combo1.getSelectedItem());
                 }
@@ -963,25 +960,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         final Paint oldPaint = g2.getPaint();
         final Stroke oldStroke = g2.getStroke();
-
-        // todo disable since drawTree clears it anyway now
-//        if( false ) {
-//            for (Node selectedNode : selectedNodes) {
-//                Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(selectedNode));
-//                if (branchPath == null) continue;
-//                g2.setPaint(selectionPaint);
-//                g2.setStroke(selectionStroke);
-//                g2.draw(branchPath);
-//            }
-//
-//            for (Taxon selectedTaxon : selectedTaxa) {
-//                g2.setPaint(selectionPaint);
-//                Shape labelBounds = taxonLabelBounds.get(selectedTaxon);
-//                if (labelBounds != null) {
-//                    g2.fill(labelBounds);
-//                }
-//            }
-//        }
 
         long start = System.currentTimeMillis();
         drawTree(g2, true, true, true, getWidth(), getHeight());
@@ -1223,8 +1201,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     g2.setPaint(paint);
 
-                    // todo: although this fix is only an if != null check, this is ok because the missing node is a root node,
-                    // todo: which should not be drawn on an unrooted view anyway
+                    //although this fix is only an if != null check, this is ok because the missing node is a root node, which should not be drawn on an unrooted view anyway
                     if(branchPath == null)
                         continue;
 
@@ -1335,14 +1312,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        assert treeBounds != null; //the code below is a hack to make this not crash for users
         if(treeBounds == null){
+            assert false;
             if(calibrated)
                 return;
             treeBounds = new Rectangle2D.Double(0,0,100,100); //this is here so the treeViewer draws somethihng...
         }
-
-        boolean oldScaleCode = false;
 
         // oldScaleCode too
         final Rectangle2D bounds = treeBounds.getBounds2D(); // (JH) same as (Rectangle2D) treeBounds.clone();
@@ -1395,7 +1370,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 //System.out.println("For " + tree.getTaxon(node).getName())
                 tbh.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
 
-                if( oldScaleCode ) {
+                if(OLD_SCALE_CODE) {
                     final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
 
                     // Work out how it is rotated and create a transform that matches that
@@ -1423,7 +1398,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     tbh.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
 
-                    if( oldScaleCode ) {
+                    if(OLD_SCALE_CODE) {
                         Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
 
                         // Work out how it is rotated and create a transform that matches that
@@ -1451,7 +1426,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     tbh.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
 
-                    if( oldScaleCode ) {
+                    if(OLD_SCALE_CODE) {
                         Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
 
                         // Work out how it is rotated and create a transform that matches that
@@ -1464,7 +1439,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        if( oldScaleCode ) {
+        if(OLD_SCALE_CODE) {
             if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
                 scaleBarPainter.calibrate(g2);
                 scaleBarBounds = new Rectangle2D.Double(treeBounds.getX(), treeBounds.getY(),
@@ -1473,7 +1448,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        if( oldScaleCode ) {
+        if(OLD_SCALE_CODE) {
           assert false;
             //availableH = height - insets.top - insets.bottom;
         }
@@ -1511,14 +1486,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final double h = availableH - yDiff;
         // oldscalecode too  ************************** ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-        double xOffset = 0.0;
+        double xOffset;
         double yOffset = 0.0;
 
         if (treeLayout.maintainAspectRatio()) {
             // If the tree is layed out in both dimensions then we
             // need to find out which axis has the least space and scale
             // the tree to that (to keep the aspect ratio.
-            if( oldScaleCode ) {
+            if(OLD_SCALE_CODE) {
                 final boolean widthLimit = (w / treeBounds.getWidth()) < (h / treeBounds.getHeight());
                 final double scale = widthLimit ? w / treeBounds.getWidth() : h / treeBounds.getHeight();
                 treeScale = xScale = yScale = scale;
@@ -1534,7 +1509,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     xorigion = tbh.getOrigion(true, yScale);
                     treeScale = yScale;
                 } else {
-                    double size = 0;
+                    double size;
                     int count = 0;
                     String oldValues = "";
                     //count is here to make sure we don't get an infinite loop if there is no scale that will
@@ -1570,7 +1545,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //            System.out.println("old/new xs " + (w / treeBounds.getWidth()) + "/" + xScale
 //                    + " ys " + (h / treeBounds.getHeight()) + "/" + yScale
 //                    + " y0 " + -bounds.getY() + "/" + yOffset + " x0 " + -bounds.getX() + "/" + xorigion);
-            if( oldScaleCode ) {
+            if(OLD_SCALE_CODE) {
                 xScale = w / treeBounds.getWidth();
                 yScale = h / treeBounds.getHeight();
 
@@ -1817,9 +1792,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.calibrate(g2);
             final double h1 = scaleBarPainter.getPreferredHeight(g2, this);
-            final double x = xl; //  treeBounds.getX()
-            final double wid = xh - xl; // treeBounds.getWidth();
-            scaleBarBounds = new Rectangle2D.Double(x, height - h1, wid, h1);
+            final double wid = xh - xl;
+            scaleBarBounds = new Rectangle2D.Double(xl, height - h1, wid, h1);
         }
 
         // unused at the moment
@@ -1888,7 +1862,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final double ty = origin.getY() - (height / 2.0);
         double tx = origin.getX();
         if( just) {
-            if (!just || line.getX2() > line.getX1()) {
+            if (line.getX2() > line.getX1()) {
                 tx += labelXOffset;
             } else {
                 tx -= (labelXOffset + width);
@@ -2065,8 +2039,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
             //assert scale > 0 : scale + " " + nit;
             //assert origin >= 0.0 : origin + " " + nit;
-            double[] r = {origin, scale};
-            return r;
+            return new double[]{origin, scale};
         }
 
         double getOrigion(boolean isx, double scale) {
@@ -2145,7 +2118,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private Set<Node> selectedNodes = new HashSet<Node>();
     private Set<Taxon> selectedTaxa = new HashSet<Taxon>();
 
-    private double rulerHeight = -1.0;
     private Rectangle2D dragRectangle = null;
 
     private BranchDecorator branchDecorator = null;
