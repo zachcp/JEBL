@@ -457,6 +457,9 @@ public final class Utils {
      *     <li>If the tree has a "natuarl root" (a node of degree 2) return a copy of the tree with that as the root</li>
      *     <li>Otherwise return a copy of the tree rooted at its center (see {@link #rootTreeAtCenter(Tree)}</li>
      * </ul>
+     * Despite its name, this method doesn't really "root the tree". It just ensure you have a tree of class "RootedTree"
+     * which could actually be conceptually unrooted. If you really want to root a tree then see
+     * {@link #rootTreeAtCenter(Tree)} or {@link RootedFromUnrooted}.
      *
      * @param tree the tree to get as a RootedTree, is not modified
      * @return an instance of RootedTree representing input tree
