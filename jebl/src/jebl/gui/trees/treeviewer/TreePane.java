@@ -1155,7 +1155,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 
             g2.setStroke(branchLineStroke);
+            if (!treeLayout.shouldAntialiasBranchPath()) {
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            }
             g2.draw(branchPath);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             if(drawNodes)
                 nodeMarker(g2, node, drawAllNodeMarkers);
@@ -1206,8 +1210,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     if (!g2.getClipBounds().intersects(branchPath.getBounds())) {
                         continue;
                     }
-
+                    if (!treeLayout.shouldAntialiasBranchPath()) {
+                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                    }
                     g2.draw(branchPath);
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                     if(drawNodes)
                         nodeMarker(g2, node, drawAllNodeMarkers);

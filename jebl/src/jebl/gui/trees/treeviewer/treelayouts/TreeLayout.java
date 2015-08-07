@@ -132,4 +132,6 @@ public interface TreeLayout extends ControlsProvider {
     int getNodeMarkerRadiusUpperLimit(Node node, AffineTransform transform);
 
     boolean smallSubTree(Node node, AffineTransform transform);
+
+    boolean shouldAntialiasBranchPath();
 }

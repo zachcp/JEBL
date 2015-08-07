@@ -64,6 +64,11 @@ public abstract class AbstractTreeLayout implements TreeLayout {
         }
     }
 
+    @Override
+    public boolean shouldAntialiasBranchPath() {
+        return true;
+    }
+
     public void addTreeLayoutListener(TreeLayoutListener listener) {
         listeners.add(listener);
     }

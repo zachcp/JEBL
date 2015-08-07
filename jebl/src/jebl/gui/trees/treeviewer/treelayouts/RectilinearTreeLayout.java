@@ -389,6 +389,11 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
         }
     }
 
+    @Override
+    public boolean shouldAntialiasBranchPath() {
+        return yProportion != 1.0 || xProportion != 1.0;
+    }
+
     private double yPosition;
     private double yIncrement;
 
