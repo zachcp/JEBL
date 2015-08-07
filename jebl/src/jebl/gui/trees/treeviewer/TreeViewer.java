@@ -59,6 +59,7 @@ import java.util.prefs.Preferences;
  * @author Andrew Rambaut
  * @version $Id$
  */
+@SuppressWarnings("unused")
 public class TreeViewer extends JPanel implements Printable {
     public enum TreeLayoutType {
         RECTILINEAR("Rectangle"),
@@ -95,14 +96,9 @@ public class TreeViewer extends JPanel implements Printable {
 
     static final int defaultPaletteSize = 200;
 
-    static private String rootedTreeLayoutPrefKey = "treelayout_rooted";
-    static private String unrootedTreeLayoutPrefKey = "treelayout_unrooted";
-    static private String unrootedTreeAllLayoutsAllowedPrefKey = "treelayout_unrooted_allallowed";
-
-    JToggleButton toggle1;
-    JToggleButton toggle2;
-    JToggleButton toggle3;
-    JCheckBox allowCB;
+    JToggleButton rectilinearToggle;
+    JToggleButton polarToggle;
+    JToggleButton radialToggle;
 
     /**
      * Creates new TreeViewer
@@ -176,7 +172,7 @@ public class TreeViewer extends JPanel implements Printable {
         } else {
             add(controlPalette.getPanel(), BorderLayout.EAST);
         }
-        setTreeLayoutType(TreeLayoutType.values()[getPrefs().getInt(rootedTreeLayoutPrefKey, TreeLayoutType.RECTILINEAR.ordinal())]);
+        setTreeLayoutType(TreeLayoutType.RECTILINEAR);
 
         // This overrides MouseListener and MouseMotionListener to allow selection in the TreePane -
         // It installs itself within the constructor.
@@ -195,12 +191,11 @@ public class TreeViewer extends JPanel implements Printable {
     }
 
     private String currentTreeLayoutPrefKey() {
-        return (tree.conceptuallyUnrooted() ? unrootedTreeLayoutPrefKey : rootedTreeLayoutPrefKey);
+        return (tree.conceptuallyUnrooted() ? "treelayout_unrooted" : "treelayout_rooted");
     }
 
     protected TreeLayoutType getDefaultTreeLayoutType() {
-        boolean isRooted = !tree.conceptuallyUnrooted();
-        TreeLayoutType defaultLayout = (isRooted ? TreeLayoutType.RECTILINEAR : TreeLayoutType.RADIAL);
+        TreeLayoutType defaultLayout = TreeLayoutType.RECTILINEAR;
         String layoutPrefKey = currentTreeLayoutPrefKey();
         return TreeLayoutType.values()[getPrefs().getInt(layoutPrefKey, defaultLayout.ordinal())];
     }
@@ -306,6 +301,7 @@ public class TreeViewer extends JPanel implements Printable {
     private boolean infoIsVisible = false;
     private String infoText = "";
 
+    @SuppressWarnings("FieldCanBeLocal")
     private ControlsProvider controlsProvider = new ControlsProvider() {
 
         public void setControlPalette(ControlPalette controlPalette) {
@@ -331,72 +327,49 @@ public class TreeViewer extends JPanel implements Printable {
                 Icon rectangularTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "rectangularTree.png");
                 Icon polarTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "polarTree.png");
                 Icon radialTreeIcon = IconUtils.getIcon(this.getClass(), imagePath + "radialTree.png");
-                toggle1 = new JToggleButton(rectangularTreeIcon);
-                toggle2 = new JToggleButton(polarTreeIcon);
-                toggle3 = new JToggleButton(radialTreeIcon);
-                toggle1.setToolTipText("Rooted tree layout");
-                toggle2.setToolTipText("Circular tree layout");
-                toggle3.setToolTipText("Unrooted tree layout");
-                toggle1.putClientProperty("Quaqua.Button.style", "toggleWest");
-                toggle2.putClientProperty("Quaqua.Button.style", "toggleCenter");
-                toggle3.putClientProperty("Quaqua.Button.style", "toggleEast");
+                rectilinearToggle = new JToggleButton(rectangularTreeIcon);
+                polarToggle = new JToggleButton(polarTreeIcon);
+                radialToggle = new JToggleButton(radialTreeIcon);
+                rectilinearToggle.setToolTipText("Rooted tree layout");
+                polarToggle.setToolTipText("Circular tree layout");
+                radialToggle.setToolTipText("Unrooted tree layout");
+                rectilinearToggle.putClientProperty("Quaqua.Button.style", "toggleWest");
+                polarToggle.putClientProperty("Quaqua.Button.style", "toggleCenter");
+                radialToggle.putClientProperty("Quaqua.Button.style", "toggleEast");
                 ButtonGroup buttonGroup = new ButtonGroup();
-                buttonGroup.add(toggle1);
-                buttonGroup.add(toggle2);
-                buttonGroup.add(toggle3);
+                buttonGroup.add(rectilinearToggle);
+                buttonGroup.add(polarToggle);
+                buttonGroup.add(radialToggle);
+
+                final JLabel unrootedLabel = new JLabel("Showing unrooted tree as rooted");
+                unrootedLabel.setFont(unrootedLabel.getFont().deriveFont(11f));
 
                 switch (getDefaultTreeLayoutType()) {
                     case RECTILINEAR:
-                        toggle1.setSelected(true);
+                        rectilinearToggle.setSelected(true);
+                        unrootedLabel.setVisible(tree.conceptuallyUnrooted());
                         break;
                     case POLAR:
-                        toggle2.setSelected(true);
+                        unrootedLabel.setVisible(tree.conceptuallyUnrooted());
+                        polarToggle.setSelected(true);
                         break;
                     case RADIAL:
-                        toggle3.setSelected(true);
+                        unrootedLabel.setVisible(false);
+                        radialToggle.setSelected(true);
                         break;
                 }
 
                 treeViewPanel.add(Box.createHorizontalStrut(0));
 
-                treeViewPanel.add(toggle1);
-                treeViewPanel.add(toggle2);
-                treeViewPanel.add(toggle3);
-                treeViewPanel.add(Box.createHorizontalStrut(0));
+                treeViewPanel.add(rectilinearToggle);
+                treeViewPanel.add(polarToggle);
+                treeViewPanel.add(radialToggle);
+                treeViewPanel.add(Box.createHorizontalGlue());
+                treeViewPanel.add(unrootedLabel);
+                treeViewPanel.add(Box.createHorizontalGlue());
                 optionsPanel.addSpanningComponent(treeViewPanel);
 
-                ChangeListener checkboxListener = null;
                 Preferences prefs = getPrefs();
-                if( tree.conceptuallyUnrooted() ) {
-                    allowCB =  new JCheckBox("Enable all layouts for unrooted trees");
-                    boolean allow = getPrefs().getBoolean(unrootedTreeAllLayoutsAllowedPrefKey, false);
-                    allowCB.setSelected(allow);
-                    optionsPanel.addSpanningComponent(allowCB);
-                    //allowCB.setToolTipText("Enable all layouts for unrooted trees");
-                    checkboxListener = new ChangeListener() {
-                        public void stateChanged(ChangeEvent e) {
-                            final boolean s = allowCB.isSelected();
-
-                            getPrefs().putBoolean(unrootedTreeAllLayoutsAllowedPrefKey, s);
-                            if (!s) {
-                                setAndStoreTreeLayoutType(TreeLayoutType.RADIAL);
-                                setExpansion();
-                                toggle1.setSelected(false);
-                                toggle2.setSelected(false);
-                                toggle3.setSelected(true);
-                            }
-                            toggle1.setEnabled(s);
-                            toggle2.setEnabled(s);
-                            toggle3.setEnabled(s);
-                            fireChangeListeners();
-                        }
-                    };
-                    allowCB.addChangeListener(checkboxListener);
-
-                    toggle1.setEnabled(allow);
-                    toggle2.setEnabled(allow);
-                    toggle3.setEnabled(allow);
-                }
 
                 zoomSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 0);
                 zoomSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -421,7 +394,7 @@ public class TreeViewer extends JPanel implements Printable {
 
                 optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
-                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 1000, 0);
+                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 5000, 0);
                 verticalExpansionSlider.setPaintTicks(true);
                 verticalExpansionSlider.setPaintLabels(true);
 
@@ -451,35 +424,38 @@ public class TreeViewer extends JPanel implements Printable {
                 optionsPanel.addComponents(verticalExpansionLabel, false, verticalExpansionSlider, true);
                 setExpansion();
 
-                toggle1.addChangeListener(new ChangeListener() {
+                rectilinearToggle.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle1.isSelected())
+                        if (rectilinearToggle.isSelected()) {
+                            unrootedLabel.setVisible(tree.conceptuallyUnrooted());
                             setAndStoreTreeLayoutType(TreeLayoutType.RECTILINEAR);
+                        }
                         setExpansion();
                         fireChangeListeners();
                     }
                 });
-                toggle2.addChangeListener(new ChangeListener() {
+                polarToggle.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle2.isSelected())
+                        if (polarToggle.isSelected()) {
+                            unrootedLabel.setVisible(tree.conceptuallyUnrooted());
                             setAndStoreTreeLayoutType(TreeLayoutType.POLAR);
+                        }
                         setExpansion();
                         fireChangeListeners();
                     }
                 });
-                toggle3.addChangeListener(new ChangeListener() {
+                radialToggle.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
-                        if (toggle3.isSelected())
+                        if (radialToggle.isSelected()) {
+                            unrootedLabel.setVisible(false);
                             setAndStoreTreeLayoutType(TreeLayoutType.RADIAL);
+                        }
                         setExpansion();
                         fireChangeListeners();
                     }
                 });
 
                 controls = new Controls("General", optionsPanel, true);
-                if(checkboxListener != null) {
-                    checkboxListener.stateChanged(null);
-                }
             }
 
             controlsList.add(controls);
@@ -539,26 +515,20 @@ public class TreeViewer extends JPanel implements Printable {
         switch (treeLayoutType) {
             case RECTILINEAR:
                 treeLayout = new RectilinearTreeLayout();
-                if(allowCB != null) {
-                    allowCB.setSelected(true);
-                }
-                if(toggle1 != null) {
-                    toggle1.setSelected(true);
+                if(rectilinearToggle != null) {
+                    rectilinearToggle.setSelected(true);
                 }
                 break;
             case POLAR:
                 treeLayout = new PolarTreeLayout();
-                if(allowCB != null) {
-                    allowCB.setSelected(true);
-                }
-                if(toggle2 != null) {
-                    toggle2.setSelected(true);
+                if(polarToggle != null) {
+                    polarToggle.setSelected(true);
                 }
                 break;
             case RADIAL:
                 treeLayout = new RadialTreeLayout();
-                if(toggle3 != null) {
-                    toggle3.setSelected(true);
+                if(radialToggle != null) {
+                    radialToggle.setSelected(true);
                 }
                 break;
             default:
@@ -616,8 +586,8 @@ public class TreeViewer extends JPanel implements Printable {
         double cx = position.getX() + (0.5 * extentSize.getWidth());
         double cy = position.getY() + (0.5 * extentSize.getHeight());
 
-        double rx = ((double) newSize.getWidth()) / viewportSize.getWidth();
-        double ry = ((double) newSize.getHeight()) / viewportSize.getHeight();
+        double rx = newSize.getWidth() / viewportSize.getWidth();
+        double ry = newSize.getHeight() / viewportSize.getHeight();
 
         double px = (cx * rx) - (extentSize.getWidth() / 2.0);
         double py = (cy * ry) - (extentSize.getHeight() / 2.0);
@@ -759,8 +729,6 @@ public class TreeViewer extends JPanel implements Printable {
                 inputFile = new java.io.File(chooser.getDirectory(), chooser.getFile());
                 chooser.dispose();
             }
-
-            assert inputFile != null;
 
 //        TreeImporter importer = new NewickImporter(new FileReader(inputFile));
             Reader reader = new BufferedReader(new FileReader(inputFile));
