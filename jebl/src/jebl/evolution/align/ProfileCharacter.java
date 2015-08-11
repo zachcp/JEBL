@@ -139,24 +139,29 @@ public class ProfileCharacter {
     }
 
     public static float score(ProfileCharacter character1, ProfileCharacter character2, Scores scores) {
-        float score = 0;
-        int totalCharacters = character1.totalCharacters*character2.totalCharacters;
+        double score = 0;
+        long totalCharacters = ((long)character1.totalCharacters)*character2.totalCharacters;
         if(totalCharacters == 1) {
             return scores.score
                     [ character1.characters [0]]
                     [ character2.characters [0]];
         }
+        if (totalCharacters==0)
+            throw new IllegalStateException("totalCharacters shouldn't be 0 for "+character1 +" and "+character2);
         for (int i = 0; i < character1.numberOfUniqueCharacters; i++) {
             for (int j = 0; j < character2.numberOfUniqueCharacters; j++) {
                 // one of these can be an empty array for some reason (bug 3472) - spreading over multiple lines to see which one, next time the bug occurs.
                 char char1 = character1.characters[i];
                 char char2 = character2.characters[j];
-                int count = (character1.count[i] * character2.count[j]);
+                long count = ((long)character1.count[i]) * character2.count[j];
                 // TT: score is a 128x128 array, so we assume the character is ASCII - is this safe?
-                score += scores.score[char1][char2] * count;
+                score += ((double)scores.score[char1][char2]) * count;
             }
         }
-        return score/totalCharacters;
+        float result = (float) (score / totalCharacters);
+        if (Float.isNaN(result) || Float.isInfinite(result))
+            throw new IllegalStateException("Got "+result+" for "+character1+" and "+character2+" from "+score+" and "+totalCharacters);
+        return result;
     }
 
     public static float scoreSelf(ProfileCharacter character, Scores scores) {
