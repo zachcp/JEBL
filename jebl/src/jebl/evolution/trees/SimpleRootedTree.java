@@ -100,7 +100,9 @@ final public class SimpleRootedTree implements RootedTree {
             newNode.setAttribute(e.getKey(), e.getValue());
         }
         // }
-        setHeight(newNode, tree.getHeight(node));
+        if (tree.hasHeights()) {
+            setHeight(newNode, tree.getHeight(node));
+        }
 
         return newNode;
     }
