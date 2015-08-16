@@ -115,7 +115,7 @@ public class RootedFromUnrooted implements RootedTree {
 	}
 
 	public boolean hasHeights() {
-		return false;
+		return true;
 	}
 
 	private double findNodeHeightFromTips(Node node) {
