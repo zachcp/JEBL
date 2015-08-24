@@ -43,6 +43,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private final PainterIntent intent;
     private int consensusSupportIndex;
     private boolean containsConsensusSupport;
+    //todo probably change the group below to include visibility attributes
     protected static final String[] attributesToNotDisplay = new String[] {TreeViewerUtilities.KEY_NODE_COLOR, TreeViewerUtilities.KEY_LABEL_FONT, "size", "first residues"};
 
     private final String isOpenKey;
@@ -55,7 +56,8 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     public enum PainterIntent {
         NODE,
         BRANCH,
-        TIP
+        TIP,
+        COLLAPSED
     }
 
     public BasicLabelPainter(String title, RootedTree tree, PainterIntent intent, int defaultSize) {
@@ -224,6 +226,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return null;
     }
 
+    public PainterIntent getIntent() {
+        return intent;
+    }
 
     public float getFontSize() {
         return defaultFontSize;

@@ -19,10 +19,7 @@ import jebl.evolution.trees.TransformedRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
-import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
-import jebl.gui.trees.treeviewer.painters.Painter;
-import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
-import jebl.gui.trees.treeviewer.painters.TaxonLabelPainter;
+import jebl.gui.trees.treeviewer.painters.*;
 import jebl.gui.trees.treeviewer.treelayouts.PolarTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RadialTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
@@ -275,6 +272,10 @@ public class TreeViewer extends JPanel implements Printable {
                 new BasicLabelPainter("Branch Labels", tree, BasicLabelPainter.PainterIntent.BRANCH, defaultLabelSize);
 
         treePane.setBranchLabelPainter(branchLabelPainter.getAttributes().length > 0 ? branchLabelPainter : null);
+
+        CollapsedNodeLabelPainter collapsedNodeLabelPainter = new CollapsedNodeLabelPainter(tree);
+        treePane.setCollapsedNodeLabelPainter(collapsedNodeLabelPainter);
+
         treePane.setScaleBarPainter(new ScaleBarPainter());
 
         // load appropriate tree layout from preferences and set it

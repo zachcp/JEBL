@@ -38,14 +38,15 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
                                   Rectangle2D labelBounds, AffineTransform transform, int priority,
                                   Node nodeSizeReference, BasicLabelPainter painter,
                                   String dtype) {
-        this(tree, node, taxonLabelJustification, labelBounds, transform, priority, nodeSizeReference, (Painter<Node>)painter, dtype);
+        this(tree, node, taxonLabelJustification, labelBounds, transform, priority, nodeSizeReference, (Painter<Node>)painter, dtype, painter.getIntent().equals(BasicLabelPainter.PainterIntent.COLLAPSED));
     }
 
     TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
-                                  Rectangle2D labelBounds, AffineTransform transform, int priority,
-                                  Node nodeSizeReference, Painter<Node> painter,
-                                  String dtype) {
+                                 Rectangle2D labelBounds, AffineTransform transform, int priority,
+                                 Node nodeSizeReference, Painter<Node> painter,
+                                 String dtype, boolean isAutoContracted) {
         super(node, labelBounds, transform, priority);
+        this.setIsAutoContracted(isAutoContracted);
 
         defaultBounds = labelBounds;
         this.nodeSizeReference = nodeSizeReference != null ? nodeSizeReference : node;
@@ -152,5 +153,9 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
 
     public int getMaxSize() {
         return defaultSize;
+    }
+
+    public boolean isAutoContracted() {
+        return isAutoContracted;
     }
 }

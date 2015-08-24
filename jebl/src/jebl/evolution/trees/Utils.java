@@ -636,13 +636,20 @@ public final class Utils {
      * @return the number of external nodes under this node.
      */
     public static int getExternalNodeCount(RootedTree tree, Node node) {
-
-        final List<Node> children = tree.getChildren(node);
-        if (children.size() == 0) return 1;
-
+        Stack<Node> countStack = new Stack<Node>();
         int externalNodeCount = 0;
-        for (Node child : children) {
-            externalNodeCount += getExternalNodeCount(tree, child);
+
+        countStack.push(node);
+        while (!countStack.isEmpty()) {
+            Node current = countStack.pop();
+            final List<Node> children = tree.getChildren(current);
+            if (children.size() == 0) {
+                externalNodeCount++;
+            } else {
+                for (Node child : children) {
+                    countStack.push(child);
+                }
+            }
         }
 
         return externalNodeCount;

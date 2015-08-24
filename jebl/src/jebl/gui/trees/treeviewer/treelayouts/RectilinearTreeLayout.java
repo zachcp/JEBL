@@ -12,7 +12,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -49,26 +52,6 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
 
     public boolean alignTaxa() {
         return alignTaxonLabels;
-    }
-
-    public Shape getCollapsedNode(Node node, double ratio) {
-        Node first = node;
-        while( ! tree.isExternal(first) ) {
-            first = tree.getChildren(first).get(0);
-        }
-        Node last = node;
-        while( ! tree.isExternal(last) ) {
-            final List<Node> children = tree.getChildren(last);
-            last = children.get(children.size()- 1);
-        }
-
-        final Point2D c1 = getNodePoint(first);
-        final Point2D cn = getNodePoint(last);
-        final Point2D n = getNodePoint(node);
-        final double dy = cn.getY() - c1.getY();
-        final double dx = cn.getX() - n.getX();   assert dx >= 0.0 && dy >= 0;
-
-        return new Rectangle2D.Double(n.getX(), n.getY() + (c1.getY() - n.getY()) * ratio, dx * ratio, dy * ratio);
     }
 
     public int getNodeMarkerRadiusUpperLimit(Node node, AffineTransform transform) {

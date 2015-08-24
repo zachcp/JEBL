@@ -8,10 +8,7 @@ import jebl.evolution.trees.TransformedRootedTree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.decorators.RgbBranchDecorator;
-import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
-import jebl.gui.trees.treeviewer.painters.Painter;
-import jebl.gui.trees.treeviewer.painters.PainterListener;
-import jebl.gui.trees.treeviewer.painters.ScaleBarPainter;
+import jebl.gui.trees.treeviewer.painters.*;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
@@ -47,10 +44,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public Point mouseLocation = new Point(0,0);
     private String referenceSequenceName;
-
-    public final static String collapsedAttributeName = "&collapsed";
-    public final static String visibleAttributeName = "&visible";
+    public final static String KEY_INVISIBLE_NODE = "&visible";
+    public final static String KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE = "&visibleInAutocollapse";
+    public final static String KEY_MAX_DISTANCE_TO_ANCESTOR = "&KEY_MAX_DISTANCE_TO_ANCESTOR";
     static final boolean OLD_SCALE_CODE = false;
+    private Set<Node> manuallyExpanded = new HashSet<Node>(); //Any node that the user has explicitly expanded by double clicking
+    private Set<Node> manuallyCollapsed = new HashSet<Node>(); //Any node that the user has explicitly collapsed by double clicking
+
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
@@ -110,6 +110,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         nodesInOrder = Utils.getNodes(tree, tree.getRootNode());
         treeLayout.setTree(tree);
 
+        setDistancesToAncestorsForAutoExpansion();
         calibrated = false;
         invalidate();
         repaint();
@@ -192,14 +193,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             repaint();
             getPrefs().putBoolean(showRootPREFSkey, showingRootBranch);
         }
-    }
-
-    public void setAutoExpansion(final boolean auto) {
-        this.autoExpantion = auto;
-        setTreeAttributesForAutoExpansion();
-        //calibrated = false;
-        repaint();
-        getPrefs().putBoolean(autoExPREFSkey, auto);
     }
 
     public boolean isShowingTaxonCallouts() {
@@ -353,72 +346,96 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     private boolean isNodeVisible(Node node) {
-        return node.getAttribute(visibleAttributeName) == null;
+        if (autoCollapseNodes) {
+            return node.getAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE) == null && node.getAttribute(KEY_INVISIBLE_NODE) == null;
+        } else {
+            return node.getAttribute(KEY_INVISIBLE_NODE) == null;
+        }
     }
 
     private boolean isNodeCollapsed(Node node) {
-         return node.getAttribute(collapsedAttributeName) != null;
+         return manuallyCollapsed.contains(node) || (autoCollapseNodes && isBelowCollapseDistanceThreshold(node) && !manuallyExpanded.contains(node));
     }
 
-    private void setCladeVisisblty(final Node node, final boolean visible) {
-        for( final Node child : tree.getChildren(node) ) {
-            if( visible ) {
-                child.removeAttribute(visibleAttributeName);
+    private boolean isBelowCollapseDistanceThreshold(Node node) {
+        if (tree.isExternal(node)) return isBelowCollapseDistanceThreshold(tree.getParent(node));
+        Object distanceToAncestor = node.getAttribute(KEY_MAX_DISTANCE_TO_ANCESTOR);
+        double distance;
+        if (distanceToAncestor != null && distanceToAncestor instanceof Double) {
+            distance = (Double) distanceToAncestor;
+            if (distance < cladeDistanceThresholdToCollapse) {
+                return true;
             } else {
-                child.setAttribute(visibleAttributeName, Boolean.TRUE);
+                return false;
             }
-            // leave collapsed subtress alone
+        } else {
+            throw new IllegalArgumentException("Internal node encountered with no distance element");
+        }
+    }
 
-            if( ! isNodeCollapsed(child) ) {
-                setCladeVisisblty(child, visible);
+    private void setCladeVisibility(final Node node, final boolean isExpandingNode) {
+        for( final Node child : tree.getChildren(node) ) {
+            if( isExpandingNode ) {
+                child.removeAttribute(KEY_INVISIBLE_NODE); //Parent was collapsed but now is expanding, child set to visible
+                child.removeAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE); //Parent was collapsed but now is expanding, child set to visible
+                    if (manuallyCollapsed.contains(child)) {
+                        manuallyCollapsed.remove(child);
+                    }
+                    manuallyExpanded.add(child); //This means expanding a node will expand all its children down to the leaves
+            } else {
+                child.setAttribute(KEY_INVISIBLE_NODE, Boolean.TRUE); //This makes the child INVISIBLE
+                if (manuallyExpanded.contains(child)) {
+                    manuallyExpanded.remove(child); //if parent is being manually collapsed, remove its kids from this list.
+                }
+            }
+
+            if (!manuallyCollapsed.contains(child)) { //won't expand nodes that have been manually collapsed, but WILL expand nodes that are only autocollapsed
+                setCladeVisibility(child, isExpandingNode);
+            }
+
+            //Node was manually collapsed - we want its children to retain that state too
+            if (!isExpandingNode ) {
+                manuallyCollapsed.add(child);
             }
         }
     }
 
-
-    private void expandContract(final Node selectedNode) {
-         assert selectedNode != null;
-
-        // no point for non internal nodes
+    public void manuallyToggleExpandContract(final Node selectedNode) {
         if( tree.isExternal(selectedNode) ) return;
+        if (!canSelectNode(selectedNode)) return;
 
-        final boolean wasCollapsed = selectedNode.getAttribute(collapsedAttributeName) != null;
-        if( wasCollapsed )  {
-            selectedNode.removeAttribute(collapsedAttributeName);
+        final boolean wasCollapsed = isNodeCollapsed(selectedNode);
+        if( wasCollapsed )  { //it was collapsed earlier, so is now manually expanded
+            manuallyCollapsed.remove(selectedNode);
+            manuallyExpanded.add(selectedNode);
+            manuallyExpanded.addAll(getParentsToRoot(selectedNode)); //This lets a node stay expended even when it's parents are autocollapsed
+
+        } else { //it wasn't collapsed before, so is now manually collapsed
+            manuallyExpanded.remove(selectedNode);
+            manuallyCollapsed.add(selectedNode);
         }
         // node should not be in collapsed mode when calling this
-        setCladeVisisblty(selectedNode, wasCollapsed);
-        if( !wasCollapsed ) {
-            selectedNode.setAttribute(collapsedAttributeName, Boolean.TRUE);
-        }
-        //fireSelectionChanged();
-        calibrated = false; // labels visibility may change
+        setCladeVisibility(selectedNode, wasCollapsed);
+
+        calibrated = false;
+        manualListChanged();
         repaint();
     }
 
-    void toggleExpandContract(final Node selectedNode) {
-        if( canSelectNode(selectedNode) ) {
-            autoExpantion = false;
-            autoEx.setSelected(false);
-            expandContract(selectedNode);
+    private void manualListChanged() {
+        if (collapsedNodeLabelPainter != null) {
+            collapsedNodeLabelPainter.setNumberManualNodes(manuallyExpanded.size() + manuallyCollapsed.size());
         }
     }
 
-    private void setTreeAttributesForAutoExpansion() {
-        for( Node node : nodesInOrder ) {
-            node.removeAttribute(collapsedAttributeName);
-            node.removeAttribute(visibleAttributeName);
+    private Collection<? extends Node> getParentsToRoot(Node selectedNode) {
+        ArrayList<Node> parentNodes = new ArrayList<Node>();
+        Node currentParent = tree.getParent(selectedNode);
+        while (currentParent != null) {
+            parentNodes.add(currentParent);
+            currentParent = tree.getParent(currentParent);
         }
-
-        if( autoExpantion ) {
-            Set<Node> ignore = new HashSet<Node>();
-            for( Node node : nodesInOrder ) {
-                if( !ignore.contains(node) && node.getAttribute(collapsedAttributeName + "-auto") != null ) {
-                    expandContract(node);   // todo problem (repints)
-                    ignore.addAll(Utils.getNodes(tree, node));
-                }
-            }
-        }
+        return parentNodes;
     }
 
     /**
@@ -500,6 +517,23 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
+    public Painter<Node> getCollapsedNodeLabelPainter() {
+        return collapsedNodeLabelPainter;
+    }
+
+    public void setCollapsedNodeLabelPainter(CollapsedNodeLabelPainter collapsedNodeLabelPainter) {
+        if (this.collapsedNodeLabelPainter != null) {
+            this.collapsedNodeLabelPainter.removePainterListener(this);
+        }
+        this.collapsedNodeLabelPainter = collapsedNodeLabelPainter;
+        if (this.collapsedNodeLabelPainter != null) {
+            this.collapsedNodeLabelPainter.addPainterListener(this);
+        }
+        controlPalette.fireControlsChanged();
+        calibrated = false;
+        repaint();
+    }
+
     public ScaleBarPainter getScaleBarPainter() {
         return scaleBarPainter;
     }
@@ -561,7 +595,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     // result[0] is the selected node
     // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
     // direction, null otherwise
-    Node[] getNodeAt(Point point) {
+    Node[] getNodeAt(Point point, Graphics2D g2) {
         if(point == null) {
             return null;
         }
@@ -569,7 +603,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             point = new Point(getWidth()-point.x, point.y);
         }
 
-        final Graphics2D g2 = (Graphics2D)getGraphics();
+        if (g2 == null) g2 = (Graphics2D)getGraphics();
         Node[] result = new Node[2];
 
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
@@ -647,15 +681,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         }
-
-//        for (Node node : tree.getExternalNodes()) {
-//            //  incorrect - some lables may have been reduced in size
-//            // need to get rid of taxonLabelBounds, ormake sure it is correct
-//            Shape taxonLabelBound = taxonLabelBounds.get(tree.getTaxon(node));
-//            if (taxonLabelBound != null && g2.hit(rect, taxonLabelBound, false)) {
-//                nodes.add(node);
-//            }
-//        }
 
         Node[] allNodes = tree.getNodes().toArray(new Node[0]);
         for(int i=allNodes.length-1; i >= 0; i--){
@@ -863,22 +888,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             });
             optionsPanel.addComponentWithLabel("Line Weight:", spinner);
 
-            autoEx = new JCheckBox("Auto subtree contract");
-            autoEx.setToolTipText("Automatically contract subtrees when there is not enough space on-screen");
-            optionsPanel.addComponent(autoEx);
-
-            autoExpantion = prefs.getBoolean(autoExPREFSkey, false);
-            autoEx.setSelected(autoExpantion);
-            autoEx.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-                    // we don't need to do this if we hover, right :)
-                    final boolean b = autoEx.isSelected();
-                    if( b != autoExpantion ) {
-                        setAutoExpansion(b);
-                    }
-                }
-            });
-
             final JCheckBox subTreeShowJB = new JCheckBox("Show selected subtree only");
             subTreeShowJB.setToolTipText("Only the selected part of the tree is shown");
             viewSubtree = prefs.getBoolean(viewSubtreePREFSkey, false);
@@ -911,6 +920,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if (getBranchLabelPainter() != null) {
             controlsList.addAll(getBranchLabelPainter().getControls(detachPrimaryCheckbox));
+        }
+
+        if (getCollapsedNodeLabelPainter() != null) {
+            controlsList.addAll(getCollapsedNodeLabelPainter().getControls(detachPrimaryCheckbox));
         }
 
         if (getScaleBarPainter() != null) {
@@ -975,7 +988,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.setPaint(oldPaint);
             g2.setStroke(oldStroke);
         }
+        treePainted = true;
     }
+    public boolean treePainted = false;
 
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 
@@ -1008,24 +1023,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
 
         Shape nodeMarker = getNodeMarker(node, circDiameter);
-
-        if( isNodeCollapsed(node) ) {
-           // final Color c = isSelected ? selectionPaint : branch;
-          //  g2.setColor(c);
-            if( isSelected ) g2.setPaint(selectionPaint);
-            final Shape cn = treeLayout.getCollapsedNode(node, .25);
-            final Shape transformedShape = transform.createTransformedShape(cn);
-
-            //we want to draw if the clade is selected, or if the mouse is close
-           // if(!alwaysDrawNodeMarkers && !nodeMarkerClip.contains(mouseLocation) && ! transformedShape.contains(mouseLocation) && !isSelected)
-           //     return;
-
-            final Stroke save = g2.getStroke();
-            g2.setStroke(collapsedStroke);
-            g2.draw(transformedShape);
-            g2.setStroke(save);
-
-        }
 
         Point correctedMouseLocation = flipTree ? new Point(getWidth()-mouseLocation.x, mouseLocation.y) : mouseLocation;
 
@@ -1107,6 +1104,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if(scaleBarPainter != null)
             scaleBarPainter.setPaintAsMirrorImage(flipTree);
+
+        if(collapsedNodeLabelPainter != null)
+            collapsedNodeLabelPainter.setPaintAsMirrorImage(flipTree);
 
         // this is a problem since paint draws some stuff before which print does not
         g2.setColor(Color.WHITE);
@@ -1193,7 +1193,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if (showingRootBranch || node != rootNode) {
                 if( !isNodeVisible(node) ) continue;
                 if( hideNode(node) ) continue;
-
+                if ( !tree.isRoot(node) && isNodeCollapsed(node) && isNodeCollapsed(tree.getParent(node))) continue;
                 if( !tree.isExternal(node) ) {
                     final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
                     g2.setStroke(branchLineStroke);
@@ -1255,15 +1255,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! preElementDrawCode ) {
             for( TreeDrawableElement e : treeElements ) {
-                if(e.isVisible() || !drawOnlyVisibleElements){
-                    //e.setForeground(new RgbBranchDecorator().getBranchPaint(tree, node));
-
-//                    if(selectedNodes.contains(e.getNode())){
-//                        e.setForeground(Color.blue);
-//                    }
-//                    else{
-//                        e.setForeground(Color.black);
-//                    }
+                if((e.isVisible() || !drawOnlyVisibleElements)){
                     Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
                     if(flipTree && viewRect != null) {
                         viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
@@ -1278,7 +1270,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
           nodeMarker(g2, rootNode, drawAllNodeMarkers);
         }
 
-        Node[] nodeAt = getNodeAt(mouseLocation);
+        Node[] nodeAt = getNodeAt(mouseLocation, g2);
         if (nodeAt != null && nodeAt.length > 0 && nodeAt[0] != null) {
             nodeMarker(g2, nodeAt[0], true);
         }
@@ -1345,7 +1337,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final Set<Node> externalNodes = tree.getExternalNodes();
         Node nodeWithLongestTaxon = null;
 
-        TreeBoundsHelper tbh =
+        TreeBoundsHelper treeBoundsHelper =
                 new TreeBoundsHelper(externalNodes.size() + 2*tree.getNodes().size(), availableW, availableH,
                         treeBounds);
 
@@ -1378,7 +1370,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
 
                 //System.out.println("For " + tree.getTaxon(node).getName())
-                tbh.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
+                treeBoundsHelper.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
 
                 if(OLD_SCALE_CODE) {
                     final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
@@ -1406,7 +1398,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
                     final double labelWidth = nodeLabelPainter.getWidth(g2, node);
 
-                    tbh.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
 
                     if(OLD_SCALE_CODE) {
                         Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
@@ -1434,7 +1426,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     final double labelHeight = branchLabelPainter.getHeightBound(g2, node);
                     final double labelWidth = branchLabelPainter.getWidth(g2, node);
 
-                    tbh.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
 
                     if(OLD_SCALE_CODE) {
                         Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
@@ -1463,11 +1455,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             //availableH = height - insets.top - insets.bottom;
         }
 
-        final double[] doubles = tbh.getOrigionAndScale(false);
+        final double[] doubles = treeBoundsHelper.getOrigionAndScale(false);
         double yorigion = doubles[0];
         double yScale = doubles[1];
 
-        final double[] xdoubles = tbh.getOrigionAndScale(true);
+        final double[] xdoubles = treeBoundsHelper.getOrigionAndScale(true);
         double xorigion = xdoubles[0];
         double xScale = xdoubles[1];
 
@@ -1514,9 +1506,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 yOffset = ((height - (treeBounds.getHeight() * yScale)) / 2) - (treeBounds.getY() * yScale);
             } else {
 
-                if( tbh.getRange(true, xorigion, yScale) <= availableW ) {
+                if( treeBoundsHelper.getRange(true, xorigion, yScale) <= availableW ) {
                 //if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
-                    xorigion = tbh.getOrigion(true, yScale);
+                    xorigion = treeBoundsHelper.getOrigion(true, yScale);
                     treeScale = yScale;
                 } else {
                     double size;
@@ -1524,14 +1516,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     String oldValues = "";
                     //count is here to make sure we don't get an infinite loop if there is no scale that will
                     //allow the tree to be contained in the current view
-                    while((size = tbh.getRange(false, yorigion, xScale)) > availableH && count < 10){
+                    while((size = treeBoundsHelper.getRange(false, yorigion, xScale)) > availableH && count < 10){
                         xScale *= availableH/size;
                         yorigion = yOffset;
                         count++;
                     }
-                    //todo: this was removed assert tbh.getRange(false, yorigion, xScale) <= availableH : tbh.getRange(false, yorigion, xScale)+" : "+availableH+" : "+oldValues;
+                    //todo: this was removed assert treeBoundsHelper.getRange(false, yorigion, xScale) <= availableH : treeBoundsHelper.getRange(false, yorigion, xScale)+" : "+availableH+" : "+oldValues;
                     //assert yorigion + xScale * treeBounds.getHeight() <= availableH;
-                    yorigion = tbh.getOrigion(false, xScale);
+                    yorigion = treeBoundsHelper.getOrigion(false, xScale);
                     treeScale  = xScale;
                 }
 
@@ -1540,10 +1532,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                 xOffset = xorigion - treeBounds.getX() * treeScale;
                 yOffset = yorigion - treeBounds.getY() * treeScale;
-                double xRange = tbh.getRange(true, xorigion, treeScale);
+                double xRange = treeBoundsHelper.getRange(true, xorigion, treeScale);
                 final double dx = (availableW - xRange)/2;
                 xOffset += dx;
-                double yRange = tbh.getRange(false, yorigion, treeScale);
+                double yRange = treeBoundsHelper.getRange(false, yorigion, treeScale);
                 final double dy = (availableH - yRange)/2;
                 yOffset += dy; //  > 0 ? dy : 0;
                 //System.out.println("xof/yof " + xOffset + "/" + yOffset);
@@ -1584,48 +1576,72 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final double xl = transform.getTranslateX() + transform.getScaleX() * treeBounds.getX();
         final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
 
-        // Get the bounds for the actual scaled tree (not anymore)
-        //treeBounds = null;
-        {
-            Set<Node> small = new HashSet<Node>();
+        treeElements.clear();
+
+        if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
+            autoCollapseNodes = collapsedNodeLabelPainter.isCollapsed();
+            double newThreshold = collapsedNodeLabelPainter.getCollapsedDistanceThreshold();
+            double oldThreshold = cladeDistanceThresholdToCollapse;
+            cladeDistanceThresholdToCollapse = newThreshold;
+            boolean wantToResetNodeStates = collapsedNodeLabelPainter.isResetCollapseState();
+
+            if (wantToResetNodeStates) {
+                resetManuallyCollapsedOrExpandedNodes();
+            }
+            if (wantToResetNodeStates || !(Math.abs(newThreshold - oldThreshold) < 0.0001)) { //If the distance has changed, work out what is now visible
+                resetNodeVisibilities();
+            }
+
+            // Iterate though all nodes
             for (Node node : tree.getNodes()) {
-                if( hideNode(node) ) continue;
+                if (hideNode(node) || !isNodeVisible(node)) {
+                    continue;
+                }
+                //We draw a label for this node if it is collapsed and it's parent isn't
+                if (isNodeCollapsed(node) && (tree.isRoot(node) || !isNodeCollapsed(tree.getParent(node)))) {
+                    final double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
 
-//                if (showingRootBranch || node != rootNode) {
-//                    final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
-//                    final Rectangle2D bounds2D = branchPath.getBounds2D();
-//                    if (treeBounds == null) {
-//                        treeBounds = bounds2D;
-//                    } else {
-//                        treeBounds.add(bounds2D);
-//                    }
-//                }
+                    // Get the line that represents the orientation of node label
+                    final Line2D labelPath = treeLayout.getNodeLabelPath(node);
 
-                node.removeAttribute(collapsedAttributeName + "-auto");
-                if( ! small.contains(node) && treeLayout.smallSubTree(node, transform) ) {
-                    node.setAttribute(collapsedAttributeName + "-auto", Boolean.TRUE);
-                    small.addAll(Utils.getNodes(tree, node));
+                    if (labelPath != null) {
+                        final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
+                        final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
+
+                        // Work out how it is rotated and create a transform that matches that
+                        AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
+
+                        Painter.Justification justification =
+                                (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
+
+                        final TreeDrawableElementNodeLabel e =
+                                new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
+                                        null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node");
+
+                        Color nodeColor = Color.red;
+                        e.setForeground(nodeColor);
+                        treeElements.add(e);
+                    }
                 }
             }
         }
+
 
         // Clear previous values of taxon label bounds and transforms
         taxonLabelBounds.clear();
         taxonLabelTransforms.clear();
         taxonLabelJustifications.clear();
-        treeElements.clear();
 
         List<TreeDrawableElement> taxonLabels = new ArrayList<TreeDrawableElement>();
         if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
 
             // Iterate though the external nodes
             for (Node node : externalNodes) {
+                if (hideNode(node) || !isNodeVisible(node)) continue;
 
                 double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
                 Rectangle2D labelBounds = (nodeWithLongestTaxon == null) ? null :
                     new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
-
-                if( hideNode(node) || !isNodeVisible(node) ) continue;
 
                 final Taxon taxon = tree.getTaxon(node);
                 if( nodeWithLongestTaxon == null ) {
@@ -1662,7 +1678,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
                                                          nodeWithLongestTaxon, taxonLabelPainter,
-                        null);
+                        null, false);
 
                 Object colorAttr = node.getAttribute("nodeColor");
                 if(colorAttr != null){
@@ -1683,11 +1699,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
 
-
             // Iterate though all nodes
             for (Node node : tree.getNodes()) {
+                if( hideNode(node) || !isNodeVisible(node) || isNodeCollapsed(node) ) continue;
                 final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
-                if( hideNode(node) || !isNodeVisible(node) ) continue;
 
                 // Get the line that represents the orientation of node label
                 final Line2D labelPath = treeLayout.getNodeLabelPath(node);
@@ -1729,20 +1744,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
-
-           // float sss = ((BasicLabelPainter)branchLabelPainter).getFontSize();
-       //     for(int k = 0; k < 2; ++k) {
-//                if(k == 0)  ((BasicLabelPainter)branchLabelPainter).setFontSize(((BasicLabelPainter)branchLabelPainter).getFontMinSize(), false) ;
-//                if(k == 1)  ((BasicLabelPainter)branchLabelPainter).setFontSize(sss, false) ;
-
             branchLabelPainter.calibrate(g2);
 
-
-            //System.out.println("transform " + transform);
-
             for( Node node : tree.getNodes() ) {
-                final double labelHeight = branchLabelPainter.getPreferredHeight(g2, node);
                 if( hideNode(node) || !isNodeVisible(node) ) continue;
+                final double labelHeight = branchLabelPainter.getPreferredHeight(g2, node);
 
                 // Get the line that represents the path for the branch label
                 final Line2D labelPath = treeLayout.getBranchLabelPath(node);
@@ -1809,9 +1815,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         // unused at the moment
         //calloutPaths.clear();
 
-        if( autoExpantion ) {
-            setTreeAttributesForAutoExpansion();
-            // some nodes may switched to non visible
+        if(autoCollapseNodes) {
+            // some nodes may have switched to non visible
             for(int k = 0; k < treeElements.size(); ++k) {
                 final TreeDrawableElement e = treeElements.get(k);
                 assert ! hideNode(e.getNode());
@@ -1828,8 +1833,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //        System.err.println("Clash " + (System.currentTimeMillis() - now));
 
         //this block of code makes sure that all labels are the same size
-        //so that users don't thing that some labels are more important than others
-        calibrated = true;
+        //so that users don't think that some labels are more important than others
         float size = Float.MAX_VALUE;
         for(TreeDrawableElement element : taxonLabels){
             if(element.getCurrentSize() < size){
@@ -1842,12 +1846,91 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             element.setSize((int)size,g2);
         }
         treeElements.addAll(taxonLabels);
-
-
-
+        calibrated = true;
 //        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
 
+    private void resetManuallyCollapsedOrExpandedNodes() {
+        manuallyExpanded.clear();
+        for (Node node : manuallyCollapsed) {
+            node.removeAttribute(KEY_INVISIBLE_NODE);
+        }
+        manuallyCollapsed.clear();
+        manualListChanged();
+    }
+
+    private void resetNodeVisibilities() {
+        for (Node node : nodesInOrder) {
+            if (!tree.isRoot(node) && !manuallyExpanded.contains(node) && !manuallyExpanded.contains(tree.getParent(node)) && isBelowCollapseDistanceThreshold(node) && isBelowCollapseDistanceThreshold(tree.getParent(node))) {
+                node.setAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE, Boolean.TRUE);
+            } else {
+                node.removeAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE);
+            }
+        }
+    }
+
+    /**
+     * Sets a qualifier on each internal node that holds the max distance between that node and its
+     * furthest child node. O(n) in size of tree
+     */
+    private void setDistancesToAncestorsForAutoExpansion() {
+        Set<Node> alreadyLookedAt = new HashSet<Node>();
+        for (Node node : tree.getExternalNodes()) {
+            if(!alreadyLookedAt.contains(node)){
+                setDistanceAndParentDistances(node);
+                alreadyLookedAt.add(node);
+            }
+        }
+    }
+
+    /**
+     * Set the distance of an internal node as the max distance between it and any of its ancestors.
+     * Iterates up the tree as far as it can, setting longest distances to ancestors on nodes.
+     * IF this method is called once for every tip in a tree, the entire tree will be traversed and have these values applied
+     * @param tip
+     */
+    private void setDistanceAndParentDistances(Node tip) {
+        final String childrenMeasuredKey = "numberChildrenDistancesMeasured";
+        Node currentChild = tip;
+        Node currentParent = tree.getParent(tip);
+
+        while (currentParent != null) {
+//            double distanceFromChildToParent = tree.getLength(currentChild);
+            double distanceFromChildToParent = originalTree.hasLengths() ? originalTree.getLength(currentChild) : 1.0;
+
+            double distanceBelowCurrentChild = 0.0;
+            Object distanceBelowCurrentChildObject = currentChild.getAttribute(KEY_MAX_DISTANCE_TO_ANCESTOR);
+            if (distanceBelowCurrentChildObject != null && distanceBelowCurrentChildObject instanceof Double) {
+                distanceBelowCurrentChild = (Double) distanceBelowCurrentChildObject;
+            }
+
+
+            double longestDistanceSoFar = 0.0;
+            Object longestDistanceSoFarObject = currentParent.getAttribute(KEY_MAX_DISTANCE_TO_ANCESTOR);
+            if (longestDistanceSoFarObject != null && longestDistanceSoFarObject instanceof Double) {
+                longestDistanceSoFar = (Double) longestDistanceSoFarObject;
+            }
+
+            longestDistanceSoFar = Math.max(longestDistanceSoFar, distanceBelowCurrentChild + distanceFromChildToParent);
+            currentParent.setAttribute(KEY_MAX_DISTANCE_TO_ANCESTOR, longestDistanceSoFar);
+
+            int childrenDone = 0;
+            Object childrenDoneAttribute = currentParent.getAttribute(childrenMeasuredKey);
+            if (childrenDoneAttribute != null && childrenDoneAttribute instanceof Integer) {
+                childrenDone = (Integer) childrenDoneAttribute;
+            }
+            currentParent.setAttribute(childrenMeasuredKey, childrenDone + 1);
+
+            //if this is the last child that needs to be processed for this node, go up a level and check there too
+            if (childrenDone + 1 == tree.getChildren(currentParent).size()) {
+                currentParent.removeAttribute(childrenMeasuredKey);
+                currentChild = currentParent;
+                currentParent = tree.getParent(currentChild);
+            } else {
+                break;
+            }
+        }
+    }
 
     private AffineTransform calculateTransform(AffineTransform globalTransform, Line2D line,
                                                double width, double height, boolean just) {
@@ -2141,17 +2224,20 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private ScaleBarPainter scaleBarPainter = null;
     private Rectangle2D scaleBarBounds = null;
 
+    private CollapsedNodeLabelPainter collapsedNodeLabelPainter;
+
     private Stroke branchLineStroke = new BasicStroke(1.0F);
-    private Stroke collapsedStroke = new BasicStroke(3.0F);
+    private Stroke collapsedStroke = new BasicStroke(1.5F); //the stroke used to draw collapsed node shapes
     private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
     private boolean calibrated = false;
+    private double cladeDistanceThresholdToCollapse = 0.0;
 
     // Transform which scales the tree from it's own units to pixles and moves it to center of window
     private AffineTransform transform = null;
 
     private boolean showingRootBranch = true;
-    private boolean autoExpantion = false;
+    private boolean autoCollapseNodes = false;
     private boolean showingTaxonCallouts = true;
 
     private Map<Taxon, AffineTransform> taxonLabelTransforms = new HashMap<Taxon, AffineTransform>();
@@ -2179,7 +2265,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private String branchOrderingPREFSkey = "branchOrdering";
     private String orderBranchesPREFSkey = "orderBranches";
     private String showRootPREFSkey = "showRootBranch";
-    private String autoExPREFSkey = "autoExpansion";
+    private String autoExPREFSkey = "autoCollapseNodes";
     private String viewSubtreePREFSkey = "viewSubtree";
     private String branchWeightPREFSkey = "branchWeight";
     private static Preferences getPrefs() {

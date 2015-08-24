@@ -3,7 +3,6 @@ package jebl.gui.trees.treeviewer.treelayouts;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.Utils;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
@@ -14,7 +13,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -57,64 +55,6 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
     public boolean alignTaxa() {
         return false;
-    }
-
-    public Shape getCollapsedNode(Node node, double ratio) {
-        Node first = node;
-        while( ! tree.isExternal(first) ) {
-            first = tree.getChildren(first).get(0);
-        }
-        Node last = node;
-        while( ! tree.isExternal(last) ) {
-            final List<Node> children = tree.getChildren(last);
-            last = children.get(children.size()- 1);
-        }
-
-        final Point2D n = getNodePoint(node);
-
-        double maxDistanceOfTaxaFromNode = 0.0;
-        for( Node n1 : Utils.getNodes(tree, node) ) {
-            if( tree.isExternal(n1) ) {
-                 final Point2D d = getNodePoint(n1);
-
-                final double v = d.distanceSq(n);
-                maxDistanceOfTaxaFromNode = Math.max(v, maxDistanceOfTaxaFromNode);
-            }
-        }
-        maxDistanceOfTaxaFromNode = Math.sqrt(maxDistanceOfTaxaFromNode);
-
-        final Point2D c1 = getNodePoint(first);
-        final Point2D cn = getNodePoint(last);
-
-        // Origin of graphic system is top left, with Y axis flowing the wrong way, while atan2 and
-        // arc drawing follow the conventional way - henece dy's need to be reversed
-        final double dy = -(cn.getY() - n.getY());
-        final double dx = (cn.getX() - n.getX());
-        final double angle1 = Math.atan2(dy, dx);
-
-        final double dy1 = -(c1.getY() - n.getY());
-        final double dx1 = (c1.getX() - n.getX());
-        final double angle2 = Math.atan2(dy1, dx1);
-
-        final Arc2D.Float arc = new Arc2D.Float();
-        final double radToDeg = (180 / Math.PI);
-
-        double arcStartAngle = angle1 * radToDeg;
-        if( arcStartAngle < 0 ) arcStartAngle += 360;
-
-        double angExt = angle2 - angle1;
-        if( angExt < 0 ) angExt += 2*Math.PI;
-        double arcSpan = radToDeg * angExt;
-
-//        System.out.println("first (to) " + tree.getTaxon(first).getName() + " last (from) " +  tree.getTaxon(last).getName());
-//        System.out.println(" angle1 " + angle1 * (180/Math.PI) + " angle2 " + angle2 * (180/Math.PI));
-//        System.out.println(" from " + st + " ext " + angExt1 + " end " + en);
-//        System.out.println(" dx last " + dx + " " + dy + " dx first " + dx1 + " " + dy1);
-
-        final double radius = maxDistanceOfTaxaFromNode * ratio;
-        arc.setArcByCenter(n.getX(), n.getY(), radius, arcStartAngle, arcSpan, Arc2D.PIE);
-
-        return arc;
     }
 
     private double distToNode( Point2D nodeLoc, Node to, AffineTransform transform) {

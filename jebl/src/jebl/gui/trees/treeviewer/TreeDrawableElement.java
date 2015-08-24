@@ -50,10 +50,19 @@ public abstract class TreeDrawableElement {
     }
 
     boolean visible = true;
+    protected boolean isAutoContracted;
 
     public void setVisible(boolean visible) { this.visible = visible; }
 
     public boolean isVisible() {  return visible; }
+
+    public void setIsAutoContracted(boolean isAutoContracted) {
+        this.isAutoContracted = isAutoContracted;
+    }
+
+    public boolean isAutoContracted() {
+        return isAutoContracted;
+    }
 
     public void setForeground(Paint p){
         this.foreground = p;
@@ -122,7 +131,7 @@ public abstract class TreeDrawableElement {
     static int prints = 0;
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
-        if(elements.size() > Short.MAX_VALUE) {
+        if(true || elements.size() > 500) {
             return; // this method has terrible performance on large data sets
         }
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);

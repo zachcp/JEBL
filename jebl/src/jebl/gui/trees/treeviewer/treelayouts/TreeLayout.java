@@ -127,8 +127,6 @@ public interface TreeLayout extends ControlsProvider {
 
     Shape getCalloutPath(Node node);
 
-    Shape getCollapsedNode(Node node, double ratio);
-
     int getNodeMarkerRadiusUpperLimit(Node node, AffineTransform transform);
 
     boolean smallSubTree(Node node, AffineTransform transform);

@@ -73,11 +73,6 @@ public class PolarTreeLayout extends AbstractTreeLayout {
         return false;
     }
 
-    public Shape getCollapsedNode(Node node, double ratio) {
-        final Point2D nodePoint = getNodePoint(node);
-        return new Line2D.Double(nodePoint.getX(), nodePoint.getY(), nodePoint.getX() + .01, nodePoint.getY());
-    }
-
     public boolean smallSubTree(Node node, AffineTransform transform) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
