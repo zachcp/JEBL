@@ -1,6 +1,8 @@
 package jebl.gui.trees.treeviewer;
 
 import jebl.evolution.graphs.Node;
+import jebl.util.Bounds;
+import jebl.util.QuadTree;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -12,7 +14,7 @@ import java.util.List;
  * @author Joseph Heled
  * @version $Id$
  */
-public abstract class TreeDrawableElement {
+public abstract class TreeDrawableElement implements QuadTree.Item {
     final protected Node node;
     protected Paint foreground;
 
@@ -82,9 +84,9 @@ public abstract class TreeDrawableElement {
 
     public abstract String getDebugName();
 
-    protected abstract void drawIt(Graphics2D g2);
+    protected abstract void drawIt(Graphics2D g2, String filterText);
 
-    public final void draw(Graphics2D g2, Shape viewRect) {
+    public final void draw(Graphics2D g2, Shape viewRect, String filterText) {
         boolean doit = true;
         if( viewRect != null ) {
             final Rectangle2D d = getBounds();
@@ -94,7 +96,7 @@ public abstract class TreeDrawableElement {
             doit = viewRect.intersects(d);
         }
         if( doit ) {
-            drawIt(g2);
+            drawIt(g2, filterText);
         }
     }
 
@@ -130,10 +132,31 @@ public abstract class TreeDrawableElement {
     static boolean smallAsserts = false;
     static int prints = 0;
 
+    @Override
+    public Bounds getBoundsForQuadTree() {
+        return new Bounds(getBounds());
+    }
+
+    static void newSetOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
+//        if (true) return;
+        long start = System.currentTimeMillis();
+        QuadTree<TreeDrawableElement> quadTree = new QuadTree<TreeDrawableElement>(elements);
+
+        for (TreeDrawableElement element : elements) {
+            final boolean intersectsAnything = quadTree.hasIntersection(element);
+            element.setVisible(!intersectsAnything);
+        }
+        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
+    }
+
+
+
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
-        if(true || elements.size() > 500) {
+        if(elements.size() > 200) {
             return; // this method has terrible performance on large data sets
         }
+        long start = System.currentTimeMillis();
+
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
 
         // get variance of each "axis of projection" (x y and distance-from origin) and element maximum along each
@@ -458,6 +481,8 @@ public abstract class TreeDrawableElement {
             }
         }
         ascheck(list);
+        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
+
     }
 
     private static void ascheck(List<TreeDrawableElement> list) {

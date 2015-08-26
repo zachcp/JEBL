@@ -94,7 +94,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
             final double dx = newBounds.getWidth() - bounds.getWidth();
             final double dy = newBounds.getHeight() - bounds.getHeight();
 
-            bounds = newBounds;
+            setBounds(newBounds);
             if( taxonLabelJustification != Painter.Justification.CENTER ) {
                 transform.translate(taxonLabelJustification == Painter.Justification.RIGHT ? -dx : 0 , -dy/2);
             } else {
@@ -120,19 +120,22 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         return curSize;
     }
 
-    protected void drawIt(Graphics2D g2) {
+    protected void drawIt(Graphics2D g2, String filterText) {
         AffineTransform oldTransform = g2.getTransform();
-
+        boolean containsFiltertext = true;
         g2.transform(transform);
         float s = 1.0f;
+
         if(painter instanceof BasicLabelPainter) {
             BasicLabelPainter basicPainter = (BasicLabelPainter)painter;
             s = basicPainter.getFontSize();
             if( basicPainter.setFontSize(curSize, false) ) {
                 painter.calibrate(g2);
             }
+            containsFiltertext = basicPainter.matchesFilter(node, filterText);
+
         }
-        painter.setForeground(foreground);
+        painter.setForeground(containsFiltertext ? foreground : Color.LIGHT_GRAY);
         painter.paint(g2, node, taxonLabelJustification, bounds);
 
         if(painter instanceof BasicLabelPainter) {

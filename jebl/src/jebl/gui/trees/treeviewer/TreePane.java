@@ -50,6 +50,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     static final boolean OLD_SCALE_CODE = false;
     private Set<Node> manuallyExpanded = new HashSet<Node>(); //Any node that the user has explicitly expanded by double clicking
     private Set<Node> manuallyCollapsed = new HashSet<Node>(); //Any node that the user has explicitly collapsed by double clicking
+    private String filterText = "";
+    private List<Node> currentFilterNodes = new ArrayList<Node>();
+    private int currentFilterNodeIndex;
 
 
     public TreePane() {
@@ -401,24 +404,30 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void manuallyToggleExpandContract(final Node selectedNode) {
-        if( tree.isExternal(selectedNode) ) return;
-        if (!canSelectNode(selectedNode)) return;
+        final boolean shouldExpand = isNodeCollapsed(selectedNode);
+        manuallyToggleExpandContract(selectedNode, shouldExpand);
+    }
 
-        final boolean wasCollapsed = isNodeCollapsed(selectedNode);
-        if( wasCollapsed )  { //it was collapsed earlier, so is now manually expanded
+    public void manuallyToggleExpandContract(final Node selectedNode, boolean expand) {
+        if( expand )  { //it was collapsed earlier, so is now manually expanded
             manuallyCollapsed.remove(selectedNode);
             manuallyExpanded.add(selectedNode);
-            manuallyExpanded.addAll(getParentsToRoot(selectedNode)); //This lets a node stay expended even when it's parents are autocollapsed
 
+            //This lets a node stay expended even when it's parents are autocollapsed
+            List<Node> parentsToRoot = getParentsToRoot(selectedNode);
+            for (Node node : parentsToRoot) {
+                manuallyExpanded.add(node);
+                manuallyCollapsed.remove(node);
+            }
         } else { //it wasn't collapsed before, so is now manually collapsed
             manuallyExpanded.remove(selectedNode);
             manuallyCollapsed.add(selectedNode);
         }
         // node should not be in collapsed mode when calling this
-        setCladeVisibility(selectedNode, wasCollapsed);
+        setCladeVisibility(selectedNode, expand);
 
-        calibrated = false;
         manualListChanged();
+        calibrated = false;
         repaint();
     }
 
@@ -428,7 +437,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
     }
 
-    private Collection<? extends Node> getParentsToRoot(Node selectedNode) {
+    private List<Node> getParentsToRoot(Node selectedNode) {
         ArrayList<Node> parentNodes = new ArrayList<Node>();
         Node currentParent = tree.getParent(selectedNode);
         while (currentParent != null) {
@@ -1142,7 +1151,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 continue;
             }
 
-            final Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
+            Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
+
+            if (!filterText.equals("")) {
+                paint = Color.LIGHT_GRAY;
+            }
+
             g2.setPaint(paint);
 
             if (showingTaxonCallouts && showingTaxonLables) {
@@ -1198,8 +1212,12 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
                     g2.setStroke(branchLineStroke);
 
-                    final Paint paint =
+                    Paint paint =
                             branchDecorator != null ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
+
+                    if (!filterText.equals("")) {
+                        paint = Color.LIGHT_GRAY;
+                    }
 
                     g2.setPaint(paint);
 
@@ -1260,7 +1278,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     if(flipTree && viewRect != null) {
                         viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
                     }
-                    e.draw(g2, viewRect);
+                    e.draw(g2, viewRect, filterText);
                 }
             }
         }
@@ -1861,10 +1879,14 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     private void resetNodeVisibilities() {
         for (Node node : nodesInOrder) {
-            if (!tree.isRoot(node) && !manuallyExpanded.contains(node) && !manuallyExpanded.contains(tree.getParent(node)) && isBelowCollapseDistanceThreshold(node) && isBelowCollapseDistanceThreshold(tree.getParent(node))) {
+            if (tree.isRoot(node)) continue;
+            boolean isManuallyExpanded = manuallyExpanded.contains(node) || manuallyExpanded.contains(tree.getParent(node));
+            if (!isManuallyExpanded && isBelowCollapseDistanceThreshold(node) && isBelowCollapseDistanceThreshold(tree.getParent(node))) {
                 node.setAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE, Boolean.TRUE);
             } else {
                 node.removeAttribute(KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE);
+                if (isManuallyExpanded) node.removeAttribute(KEY_INVISIBLE_NODE);
+//
             }
         }
     }
@@ -1981,6 +2003,42 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     public void setReferenceSequenceName(String referenceSequenceName) {
         this.referenceSequenceName = referenceSequenceName;
     }
+
+    public void setFilterText(String filterText) {
+        this.filterText = filterText;
+        currentFilterNodes.clear();
+        for (Node node : tree.getExternalNodes()) {
+            BasicLabelPainter painter = (BasicLabelPainter) taxonLabelPainter;
+            if (painter.matchesFilter(node, filterText)) {
+                currentFilterNodes.add(node);
+            }
+        }
+        currentFilterNodeIndex = currentFilterNodes.size() - 1;
+        repaint();
+    }
+
+    public void jumpToNextFilterMatch(boolean forwards) {
+        if (currentFilterNodes.size() == 0) return;
+
+        if (forwards) {
+            currentFilterNodeIndex ++;
+            if (currentFilterNodeIndex==currentFilterNodes.size()) {
+                currentFilterNodeIndex = 0;
+            }
+        } else {
+            currentFilterNodeIndex --;
+            if (currentFilterNodeIndex == -1) {
+                currentFilterNodeIndex = currentFilterNodes.size() - 1;
+            }
+        }
+        Node toJumpTo = currentFilterNodes.get(currentFilterNodeIndex);
+        if (isNodeCollapsed(toJumpTo)) {
+            manuallyToggleExpandContract(toJumpTo, true);
+            resetNodeVisibilities();
+        }
+        setSelectedNode(toJumpTo);
+        fireSelectionChanged();
+     }
 
     private class TreeBoundsHelper {
         private double[] xbounds;

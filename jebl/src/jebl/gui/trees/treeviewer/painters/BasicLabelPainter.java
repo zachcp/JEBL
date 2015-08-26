@@ -187,20 +187,18 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return taxonLabelFont;
     }
 
-    protected String getLabel(Node node) {
+    public String getLabel(Node node) {
         String prefix = " ";
         String suffix = " ";
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
             return prefix+tree.getTaxon(node).getName()+suffix;
         }
 
-        if( tree instanceof RootedTree ) {
-            final RootedTree rtree = (RootedTree) tree;
-
+        if(tree != null) {
             if (attribute.equalsIgnoreCase(NODE_HEIGHTS) ) {
-                return prefix+getFormattedValue(rtree.getHeight(node))+suffix;
+                return prefix+getFormattedValue(tree.getHeight(node))+suffix;
             } else if (attribute.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-                return prefix+getFormattedValue(rtree.getLength(node))+suffix;
+                return prefix+getFormattedValue(tree.getLength(node))+suffix;
             }
         }
 
@@ -591,6 +589,17 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     public void getSettings(ControlsSettings settings) {
+    }
+
+    public boolean matchesFilter(Node node, String filterText) {
+        if (filterText.equals("")) return true;
+        String label = getLabel(node);
+        if (label != null) {
+            if (label.toLowerCase().contains(filterText.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Controls controls = null;

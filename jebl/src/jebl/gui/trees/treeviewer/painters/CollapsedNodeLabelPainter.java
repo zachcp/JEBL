@@ -11,13 +11,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
- * TODO: Write some javadoc
+ * Draws labels for nodes whose subtree have been collapsed. Also provides controls for auto-collapsing subtrees
  *
  * @author Sebastian Dunn
  *         Created on 10/08/15 3:05 PM
@@ -33,11 +31,12 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private boolean resetCollapseState = false;
     private int numberManualNodes;
     private JButton resetButton;
+    private Map<Node, Integer> externalNodesUnderNode = new HashMap<Node, Integer>();
 
     public CollapsedNodeLabelPainter(RootedTree tree) {
         super("Collapsed Node Labels", tree, PainterIntent.COLLAPSED, 12);
-        collapsedDistanceThreshold = getPrefs().getDouble(KEY_COLLAPSE_THRESHOLD, 0.1);
-        isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 100));
+        collapsedDistanceThreshold = getPrefs().getDouble(KEY_COLLAPSE_THRESHOLD, 0.0);
+        isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 1000));
         isCollapsed = isCollapsedDefault;
         Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_ANCESTOR);
         double distance;
@@ -51,7 +50,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     @Override
-    protected String getLabel(Node node) {
+    public String getLabel(Node node) {
         Node first = node;
         while( ! tree.isExternal(first) ) {
             final List<Node> children = tree.getChildren(first);
@@ -64,13 +63,16 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         } else {
             throw new IllegalStateException("Collapsed Node encountered with no distance to lowest ancestor");
         }
-        return tree.getTaxon(first).getName() + " and " + countExternalNodesUnderNode(node) + " others (max distance from ancestor: " + String.format("%.3f", distance) + ")";
+        return tree.getTaxon(first).getName() + " and " + countExternalNodesUnderNode(node) + " others (" + String.format("%.3f", distance) + ")";
     }
 
     private int countExternalNodesUnderNode(Node node) {
         if (tree.isExternal(node)) {
             return 0;
         }
+        Integer cachedValue = externalNodesUnderNode.get(node);
+        if (cachedValue != null) return cachedValue;
+
         Stack<Node> stack = new Stack<Node>();
         int count  = 0;
         stack.push(node);
@@ -84,6 +86,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
                 }
             }
         }
+        externalNodesUnderNode.put(node, count);
         return count;
     }
 

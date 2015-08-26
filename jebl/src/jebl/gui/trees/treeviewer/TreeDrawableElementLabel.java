@@ -14,7 +14,9 @@ import java.awt.geom.Rectangle2D;
  */
 public abstract class TreeDrawableElementLabel extends TreeDrawableElement {
     protected Rectangle2D bounds;
-    protected AffineTransform transform;
+    final protected AffineTransform transform;
+    private Shape lableShape;
+    private Rectangle2D transformedBounds;
     private int priority;
 
     public TreeDrawableElementLabel(Node node, Rectangle2D labelBounds, AffineTransform transform, int priority) {
@@ -38,15 +40,27 @@ public abstract class TreeDrawableElementLabel extends TreeDrawableElement {
     }
     
     public Rectangle2D getBounds() {
-        Rectangle oldBounds = getLableShape().getBounds();
-        if(oldBounds == null) {
-            return null;
+        if (transformedBounds == null) {
+            Rectangle oldBounds = getLableShape().getBounds();
+            if (oldBounds == null) {
+                return null;
+            }
+            transformedBounds = new Rectangle2D.Double(oldBounds.getX(), oldBounds.getY() + 0.15*oldBounds.getHeight(), oldBounds.getWidth(), 0.6* oldBounds.getHeight());
         }
-        return new Rectangle2D.Double(oldBounds.getX(), oldBounds.getY() + 0.15*oldBounds.getHeight(), oldBounds.getWidth(), 0.6* oldBounds.getHeight());
+        return  transformedBounds;
     }
 
     private Shape getLableShape() {
-        return transform.createTransformedShape(bounds);
+        if (lableShape == null) {
+            lableShape = transform.createTransformedShape(bounds);
+        }
+        return lableShape;
+    }
+
+    public void setBounds(Rectangle2D bounds) {
+        this.bounds = bounds;
+        transformedBounds = null;
+        lableShape = null;
     }
 
     public int getPriority() {
