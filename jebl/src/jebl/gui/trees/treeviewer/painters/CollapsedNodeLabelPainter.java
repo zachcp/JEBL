@@ -111,7 +111,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 //                    if (source.getValueIsAdjusting()) return; //Don't change the tree while the JSlider is still adjusting
                     double value = collapseSlider.getValue() / (double) 100;
                     if (Math.abs(value - collapsedDistanceThreshold) > 0.0001) setCollapsedDistanceThreshold(value);
-                    getPrefs().putInt(KEY_COLLAPSE_THRESHOLD, collapseSlider.getValue());
+                    getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, value);
                 }
             });
 
@@ -132,14 +132,12 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
             resetButton = new JButton("Reset state of 0 nodes");
             resetButton.setToolTipText("Reset the state of nodes that have been manually expanded or contracted");
-
             resetButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     resetNodeCollapseStates();
                 }
             });
-
             optionsPanel.addComponent(resetButton);
 
             controls = new Controls("Subtree Collapse", optionsPanel, true, false, collapseCheckbox);
