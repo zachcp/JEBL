@@ -32,6 +32,9 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private int numberManualNodes;
     private JButton resetButton;
     private Map<Node, Integer> externalNodesUnderNode = new HashMap<Node, Integer>();
+    private JButton helpButton;
+    private OptionsPanel optionsPanel;
+    private JSlider collapseSlider;
 
     public CollapsedNodeLabelPainter(RootedTree tree) {
         super("Collapsed Node Labels", tree, PainterIntent.COLLAPSED, 12);
@@ -95,29 +98,18 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     @Override
+    /**
+     * This controls method only sets up the default checkbox and leaves a reference
+     * to the options panel for later. When setHelpButton() is called the rest of the
+     * components are made and added.
+     */
     public List<Controls> getControls(boolean detachPrimaryCheckbox) {
         List<Controls> controlsList = new ArrayList<Controls>();
 
         if (controls == null) {
-            OptionsPanel optionsPanel = new OptionsPanel();
+            optionsPanel = new OptionsPanel();
 
-            final JSlider collapseSlider = new JSlider(SwingConstants.HORIZONTAL, 0, collapseSliderMax, 0);
-            collapseSlider.setValue((int) (collapsedDistanceThreshold * 100));
-
-
-            collapseSlider.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent changeEvent) {
-//                    JSlider source = (JSlider) changeEvent.getSource();
-//                    if (source.getValueIsAdjusting()) return; //Don't change the tree while the JSlider is still adjusting
-                    double value = collapseSlider.getValue() / (double) 100;
-                    if (Math.abs(value - collapsedDistanceThreshold) > 0.0001) setCollapsedDistanceThreshold(value);
-                    getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, value);
-                }
-            });
-
-            optionsPanel.addComponentWithLabel("Subtree Distance:", collapseSlider, true);
-
-            final JCheckBox collapseCheckbox = new JCheckBox("Automatically Contract Subtrees");
+            final JCheckBox collapseCheckbox = new JCheckBox(helpTitle);
             collapseCheckbox.setSelected(isCollapsedDefault);
             collapseCheckbox.setToolTipText("Automatically collapse subtrees when there is not enough space on-screen");
 
@@ -129,16 +121,6 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
                     }
                 }
             });
-
-            resetButton = new JButton("Reset state of 0 nodes");
-            resetButton.setToolTipText("Reset the state of nodes that have been manually expanded or contracted");
-            resetButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    resetNodeCollapseStates();
-                }
-            });
-            optionsPanel.addComponent(resetButton);
 
             controls = new Controls("Subtree Collapse", optionsPanel, true, false, collapseCheckbox);
         }
@@ -185,4 +167,59 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             resetButton.setText("Reset state of " + numberManualNodes + " nodes");
         }
     }
+
+    public void setHelpButton(JButton help) {
+        helpButton = help;
+        finishSettingUpControlPanel();
+    }
+
+    /**
+     * Controls are created and given to the treePane above in getControls(), but
+     * can't be fully populated until we have the help button. To fit with the theme,
+     * the help button has to be created in TreeDocumentViewer with access to the PublicAPI,
+     * then passed down to here to finish the panel.
+     */
+    private void finishSettingUpControlPanel() {
+        createCollapseSlider();
+        createResetButton();
+
+        Box sliderBox = Box.createHorizontalBox();
+        sliderBox.add(collapseSlider);
+        sliderBox.add(Box.createHorizontalStrut(5));
+        sliderBox.add(helpButton);
+
+        optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
+        optionsPanel.addComponent(resetButton, false);
+    }
+
+    private void createCollapseSlider() {
+        collapseSlider = new JSlider(SwingConstants.HORIZONTAL, 0, collapseSliderMax, 0);
+        collapseSlider.setValue((int) (collapsedDistanceThreshold * 100));
+        collapseSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+//                    JSlider source = (JSlider) changeEvent.getSource();
+//                    if (source.getValueIsAdjusting()) return; //Don't change the tree while the JSlider is still adjusting
+                double value = collapseSlider.getValue() / (double) 100;
+                if (Math.abs(value - collapsedDistanceThreshold) > 0.0001) setCollapsedDistanceThreshold(value);
+                getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, value);
+            }
+        });
+    }
+
+    private void createResetButton() {
+        resetButton = new JButton("Reset state of 0 nodes");
+        resetButton.setToolTipText("Reset the state of nodes that have been manually expanded or contracted");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resetNodeCollapseStates();
+            }
+        });
+    }
+
+    public static String helpTitle = "Automatically Collapse Subtrees";
+    public static String helpText = "When <b>Automatically Collapse Subtrees</b> is enabled, groups of similar nodes will be collapsed into a single node that represents that subtree. "
+            + "The size of the subtrees is determined by the <b>Subtree Distance</b> slider. Use this option to help navigate trees with many nodes and tips.\n\n"
+            + "Double-clicking a node in a tree will force it to expand or contract. <b>Automatically Collapse Subtrees</b> will not override this state. "
+            + "To reset the state of all the nodes in the tree, click <b>Reset state of X nodes</b>, where <b>X</b> is the number of nodes with a forced expanded or collapsed state.";
 }

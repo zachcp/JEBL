@@ -458,7 +458,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     public void setTaxonLabelPainter(BasicLabelPainter taxonLabelPainter) {
-        setTaxonLabelPainter((Painter<Node>)taxonLabelPainter);
+        setTaxonLabelPainter((Painter<Node>) taxonLabelPainter);
     }
 
     public void setTaxonLabelPainter(Painter<Node> taxonLabelPainter) {
@@ -2039,6 +2039,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         setSelectedNode(toJumpTo);
         fireSelectionChanged();
      }
+
+    public void setCollapsedNodeHelp(JButton help) {
+        collapsedNodeLabelPainter.setHelpButton(help);
+    }
 
     private class TreeBoundsHelper {
         private double[] xbounds;
