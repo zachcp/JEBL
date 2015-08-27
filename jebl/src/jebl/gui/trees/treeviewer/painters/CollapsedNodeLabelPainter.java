@@ -219,7 +219,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
     public static String helpTitle = "Automatically Collapse Subtrees";
     public static String helpText = "When <b>Automatically Collapse Subtrees</b> is enabled, groups of similar nodes will be collapsed into a single node that represents that subtree. "
-            + "The size of the subtrees is determined by the <b>Subtree Distance</b> slider. Use this option to help navigate trees with many nodes and tips.\n\n"
+            + "The maximum distance within the subtrees is determined by the <b>Subtree Distance</b> slider. Use this option to help navigate trees with many nodes and tips.\n\n"
             + "Double-clicking a node in a tree will force it to expand or contract. <b>Automatically Collapse Subtrees</b> will not override this state. "
-            + "To reset the state of all the nodes in the tree, click <b>Reset state of X nodes</b>, where <b>X</b> is the number of nodes with a forced expanded or collapsed state.";
+            + "To reset the state of double-clicked nodes in the tree, click <b>Reset state of X nodes</b>. <b>X</b> is the number of nodes with a manually expanded or collapsed state.";
 }
