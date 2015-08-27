@@ -1610,35 +1610,37 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 resetNodeVisibilities();
             }
 
-            // Iterate though all nodes
-            for (Node node : tree.getNodes()) {
-                if (hideNode(node) || !isNodeVisible(node)) {
-                    continue;
-                }
-                //We draw a label for this node if it is collapsed and it's parent isn't
-                if (isNodeCollapsed(node) && (tree.isRoot(node) || !isNodeCollapsed(tree.getParent(node)))) {
-                    final double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
+            if (collapsedNodeLabelPainter.areLabelsVisible()) {
+                // Iterate though all nodes
+                for (Node node : tree.getNodes()) {
+                    if (hideNode(node) || !isNodeVisible(node)) {
+                        continue;
+                    }
+                    //We draw a label for this node if it is collapsed and it's parent isn't
+                    if (isNodeCollapsed(node) && (tree.isRoot(node) || !isNodeCollapsed(tree.getParent(node)))) {
+                        final double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
 
-                    // Get the line that represents the orientation of node label
-                    final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+                        // Get the line that represents the orientation of node label
+                        final Line2D labelPath = treeLayout.getNodeLabelPath(node);
 
-                    if (labelPath != null) {
-                        final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
-                        final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
+                        if (labelPath != null) {
+                            final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
+                            final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
 
-                        // Work out how it is rotated and create a transform that matches that
-                        AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
+                            // Work out how it is rotated and create a transform that matches that
+                            AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
 
-                        Painter.Justification justification =
-                                (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
+                            Painter.Justification justification =
+                                    (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
 
-                        final TreeDrawableElementNodeLabel e =
-                                new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
-                                        null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node");
+                            final TreeDrawableElementNodeLabel e =
+                                    new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
+                                            null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node");
 
-                        Color nodeColor = Color.red;
-                        e.setForeground(nodeColor);
-                        treeElements.add(e);
+                            Color nodeColor = Color.red;
+                            e.setForeground(nodeColor);
+                            treeElements.add(e);
+                        }
                     }
                 }
             }
