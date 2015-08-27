@@ -13,7 +13,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.awt.*;
 
-public abstract class AbstractFrame extends JFrame implements Exportable {
+public abstract class AbstractFrame extends JeblFrame implements Exportable {
 
     private JMenuBar menuBar = null;
     private boolean isDirty = false;

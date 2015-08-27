@@ -195,7 +195,7 @@ public abstract class Application {
     public DocumentFrame doOpen() {
         Frame frame = getDefaultFrame();
         if (frame == null) {
-            frame = new JFrame();
+            frame = new JeblFrame();
         }
 
         FileDialog dialog = new FileDialog(frame,
