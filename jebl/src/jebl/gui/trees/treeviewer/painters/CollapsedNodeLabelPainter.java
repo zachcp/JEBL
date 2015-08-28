@@ -46,7 +46,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 1000));
         isCollapsed = isCollapsedDefault;
         areLabelsVisible = getPrefs().getBoolean(KEY_SHOW_COLLAPSE_LABELS, true);
-        Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_ANCESTOR);
+        Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT);
         double distance;
         if (distanceObject != null && distanceObject instanceof Double) {
             distance = (Double) distanceObject;
@@ -64,7 +64,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             final List<Node> children = tree.getChildren(first);
             first = children.get(0);
         }
-        Object distanceObject = node.getAttribute(TreePane.KEY_MAX_DISTANCE_TO_ANCESTOR);
+        Object distanceObject = node.getAttribute(TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT);
         Double distance;
         if (distanceObject != null && distanceObject instanceof Double) {
             distance = (Double) distanceObject;
@@ -184,9 +184,9 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
     /**
      * Controls are created and given to the treePane above in getControls(), but
-     * can't be fully populated until we have the help button. To fit with the theme,
-     * the help button has to be created in TreeDocumentViewer with access to the PublicAPI,
-     * then passed down to here to finish the panel.
+     * can't be fully populated until we have the help button. Here we finish
+     * creating the components and adding them to the options panel, which the
+     * tree viewer already has.
      */
     private void finishSettingUpControlPanel() {
         createCollapseSlider();
@@ -199,7 +199,6 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         sliderBox.add(helpButton);
 
         optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
-//        optionsPanel.addComponentWithLabel("Show Collapsed Node Labels:", showLabelsCheckBox, true);
         optionsPanel.addComponent(showLabelsCheckBox, true);
         optionsPanel.addComponent(resetButton, false);
     }
