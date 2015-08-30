@@ -71,7 +71,9 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         } else {
             throw new IllegalStateException("Collapsed Node encountered with no distance to lowest ancestor");
         }
-        return tree.getTaxon(first).getName() + " and " + (countExternalNodesUnderNode(node) - 1) + " others (" + String.format("%.3f", distance) + ")";
+
+        final int extraNodes = countExternalNodesUnderNode(node) - 1;
+        return tree.getTaxon(first).getName() + " and " + extraNodes + " other" + (extraNodes == 1 ? "" : "s") + " (" + String.format("%.3f", distance) + ")";
     }
 
     private int countExternalNodesUnderNode(Node node) {
