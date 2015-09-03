@@ -128,7 +128,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
                         getPrefs().putInt("root length",slider1.getValue());
                     }
                 });
-                slider1.setValue(prefs.getInt("root length",0));
+                slider1.setValue(prefs.getInt("root length",slider1.getValue()));
                 optionsPanel.addComponentWithLabel("Root Length:", slider1, true);
             }
 
@@ -385,7 +385,7 @@ public class RectilinearTreeLayout extends AbstractTreeLayout {
     private double xProportion = 1.0;
     private double yProportion = 1.0;
 
-    private double rootLength = 0.01;
+    private double rootLength = 0.02;
 
     private boolean alignTaxonLabels = false;
 }
