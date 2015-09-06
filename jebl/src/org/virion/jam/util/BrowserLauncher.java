@@ -216,6 +216,7 @@ public class BrowserLauncher {
 		loadedWithoutErrors = true;
 		String osName = System.getProperty("os.name");
 		if (osName.startsWith("Mac OS")) {
+			// JEBL only supports Java 5 so should be MRJ_3_1+.  Assume that 3.1 and later versions of MRJ work the same.
 			jvm = MRJ_3_1;
 		} else if (osName.startsWith("Windows")) {
 			if (osName.indexOf("9") != -1) {
