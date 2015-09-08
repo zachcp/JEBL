@@ -4,6 +4,7 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
+import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
@@ -44,7 +45,15 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private int consensusSupportIndex;
     private boolean containsConsensusSupport;
     //todo probably change the group below to include visibility attributes
-    protected static final String[] attributesToNotDisplay = new String[] {TreeViewerUtilities.KEY_NODE_COLOR, TreeViewerUtilities.KEY_LABEL_FONT, "size", "first residues"};
+    protected static final String[] attributesToNotDisplay = new String[] {
+            TreeViewerUtilities.KEY_NODE_COLOR,
+            TreeViewerUtilities.KEY_LABEL_FONT,
+            "size",
+            "first residues",
+            TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT,
+            TreePane.KEY_INVISIBLE_NODE,
+            TreePane.KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE
+    };
 
     private final String isOpenKey;
 
