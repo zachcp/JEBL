@@ -196,7 +196,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return taxonLabelFont;
     }
 
-    public String getLabel(Node node) {
+    public String getLabel(Node node, boolean truncateLabel) {
         String prefix = " ";
         String suffix = " ";
         if (attribute.equalsIgnoreCase(TAXON_NAMES)) {
@@ -231,6 +231,10 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             return prefix+s+suffix;
         }
         return null;
+    }
+
+    public String getNonTruncatedLabel(Node node) {
+        return getLabel(node, false);
     }
 
     public PainterIntent getIntent() {
@@ -291,7 +295,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     public double getWidth(Graphics2D g2, Node item) {
-        final String label = getLabel(item);
+        final String label = getLabel(item, true);
         if( label != null ) {
             final Font oldFont = g2.getFont();
             g2.setFont(taxonLabelFont);
@@ -363,7 +367,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         g2.setPaint(foreground);
         g2.setFont(taxonLabelFont);
 
-        final String label = getLabel(item);
+        final String label = getLabel(item, true);
         if (label != null) {
             String prefix = label;
             String suffix = "";
@@ -602,7 +606,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
     public boolean matchesFilter(Node node, String filterText) {
         if (filterText.equals("")) return true;
-        String label = getLabel(node);
+        String label = getNonTruncatedLabel(node);
         if (label != null) {
             if (label.toLowerCase().contains(filterText.toLowerCase())) {
                 return true;

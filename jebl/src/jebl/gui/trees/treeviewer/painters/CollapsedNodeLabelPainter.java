@@ -58,7 +58,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     @Override
-    public String getLabel(Node node) {
+    public String getLabel(Node node, boolean truncateLabel) {
         Node first = node;
         while( ! tree.isExternal(first) ) {
             final List<Node> children = tree.getChildren(first);

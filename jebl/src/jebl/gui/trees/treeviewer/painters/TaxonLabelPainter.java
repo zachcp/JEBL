@@ -58,10 +58,10 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     }
 
-    public String getLabel(Node node){
+    public String getLabel(Node node, boolean truncateLabel){
         List<String> attributeValues = new ArrayList<String>();
         for(String s : selectedAttributes) {
-            String value = getLabel(node, s);
+            String value = getLabel(node, s, truncateLabel);
             if(value != null) {
                 attributeValues.add(value);
             }
@@ -83,17 +83,29 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return value;
     }
 
-    public String getLabel(Node node, String attributeName){
+    public String getLabel(Node node, String attributeName, boolean truncateLabel){
         String prefix = " ";
         String suffix = " ";
         if (attributeName.equalsIgnoreCase(TAXON_NAMES)) {
-            return prefix+limitString(tree.getTaxon(node).getName())+suffix;
+            if(truncateLabel) {
+                return prefix + limitString(tree.getTaxon(node).getName()) + suffix;
+            } else {
+                return prefix + tree.getTaxon(node).getName() + suffix;
+            }
         }
 
         if (attributeName.equalsIgnoreCase(NODE_HEIGHTS) ) {
-            return prefix+limitString(getFormattedValue(tree.getHeight(node)))+suffix;
+            if(truncateLabel) {
+                return prefix + limitString(getFormattedValue(tree.getHeight(node))) + suffix;
+            } else {
+                return prefix + getFormattedValue(tree.getHeight(node)) + suffix;
+            }
         } else if (attributeName.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-            return prefix+limitString(getFormattedValue(tree.getLength(node)))+suffix;
+            if(truncateLabel) {
+                return prefix + limitString(getFormattedValue(tree.getLength(node))) + suffix;
+            } else {
+                return prefix + getFormattedValue(tree.getLength(node)) + suffix;
+            }
         }
 
         Object value = node.getAttribute(attributeName);
@@ -115,7 +127,12 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     return String.format("%.6f - %.6f", (Double)_value[0], (Double)_value[1]);
                 }
             }
-            String s = limitString(value.toString());
+            String s;
+            if(truncateLabel) {
+                s = limitString(value.toString());
+            } else {
+                s = value.toString();
+            }
             //limit node labels to 15 chars (plus ...)
             //if(s.length() > 15)
             //    return s.substring(0,15)+"...";
@@ -158,7 +175,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         g2.setFont(taxonLabelFont);
 
 
-        final String label = getLabel(item);
+        final String label = getLabel(item, true);
         if (label != null) {
             String prefix = label;
             String suffix = "";
@@ -211,7 +228,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     public double getWidth(Graphics2D g2, Node item) {
         FontMetrics fm = getCurrentFontMetricsForGraphicsAndNode(g2, item);
-        String label = getLabel(item);
+        String label = getLabel(item, true);
         return label == null ? 0 : fm.getStringBounds(label, g2).getWidth();
     }
 

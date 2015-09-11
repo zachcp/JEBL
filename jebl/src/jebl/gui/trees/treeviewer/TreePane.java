@@ -2076,8 +2076,51 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             resetNodeVisibilities();
         }
         setSelectedNode(toJumpTo);
+        focusViewerOnNode(toJumpTo);
         fireSelectionChanged();
      }
+
+    /**
+     * Focuses the viewport on the specified node
+     * @param node node to focus on
+     */
+    private void focusViewerOnNode(Node node) {
+        Point2D nodeCoords = nodeCoord(node);
+        if(viewport != null) {
+            // +++commencing black magic. Beware of snooping paladins+++
+            double nodeX = nodeCoords.getX();
+            double nodeY = nodeCoords.getY();
+            Point viewportMidPoint = new Point(
+                    (int)(viewport.getViewRect().getX() + (viewport.getWidth() / 2.0)),
+                    (int)(viewport.getViewRect().getY() + (viewport.getHeight() / 2.0)));
+            double halfViewportWidth = viewport.getViewRect().getWidth() / 2.0;
+            double halfViewportHeight = viewport.getViewRect().getHeight() / 2.0;
+            Point pointToScrollTo;
+
+            if(nodeX > viewportMidPoint.getX() && nodeY > viewportMidPoint.getY()) {
+                // scroll down and right
+                pointToScrollTo = new Point(
+                        (int)(nodeX + halfViewportWidth),
+                        (int)(nodeY + halfViewportHeight));
+            } else if(nodeX > viewportMidPoint.getX() && nodeY <= viewportMidPoint.getY()) {
+                // scroll
+                pointToScrollTo = new Point(
+                        (int)(nodeX + halfViewportWidth),
+                        (int)(nodeY - halfViewportHeight));
+            } else if(nodeX <= viewportMidPoint.getX() && nodeY > viewportMidPoint.getY()) {
+                pointToScrollTo = new Point(
+                        (int)(nodeX - halfViewportWidth),
+                        (int)(nodeY + halfViewportHeight));
+            } else {
+                pointToScrollTo = new Point(
+                        (int)(nodeX - halfViewportWidth),
+                        (int)(nodeY - halfViewportHeight));
+            }
+            // +++ritual complete+++
+            // using viewport.setViewPosition was behaving strangely so using this method instead
+            scrollRectToVisible(new Rectangle((int) pointToScrollTo.getX(), (int) pointToScrollTo.getY(), 1, 1));
+        }
+    }
 
     public void setCollapsedNodeHelp(JButton help) {
         collapsedNodeLabelPainter.setHelpButton(help);
