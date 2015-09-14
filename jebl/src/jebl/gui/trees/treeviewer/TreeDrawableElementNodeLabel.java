@@ -33,18 +33,20 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
     // debug
     private Tree tree;
     String dtype;
+    private boolean paintAsGray;
+
 
     TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
-                                  Rectangle2D labelBounds, AffineTransform transform, int priority,
-                                  Node nodeSizeReference, BasicLabelPainter painter,
-                                  String dtype) {
-        this(tree, node, taxonLabelJustification, labelBounds, transform, priority, nodeSizeReference, (Painter<Node>)painter, dtype, painter.getIntent().equals(BasicLabelPainter.PainterIntent.COLLAPSED));
+                                 Rectangle2D labelBounds, AffineTransform transform, int priority,
+                                 Node nodeSizeReference, BasicLabelPainter painter,
+                                 String dtype, boolean paintAsGray) {
+        this(tree, node, taxonLabelJustification, labelBounds, transform, priority, nodeSizeReference, (Painter<Node>)painter, dtype, painter.getIntent().equals(BasicLabelPainter.PainterIntent.COLLAPSED), paintAsGray);
     }
 
     TreeDrawableElementNodeLabel(Tree tree, Node node, Painter.Justification taxonLabelJustification,
                                  Rectangle2D labelBounds, AffineTransform transform, int priority,
                                  Node nodeSizeReference, Painter<Node> painter,
-                                 String dtype, boolean isAutoContracted) {
+                                 String dtype, boolean isAutoContracted, boolean paintAsGray) {
         super(node, labelBounds, transform, priority);
         this.setIsAutoContracted(isAutoContracted);
 
@@ -59,6 +61,7 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
 
         this.tree = tree;
         this.dtype = dtype;
+        this.paintAsGray = paintAsGray;
     }
 
     public void setSize(int size, Graphics2D g2) {
@@ -120,9 +123,8 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
         return curSize;
     }
 
-    protected void drawIt(Graphics2D g2, String filterText) {
+    protected void drawIt(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
-        boolean containsFiltertext = true;
         g2.transform(transform);
         float s = 1.0f;
 
@@ -132,10 +134,10 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
             if( basicPainter.setFontSize(curSize, false) ) {
                 painter.calibrate(g2);
             }
-            containsFiltertext = basicPainter.matchesFilter(node, filterText);
 
         }
-        painter.setForeground(containsFiltertext ? foreground : Color.LIGHT_GRAY);
+        //Paint as gray only if tree pane filter is applied and this node doesn't match the filter
+        painter.setForeground(paintAsGray ? Color.LIGHT_GRAY : foreground);
         painter.paint(g2, node, taxonLabelJustification, bounds);
 
         if(painter instanceof BasicLabelPainter) {

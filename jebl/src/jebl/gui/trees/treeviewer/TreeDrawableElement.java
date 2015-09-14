@@ -84,9 +84,9 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
 
     public abstract String getDebugName();
 
-    protected abstract void drawIt(Graphics2D g2, String filterText);
+    protected abstract void drawIt(Graphics2D g2);
 
-    public final void draw(Graphics2D g2, Shape viewRect, String filterText) {
+    public final void draw(Graphics2D g2, Shape viewRect) {
         boolean doit = true;
         if( viewRect != null ) {
             final Rectangle2D d = getBounds();
@@ -96,7 +96,7 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
             doit = viewRect.intersects(d);
         }
         if( doit ) {
-            drawIt(g2, filterText);
+            drawIt(g2);
         }
     }
 
@@ -155,7 +155,7 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
         if(elements.size() > 200) {
             return; // this method has terrible performance on large data sets
         }
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 
         final List<TreeDrawableElement> list = new ArrayList<TreeDrawableElement>(elements);
 
@@ -481,7 +481,7 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
             }
         }
         ascheck(list);
-        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
+//        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
 
     }
 

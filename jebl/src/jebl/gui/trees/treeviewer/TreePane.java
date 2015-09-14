@@ -44,14 +44,20 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public Point mouseLocation = new Point(0,0);
     private String referenceSequenceName;
+
+    //Visibility and collapse variables
     public final static String KEY_INVISIBLE_NODE = "&visible"; //Node annotation qualifier set when the node isn't visible
     public final static String KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE = "&visibleInAutocollapse"; //Set when node is invisible due to autocollapse threshold
     public final static String KEY_MAX_DISTANCE_TO_DESCENDANT = "&KEY_MAX_DISTANCE_TO_DESCENDANT";
     private Set<Node> manuallyExpanded = new HashSet<Node>(); //Any node that the user has explicitly expanded by double clicking
     private Set<Node> manuallyCollapsed = new HashSet<Node>(); //Any node that the user has explicitly collapsed by double clicking
+
+    //Filter variables
     private String filterText = "";
-    private List<Node> currentFilterNodes = new ArrayList<Node>();
+    private List<Node> externalNodesThatFitFilter = new ArrayList<Node>();
+    private List<Node> internalNodesAboveFilterNodes = new ArrayList<Node>();
     private int currentFilterNodeIndex;
+    private boolean isFiltering;
 
 
     public TreePane() {
@@ -1207,7 +1213,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
 
             //If there is any search/filter text, draw all the branches as gray
-            if (!filterText.equals("")) {
+            if (isFiltering) {
                 paint = Color.LIGHT_GRAY;
             }
 
@@ -1274,7 +1280,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                             branchDecorator != null ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
 
                     //If there is any search text, draw branches as gray
-                    if (!filterText.equals("")) {
+                    if (isFiltering) {
                         paint = Color.LIGHT_GRAY;
                     }
 
@@ -1335,13 +1341,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
              * Loop through all the treeElements (= any node or branch label that is visible) and paints them
              * These elements are populated in the calibrate method
              */
-            for( TreeDrawableElement e : treeElements ) {
-                if((e.isVisible() || !drawOnlyVisibleElements)){
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)){
                     Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
                     if(flipTree && viewRect != null) {
                         viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
                     }
-                    e.draw(g2, viewRect, filterText);
+                    label.draw(g2, viewRect);
                 }
             }
         }
@@ -1647,9 +1653,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                             Painter.Justification justification =
                                     (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
 
+                            //Paint this node label grey if we ARE using a filter and this node is NOT in the list of nodes above filter nodes
+                            boolean paintAsGray = isFiltering && !internalNodesAboveFilterNodes.contains(node);
                             final TreeDrawableElementNodeLabel e =
                                     new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
-                                            null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node");
+                                            null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node", paintAsGray);
 
                             Color nodeColor = Color.red; //Collapsed nodes default to RED right now
                             e.setForeground(nodeColor);
@@ -1712,10 +1720,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     nodeColor = new Color(0, 150,0);
                     priority = 11; // if there are too many labels to show them all, we prefer to show the reference sequence rather than other sequences
                 }
+
+                //Paint this node label grey if we ARE using a filter and the node DOES NOT match the filter. Paint normally in every other case
+                boolean paintAsGray = isFiltering && !externalNodesThatFitFilter.contains(node);
                 final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
                                                          nodeWithLongestTaxon, taxonLabelPainter,
-                        null, false);
+                        null, false, paintAsGray);
 
                 Object colorAttr = node.getAttribute("nodeColor");
                 if(colorAttr != null){
@@ -1767,7 +1778,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 9,
-                                                          null, ((BasicLabelPainter) nodeLabelPainter), "node");
+                                                          null, ((BasicLabelPainter) nodeLabelPainter), "node", isFiltering);
 
 
                 Object colorAttr = node.getAttribute("nodeColor");
@@ -1835,7 +1846,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
                     final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, Painter.Justification.CENTER, labelBounds, labelTransform, 8,
-                                                          null, ((BasicLabelPainter) branchLabelPainter), "branch");
+                                                          null, ((BasicLabelPainter) branchLabelPainter), "branch", isFiltering);
 
 
                     Paint nodeColor = new RgbBranchDecorator().getBranchPaint(tree, node);
@@ -2031,21 +2042,27 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     /**
      * Sets the filter string text. Checks the external node labels to see if they match the filter
-     * and add them to the currentFilterNodes set if they do. If filterText != "", labels for nodes
+     * and add them to the externalNodesThatFitFilter set if they do. If filterText != "", labels for nodes
      * that don't match the filter and all branches will be drawn in gray.
+     * Also adds all nodes on the way from the filter nodes to the root into a separate list. This is so
+     * any collapsed node can signal when a filter node is below it.
      *
      * @param filterText
      */
     public void setFilterText(String filterText) {
         this.filterText = filterText;
-        currentFilterNodes.clear();
+        this.isFiltering = !"".equals(filterText);
+        externalNodesThatFitFilter.clear();
+        internalNodesAboveFilterNodes.clear();
         for (Node node : tree.getExternalNodes()) {
             BasicLabelPainter painter = (BasicLabelPainter) taxonLabelPainter;
             if (painter.matchesFilter(node, filterText)) {
-                currentFilterNodes.add(node);
+                externalNodesThatFitFilter.add(node);
+                internalNodesAboveFilterNodes.addAll(getParentsToRoot(node));
             }
         }
-        currentFilterNodeIndex = currentFilterNodes.size() - 1;
+        currentFilterNodeIndex = externalNodesThatFitFilter.size() - 1;
+        calibrated = false;
         repaint();
     }
 
@@ -2057,20 +2074,20 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param forwards
      */
     public void jumpToNextFilterMatch(boolean forwards) {
-        if (currentFilterNodes.size() == 0) return;
+        if (externalNodesThatFitFilter.size() == 0) return;
 
         if (forwards) {
             currentFilterNodeIndex ++;
-            if (currentFilterNodeIndex==currentFilterNodes.size()) {
+            if (currentFilterNodeIndex== externalNodesThatFitFilter.size()) {
                 currentFilterNodeIndex = 0;
             }
         } else {
             currentFilterNodeIndex --;
             if (currentFilterNodeIndex == -1) {
-                currentFilterNodeIndex = currentFilterNodes.size() - 1;
+                currentFilterNodeIndex = externalNodesThatFitFilter.size() - 1;
             }
         }
-        Node toJumpTo = currentFilterNodes.get(currentFilterNodeIndex);
+        Node toJumpTo = externalNodesThatFitFilter.get(currentFilterNodeIndex);
         if (isNodeCollapsed(toJumpTo)) {
             manuallyToggleExpandContract(toJumpTo, true);
             resetNodeVisibilities();
