@@ -58,15 +58,32 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     }
 
-    public String getLabel(Node node, boolean truncateLabel){
+    @Override
+    public boolean matchesFilter(Node node, String filterText) {
+        //Filter should look through the whole label string for a match
+        return super.matchesFilter(getRawLabel(node), filterText);
+    }
+
+    @Override
+    public String getLabel(Node node) {
+        //Return a label to paint, so truncating long strings of attributes
+        return limitString(getRawLabel(node));
+    }
+
+    /**
+     * The raw label is the values for this node of the selected attributes, joined
+     * into one string.
+     * @param node
+     * @return
+     */
+    private String getRawLabel(Node node){
         List<String> attributeValues = new ArrayList<String>();
-        for(String s : selectedAttributes) {
-            String value = getLabel(node, s, truncateLabel);
+        for(String attributeName : selectedAttributes) {
+            String value = getAttributeLabel(node, attributeName);
             if(value != null) {
                 attributeValues.add(value);
             }
         }
-
         if(attributeValues.size() == 0) {
             return null;
         }
@@ -83,62 +100,39 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return value;
     }
 
-    public String getLabel(Node node, String attributeName, boolean truncateLabel){
+    public String getAttributeLabel(Node node, String attributeName){
         String prefix = " ";
         String suffix = " ";
+        String valueString = null;
         if (attributeName.equalsIgnoreCase(TAXON_NAMES)) {
-            if(truncateLabel) {
-                return prefix + limitString(tree.getTaxon(node).getName()) + suffix;
-            } else {
-                return prefix + tree.getTaxon(node).getName() + suffix;
-            }
-        }
-
-        if (attributeName.equalsIgnoreCase(NODE_HEIGHTS) ) {
-            if(truncateLabel) {
-                return prefix + limitString(getFormattedValue(tree.getHeight(node))) + suffix;
-            } else {
-                return prefix + getFormattedValue(tree.getHeight(node)) + suffix;
-            }
+            valueString = tree.getTaxon(node).getName();
+        } else if (attributeName.equalsIgnoreCase(NODE_HEIGHTS) ) {
+            valueString = getFormattedValue(tree.getHeight(node));
         } else if (attributeName.equalsIgnoreCase(BRANCH_LENGTHS) ) {
-            if(truncateLabel) {
-                return prefix + limitString(getFormattedValue(tree.getLength(node))) + suffix;
-            } else {
-                return prefix + getFormattedValue(tree.getLength(node)) + suffix;
+            valueString = getFormattedValue(tree.getLength(node));
+        } else {
+            Object attribute = node.getAttribute(attributeName);
+            final Taxon nodeTaxon = tree.getTaxon(node);
+            if (attribute == null && nodeTaxon != null) {
+                attribute = nodeTaxon.getAttribute(attributeName);
             }
-        }
-
-        Object value = node.getAttribute(attributeName);
-        final Taxon nodeTaxon = tree.getTaxon(node);
-        if(value == null && nodeTaxon != null) {
-            value = nodeTaxon.getAttribute(attributeName);
-        }
-        if (value != null) {
-            if (value instanceof Double) {
-                return prefix+formatter.getFormattedValue((Double) value)+suffix;
-            }
-            if(value instanceof Date){
-                DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
-                return  prefix+format.format((Date)value)+suffix;
-            }
-            if (value instanceof Object[]) {
-                Object[] _value = (Object[])value;
-                if (_value.length == 2 && _value[0] instanceof Double && _value[1] instanceof Double) {
-                    return String.format("%.6f - %.6f", (Double)_value[0], (Double)_value[1]);
+            if (attribute != null) {
+                if (attribute instanceof Double) {
+                    valueString = formatter.getFormattedValue((Double) attribute);
+                } else if (attribute instanceof Date) {
+                    DateFormat format = new SimpleDateFormat("dd MMM yyyy h:mm a");
+                    valueString = format.format((Date) attribute);
+                } else if (attribute instanceof Object[]) {
+                    Object[] _value = (Object[]) attribute;
+                    if (_value.length == 2 && _value[0] instanceof Double && _value[1] instanceof Double) {
+                        valueString = String.format("%.6f - %.6f", (Double) _value[0], (Double) _value[1]);
+                    }
+                } else {
+                    valueString = attribute.toString();
                 }
             }
-            String s;
-            if(truncateLabel) {
-                s = limitString(value.toString());
-            } else {
-                s = value.toString();
-            }
-            //limit node labels to 15 chars (plus ...)
-            //if(s.length() > 15)
-            //    return s.substring(0,15)+"...";
-            return prefix+s+suffix;
         }
-        return null;    
+        return (valueString == null) ? null : prefix + valueString + suffix;
     }
 
     public void paint(Graphics2D g2, Node item, Justification justification, Rectangle2D bounds) {
@@ -175,7 +169,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         g2.setFont(taxonLabelFont);
 
 
-        final String label = getLabel(item, true);
+        final String label = getLabel(item);
         if (label != null) {
             String prefix = label;
             String suffix = "";
@@ -228,7 +222,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
 
     public double getWidth(Graphics2D g2, Node item) {
         FontMetrics fm = getCurrentFontMetricsForGraphicsAndNode(g2, item);
-        String label = getLabel(item, true);
+        String label = getLabel(item);
         return label == null ? 0 : fm.getStringBounds(label, g2).getWidth();
     }
 
