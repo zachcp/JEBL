@@ -2104,38 +2104,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private void focusViewerOnNode(Node node) {
         Point2D nodeCoords = nodeCoord(node);
         if(viewport != null) {
-            // +++commencing black magic. Beware of snooping paladins+++
-            double nodeX = nodeCoords.getX();
-            double nodeY = nodeCoords.getY();
-            Point viewportMidPoint = new Point(
-                    (int)(viewport.getViewRect().getX() + (viewport.getWidth() / 2.0)),
-                    (int)(viewport.getViewRect().getY() + (viewport.getHeight() / 2.0)));
+            // half the viewport's width and height.
+            // Used to get the origin of the rectangle that should be scrolled to in order to centre the viewport on the node
             double halfViewportWidth = viewport.getViewRect().getWidth() / 2.0;
             double halfViewportHeight = viewport.getViewRect().getHeight() / 2.0;
-            Point pointToScrollTo;
-
-            if(nodeX > viewportMidPoint.getX() && nodeY > viewportMidPoint.getY()) {
-                // scroll down and right
-                pointToScrollTo = new Point(
-                        (int)(nodeX + halfViewportWidth),
-                        (int)(nodeY + halfViewportHeight));
-            } else if(nodeX > viewportMidPoint.getX() && nodeY <= viewportMidPoint.getY()) {
-                // scroll
-                pointToScrollTo = new Point(
-                        (int)(nodeX + halfViewportWidth),
-                        (int)(nodeY - halfViewportHeight));
-            } else if(nodeX <= viewportMidPoint.getX() && nodeY > viewportMidPoint.getY()) {
-                pointToScrollTo = new Point(
-                        (int)(nodeX - halfViewportWidth),
-                        (int)(nodeY + halfViewportHeight));
-            } else {
-                pointToScrollTo = new Point(
-                        (int)(nodeX - halfViewportWidth),
-                        (int)(nodeY - halfViewportHeight));
-            }
-            // +++ritual complete+++
-            // using viewport.setViewPosition was behaving strangely so using this method instead
-            scrollRectToVisible(new Rectangle((int) pointToScrollTo.getX(), (int) pointToScrollTo.getY(), 1, 1));
+            // x and y coordinates the viewport should move to: node's coordinate - half the viewport's width/height
+            double x = nodeCoords.getX() - halfViewportWidth;
+            double y = nodeCoords.getY() - halfViewportHeight;
+            // scroll the viewport
+            scrollRectToVisible(new Rectangle((int)x, (int)y, (int)viewport.getViewRect().getWidth(), (int)viewport.getViewRect().getHeight()));
         }
     }
 
