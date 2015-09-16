@@ -159,8 +159,4 @@ public class TreeDrawableElementNodeLabel extends TreeDrawableElementLabel {
     public int getMaxSize() {
         return defaultSize;
     }
-
-    public boolean isAutoContracted() {
-        return isAutoContracted;
-    }
 }
