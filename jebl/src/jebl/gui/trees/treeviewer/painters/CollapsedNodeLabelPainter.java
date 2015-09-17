@@ -180,6 +180,20 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         finishSettingUpControlPanel();
     }
 
+    /**
+     * Given the maximum distance between a root node and any of its tips, sets the max
+     * of the collapse slider that covers it. The actual number on the slider will be (maxDist * 100) + 1
+     * because it needs to be an integer and we want the final position to fully collapse the tree.
+     *
+     * This is called when the tree could've changed and therefore the max dist under the root could've
+     * changed.
+     * @param maxDistUnderRoot
+     */
+    public void setCollapseSliderMax(double maxDistUnderRoot) {
+        collapseSliderMax = (int) (maxDistUnderRoot * 100) + 1; //+1 to make sure the last position on the slider will collapse to the root node
+        finishSettingUpControlPanel();
+    }
+
     public boolean areLabelsVisible() {
         return areLabelsVisible;
     }
@@ -191,18 +205,21 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
      * tree viewer already has.
      */
     private void finishSettingUpControlPanel() {
-        createCollapseSlider();
-        createShowLabelsCheckbox();
-        createResetButton();
+        if (helpButton != null) { //We can only finish this if we already have a help button
+            createCollapseSlider();
+            createShowLabelsCheckbox();
+            createResetButton();
 
-        Box sliderBox = Box.createHorizontalBox();
-        sliderBox.add(collapseSlider);
-        sliderBox.add(Box.createHorizontalStrut(5));
-        sliderBox.add(helpButton);
+            Box sliderBox = Box.createHorizontalBox();
+            sliderBox.add(collapseSlider);
+            sliderBox.add(Box.createHorizontalStrut(5));
+            sliderBox.add(helpButton);
 
-        optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
-        optionsPanel.addComponent(showLabelsCheckBox, true);
-        optionsPanel.addComponent(resetButton, false);
+            optionsPanel.removeAll();
+            optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
+            optionsPanel.addComponent(showLabelsCheckBox, true);
+            optionsPanel.addComponent(resetButton, false);
+        }
     }
 
     private void createShowLabelsCheckbox() {

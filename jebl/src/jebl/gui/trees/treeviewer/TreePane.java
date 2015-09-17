@@ -1937,6 +1937,22 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 alreadyLookedAt.add(node);
             }
         }
+
+        //This will happen if setUpTree() is called anywhere after the initial construction of treePane.
+        //Which is good because tree distances could've changed
+        if (collapsedNodeLabelPainter != null) {
+            setNewSliderMaxForAutoExpansion();
+        }
+    }
+
+    private void setNewSliderMaxForAutoExpansion() {
+        //Get the newly set distance from the root to a tip and make it the max on the control panel slider
+        Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT);
+        double distance = 1.0;
+        if (distanceObject != null && distanceObject instanceof Double) {
+            distance = (Double) distanceObject;
+        }
+        collapsedNodeLabelPainter.setCollapseSliderMax(distance);
     }
 
     /**
