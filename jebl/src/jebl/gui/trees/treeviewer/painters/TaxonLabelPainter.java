@@ -79,7 +79,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     private String getRawLabel(Node node){
         List<String> attributeValues = new ArrayList<String>();
         for(String attributeName : selectedAttributes) {
-            String value = getAttributeLabel(node, attributeName);
+            String value = getLabel(node, attributeName);
             if(value != null) {
                 attributeValues.add(value);
             }
@@ -100,7 +100,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return value;
     }
 
-    public String getAttributeLabel(Node node, String attributeName){
+    public String getLabel(Node node, String attributeName){
         String prefix = " ";
         String suffix = " ";
         String valueString = null;
