@@ -1941,7 +1941,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         //This will happen if setUpTree() is called anywhere after the initial construction of treePane.
         //Which is good because tree distances could've changed
         if (collapsedNodeLabelPainter != null) {
-            collapsedNodeLabelPainter.setCollapseSliderMax();
+            collapsedNodeLabelPainter.treeChanged();
         }
     }
 
