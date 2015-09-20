@@ -139,14 +139,14 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
 
     static void newSetOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
 //        if (true) return;
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         QuadTree<TreeDrawableElement> quadTree = new QuadTree<TreeDrawableElement>(elements);
 
         for (TreeDrawableElement element : elements) {
             final boolean intersectsAnything = quadTree.hasIntersection(element);
             element.setVisible(!intersectsAnything);
         }
-        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
+//        System.out.println("SetOverlappingVisibility: " + (System.currentTimeMillis() - start));
     }
 
 
@@ -373,28 +373,28 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
         }
 
         while (queue.peek() != null) {
-            TreeDrawableElement e = queue.poll();
-            final List<TreeDrawableElement> overlapping = conflicts.get(e);
+            TreeDrawableElement label = queue.poll();
+            final List<TreeDrawableElement> overlapping = conflicts.get(label);
 
             // start with maximal size for element
-            int size = e.getMaxSize();
-            e.setSize(size, g2);
+            int maxSize = label.getMaxSize();
+            label.setSize(maxSize, g2);
 
-            if(prints>0) System.out.println("** Start for " + e.getDebugName() + " (" + e.getCurrentSize() + ")");
+            if(prints>0) System.out.println("** Start for " + label.getDebugName() + " (" + label.getCurrentSize() + ")");
 
             // loop until finding a size where no overlaps. this must be the case
             // for the min size
-            while( size >= e.getMinSize() ) {
-                e.setSize(size, g2);
+            while( maxSize >= label.getMinSize() ) {
+                label.setSize(maxSize, g2);
                 int nc = 0;
                 for(; nc < overlapping.size(); ++nc) {
-                   if( intersects(e, overlapping.get(nc) ) ) {
-                        if(prints>0) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                   if( intersects(label, overlapping.get(nc) ) ) {
+                        if(prints>0) System.out.println(label.getDebugName() + " (" + label.getCurrentSize() + ")"
                          + " overlaps " + overlapping.get(nc).getDebugName() +
                          " (" + overlapping.get(nc).getCurrentSize() + ")" );
                        break;
                    }
-                   if(prints>0) System.out.println(e.getDebugName() + " (" + e.getCurrentSize() + ")"
+                   if(prints>0) System.out.println(label.getDebugName() + " (" + label.getCurrentSize() + ")"
                          + " is ok with " + overlapping.get(nc).getDebugName() +
                          " (" + overlapping.get(nc).getCurrentSize() + ")" );
                 }
@@ -402,80 +402,80 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
                     // no overlaps - use this size
                     break;
                 }
-                --size;
+                --maxSize;
             }
 
-            if(smallAsserts) assert size >= e.getMinSize() : "for " + e.getDebugName() + " (" + size + " >= " + e.getMinSize();
+            if(smallAsserts) assert maxSize >= label.getMinSize() : "for " + label.getDebugName() + " (" + maxSize + " >= " + label.getMinSize();
 
             // try to get elements with same priority to the same size if possible
-            int priority = e.getPriority();
+            int priority = label.getPriority();
 
-            for( TreeDrawableElement ec : overlapping ) {
-                if( ec.getPriority() == priority ) {
-                    final int ecs = ec.getCurrentSize();
+            for( TreeDrawableElement clashingLabel : overlapping ) {
+                if( clashingLabel.getPriority() == priority ) {
+                    final int ecs = clashingLabel.getCurrentSize();
                     // size should only go down to accomodate others of same priority
-                    if( ecs >= size )  {
+                    if( ecs >= maxSize )  {
                         // overlapping element is already larger
                         continue;
                     }
 
                     // save size as it is not allowed to go up
-                    final int sizeMax = size;
+                    final int sizeMax = maxSize;
 
                     // size for overlapping element
-                    int ecSize = ecs;
+                    int overlappingSize = ecs;
                     
-                    if(prints>0) System.out.println("resolve conflict of " + e.getDebugName() + " with " + ec.getDebugName() + " - " + ecs);
+                    if(prints>0) System.out.println("resolve conflict of " + label.getDebugName() + " with " + clashingLabel.getDebugName() + " - " + ecs);
                     if( smallAsserts  ) {
-                        assert !intersects(e, ec);
+                        assert !intersects(label, clashingLabel);
                     }
 
                     boolean keepGoing = true;
-                    while( ecSize < size && keepGoing) {
+                    while( overlappingSize < maxSize && keepGoing) {
                         // take ec up, exit loop with no intersection
-                        while( ecSize < size && ecSize < ec.getMaxSize() ) {
-                            ec.setSize(ecSize + 1, g2);
-                            if( ! intersects(e, ec) ) {
-                                ++ecSize;
+                        while( overlappingSize < maxSize && overlappingSize < clashingLabel.getMaxSize() ) {
+                            clashingLabel.setSize(overlappingSize + 1, g2);
+                            if( ! intersects(label, clashingLabel) ) {
+                                ++overlappingSize;
                             } else {
-                                ec.setSize(ecSize, g2);
+                                clashingLabel.setSize(overlappingSize, g2);
                                 keepGoing = false;
                                 break;
                             }
                         }
-                        if( smallAsserts  ) assert ! intersects(e, ec);
+                        if( smallAsserts  ) assert ! intersects(label, clashingLabel);
 
                         // if overlapping element has still smaller size, take element size one down
-                        if( ecSize < size && size > e.getMinSize() ) {
-                            --size;
-                            e.setSize(size, g2);
+                        if( overlappingSize < maxSize && maxSize > label.getMinSize() ) {
+                            --maxSize;
+                            label.setSize(maxSize, g2);
                         }
-                        if( smallAsserts  ) assert ! intersects(e, ec);
+                        if( smallAsserts  ) assert ! intersects(label, clashingLabel);
                     }
 
                     // now set size of element to largest possible given known overlapper size
-                    while( size+1 < sizeMax ) {
-                        e.setSize(size+1, g2);
-                        if( intersects(e, ec) ) {
-                            e.setSize(size, g2);
+                    while( maxSize+1 < sizeMax ) {
+                        label.setSize(maxSize+1, g2);
+                        if( intersects(label, clashingLabel) ) {
+                            label.setSize(maxSize, g2);
                             break;
                         }
-                        ++size;
+                        ++maxSize;
                     }
 
-                    if( smallAsserts  ) assert ! intersects(e, ec);
+                    if( smallAsserts  ) assert ! intersects(label, clashingLabel);
 
                     // restore overlapper to original size. it's true size will be known only when checked
                     // against all it's overlappers
-                    ec.setSize(ecs, g2);
-                    if( smallAsserts  ) assert ! intersects(e, ec);
+                    clashingLabel.setSize(ecs, g2);
+                    if( smallAsserts  ) assert ! intersects(label, clashingLabel);
                 }
             }
 
             if( smallAsserts  ) {
                 for (TreeDrawableElement aConflicting : overlapping) {
-                    if (intersects(e, aConflicting)) {
-                        System.out.println(e.getDebugName() + " " + e.getCurrentSize() + " conflicts with " +
+                    if (intersects(label, aConflicting)) {
+                        System.out.println(label.getDebugName() + " " + label.getCurrentSize() + " conflicts with " +
                                 aConflicting.getDebugName() + " " + aConflicting.getCurrentSize());
                         assert false;
                     }
