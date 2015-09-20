@@ -46,14 +46,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 1000));
         isCollapsed = isCollapsedDefault;
         areLabelsVisible = getPrefs().getBoolean(KEY_SHOW_COLLAPSE_LABELS, true);
-        Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT);
-        double distance;
-        if (distanceObject != null && distanceObject instanceof Double) {
-            distance = (Double) distanceObject;
-        } else {
-            distance = 1.0;
-        }
-        collapseSliderMax = (int) (distance * 100) + 1; //+1 to make sure the last position on the slider will collapse to the root node
+        collapseSliderMax = getMaxForSlider(tree);
         numberManualNodes = 0;
     }
 
@@ -181,17 +174,31 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     /**
-     * Given the maximum distance between a root node and any of its tips, sets the max
-     * of the collapse slider that covers it. The actual number on the slider will be (maxDist * 100) + 1
-     * because it needs to be an integer and we want the final position to fully collapse the tree.
-     *
      * This is called when the tree could've changed and therefore the max dist under the root could've
      * changed.
-     * @param maxDistUnderRoot
+     *
      */
-    public void setCollapseSliderMax(double maxDistUnderRoot) {
-        collapseSliderMax = (int) (maxDistUnderRoot * 100) + 1; //+1 to make sure the last position on the slider will collapse to the root node
+    public void setCollapseSliderMax() {
+        collapseSliderMax = getMaxForSlider(tree); //+1 to make sure the last position on the slider will collapse to the root node
         finishSettingUpControlPanel();
+    }
+
+    /**
+     * Calculates the max value of the collapse slider based on the maximum distance between a root node and any of its
+     * tips. The actual number on the slider will be (maxDist * 100) + 1
+     * because it needs to be an integer and we want the final position to fully collapse the tree.
+     *
+     * @param tree The tree to get the max slider value for
+     */
+    private static int getMaxForSlider(RootedTree tree) {
+        //Get the newly set distance from the root to a tip and make it the max on the control panel slider
+        Object distanceObject = tree.getRootNode().getAttribute(TreePane.KEY_MAX_DISTANCE_TO_DESCENDANT);
+        double distance = 1.0;
+        if (distanceObject != null && distanceObject instanceof Double) {
+            distance = (Double) distanceObject;
+        }
+        //+1 to make sure the last position on the slider will collapse to the root node
+        return (int) (distance * 100) + 1;
     }
 
     public boolean areLabelsVisible() {
