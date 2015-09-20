@@ -430,7 +430,8 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
                         assert !intersects(e, ec);
                     }
 
-                    while( ecSize < size ) {
+                    boolean keepGoing = true;
+                    while( ecSize < size && keepGoing) {
                         // take ec up, exit loop with no intersection
                         while( ecSize < size && ecSize < ec.getMaxSize() ) {
                             ec.setSize(ecSize + 1, g2);
@@ -438,6 +439,7 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
                                 ++ecSize;
                             } else {
                                 ec.setSize(ecSize, g2);
+                                keepGoing = false;
                                 break;
                             }
                         }
