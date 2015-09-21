@@ -176,10 +176,12 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     /**
      * Notifies the {@link CollapsedNodeLabelPainter} that the tree it is painting has changed.  This will update any
      * dependent controls previously obtained from calling {@link #getControls(boolean)}
+     * @param tree
      */
-    public void treeChanged() {
+    public void treeChanged(RootedTree tree) {
+        this.tree = tree;
         // If the tree could have changed then the max dist under the root could have too.  Re-calculate and update control.
-        collapseSliderMax = getMaxForSlider(tree); //+1 to make sure the last position on the slider will collapse to the root node
+        collapseSliderMax = getMaxForSlider(this.tree); //+1 to make sure the last position on the slider will collapse to the root node
         finishSettingUpControlPanel();
     }
 
