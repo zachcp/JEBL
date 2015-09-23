@@ -36,6 +36,7 @@ class MacOsJava8WindowMemoryLeakFix {
             if (!clearFieldsFromObjectIfClass("sun.lwawt.LWComponentPeer", peer, "target")) {
                 return;
             }
+            peer.setEnabled(false);
 
             Field windowField = peer.getClass().getDeclaredField("platformWindow");
             windowField.setAccessible(true);
