@@ -395,7 +395,7 @@ public class TreeViewer extends JPanel implements Printable {
 
                 optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
-                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 5000, 0);
+                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, calculateExpansionSliderMax(tree), 0);
                 verticalExpansionSlider.setPaintTicks(true);
                 verticalExpansionSlider.setPaintLabels(true);
 
@@ -748,5 +748,26 @@ public class TreeViewer extends JPanel implements Printable {
 
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
         return treePane.print(graphics, pageFormat, pageIndex);
+    }
+
+    /**
+     * Calculates the maximum value of the expansion slider based off the formula {@code 1.12759 x},
+     * where {@code x} is the number of tips in the tree.<br>
+     * This is being used on a 'for now' basis to make the expansion slider take more reasonable values without
+     * investing too much time.
+     * <p>
+     * The formula was determined by taking trees of varying number of tips, from 50 to 263691, with their font size
+     * set to 36pt and using the expansion slider until each label had a 'comfortable' level of padding between them
+     * (roughly the size of the label). Once the right level of expansion was found the expansion slider's value
+     * was recorded and plotted. The trend line of the graph expansion slide value vs. number of tips then gave the
+     * formula used.
+     *
+     * @param tree tree who is being considered
+     * @return the maximum value the expansion slider should take
+     */
+    private int calculateExpansionSliderMax(Tree tree) {
+        int numberOfTips = tree.getTaxa().size();
+        double coefficient = 1.12759;
+        return (int)(coefficient * numberOfTips);
     }
 }
