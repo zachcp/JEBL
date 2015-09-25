@@ -42,6 +42,11 @@ import java.util.prefs.Preferences;
 @SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "ToArrayCallWithZeroLengthArrayArgument", "OverlyLongMethod"})
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {
 
+    /**
+     * Trees with more than this number of taxa are treated as "big" meaning that some behaviour changes for efficiency.
+     */
+    static final int BIG_TREE_TAXA_THRESHOLD = 200;
+
     public Point mouseLocation = new Point(0,0);
     private String referenceSequenceName;
 

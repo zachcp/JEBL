@@ -152,7 +152,7 @@ public abstract class TreeDrawableElement implements QuadTree.Item {
 
 
     static void setOverlappingVisiblitiy(Collection<TreeDrawableElement> elements, Graphics2D g2) {
-        if(elements.size() > 200) {
+        if(elements.size() > TreePane.BIG_TREE_TAXA_THRESHOLD) {
             return; // this method has terrible performance on large data sets
         }
 //        long start = System.currentTimeMillis();

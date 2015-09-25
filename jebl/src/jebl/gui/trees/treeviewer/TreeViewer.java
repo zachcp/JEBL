@@ -400,7 +400,7 @@ public class TreeViewer extends JPanel implements Printable {
                 verticalExpansionSlider.setPaintTicks(true);
                 verticalExpansionSlider.setPaintLabels(true);
 
-                final String expansionValuePrefKey = "expansionFraction";
+                final String expansionValuePrefKey = "expansionFraction" + (tree.getTaxa().size() > TreePane.BIG_TREE_TAXA_THRESHOLD ? "BigTree" : "");
                 // between 0 and 1, from no expansion to full expansion
                 final double expansionFraction = prefs.getDouble(expansionValuePrefKey, 0);
                 verticalExpansionSlider.setValue((int)(expansionFraction * expansionMax));
@@ -410,7 +410,7 @@ public class TreeViewer extends JPanel implements Printable {
                     public void stateChanged(ChangeEvent changeEvent) {
                         final int value = verticalExpansionSlider.getValue();
                         setVerticalExpansion(((double) value) / 100.0);
-                        getPrefs().putDouble(expansionValuePrefKey, (double)value / expansionMax);
+                        getPrefs().putDouble(expansionValuePrefKey, (double) value / expansionMax);
                         fireChangeListeners();
                     }
                 });
