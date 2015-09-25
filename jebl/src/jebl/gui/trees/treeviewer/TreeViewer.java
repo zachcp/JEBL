@@ -395,20 +395,22 @@ public class TreeViewer extends JPanel implements Printable {
 
                 optionsPanel.addComponentWithLabel("Zoom:", zoomSlider, true);
 
-                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, calculateExpansionSliderMax(tree), 0);
+                final int expansionMax = calculateExpansionSliderMax(tree);
+                verticalExpansionSlider = new JSlider(SwingConstants.HORIZONTAL, 0, expansionMax, 0);
                 verticalExpansionSlider.setPaintTicks(true);
                 verticalExpansionSlider.setPaintLabels(true);
 
-                final String expansionValuePrefKey = "vzoomvalue";
-                final int expansionValue = prefs.getInt(expansionValuePrefKey, 0);
-                verticalExpansionSlider.setValue(expansionValue);
-                verticalExpansion = ((double)expansionValue) / 100.0;
+                final String expansionValuePrefKey = "expansionFraction";
+                // between 0 and 1, from no expansion to full expansion
+                final double expansionFraction = prefs.getDouble(expansionValuePrefKey, 0);
+                verticalExpansionSlider.setValue((int)(expansionFraction * expansionMax));
+                verticalExpansion = ((double)verticalExpansionSlider.getValue()) / 100.0;
 
                 verticalExpansionSlider.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent changeEvent) {
                         final int value = verticalExpansionSlider.getValue();
                         setVerticalExpansion(((double) value) / 100.0);
-                        getPrefs().putInt(expansionValuePrefKey, value);
+                        getPrefs().putDouble(expansionValuePrefKey, (double)value / expansionMax);
                         fireChangeListeners();
                     }
                 });
