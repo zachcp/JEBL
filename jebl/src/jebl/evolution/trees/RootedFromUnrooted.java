@@ -41,7 +41,13 @@ public class RootedFromUnrooted implements RootedTree {
 	 * branch lengths from synthetic root to its children (when rooted between nodes)
 	 */
 	private double rootToLeft, rootToRight;
+	private double rootHeight;
 	private boolean intentUnrooted;
+
+	/**
+	 * Maps each node to the length of the path from that node to the root
+	 */
+	private Map<Node, Double> lengthsFromNodeToRoot;
 
 	/**
 	 * Set <arg>parent</arg> as parent of <arg>node</arg>, and recursivly set parents for node subtree
@@ -74,8 +80,9 @@ public class RootedFromUnrooted implements RootedTree {
 		parents = new LinkedHashMap<Node, Node>();
 		for( Node adj : source.getAdjacencies(root) ) {
             setParent(adj, root);
-			}
 		}
+		populateLengthsFromNodeToRoot();
+	}
 
 	/**
 	 * Root source by creating a new internal node whose children are (the adjacent) left and right.
@@ -102,9 +109,51 @@ public class RootedFromUnrooted implements RootedTree {
 
 		parents.put(root, null);
         setParent(left, root);
-        setParent(right, root);
-		// setAttributeIfPresent(attributeMap, root) ?
+		setParent(right, root);
+		populateLengthsFromNodeToRoot();
     }
+
+	/**
+	 * Populates the lengthsFromNodeToRoot map. Steps down along branches from the root, saving the
+	 * distances to each node. Does an iterative pre-order traversal of the tree.
+	 */
+	private void populateLengthsFromNodeToRoot() {
+		lengthsFromNodeToRoot = new HashMap<Node, Double>();
+		lengthsFromNodeToRoot.put(root, 0.0);
+		double maxHeight = 0.0;
+		Stack<Node> stack = new Stack<Node>();
+		for (Node rootChild : this.getChildren(root)) {
+			stack.push(rootChild);
+		}
+
+		while (!stack.empty()) {
+			Node current = stack.peek();
+			Double currentDistance = lengthsFromNodeToRoot.get(current);
+			if (currentDistance == null) { //no distance worked out for this node yet. Its parent is guaranteed to have a distance in the map
+				Double parentDistance = lengthsFromNodeToRoot.get(this.getParent(current));
+				if (parentDistance == null) {
+					throw new IllegalStateException("Each parent should have a height already :O");
+				}
+				currentDistance = parentDistance + getLength(current);
+				lengthsFromNodeToRoot.put(current, currentDistance);
+
+				//If is external, we keep track of the max height in the tree
+				if (this.isExternal(current)) {
+					if (currentDistance > maxHeight) {
+						maxHeight = currentDistance;
+					}
+				} else {
+					//Else we add the children to the stack to be processed
+					for (Node child : this.getChildren(current)) {
+						stack.push(child);
+					}
+				}
+			} else { //revisiting a node in the stack with a distance means its children are all done. Can remove it now
+				stack.pop();
+			}
+		}
+		rootHeight = maxHeight;
+	}
 
 	public List<Node> getChildren(Node node) {
 		ArrayList<Node> s = new ArrayList<Node>(getAdjacencies(node));
@@ -118,28 +167,22 @@ public class RootedFromUnrooted implements RootedTree {
 		return true;
 	}
 
-	private double findNodeHeightFromTips(Node node) {
-		if( isExternal(node) ) return 0.0;
-
-		double h = 0.0;
-		for( Node n : getChildren(node) ) {
-			h = Math.max(h, getLength(n) + findNodeHeightFromTips(n));
-		}
-		return h;
-	}
-
+	/**
+	 * Calculates height as getHeight(root) - getPathLength(root, node)
+	 * @param node the node whose height is being requested.
+	 * @return
+	 */
 	public double getHeight(Node node) {
-		double hr = findNodeHeightFromTips(root);
 		if( node == root ) {
-			return hr;
+			return rootHeight;
 		}
 
-		double toRoot = 0.0;
-		while( node != root ) {
-			toRoot += getLength(node);
-			node = getParent(node);
+		Double toRoot = lengthsFromNodeToRoot.get(node);
+		if (toRoot == null) {
+			throw new IllegalStateException("Shouldn't have a node with no lengthToRoot calculated!");
 		}
-		return hr - toRoot;
+
+		return rootHeight - toRoot;
 	}
 
 	public boolean hasLengths() {
