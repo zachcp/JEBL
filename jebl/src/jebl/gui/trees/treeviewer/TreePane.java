@@ -32,6 +32,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.prefs.Preferences;
 
 /**
@@ -1057,9 +1058,29 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.setPaint(oldPaint);
             g2.setStroke(oldStroke);
         }
-        treePainted = true;
+        treePainted.set(true);
     }
-    public boolean treePainted = false;
+
+    private AtomicBoolean treePainted = new AtomicBoolean(false);
+
+    /**
+     * Introduced for testing purposes. Returns true after the tree has finished painting.
+     * Call {@link TreePane#setTreePainted(boolean)} before painting the frame you want to measure for this to
+     * be accurate.
+     * @return true when the tree has finished painting
+     */
+    public boolean isTreePainted() {
+        return treePainted.get();
+    }
+
+    /**
+     * @see TreePane#isTreePainted()
+     *
+     * @param treePainted
+     */
+    public void setTreePainted(boolean treePainted) {
+        this.treePainted.set(treePainted);
+    }
 
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 
