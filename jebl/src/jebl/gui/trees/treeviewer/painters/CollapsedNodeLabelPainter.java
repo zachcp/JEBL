@@ -38,6 +38,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private JButton resetButton;
     private JButton helpButton;
     private JSlider collapseSlider;
+    private JLabel sliderLabel;
     private JCheckBox showLabelsCheckBox;
 
     public CollapsedNodeLabelPainter(RootedTree tree) {
@@ -215,12 +216,14 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
      */
     private void finishSettingUpControlPanel() {
         if (helpButton != null) { //We can only finish this if we already have a help button
+            sliderLabel = new JLabel();
             createCollapseSlider();
             createShowLabelsCheckbox();
             createResetButton();
 
             Box sliderBox = Box.createHorizontalBox();
             sliderBox.add(collapseSlider);
+            sliderBox.add(sliderLabel);
             sliderBox.add(Box.createHorizontalStrut(5));
             sliderBox.add(helpButton);
 
@@ -247,6 +250,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private void createCollapseSlider() {
         collapseSlider = new JSlider(SwingConstants.HORIZONTAL, 0, collapseSliderMax, 0);
         collapseSlider.setValue((int) (collapsedDistanceThreshold * 100));
+        sliderLabel.setText(String.format("%.2f", collapsedDistanceThreshold));
         collapseSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
 //                    JSlider source = (JSlider) changeEvent.getSource();
@@ -254,6 +258,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
                 double value = collapseSlider.getValue() / (double) 100;
                 if (Math.abs(value - collapsedDistanceThreshold) > 0.0001) setCollapsedDistanceThreshold(value);
                 getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, value);
+                sliderLabel.setText(String.format("%.2f", value));
             }
         });
     }
