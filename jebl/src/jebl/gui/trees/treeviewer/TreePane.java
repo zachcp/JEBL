@@ -1311,36 +1311,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        // check if there are too many labels to be shown effectively
-        Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
-        if(flipTree && viewRect != null) {
-            viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
-        }
-        int count = 0;
-        final int maxCount = 1000;
-        if (viewRect != null) {
-            for( TreeDrawableElement label : treeElements ) {
-                if((label.isVisible() || !drawOnlyVisibleElements)) {
-                    if (label.getBounds().intersects(viewRect)) {
-                        if (++count == maxCount) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (count < maxCount) {
-            /*
-             Loop through all the treeElements (= any node or branch label that is visible) and paints them
-             These elements are populated in the calibrate method
-             */
-            for( TreeDrawableElement label : treeElements ) {
-                if((label.isVisible() || !drawOnlyVisibleElements)){
-                    label.draw(g2, viewRect);
-                }
-            }
-        }
+        drawLabelElements(g2, clipOffscreenShapes, drawOnlyVisibleElements);
 
         if( ! hideNode(rootNode) && drawNodes) {
           g2.setStroke(branchLineStroke);
@@ -1362,6 +1333,38 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! antialiasOn ) {
            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
+    }
+
+    /**
+     * Draws all the taxa, branch and node labels.
+     */
+    private void drawLabelElements(Graphics2D g2, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements) {
+        // check if there are too many labels to be shown effectively
+        Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
+        if(flipTree && viewRect != null) {
+            viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
+        }
+        int count = 0;
+        final int maxCount = 1000;
+        if (viewRect != null) {
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)) {
+                    if (label.getBounds().intersects(viewRect)) {
+                        if (++count == maxCount) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (count < maxCount) {
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)){
+                    label.draw(g2, viewRect);
+                }
+            }
         }
     }
 
