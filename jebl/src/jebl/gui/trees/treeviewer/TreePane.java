@@ -62,6 +62,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private int currentFilterNodeIndex;
     private boolean isFiltering;
 
+    private int numberOfTaxa;
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
@@ -105,6 +106,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( selectedNodes != null ) {
             this.selectedNodes.addAll(selectedNodes);
         }
+
+        this.numberOfTaxa = tree.getTaxa().size();
 
         setupTree();
     }
@@ -1101,9 +1104,24 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         return result;
     }
 
-    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers) {
+    /**
+     * Draws the node's marker
+     * @param g2 the graphics
+     * @param node the node
+     * @param alwaysDrawNodeMarkers whether or not to always draw node markers
+     * @param isPrinting whether or not the tree is being printed or saved as image
+     */
+    private void nodeMarker(Graphics2D g2, Node node, boolean alwaysDrawNodeMarkers, boolean isPrinting) {
         final boolean isSelected = selectedNodes.contains(node);
         final Paint color = g2.getPaint();
+        final boolean antiAliasingWasOff = !g2.getRenderingHints().containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
+        final boolean wantAntiAliasing = numberOfTaxa <= BIG_TREE_TAXA_THRESHOLD;
+
+        if(isPrinting || (antiAliasingWasOff && wantAntiAliasing)) {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        } else if(!wantAntiAliasing) {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
 
         Shape nodeMarker = getNodeMarker(node, circDiameter);
 
@@ -1119,6 +1137,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         g2.setColor(Color.black);
         g2.draw(nodeMarker);
         g2.setPaint(color);
+        if(antiAliasingWasOff) {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
     }
 
     boolean viewSubtree;
@@ -1194,7 +1215,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         final RenderingHints rhints = g2.getRenderingHints();
         final boolean antialiasOn = rhints.containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
-        if( ! antialiasOn ) {
+        // anti-aliasing slows things down a lot on non-rectilinear layouts.
+        // Keep it for printing/saving as an image though
+        final boolean wantAntiAliasing = isPrinting || treeLayout instanceof RectilinearTreeLayout || numberOfTaxa <= BIG_TREE_TAXA_THRESHOLD;
+
+        if( ! antialiasOn && wantAntiAliasing) {
           g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
 
@@ -1251,7 +1276,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             if(drawNodes)
-                nodeMarker(g2, node, drawAllNodeMarkers);
+                nodeMarker(g2, node, drawAllNodeMarkers, isPrinting);
         }
 
         final Node rootNode = tree.getRootNode();
@@ -1298,7 +1323,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                     if(drawNodes)
-                        nodeMarker(g2, node, drawAllNodeMarkers);
+                        nodeMarker(g2, node, drawAllNodeMarkers, isPrinting);
                 }
             }
         }
@@ -1307,13 +1332,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if( ! hideNode(rootNode) && drawNodes) {
             g2.setStroke(branchLineStroke);
-            nodeMarker(g2, rootNode, drawAllNodeMarkers);
+            nodeMarker(g2, rootNode, drawAllNodeMarkers, isPrinting);
         }
 
         if (mouseLocation != null) {
             Node nodeAt = getNodeAt(mouseLocation, g2);
             if (nodeAt != null) {
-                nodeMarker(g2, nodeAt, true);
+                nodeMarker(g2, nodeAt, true, isPrinting);
             }
         }
 
