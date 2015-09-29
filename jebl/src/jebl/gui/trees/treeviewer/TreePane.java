@@ -665,11 +665,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     final private int circDiameter = 9;
 
-    //this method is for figuring out which node the user clicked on (if any)
-    // result[0] is the selected node
-    // result[1] is the parent if tree is unrooted and selection is of the clade *away* from the currect
-    // direction, null otherwise
-    Node[] getNodeAt(Point point, Graphics2D g2, List<Node> candidateNodes) {
+    /**
+     * Return the node from the candidate list that is at the given point or null if no node is at the point
+     */
+    Node getNodeAt(Point point, Graphics2D g2, List<Node> candidateNodes) {
         if(point == null) {
             return null;
         }
@@ -691,15 +690,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         if (g2 == null) g2 = (Graphics2D)getGraphics();
 
-        Node[] result = new Node[2];
 
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
         for (int i = candidateNodes.size() - 1; i >= 0; i--) {
             Node node = candidateNodes.get(i);
             if( checkNodeIntersects(node, point)) {
-                result[0] = node;
-                return result;
+                return node;
             }
         }
 
@@ -710,14 +707,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     Node node = e.getNode();
                     if( node != null ) {
                         if( e.hit(g2, rect) ) {
-                           result[0] = node;
-                           return result;
+                           return node;
                         }
                     }
                 }
             }
         }
-        return result;
+        return null;
     }
 
     private Shape getNodeMarker(Node node, int d) {
@@ -1323,9 +1319,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (mouseLocation != null) {
-            Node[] nodeAt = getNodeAt(mouseLocation, g2, nodesOnScreen);
-            if (nodeAt != null && nodeAt.length > 0 && nodeAt[0] != null) {
-                nodeMarker(g2, nodeAt[0], true);
+            Node nodeAt = getNodeAt(mouseLocation, g2, nodesOnScreen);
+            if (nodeAt != null) {
+                nodeMarker(g2, nodeAt, true);
             }
         }
 

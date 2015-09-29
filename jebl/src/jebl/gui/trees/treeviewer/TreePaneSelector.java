@@ -42,7 +42,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
 
     public void mouseClicked(MouseEvent mouseEvent) {
         final Point mousePoint = mouseEvent.getPoint();
-        final Node[] selectedNode = treePane.getNodeAt(mousePoint, null, null);
+        final Node mainSelectedNode = treePane.getNodeAt(mousePoint, null, null);
         final boolean doubleClick = mouseEvent.getClickCount() > 1;
 
         final boolean addToSelection = mouseEvent.isShiftDown() || mouseEvent.isControlDown();
@@ -63,8 +63,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
             }
         }
 
-        final Node mainSelectedNode = selectedNode[0];
-
         final boolean alreadySelected = treePane.getSelectedNodes().contains(mainSelectedNode);
         switch (mode) {
             case NODE:
@@ -76,7 +74,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
                     if( mainSelectedNode != null )
                         treePane.manuallyToggleExpandContract(mainSelectedNode);
                 } else {
-                    treePane.addSelectedClade(selectedNode, !(addToSelection && alreadySelected));
+                    treePane.addSelectedClade(new Node[]{mainSelectedNode,null}, !(addToSelection && alreadySelected));
                 }
                 break;
             case TAXA:
