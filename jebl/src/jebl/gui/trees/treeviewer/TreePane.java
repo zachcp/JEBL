@@ -22,10 +22,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -71,6 +68,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         addMouseMotionListener(new MouseMotionAdapter(){
             public void mouseMoved(MouseEvent e) {
                 mouseLocation = e.getPoint();
+                repaint();
+            }
+        });
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseExited(MouseEvent e) {
+                mouseLocation = null;
                 repaint();
             }
         });
@@ -1111,10 +1115,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final boolean isSelected = selectedNodes.contains(node);
         final Paint color = g2.getPaint();
 
-
         Shape nodeMarker = getNodeMarker(node, circDiameter);
-
-        Point correctedMouseLocation = flipTree ? new Point(getWidth()-mouseLocation.x, mouseLocation.y) : mouseLocation;
 
         //we want to draw node markers either if they are selected, or if the mouse is close to them
         if(!alwaysDrawNodeMarkers && !isSelected)
@@ -1318,9 +1319,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
           nodeMarker(g2, rootNode, drawAllNodeMarkers);
         }
 
-        Node[] nodeAt = getNodeAt(mouseLocation, g2);
-        if (nodeAt != null && nodeAt.length > 0 && nodeAt[0] != null) {
-            nodeMarker(g2, nodeAt[0], true);
+        if (mouseLocation != null) {
+            Node[] nodeAt = getNodeAt(mouseLocation, g2);
+            if (nodeAt != null && nodeAt.length > 0 && nodeAt[0] != null) {
+                nodeMarker(g2, nodeAt[0], true);
+            }
         }
 
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
