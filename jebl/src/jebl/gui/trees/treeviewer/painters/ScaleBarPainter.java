@@ -99,6 +99,8 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
         Font oldFont = g2.getFont();
         Paint oldPaint = g2.getPaint();
         Stroke oldStroke = g2.getStroke();
+        boolean antiAliasingWasOn = g2.getRenderingHints().containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         if(paintAsMirrorImage) {
             g2.scale(-1,1);
@@ -165,6 +167,7 @@ public class ScaleBarPainter extends AbstractPainter<TreePane> {
             g2.translate(bounds.getWidth()+2*bounds.getX(),0);
             g2.scale(-1,1);
         }
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
     public double getWidth(Graphics2D g2, TreePane treePane) {

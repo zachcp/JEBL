@@ -18,9 +18,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,8 +36,6 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     private static Preferences getPrefs() {
         return Preferences.userNodeForPackage(TaxonLabelPainter.class);
     }
-
-    public static final Map<TextWidthCacheKey,Double> textWidthCache = new HashMap<TextWidthCacheKey, Double>();
 
     private Controls controls;
     private boolean visible;
@@ -228,7 +223,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
     public double getWidth(Graphics2D g2, Node item) {
         FontMetrics fm = getCurrentFontMetricsForGraphicsAndNode(g2, item);
         String label = getLabel(item);
-        return label == null ? 0 : getTextWidth(label, fm.getFont(), g2);
+        return label == null ? 0 : TreeViewerUtilities.getTextWidth(label, fm.getFont(), g2);
     }
 
     public double getPreferredHeight(Graphics2D g2, Node item) {
@@ -256,67 +251,6 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         FontMetrics fm = g2.getFontMetrics();
         g2.setFont(oldFont);
         return fm;
-    }
-
-    /**
-     * Gets the text width some text would be rendered with.
-     * @param text the text
-     * @param font the font
-     * @param g This is optional, but if provided the results will be more accurate.
-     * @return the width the text is rendered with
-     */
-    private static double getTextWidth(String text, Font font, Graphics2D g) {
-        if (text.length() == 0) {
-            return 0;
-        }
-        FontRenderContext frc = g==null?new FontRenderContext(new AffineTransform(), true, false) : g.getFontRenderContext();
-        TextWidthCacheKey key=new TextWidthCacheKey(frc, font, text);
-        Double value;
-        synchronized (textWidthCache) {
-            value = textWidthCache.get(key);
-        }
-        if (value != null) {
-            return value;
-        }
-        final Rectangle2D bounds = new TextLayout(text, font, frc).getBounds();
-        value = bounds.getWidth() + bounds.getX();
-        synchronized (textWidthCache) {
-            textWidthCache.put(key,value);
-        }
-        return value;
-    }
-
-    private static class TextWidthCacheKey {
-        FontRenderContext fontRenderContext;
-        Font font;
-        String text;
-
-        private TextWidthCacheKey(FontRenderContext fontRenderContext, Font font, String text) {
-            this.fontRenderContext = fontRenderContext;
-            this.font = font;
-            this.text = text;
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            TextWidthCacheKey that = (TextWidthCacheKey) o;
-
-            if (!font.equals(that.font)) return false;
-            if (!fontRenderContext.equals(that.fontRenderContext)) return false;
-            if (!text.equals(that.text)) return false;
-
-            return true;
-        }
-
-        public int hashCode() {
-            int result;
-            result = fontRenderContext.hashCode();
-            result = 31 * result + font.hashCode();
-            result = 31 * result + text.hashCode();
-            return result;
-        }
     }
 
     public void setControlPalette(ControlPalette controlPalette) {}
