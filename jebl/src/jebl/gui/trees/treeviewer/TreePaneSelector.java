@@ -42,7 +42,7 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
 
     public void mouseClicked(MouseEvent mouseEvent) {
         final Point mousePoint = mouseEvent.getPoint();
-        final Node[] selectedNode = treePane.getNodeAt(mousePoint, null);
+        final Node[] selectedNode = treePane.getNodeAt(mousePoint, null, null);
         final boolean doubleClick = mouseEvent.getClickCount() > 1;
 
         final boolean addToSelection = mouseEvent.isShiftDown() || mouseEvent.isControlDown();
