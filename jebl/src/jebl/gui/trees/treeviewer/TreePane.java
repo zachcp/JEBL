@@ -1311,17 +1311,34 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
 
-        /*
-         Loop through all the treeElements (= any node or branch label that is visible) and paints them
-         These elements are populated in the calibrate method
-         */
-        for( TreeDrawableElement label : treeElements ) {
-            if((label.isVisible() || !drawOnlyVisibleElements)){
-                Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
-                if(flipTree && viewRect != null) {
-                    viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
+        // check if there are too many labels to be shown effectively
+        Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
+        if(flipTree && viewRect != null) {
+            viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
+        }
+        int count = 0;
+        final int maxCount = 1000;
+        if (viewRect != null) {
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)) {
+                    if (label.getBounds().intersects(viewRect)) {
+                        if (++count == maxCount) {
+                            break;
+                        }
+                    }
                 }
-                label.draw(g2, viewRect);
+            }
+        }
+
+        if (count < maxCount) {
+            /*
+             Loop through all the treeElements (= any node or branch label that is visible) and paints them
+             These elements are populated in the calibrate method
+             */
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)){
+                    label.draw(g2, viewRect);
+                }
             }
         }
 
