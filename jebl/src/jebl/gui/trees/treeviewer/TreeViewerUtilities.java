@@ -1,6 +1,8 @@
 package jebl.gui.trees.treeviewer;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Steven Stones-Havas
@@ -14,7 +16,12 @@ public class TreeViewerUtilities {
     public static String KEY_NODE_COLOR = "nodeColor";
     public static String KEY_LABEL_FONT = "labelFont";
 
+    private static final Map<String, Font> cache = new HashMap<String, Font>();
+
     public static Font fontFromString(String fontRepresentation) {
+        if (cache.containsKey(fontRepresentation)) {
+            return cache.get(fontRepresentation);
+        }
         String[] attributes = fontRepresentation.split(":");
         if(attributes.length != 4) {
             throw new IllegalArgumentException("The font descriptor \""+fontRepresentation+"\" is invalid or corrupt");
@@ -39,7 +46,9 @@ public class TreeViewerUtilities {
             style += Font.ITALIC;
         }
 
-        return new Font(family, style, size);
+        final Font font = new Font(family, style, size);
+        cache.put(fontRepresentation, font);
+        return font;
     }
 
 
