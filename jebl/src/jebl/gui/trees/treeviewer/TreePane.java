@@ -1230,7 +1230,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
             final Shape branchPath = transform.createTransformedShape(treeLayout.getBranchPath(node));
 
-            if (!branchPath.intersects(g2.getClipBounds())) {
+            if (clipOffscreenShapes && !branchPath.intersects(g2.getClipBounds())) {
                 continue;
             }
 
@@ -1296,7 +1296,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     if(branchPath == null)
                         continue;
 
-                    if (!branchPath.intersects(g2.getClipBounds())) {
+                    if (clipOffscreenShapes && !branchPath.intersects(g2.getClipBounds())) {
                         continue;
                     }
                     if (!treeLayout.shouldAntialiasBranchPath()) {
