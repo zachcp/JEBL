@@ -668,21 +668,19 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     /**
      * Return the node from the candidate list that is at the given point or null if no node is at the point
      */
-    Node getNodeAt(Point point, Graphics2D g2, List<Node> candidateNodes) {
+    Node getNodeAt(Point point, Graphics2D g2) {
         if(point == null) {
             return null;
         }
 
-        if (candidateNodes == null) {
-            candidateNodes = new ArrayList<Node>();
-            candidateNodes.addAll(tree.getExternalNodes());
-            for (Node node : nodesInOrder) {
-                if (!tree.isExternal(node)) {
-                    candidateNodes.add(node);
-                }
+        List<Node> nodes = new ArrayList<Node>();
+        nodes.addAll(tree.getExternalNodes());
+        for (Node node : nodesInOrder) {
+            if (!tree.isExternal(node)) {
+                nodes.add(node);
             }
-            candidateNodes.add(tree.getRootNode());
         }
+        nodes.add(tree.getRootNode());
 
         if(flipTree) {
             point = new Point(getWidth()-point.x, point.y);
@@ -693,8 +691,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
 
-        for (int i = candidateNodes.size() - 1; i >= 0; i--) {
-            Node node = candidateNodes.get(i);
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            Node node = nodes.get(i);
             if( checkNodeIntersects(node, point)) {
                 return node;
             }
@@ -1214,9 +1212,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         final boolean alignedTaxa = treeLayout.alignTaxa();
 
-        // nodes that haven't been clipped
-        final List<Node> nodesOnScreen = new ArrayList<Node>();
-
         /**
          * Loops through external nodes, drawing their branches and node markers if they are visible
          */
@@ -1229,7 +1224,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             if (clipOffscreenShapes && !branchPath.intersects(g2.getClipBounds())) {
                 continue;
             }
-            nodesOnScreen.add(node);
 
             Paint paint = (branchDecorator != null) ? branchDecorator.getBranchPaint(tree, node) : Color.BLACK;
 
@@ -1296,7 +1290,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     if (clipOffscreenShapes && !branchPath.intersects(g2.getClipBounds())) {
                         continue;
                     }
-                    nodesOnScreen.add(node);
 
                     if (!treeLayout.shouldAntialiasBranchPath()) {
                         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -1315,11 +1308,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if( ! hideNode(rootNode) && drawNodes) {
             g2.setStroke(branchLineStroke);
             nodeMarker(g2, rootNode, drawAllNodeMarkers);
-            nodesOnScreen.add(rootNode);
         }
 
         if (mouseLocation != null) {
-            Node nodeAt = getNodeAt(mouseLocation, g2, nodesOnScreen);
+            Node nodeAt = getNodeAt(mouseLocation, g2);
             if (nodeAt != null) {
                 nodeMarker(g2, nodeAt, true);
             }
