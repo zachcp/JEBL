@@ -1385,23 +1385,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         } else {
-            // the transform used on the tree will cause the text to be transformed we don't want this
-            // so a new, blank transform is used and the other one will be applied back later
-            AffineTransform previousTransform = g2.getTransform();
-            g2.setTransform(new AffineTransform());
-            AffineTransform nwTransform = g2.getTransform();
-
-            String tooManyTipsWarning = "Too many tips labels to display. Tip labels have been hidden.";
+            String tooManyTipsWarning = "Too many labels to display. Expand, zoom or collapse to see labels";
             int padding = 10;
             double textWidth = TreeViewerUtilities.getTextWidth(tooManyTipsWarning, g2.getFont(), g2);
-            double warningLabelX = viewport.getX() + viewport.getWidth() - textWidth - padding;
-            double warningLabelY = viewport.getY() + viewport.getHeight() - padding;
+            double warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
+            double warningLabelY = viewport.getViewRect().y + viewport.getViewRect().height - padding;
             boolean antiAliasingWasOn = g2.getRenderingHints().containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
 
-            g2.setColor(Color.RED);
+            g2.setColor(Color.darkGray);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.drawString(tooManyTipsWarning, (int) warningLabelX, (int) warningLabelY);
-            g2.setTransform(previousTransform);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
         }
     }
