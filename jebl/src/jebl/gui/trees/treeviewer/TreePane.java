@@ -1404,7 +1404,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         } else {
-            String tooManyTipsWarning = "Too many labels to display. Expand, zoom or collapse to see labels";
+            String tooManyTipsWarning = "Too many labels to display";
             int padding = 10;
             double textWidth = TreeViewerUtilities.getTextWidth(tooManyTipsWarning, g2.getFont(), g2);
             double warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
