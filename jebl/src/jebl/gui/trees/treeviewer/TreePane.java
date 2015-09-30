@@ -1032,6 +1032,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         for (TreeSelectionListener treeSelectionListener : treeSelectionListeners) {
             treeSelectionListener.selectionChanged();
         }
+        resetNodeVisibilities();
     }
 
     public void paint(Graphics graphics) {
@@ -2120,10 +2121,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             // scroll the viewport
             scrollRectToVisible(new Rectangle((int)x, (int)y, (int)viewport.getViewRect().getWidth(), (int)viewport.getViewRect().getHeight()));
         }
-    }
-
-    public void setCollapsedNodeHelp(JButton help) {
-        collapsedNodeLabelPainter.setHelpButton(help);
     }
 
     private class TreeBoundsHelper {
