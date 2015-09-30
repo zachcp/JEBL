@@ -45,11 +45,11 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
     public CollapsedNodeLabelPainter(RootedTree tree) {
         super("Collapsed Node Labels", tree, PainterIntent.COLLAPSED, 12);
-        collapsedDistanceThreshold = getPrefs().getDouble(KEY_COLLAPSE_THRESHOLD, 0.0);
+        maxDistanceForCurrentTree = getMaxDistanceForTree(tree);
+        collapsedDistanceThreshold = getPrefs().getDouble(KEY_COLLAPSE_THRESHOLD, 0.0) * maxDistanceForCurrentTree / 100;
         isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 1000));
         isCollapsed = isCollapsedDefault;
         areLabelsVisible = getPrefs().getBoolean(KEY_SHOW_COLLAPSE_LABELS, true);
-        maxDistanceForCurrentTree = getMaxDistanceForTree(tree);
         numberManualNodes = 0;
     }
 
@@ -134,7 +134,16 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
                 }
             });
 
-            sliderLabel = new JLabel();
+            // Set the preferred size of the label so it doesn't change.  The label will be one of:
+            // N.NNE(+/-)M
+            // 0.NNNN
+            // N.NN
+            // The largest being the scientific notation.  So that's the one we size the label for.
+            // We add an extra space just to be safe :)
+            char[] forSizing = new char[formatter.getSignificantFigures()+1];
+            Arrays.fill(forSizing, '0');
+            sliderLabel = new JLabel(" .E-4" + new String(forSizing));
+            sliderLabel.setPreferredSize(sliderLabel.getPreferredSize());
             createCollapseSlider();
             createShowLabelsCheckbox();
             createResetButton();
@@ -213,7 +222,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         this.tree = tree;
         // If the tree could have changed then the max dist under the root could have too.  Re-calculate and update control.
         maxDistanceForCurrentTree = getMaxDistanceForTree(this.tree);
-        sliderLabel.setText(getCollapseSliderLabelText());
+        updateSliderFromCollapseDistanceValue();
     }
 
     private static double getMaxDistanceForTree(RootedTree tree) {
@@ -247,8 +256,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
     private void createCollapseSlider() {
         collapseSlider = new JSlider(SwingConstants.HORIZONTAL, 0, getSliderMax(), 0);
-        collapseSlider.setValue((int) (collapsedDistanceThreshold / maxDistanceForCurrentTree * NUM_SLIDER_INCREMENTS));
-        sliderLabel.setText(getCollapseSliderLabelText());
+        updateSliderFromCollapseDistanceValue();
         collapseSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 double value = getCollapseDistance();
@@ -256,9 +264,18 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
                     sliderLabel.setText(getCollapseSliderLabelText());
                     setCollapsedDistanceThreshold(value);
                 }
-                getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, value);
+                getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, collapseSlider.getValue());
             }
         });
+    }
+
+    /**
+     * Updates the collapse slider component and label based on the collapse distance that has been set on the painter.
+     * i.e. Updates the view based on the model.
+     */
+    private void updateSliderFromCollapseDistanceValue() {
+        collapseSlider.setValue((int) (collapsedDistanceThreshold / maxDistanceForCurrentTree * NUM_SLIDER_INCREMENTS));
+        sliderLabel.setText(getCollapseSliderLabelText());
     }
 
     private NumberFormatter formatter = new NumberFormatter(3);
