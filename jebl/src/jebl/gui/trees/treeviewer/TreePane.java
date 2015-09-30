@@ -1253,8 +1253,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final Set<Node> externalNodes = tree.getExternalNodes();
         final boolean showingTaxonLables = taxonLabelPainter != null && taxonLabelPainter.isVisible();
 
-        final boolean alignedTaxa = treeLayout.alignTaxa();
-
         /**
          * Loops through external nodes, drawing their branches and node markers if they are visible
          */
@@ -1276,15 +1274,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
 
             g2.setPaint(paint);
-
-            if (showingTaxonCallouts && showingTaxonLables) {
-                final Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(node));
-                if (calloutPath != null) {
-                    g2.setStroke(taxonCalloutStroke);
-                    g2.draw(calloutPath);
-                }
-            }
-
 
             g2.setStroke(branchLineStroke);
             if (!treeLayout.shouldAntialiasBranchPath()) {
@@ -1401,6 +1390,16 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (count < maxCount) {
             for( TreeDrawableElement label : treeElements ) {
                 if((label.isVisible() || !drawOnlyVisibleElements)){
+                    if (showingTaxonCallouts) {
+                        final Shape calloutPath = transform.createTransformedShape(treeLayout.getCalloutPath(label.getNode()));
+                        if (calloutPath != null) {
+                            g2.setStroke(branchLineStroke);
+                            g2.setColor(new Color(220,220,220));
+                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+                            g2.draw(calloutPath);
+                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        }
+                    }
                     label.draw(g2, viewRect);
                 }
             }
@@ -2380,7 +2379,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     private Stroke branchLineStroke = new BasicStroke(1.0F);
     private Stroke collapsedStroke = new BasicStroke(1.5F); //the stroke used to draw collapsed node shapes
-    private Stroke taxonCalloutStroke = new BasicStroke(0.5F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{0.5f, 2.0f}, 0.0f);
     private Paint selectionPaint = Color.BLUE; // new Color(180, 213, 254);
     private boolean calibrated = false;
     private double cladeDistanceThresholdToCollapse = 0.0;
