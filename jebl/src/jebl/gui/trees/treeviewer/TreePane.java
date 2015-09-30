@@ -66,7 +66,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     public TreePane() {
         setBackground(UIManager.getColor("TextArea.background"));
-        addMouseMotionListener(new MouseMotionAdapter(){
+        addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseMoved(MouseEvent e) {
                 mouseLocation = e.getPoint();
                 repaint();
@@ -696,7 +696,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         for (int i = nodes.size() - 1; i >= 0; i--) {
             Node node = nodes.get(i);
-            if( checkNodeIntersects(node, point)) {
+            if(  isNodeVisible(node) && !hideNode(node) && checkNodeIntersects(node, point)) {
                 return node;
             }
         }
