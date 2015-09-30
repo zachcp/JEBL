@@ -108,20 +108,23 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
                 }
             }
 
-            for (Node selectedNode : selectedNodes) {
-                switch (mode) {
-                    case NODE:
+            switch (mode) {
+                case NODE:
+                    for (Node selectedNode : selectedNodes) {
                         treePane.addSelectedNode(selectedNode, true);
-                        break;
-                    case CLADE:
-                        treePane.addSelectedClade(new Node[]{selectedNode, null}, true);
-                        break;
-                    case TAXA:
+                    }
+                    break;
+                case CLADE:
+                    treePane.addSelectedClades(selectedNodes, true);
+                    break;
+                case TAXA:
+
+                    for (Node selectedNode : selectedNodes) {
                         treePane.addSelectedTaxa(selectedNode);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
-                }
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown SelectionMode: " + selectionMode.name());
             }
         }
         treePane.setDragRectangle(null);

@@ -309,6 +309,17 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
+    public void addSelectedClades(Collection<Node> nodes, boolean add) {
+        for (Node node : nodes) {
+            if ( canSelectNode(node) ) {
+                addSelectedChildClades(new Node[] {node, null}, add);
+            }
+        }
+        if( viewSubtree ) calibrated = false;
+        fireSelectionChanged();
+        repaint();
+    }
+
     private void addSelectedChildClades(Node[] selectedNode, boolean add) {
         if( selectedNode[1] == null ) {
             addSelectedChildClades(selectedNode[0], null, add);
