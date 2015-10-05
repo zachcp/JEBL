@@ -260,10 +260,8 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         collapseSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent changeEvent) {
                 double value = getCollapseDistance();
-                if (Math.abs(value - collapsedDistanceThreshold) > 0.0001) {
-                    sliderLabel.setText(getCollapseSliderLabelText());
-                    setCollapsedDistanceThreshold(value);
-                }
+                setCollapsedDistanceThreshold(value);
+                sliderLabel.setText(getCollapseSliderLabelText());
                 getPrefs().putDouble(KEY_COLLAPSE_THRESHOLD, collapseSlider.getValue());
             }
         });
