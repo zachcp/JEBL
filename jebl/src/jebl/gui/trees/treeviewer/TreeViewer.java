@@ -277,6 +277,7 @@ public class TreeViewer extends JPanel implements Printable {
         treePane.setCollapsedNodeLabelPainter(collapsedNodeLabelPainter);
 
         treePane.setScaleBarPainter(new ScaleBarPainter());
+        treePane.setTooManyLabelsPainter(new ExtraLabelPainter("Too many labels to display"));
 
         // load appropriate tree layout from preferences and set it
         setTreeLayoutType(getDefaultTreeLayoutType());
