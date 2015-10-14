@@ -140,7 +140,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             // N.NN
             // The largest being the scientific notation.  So that's the one we size the label for.
             // We add an extra space just to be safe :)
-            char[] forSizing = new char[formatter.getSignificantFigures()+1];
+            char[] forSizing = new char[formatter.getSignificantFigures()];
             Arrays.fill(forSizing, '0');
             sliderLabel = new JLabel(" .E-4" + new String(forSizing));
             sliderLabel.setPreferredSize(sliderLabel.getPreferredSize());
@@ -280,9 +280,9 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private String getCollapseSliderLabelText() {
         int sliderValue = collapseSlider.getValue();
         if(sliderValue == 0) {
-            return "None";
+            return "0";
         } else if(sliderValue == getSliderMax()) {
-            return "All";
+            return "Max";
         } else {
             return formatter.getFormattedValue(getCollapsedDistanceThreshold());
         }
