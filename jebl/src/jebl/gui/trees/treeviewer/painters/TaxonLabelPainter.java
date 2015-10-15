@@ -37,8 +37,13 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return Preferences.userNodeForPackage(TaxonLabelPainter.class);
     }
 
+    public JLabel getCheckBoxWarningLabel() {
+        return checkBoxWarningLabel;
+    }
+
     private Controls controls;
     private boolean visible;
+    private JLabel checkBoxWarningLabel;
     private int maxChars = 30;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
@@ -262,13 +267,22 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             OptionsPanel panel = new OptionsPanel();
 
             final JCheckBox visibleCheckBox = new JCheckBox("Show Tip Labels", visible);
+            Icon warningIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/warning16.png");
+            checkBoxWarningLabel = new JLabel("Too many to display", warningIcon, SwingConstants.LEFT);
+            checkBoxWarningLabel.setToolTipText("Zoom in or collapse subtrees to show labels");
             visibleCheckBox.addChangeListener(new ChangeListener(){
                 public void stateChanged(ChangeEvent e) {
                     visible = visibleCheckBox.isSelected();
                     getPrefs().putBoolean("Tip Labels_isopoen", visible);
+                    checkBoxWarningLabel.setVisible(visible);   // don't show warning if labels aren't visible anyway
                     firePainterChanged();
                 }
             });
+
+            JPanel checkBoxAndLabel = new JPanel(new BorderLayout());
+            checkBoxAndLabel.setBorder(new EmptyBorder(0,0,0,10));
+            checkBoxAndLabel.add(visibleCheckBox, BorderLayout.WEST);
+            checkBoxAndLabel.add(checkBoxWarningLabel, BorderLayout.EAST);
 
             final JList attributeBox = new JList(attributes){
                 @Override
@@ -277,7 +291,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
                     return new Dimension(super.getPreferredSize().width+1, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight)); // +1 seems to stop ugly horizontal scroll bars showing up
                 }
-            };;
+            };
             String[] prefsValue = getPrefs().get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -347,8 +361,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             infoLabel.setBorder(new EmptyBorder(5,0,5,0));
             panel.addSpanningComponent(infoLabel);
 
-            controls = new Controls("Tip Labels", panel, true, true, visibleCheckBox);
-            
+            controls = new Controls("Tip Labels", panel, true, true, checkBoxAndLabel);
         }
         controlsList.add(controls);
 

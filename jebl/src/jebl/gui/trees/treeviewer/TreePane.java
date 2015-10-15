@@ -1388,6 +1388,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (count < maxCount) {
+            ((TaxonLabelPainter) taxonLabelPainter).getCheckBoxWarningLabel().setVisible(false);
             for( TreeDrawableElement label : treeElements ) {
                 if((label.isVisible() || !drawOnlyVisibleElements)){
                     if (showingTaxonCallouts) {
@@ -1404,14 +1405,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         } else {
-            String tooManyTipsWarning = "Too many labels to display";
-            int padding = 10;
-            double textWidth = TreeViewerUtilities.getTextWidth(tooManyTipsWarning, g2.getFont(), g2);
-            double warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
-            double warningLabelY = viewport.getViewRect().y + viewport.getViewRect().height - padding;
-
-            g2.setColor(Color.darkGray);
-            g2.drawString(tooManyTipsWarning, (int) warningLabelX, (int) warningLabelY);
+            ((TaxonLabelPainter) taxonLabelPainter).getCheckBoxWarningLabel().setVisible(true);
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     }
