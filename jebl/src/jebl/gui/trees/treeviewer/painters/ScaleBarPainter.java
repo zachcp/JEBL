@@ -3,7 +3,9 @@ package jebl.gui.trees.treeviewer.painters;
 import jebl.gui.trees.treeviewer.TreePane;
 import jebl.gui.trees.treeviewer.TreeViewer;
 import org.virion.jam.components.RealNumberField;
+import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
 
 import javax.swing.*;
@@ -21,24 +23,37 @@ import java.util.prefs.Preferences;
  * @author Alexei Drummond
  * @version $Id$
  */
-public class ScaleBarPainter extends ExtraElementPainter {
+public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private int defaultFontSize;
     private double scaleRange;
     private double userScaleRange = 0.0;
     private boolean initializeEnabled = true;
-    private Controls controls = null;
-    private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-    private Font scaleFont;
-    private float yOffset;
 
     public ScaleBarPainter() {
         this(0.0, 12);
+    }
+
+    public ScaleBarPainter(double scaleRange) {
+        this(scaleRange, 12);
+    }
+
+    public ScaleBarPainter(int defaultSize) {
+        this(0.0, defaultSize);
     }
 
     public ScaleBarPainter(double scaleRange, int defaultSize) {
         this.scaleRange = scaleRange;
         this.defaultFontSize = defaultSize;
         scaleFont = new Font("sansserif", Font.PLAIN, defaultFontSize);
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        firePainterChanged();
     }
 
     public void calibrate(Graphics2D g2) {
@@ -189,14 +204,32 @@ public class ScaleBarPainter extends ExtraElementPainter {
         return preferredWidth;
     }
 
+    public double getPreferredHeight(Graphics2D g, TreePane item) {
+        return preferredHeight;
+    }
+
+    public double getHeightBound(Graphics2D g, TreePane item) {
+        return preferredHeight + yOffset;
+    }
+
     public void setScaleRange(double scaleRange) {
         this.userScaleRange = scaleRange;
         firePainterChanged();
     }
 
+    public void setFontSize(float size) {
+        scaleFont = scaleFont.deriveFont(size);
+        firePainterChanged();
+    }
+
+
     public void setLineWeight(float weight) {
         this.scaleBarStroke = new BasicStroke(weight, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
         firePainterChanged();
+    }
+
+    public void setControlPalette(ControlPalette controlPalette) {
+        // nothing to do
     }
 
     /**
@@ -309,4 +342,22 @@ public class ScaleBarPainter extends ExtraElementPainter {
     private Preferences getPrefs() {
         return Preferences.userNodeForPackage(TreeViewer.class);
     }
+
+    public void setSettings(ControlsSettings settings) {
+    }
+
+    public void getSettings(ControlsSettings settings) {
+    }
+
+    private Controls controls = null;
+
+    private boolean visible = true;
+
+    private BasicStroke scaleBarStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+
+    private Font scaleFont;
+    private double preferredHeight;
+    //private double preferredWidth;
+
+    private float yOffset;
 }

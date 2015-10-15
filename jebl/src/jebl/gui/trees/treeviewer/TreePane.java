@@ -608,10 +608,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         repaint();
     }
 
-    public void setTooManyLabelsPainter(ExtraLabelPainter tooManyLabelsPainter) {
-        this.tooManyLabelsPainter = tooManyLabelsPainter;
-    }
-
     public Painter<Node> getCollapsedNodeLabelPainter() {
         return collapsedNodeLabelPainter;
     }
@@ -733,17 +729,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             }
         }
         return null;
-    }
-
-    boolean intersectsWithLabel(Point point) {
-        if(point == null) return false;
-        if(flipTree) point = new Point(getWidth()-point.x, point.y);
-        Rectangle rect = new Rectangle(point.x - 1, point.y - 1, 3, 3);
-        return tooManyLabelsPainter.isVisible() && tooManyLabelsPainter.intersectsWith(point);
-    }
-
-    ExtraLabelPainter getTooManyLabelsPainter() {
-        return tooManyLabelsPainter;
     }
 
     private Shape getNodeMarker(Node node, int d) {
@@ -1418,14 +1403,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     label.draw(g2, viewRect);
                 }
             }
-            tooManyLabelsPainter.setVisible(true);  // so that it is visible next time when it's painted.
         } else {
+            String tooManyTipsWarning = "Too many labels to display";
             int padding = 10;
-            int textWidth = (int) Math.ceil(TreeViewerUtilities.getTextWidth(tooManyLabelsPainter.label, g2.getFont(), g2));
-            int warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
-            int warningLabelY = viewport.getViewRect().y + viewport.getViewRect().height - padding;
-            tooManyLabelsPainter.setPaintAsMirrorImage(flipTree);
-            tooManyLabelsPainter.paint(g2, viewRect, warningLabelX, warningLabelY);
+            double textWidth = TreeViewerUtilities.getTextWidth(tooManyTipsWarning, g2.getFont(), g2);
+            double warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
+            double warningLabelY = viewport.getViewRect().y + viewport.getViewRect().height - padding;
+
+            g2.setColor(Color.darkGray);
+            g2.drawString(tooManyTipsWarning, (int) warningLabelX, (int) warningLabelY);
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
     }
@@ -2388,8 +2374,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
     private ScaleBarPainter scaleBarPainter = null;
     private Rectangle2D scaleBarBounds = null;
-
-    private ExtraLabelPainter tooManyLabelsPainter = null;
 
     private CollapsedNodeLabelPainter collapsedNodeLabelPainter;
 

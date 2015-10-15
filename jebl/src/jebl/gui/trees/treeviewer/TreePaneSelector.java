@@ -43,13 +43,6 @@ public class TreePaneSelector implements MouseListener, MouseMotionListener {
     public void mouseClicked(MouseEvent mouseEvent) {
         final Point mousePoint = mouseEvent.getPoint();
         final Node mainSelectedNode = treePane.getNodeAt(mousePoint, null);
-        if (mainSelectedNode == null) {
-            // check whether the "too many labels" label has been clicked...
-            System.out.println("Clicked and no node selected...");
-            if (treePane.intersectsWithLabel(mousePoint)){
-                treePane.getTooManyLabelsPainter().setVisible(false);
-            }
-        }
         final boolean doubleClick = mouseEvent.getClickCount() > 1;
 
         final boolean addToSelection = mouseEvent.isShiftDown() || mouseEvent.isControlDown();
