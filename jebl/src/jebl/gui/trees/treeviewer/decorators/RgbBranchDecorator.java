@@ -1,8 +1,9 @@
 package jebl.gui.trees.treeviewer.decorators;
 
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.RootedTree;
 import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Tree;
+import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 
 import java.awt.*;
 
@@ -22,7 +23,7 @@ public class RgbBranchDecorator implements BranchDecorator{
         Node newNode = rootedTree.getParent(node);
         if(newNode == null)
             return Color.black;
-        Object colorString = newNode.getAttribute("nodeColor");
+        Object colorString = newNode.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
         if(colorString == null)
             return Color.black;
         String rgb = colorString.toString();

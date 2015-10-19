@@ -1753,7 +1753,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                                                          nodeWithLongestTaxon, taxonLabelPainter,
                         null, false, paintAsGray);
 
-                Object colorAttr = node.getAttribute("nodeColor");
+                Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
                 if(colorAttr != null){
                     nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
                 }
@@ -1798,7 +1798,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                                                           null, ((BasicLabelPainter) nodeLabelPainter), "node", isFiltering);
 
 
-                Object colorAttr = node.getAttribute("nodeColor");
+                Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
                 Color nodeColor = Color.black;
                 if(colorAttr != null){
                     nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
