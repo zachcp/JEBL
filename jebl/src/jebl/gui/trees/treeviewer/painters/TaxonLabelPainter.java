@@ -37,13 +37,8 @@ public class TaxonLabelPainter extends BasicLabelPainter{
         return Preferences.userNodeForPackage(TaxonLabelPainter.class);
     }
 
-    public JLabel getCheckBoxWarningLabel() {
-        return checkBoxWarningLabel;
-    }
-
     private Controls controls;
     private boolean visible;
-    private JLabel checkBoxWarningLabel;
     private int maxChars = 30;
     private String[] selectedAttributes = new String[] {TAXON_NAMES};
     private static final String SELECTED_FIELDS_SERIALIZATION_SEPARATOR = "|";
@@ -267,22 +262,14 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             OptionsPanel panel = new OptionsPanel();
 
             final JCheckBox visibleCheckBox = new JCheckBox("Show Tip Labels", visible);
-            Icon warningIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/warning16.png");
-            checkBoxWarningLabel = new JLabel("Too many to display", warningIcon, SwingConstants.LEFT);
-            checkBoxWarningLabel.setToolTipText("Zoom in or collapse subtrees to show labels");
-            visibleCheckBox.addChangeListener(new ChangeListener(){
+            visibleCheckBox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     visible = visibleCheckBox.isSelected();
                     getPrefs().putBoolean("Tip Labels_isopoen", visible);
-                    checkBoxWarningLabel.setVisible(visible);   // don't show warning if labels aren't visible anyway
                     firePainterChanged();
                 }
             });
-
-            JPanel checkBoxAndLabel = new JPanel(new BorderLayout());
-            checkBoxAndLabel.setBorder(new EmptyBorder(0,0,0,10));
-            checkBoxAndLabel.add(visibleCheckBox, BorderLayout.WEST);
-            checkBoxAndLabel.add(checkBoxWarningLabel, BorderLayout.EAST);
+            final JComponent checkBoxAndLabel = combineCheckBoxWithLabel(visibleCheckBox);
 
             final JList attributeBox = new JList(attributes){
                 @Override

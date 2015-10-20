@@ -1388,7 +1388,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (count < maxCount) {
-            ((TaxonLabelPainter) taxonLabelPainter).getCheckBoxWarningLabel().setVisible(false);
+            showTooManyLabelsWarning(false);
             for( TreeDrawableElement label : treeElements ) {
                 if((label.isVisible() || !drawOnlyVisibleElements)){
                     if (showingTaxonCallouts) {
@@ -1405,9 +1405,17 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         } else {
-            ((TaxonLabelPainter) taxonLabelPainter).getCheckBoxWarningLabel().setVisible(true);
+            showTooManyLabelsWarning(true);
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
+    private void showTooManyLabelsWarning(boolean showWarning) {
+        for (Painter painter : new Painter[]{taxonLabelPainter, nodeLabelPainter, branchLabelPainter}) {
+            if (painter instanceof BasicLabelPainter) {
+                ((BasicLabelPainter) painter).showTooManyLabelsWarning(showWarning);
+            }
+        }
     }
 
     /**

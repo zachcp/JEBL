@@ -26,7 +26,24 @@ public class Controls {
         this.panel = panel;
         this.isVisible = isVisible;
         this.isPinned = isPinned;
+        this.primaryCheckbox = getCheckBoxFromComponent(primaryComponent);
         this.primaryComponent = primaryComponent;
+    }
+
+    private JCheckBox getCheckBoxFromComponent(JComponent primaryComponent) {
+        if (primaryComponent == null) {
+            return null;
+        }
+        if (primaryComponent instanceof JCheckBox) {
+            return (JCheckBox) primaryComponent;
+        } else {
+            for (Component component : primaryComponent.getComponents()) {
+                if (component instanceof JCheckBox) {
+                    return (JCheckBox) component;   // we shouldn't have more than one here!
+                }
+            }
+        }
+        return null;
     }
 
     public String getTitle() {
@@ -54,19 +71,7 @@ public class Controls {
     }
 
     public JCheckBox getPrimaryCheckbox() {
-        if (primaryComponent == null) {
-            return null;
-        }
-        if (primaryComponent instanceof JCheckBox) {
-            return (JCheckBox) primaryComponent;
-        } else {
-            for (Component component : primaryComponent.getComponents()) {
-                if (component instanceof JCheckBox) {
-                    return (JCheckBox) component;   // we shouldn't have more than one here!
-                }
-            }
-        }
-        return null;
+        return primaryCheckbox;
     }
 
     public JComponent getPrimaryComponent() {
@@ -75,6 +80,7 @@ public class Controls {
 
     private String title;
     private JPanel panel;
+    private JCheckBox primaryCheckbox;
     private JComponent primaryComponent;
     private boolean isVisible;
 
