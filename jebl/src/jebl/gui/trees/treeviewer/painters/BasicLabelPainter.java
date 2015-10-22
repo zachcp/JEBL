@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 /**
  * @author Andrew Rambaut
@@ -34,12 +35,9 @@ import java.util.prefs.Preferences;
  */
 public class BasicLabelPainter extends AbstractPainter<Node> {
 
-    private static final List<String> consensusSupportAtrributeNames = Arrays.asList(
-            "Consensus support(%)",
-            "Clade Support",
-            "bootstrap proportion",
-            "Bootstrap proportion",
-            "Posterior Probability");
+    private static final Pattern consensusSupportAttributePattern = Pattern.compile(
+            "(consensus|clade|bootstrap|posterior)\\s*(support|probability)",
+            Pattern.CASE_INSENSITIVE);
 
     final String fontMinSizePrefKey;
     final String fontSizePrefKey;
@@ -156,9 +154,9 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         if (intent == PainterIntent.BRANCH) {
             Set<Node> nodes = tree.getInternalNodes();
             for (Node node : nodes) {
-                for (String consensusSupportAtrributeName : consensusSupportAtrributeNames) {
-                    if (node.getAttribute(consensusSupportAtrributeName) != null) {
-                        names.add(consensusSupportAtrributeName);
+                for (String attributeName : node.getAttributeNames()) {
+                    if (isConsensusSupportAttribute(attributeName)) {
+                        names.add(attributeName);
                     }
                 }
             }
@@ -610,19 +608,20 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     }
 
     private int getConsensusSupportIndex() {
-
-        List<String> attributesList = Arrays.asList(getAttributes());
-        for(String s : consensusSupportAtrributeNames) {
-            int index = attributesList.indexOf(s);
-            if(index >= 0) {
-                return index;
+        for (int i = 0; i < attributes.length; i++) {
+            if (isConsensusSupportAttribute(attributes[i])) {
+                return i;
             }
         }
         return -1;
     }
 
     public boolean isConsensusSupportAttribute() {
-        return consensusSupportAtrributeNames.contains(attribute);
+        return isConsensusSupportAttribute(attribute);
+    }
+
+    private boolean isConsensusSupportAttribute(String attributeName) {
+        return consensusSupportAttributePattern.matcher(attributeName).find();
     }
 
     public void setSettings(ControlsSettings settings) {
