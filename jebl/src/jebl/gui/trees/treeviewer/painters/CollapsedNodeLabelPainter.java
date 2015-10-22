@@ -146,6 +146,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             sliderLabel.setPreferredSize(sliderLabel.getPreferredSize());
             createCollapseSlider();
             createShowLabelsCheckbox();
+            createCheckBoxWarningLabel(true);
             createResetButton();
 
             Box sliderBox = Box.createHorizontalBox();
@@ -154,8 +155,12 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             sliderBox.add(Box.createHorizontalStrut(5));
             sliderBox.add(HelpButtonGetter.get(helpTitle, helpText));
 
+            Box showLabelsBox = Box.createHorizontalBox();
+            showLabelsBox.add(showLabelsCheckBox);
+            showLabelsBox.add(checkBoxWarningLabel);
+
             optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
-            optionsPanel.addComponent(showLabelsCheckBox, true);
+            optionsPanel.addComponent(showLabelsBox, true);
             optionsPanel.addComponent(resetButton, false);
 
             controls = new Controls("Subtree Collapse", optionsPanel, true, false, collapseCheckbox);
@@ -236,6 +241,11 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     public boolean areLabelsVisible() {
+        return areLabelsVisible;
+    }
+
+    @Override
+    public boolean isVisible() {
         return areLabelsVisible;
     }
 

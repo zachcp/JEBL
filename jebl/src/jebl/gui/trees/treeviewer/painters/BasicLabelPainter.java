@@ -582,16 +582,25 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         return controlsList;
     }
 
-    JComponent combineCheckBoxWithLabel(JCheckBox checkBox) {
-        Icon warningIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/warning16.png");
-        checkBoxWarningLabel = new JLabel("Too many to display", warningIcon, SwingConstants.LEFT);
-        checkBoxWarningLabel.setToolTipText("Zoom in or collapse subtrees to show labels");
-        checkBoxWarningLabel.setVisible(false);     // not visible by default, only visible when set explicitly!
+    protected JComponent combineCheckBoxWithLabel(JCheckBox checkBox) {
+        createCheckBoxWarningLabel(false);
         JPanel checkBoxAndLabel = new JPanel(new BorderLayout());
         checkBoxAndLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
         checkBoxAndLabel.add(checkBox, BorderLayout.WEST);
         checkBoxAndLabel.add(checkBoxWarningLabel, BorderLayout.EAST);
         return checkBoxAndLabel;
+    }
+
+    protected void createCheckBoxWarningLabel(boolean showOnlyIcon) {
+        Icon warningIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/warning16.png");
+        if (showOnlyIcon) {
+            checkBoxWarningLabel = new JLabel(warningIcon);
+            checkBoxWarningLabel.setToolTipText("Too many labels to display. Zoom in or collapse subtrees to show labels");
+        } else {
+            checkBoxWarningLabel = new JLabel("Too many to display", warningIcon, SwingConstants.LEFT);
+            checkBoxWarningLabel.setToolTipText("Zoom in or collapse subtrees to show labels");
+        }
+        checkBoxWarningLabel.setVisible(false);     // not visible by default, only visible when set explicitly!
     }
 
     public void showTooManyLabelsWarning(boolean showWarning) {

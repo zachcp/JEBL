@@ -1411,7 +1411,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     private void showTooManyLabelsWarning(boolean showWarning) {
-        for (Painter painter : new Painter[]{taxonLabelPainter, nodeLabelPainter, branchLabelPainter}) {
+        for (Painter painter : new Painter[]{taxonLabelPainter, nodeLabelPainter, branchLabelPainter, collapsedNodeLabelPainter}) {
             if (painter instanceof BasicLabelPainter) {
                 ((BasicLabelPainter) painter).showTooManyLabelsWarning(showWarning);
             }
