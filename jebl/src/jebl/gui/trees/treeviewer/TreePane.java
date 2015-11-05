@@ -1372,22 +1372,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if(flipTree && viewRect != null) {
             viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
         }
-        // check if there are too many labels to be shown effectively
-        int count = 0;
-        final int maxCount = 1000;
-        if (viewRect != null) {
-            for( TreeDrawableElement label : treeElements ) {
-                if((label.isVisible() || !drawOnlyVisibleElements)) {
-                    if (label.getBounds().intersects(viewRect)) {
-                        if (++count == maxCount) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (count < maxCount) {
+        if (isShowLabels(drawOnlyVisibleElements, viewRect)) {
             showTooManyLabelsWarning(false);
             for( TreeDrawableElement label : treeElements ) {
                 if((label.isVisible() || !drawOnlyVisibleElements)){
@@ -1408,6 +1393,24 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
             showTooManyLabelsWarning(true);
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
+    private boolean isShowLabels(boolean drawOnlyVisibleElements, Rectangle viewRect) {
+        // check if there are too many labels to be shown effectively
+        int count = 0;
+        final int maxCount = 1000;
+        if (viewRect != null) {
+            for( TreeDrawableElement label : treeElements ) {
+                if((label.isVisible() || !drawOnlyVisibleElements)) {
+                    if (label.getBounds().intersects(viewRect)) {
+                        if (++count == maxCount) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return count < maxCount;
     }
 
     private void showTooManyLabelsWarning(boolean showWarning) {
@@ -1433,10 +1436,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 
         // First of all get the bounds for the unscaled tree
         Rectangle2D treeBounds = null;
-
+        Set<Node> externalNodes = tree.getExternalNodes();
         final Node rootNode = tree.getRootNode();
-
-        // todo efficency create a list once of none hidden nodes etc
+        checkAndSetNewAutoCollapseVariables();
 
         // bounds on branches
         for (Node node : tree.getNodes()) {
@@ -1474,183 +1476,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         final double availableW = width - (insets.left + insets.right);
         final double availableH = height - (insets.top + insets.bottom + scaleHeight);
 
-        final Set<Node> externalNodes = tree.getExternalNodes();
-        Node nodeWithLongestTaxon = null;
-
         TreeBoundsHelper treeBoundsHelper =
                 new TreeBoundsHelper(externalNodes.size() + 2*tree.getNodes().size(), availableW, availableH,
                         treeBounds);
-
-        /**
-         * Go through each painter, calculating the label bounds and adding them to
-         * the tree bounds helper object.
-         */
-
-        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
-
-            taxonLabelWidth = 0.0;
-            taxonLabelPainter.calibrate(g2);
-
-            if( treeLayout.alignTaxa() ) {
-                // Find the longest taxon label
-                for (Node node : externalNodes) {
-                    final double preferredWidth = taxonLabelPainter.getWidth(g2, node);
-                    if( preferredWidth > taxonLabelWidth ) {
-                        taxonLabelWidth = preferredWidth;
-                        nodeWithLongestTaxon = node;
-                    }
-                }
-            }
-
-
-            for (Node node : externalNodes) {
-                if( hideNode(node) ) continue;
-
-                 if( nodeWithLongestTaxon == null ) {
-                    taxonLabelPainter.calibrate(g2);
-                    taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
-                }
-                // Get the line that represents the orientation for the taxon label
-                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
-                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
-
-                //System.out.println("For " + tree.getTaxon(node).getName())
-                treeBoundsHelper.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
-            }
-        }
-
-
-        if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
-
-            for( Node node : tree.getNodes() ) {
-                if( hideNode(node) ) continue;
-
-                // Get the line that represents the label orientation
-                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
-
-                if (labelPath != null) {
-                    nodeLabelPainter.calibrate(g2);
-                    final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
-                    final double labelWidth = nodeLabelPainter.getWidth(g2, node);
-
-                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
-                }
-            }
-        }
-
-        if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
-            // Iterate though the nodes
-            for (Node node : tree.getNodes()) {
-                if( hideNode(node) ) continue;
-
-                // Get the line that represents the path for the branch label
-                final Line2D labelPath = treeLayout.getBranchLabelPath(node);
-
-                if (labelPath != null) {
-                    branchLabelPainter.calibrate(g2);
-                    final double labelHeight = branchLabelPainter.getHeightBound(g2, node);
-                    final double labelWidth = branchLabelPainter.getWidth(g2, node);
-
-                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
-                }
-            }
-        }
-
-        final double[] doubles = treeBoundsHelper.getOrigionAndScale(false);
-        double yorigion = doubles[0];
-        double yScale = doubles[1];
-
-        final double[] xdoubles = treeBoundsHelper.getOrigionAndScale(true);
-        double xorigion = xdoubles[0];
-        double xScale = xdoubles[1];
-
-        // oldscalecode too  ************************** vvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-        // get the difference between the tree's bounds and the overall bounds, i.e. the amount (in pixels) required
-        // to hold non-scaling stuff located outside the tree
-
-        double xDiff = bounds.getWidth() - treeBounds.getWidth();
-        double yDiff = bounds.getHeight() - treeBounds.getHeight();
-        assert xDiff >= 0 && yDiff >= 0;
-
-        // small tree, long labels, label bounds may get larger that window, protect against that
-
-        if( xDiff >= availableW ) {
-           xDiff = Math.min(availableW, bounds.getWidth()) - treeBounds.getWidth();
-        }
-
-        if( yDiff >= availableH ) {
-           yDiff = Math.min(availableH, bounds.getHeight()) - treeBounds.getHeight();
-        }
-
-        // Get the amount of canvas that is going to be taken up by the tree -
-        // The rest is taken up by taxon labels which don't scale
-        final double w = availableW - xDiff;
-        final double h = availableH - yDiff;
-        // oldscalecode too  ************************** ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-        double xOffset;
-        double yOffset = 0.0;
-
-        if (treeLayout.maintainAspectRatio()) {
-            // If the tree is layed out in both dimensions then we
-            // need to find out which axis has the least space and scale
-            // the tree to that (to keep the aspect ratio.
-
-            if( treeBoundsHelper.getRange(true, xorigion, yScale) <= availableW ) {
-                //if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
-                xorigion = treeBoundsHelper.getOrigion(true, yScale);
-                treeScale = yScale;
-            } else {
-                double size;
-                int count = 0;
-                String oldValues = "";
-                //count is here to make sure we don't get an infinite loop if there is no scale that will
-                //allow the tree to be contained in the current view
-                while((size = treeBoundsHelper.getRange(false, yorigion, xScale)) > availableH && count < 10){
-                    xScale *= availableH/size;
-                    yorigion = yOffset;
-                    count++;
-                }
-                //todo: this was removed assert treeBoundsHelper.getRange(false, yorigion, xScale) <= availableH : treeBoundsHelper.getRange(false, yorigion, xScale)+" : "+availableH+" : "+oldValues;
-                //assert yorigion + xScale * treeBounds.getHeight() <= availableH;
-                yorigion = treeBoundsHelper.getOrigion(false, xScale);
-                treeScale  = xScale;
-            }
-
-            //System.out.println("xs/ys " + xScale + "/" + yScale +  " (" + treeScale + ")" + " xo/yo " + xorigion + "/" + yorigion);
-            xScale = yScale = treeScale;
-
-            xOffset = xorigion - treeBounds.getX() * treeScale;
-            yOffset = yorigion - treeBounds.getY() * treeScale;
-            double xRange = treeBoundsHelper.getRange(true, xorigion, treeScale);
-            final double dx = (availableW - xRange)/2;
-            xOffset += dx;
-            double yRange = treeBoundsHelper.getRange(false, yorigion, treeScale);
-            final double dy = (availableH - yRange)/2;
-            yOffset += dy; //  > 0 ? dy : 0;
-            //System.out.println("xof/yof " + xOffset + "/" + yOffset);
-
-        } else {
-            // Otherwise just scale both dimensions
-            xOffset = xorigion - treeBounds.getX() * xScale;
-            yOffset = yorigion - treeBounds.getY() * yScale;
-            treeScale = xScale;
-        }
-
-        if(treeScale < 0) {
-            treeScale = 0;
-        }
-
-//        assert treeScale > 0;
-
-        // Create the overall transform
-        transform = new AffineTransform();
-        transform.translate(xOffset + insets.left, yOffset + insets.top);
-        transform.scale(xScale, yScale);
-
-        final double xl = transform.getTranslateX() + transform.getScaleX() * treeBounds.getX();
-        final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
+        calibrateTreeBoundsForLabels(g2, treeBoundsHelper);
+        double xScale = scaleTreeReturningXScale(width, height, availableW, availableH, scaleHeight, treeBounds, treeBoundsHelper);
 
         /**
          * Now we make all of the branch, node, taxa and collapsed node labels, adding them to treeElements to be drawn
@@ -1659,53 +1489,36 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         treeElements.clear();
 
         if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
-            //This block checks if any of the collapsed subtree settings have changed and
-            //can reset the states and visibilities of nodes if needed
-            autoCollapseNodes = collapsedNodeLabelPainter.isCollapsed();
-            double newThreshold = collapsedNodeLabelPainter.getCollapsedDistanceThreshold();
-            double oldThreshold = cladeDistanceThresholdToCollapse;
-            cladeDistanceThresholdToCollapse = newThreshold;
-            boolean wantToResetNodeStates = collapsedNodeLabelPainter.isResetCollapseState();
+            for (Node node : tree.getNodes()) {
+                if (hideNode(node) || !isNodeVisible(node)) {
+                    continue;
+                }
+                //We draw a label for this node if it is the top of a collapsed subtree (i.e. it is collapsed but its parent isn't)
+                if (isNodeCollapsed(node) && (tree.isRoot(node) || !isNodeCollapsed(tree.getParent(node)))) {
+                    final double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
 
-            if (wantToResetNodeStates) {
-                resetManuallyCollapsedOrExpandedNodes();
-            }
-            if (wantToResetNodeStates || !(Math.abs(newThreshold - oldThreshold) < 0.0001)) { //If the distance has changed, work out what is now visible
-                resetNodeVisibilities();
-            }
+                    // Get the line that represents the orientation of node label
+                    final Line2D labelPath = treeLayout.getNodeLabelPath(node);
 
-            if (collapsedNodeLabelPainter.areLabelsVisible()) { //Collpased labels can be turned off
-                for (Node node : tree.getNodes()) {
-                    if (hideNode(node) || !isNodeVisible(node)) {
-                        continue;
-                    }
-                    //We draw a label for this node if it is the top of a collapsed subtree (i.e. it is collapsed but its parent isn't)
-                    if (isNodeCollapsed(node) && (tree.isRoot(node) || !isNodeCollapsed(tree.getParent(node)))) {
-                        final double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
+                    if (labelPath != null) {
+                        final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
+                        final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
 
-                        // Get the line that represents the orientation of node label
-                        final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+                        // Work out how it is rotated and create a transform that matches that
+                        AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
 
-                        if (labelPath != null) {
-                            final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
-                            final Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, labelWidth, labelHeight);
+                        Painter.Justification justification =
+                                (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
 
-                            // Work out how it is rotated and create a transform that matches that
-                            AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, true);
+                        //Paint this node label grey if we ARE using a filter and this node is NOT in the list of nodes above filter nodes
+                        boolean paintAsGray = isFiltering && !internalNodesAboveFilterNodes.contains(node);
+                        final TreeDrawableElementNodeLabel e =
+                                new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
+                                        null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node", paintAsGray);
 
-                            Painter.Justification justification =
-                                    (labelPath.getX1() < labelPath.getX2()) ? Painter.Justification.LEFT : Painter.Justification.RIGHT;
-
-                            //Paint this node label grey if we ARE using a filter and this node is NOT in the list of nodes above filter nodes
-                            boolean paintAsGray = isFiltering && !internalNodesAboveFilterNodes.contains(node);
-                            final TreeDrawableElementNodeLabel e =
-                                    new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
-                                            null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node", paintAsGray);
-
-                            Color nodeColor = Color.red; //Collapsed nodes default to RED right now
-                            e.setForeground(nodeColor);
-                            treeElements.add(e);
-                        }
+                        Color nodeColor = Color.red; //Collapsed nodes default to RED right now
+                        e.setForeground(nodeColor);
+                        treeElements.add(e);
                     }
                 }
             }
@@ -1728,15 +1541,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 if (hideNode(node) || !isNodeVisible(node)) continue;
 
                 double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
-                Rectangle2D labelBounds = (nodeWithLongestTaxon == null) ? null :
-                    new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
-
                 final Taxon taxon = tree.getTaxon(node);
-                if( nodeWithLongestTaxon == null ) {
-                    taxonLabelPainter.calibrate(g2);
-                    taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
-                    labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
-                }
+                taxonLabelPainter.calibrate(g2);
+                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+                Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
                 // Get the line that represents the path for the taxon label
                 final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
 
@@ -1758,7 +1566,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 boolean paintAsGray = isFiltering && !externalNodesThatFitFilter.contains(node);
                 final TreeDrawableElementNodeLabel e =
                         new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
-                                                         nodeWithLongestTaxon, taxonLabelPainter,
+                                                         null, taxonLabelPainter,
                         null, false, paintAsGray);
 
                 Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
@@ -1769,7 +1577,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 taxonLabels.add(e);
             }
         }
-
 
         /**
          * Now create internal node labels
@@ -1842,10 +1649,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     // Work out how it is rotated and create a transform that matches that
                     AffineTransform labelTransform = calculateTransform(transform, labelPath, labelWidth, labelHeight, false);
 
-//                    System.out.print( Utils.DEBUGsubTreeRep(Utils.rootTheTree(tree), node)
-//                            + " " + labelWidth + "x" + labelHeight + " " +
-//                            ((BasicLabelPainter)branchLabelPainter).getFontSize() + " " + labelTransform);
-
                     // move to middle of branch - since the move is before the rotation
                     // and center label by moving an extra half width of label
                     final double direction = just == Painter.Justification.RIGHT ? 1 : -1;
@@ -1873,22 +1676,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
             scaleBarPainter.calibrate(g2);
             final double h1 = scaleBarPainter.getPreferredHeight(g2, this);
+            final double xl = transform.getTranslateX() + transform.getScaleX() * treeBounds.getX();
+            final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
             final double wid = xh - xl;
             scaleBarBounds = new Rectangle2D.Double(xl, height - h1, wid, h1);
         }
-
-        if(autoCollapseNodes) {
-            // some nodes may have switched to non visible
-            for(int k = 0; k < treeElements.size(); ++k) {
-                final TreeDrawableElement e = treeElements.get(k);
-                assert ! hideNode(e.getNode());
-                if( !isNodeVisible(e.getNode() ) ) {
-                    treeElements.remove(k);
-                    --k;
-                }
-            }
-        }
-
 //        long now = System.currentTimeMillis();
         /**
          * Checks for label collisions and sets visibility based on that. Very complex right now -
@@ -1911,9 +1703,189 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         for(TreeDrawableElement element : taxonLabels){
             element.setSize((int)size,g2);
         }
+
         treeElements.addAll(taxonLabels);
+
+        checkIfPaintingLabelsAndReScaleTreeIfNot(width, height, treeBounds, externalNodes, scaleHeight, availableW, availableH);
+
         calibrated = true;
 //        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+    }
+
+    private void checkIfPaintingLabelsAndReScaleTreeIfNot(double width, double height, Rectangle2D treeBounds, Set<Node> externalNodes, double scaleHeight, double availableW, double availableH) {
+        Rectangle initialViewRect = viewport.getViewRect();
+        if (flipTree) {
+            initialViewRect.translate(getWidth() - 2 * initialViewRect.x - initialViewRect.width, 0);
+        }
+        if (!isShowLabels(true, initialViewRect)) { //drawOnlyVisibleElements is only false when printing
+            TreeBoundsHelper treeBoundsHelper =
+                    new TreeBoundsHelper(externalNodes.size() + 2*tree.getNodes().size(), availableW, availableH,
+                            treeBounds);
+            scaleTreeReturningXScale(width, height, availableW, availableH, scaleHeight, treeBounds, treeBoundsHelper);
+        }
+    }
+
+    private double scaleTreeReturningXScale(double width, double height, double availableW, double availableH, double scaleHeight, Rectangle2D treeBounds, TreeBoundsHelper treeBoundsHelper) {
+        final double[] doubles = treeBoundsHelper.getOrigionAndScale(false);
+        double yorigion = doubles[0];
+        double yScale = doubles[1];
+
+        final double[] xdoubles = treeBoundsHelper.getOrigionAndScale(true);
+        double xorigion = xdoubles[0];
+        double xScale = xdoubles[1];
+        double xOffset;
+        double yOffset = 0.0;
+
+        if (treeLayout.maintainAspectRatio()) {
+            // If the tree is layed out in both dimensions then we
+            // need to find out which axis has the least space and scale
+            // the tree to that (to keep the aspect ratio.
+
+            if( treeBoundsHelper.getRange(true, xorigion, yScale) <= availableW ) {
+                //if( xorigion + yScale * treeBounds.getWidth() <= availableW ) {
+                xorigion = treeBoundsHelper.getOrigion(true, yScale);
+                treeScale = yScale;
+            } else {
+                double size;
+                int count = 0;
+                String oldValues = "";
+                //count is here to make sure we don't get an infinite loop if there is no scale that will
+                //allow the tree to be contained in the current view
+                while((size = treeBoundsHelper.getRange(false, yorigion, xScale)) > availableH && count < 10){
+                    xScale *= availableH/size;
+                    yorigion = yOffset;
+                    count++;
+                }
+                //todo: this was removed assert treeBoundsHelper.getRange(false, yorigion, xScale) <= availableH : treeBoundsHelper.getRange(false, yorigion, xScale)+" : "+availableH+" : "+oldValues;
+                //assert yorigion + xScale * treeBounds.getHeight() <= availableH;
+                yorigion = treeBoundsHelper.getOrigion(false, xScale);
+                treeScale  = xScale;
+            }
+
+            //System.out.println("xs/ys " + xScale + "/" + yScale +  " (" + treeScale + ")" + " xo/yo " + xorigion + "/" + yorigion);
+            xScale = yScale = treeScale;
+
+            xOffset = xorigion - treeBounds.getX() * treeScale;
+            yOffset = yorigion - treeBounds.getY() * treeScale;
+            double xRange = treeBoundsHelper.getRange(true, xorigion, treeScale);
+            final double dx = (availableW - xRange)/2;
+            xOffset += dx;
+            double yRange = treeBoundsHelper.getRange(false, yorigion, treeScale);
+            final double dy = (availableH - yRange)/2;
+            yOffset += dy; //  > 0 ? dy : 0;
+            //System.out.println("xof/yof " + xOffset + "/" + yOffset);
+
+        } else {
+            // Otherwise just scale both dimensions
+            xOffset = xorigion - treeBounds.getX() * xScale;
+            yOffset = yorigion - treeBounds.getY() * yScale;
+            treeScale = xScale;
+        }
+
+        if(treeScale < 0) {
+            treeScale = 0;
+        }
+
+//        assert treeScale > 0;
+
+        // Create the overall transform
+        transform = new AffineTransform();
+        transform.translate(xOffset + insets.left, yOffset + insets.top);
+        transform.scale(xScale, yScale);
+        return xScale;
+    }
+
+    private void calibrateTreeBoundsForLabels(Graphics2D g2, TreeBoundsHelper treeBoundsHelper) {
+        Set<Node> externalNodes = tree.getExternalNodes();
+
+        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
+
+            for (Node node : externalNodes) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+                taxonLabelPainter.calibrate(g2);
+                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+
+                // Get the line that represents the orientation for the taxon label
+                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
+                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
+
+                //System.out.println("For " + tree.getTaxon(node).getName())
+                treeBoundsHelper.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
+            }
+        }
+
+        if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
+
+            for( Node node : tree.getNodes() ) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+
+                // Get the line that represents the label orientation
+                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+
+                if (labelPath != null) {
+                    nodeLabelPainter.calibrate(g2);
+                    final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
+                    final double labelWidth = nodeLabelPainter.getWidth(g2, node);
+
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
+                }
+            }
+        }
+
+        if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
+            // Iterate though the nodes
+            for (Node node : tree.getNodes()) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+
+                // Get the line that represents the path for the branch label
+                final Line2D labelPath = treeLayout.getBranchLabelPath(node);
+
+                if (labelPath != null) {
+                    branchLabelPainter.calibrate(g2);
+                    final double labelHeight = branchLabelPainter.getHeightBound(g2, node);
+                    final double labelWidth = branchLabelPainter.getWidth(g2, node);
+
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
+                }
+            }
+        }
+
+        if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
+            collapsedNodeLabelPainter.calibrate(g2);
+
+            for (Node node : tree.getInternalNodes()) {
+                if(hideNode(node) || !isNodeCollapsed(node)) continue;
+
+                final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
+                double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
+
+                // Get the line that represents the orientation for the collapsed node label
+                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+
+                //System.out.println("For " + tree.getTaxon(node).getName())
+                treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
+            }
+        }
+    }
+
+    /**
+     * This method checks if any of the collapsed subtree settings have changed and
+     * can reset the states and visibilities of nodes if needed
+     */
+    private void checkAndSetNewAutoCollapseVariables() {
+        autoCollapseNodes = collapsedNodeLabelPainter.isCollapsed();
+        double newThreshold = collapsedNodeLabelPainter.getCollapsedDistanceThreshold();
+        double oldThreshold = cladeDistanceThresholdToCollapse;
+        cladeDistanceThresholdToCollapse = newThreshold;
+        boolean wantToResetNodeStates = collapsedNodeLabelPainter.isResetCollapseState();
+
+        if (wantToResetNodeStates) {
+            resetManuallyCollapsedOrExpandedNodes();
+        }
+        //If the distance has changed, work out what is now visible
+        if (wantToResetNodeStates || !(Math.abs(newThreshold - oldThreshold) < 0.0001)) {
+            resetNodeVisibilities();
+        }
     }
 
     private void resetManuallyCollapsedOrExpandedNodes() {
