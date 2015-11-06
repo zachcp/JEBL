@@ -240,6 +240,20 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
         return distance;
     }
 
+    public void calibrate(Graphics2D g2) {
+        final Font oldFont = g2.getFont();
+        g2.setFont(taxonLabelFont);
+
+        final FontMetrics fm = g2.getFontMetrics();
+        preferredHeight = fm.getHeight()-5;
+
+        yOffset = (float)fm.getAscent();
+        yOffset -= yOffset/4;
+
+        g2.setFont(oldFont);
+    }
+
+
     public boolean areLabelsVisible() {
         return areLabelsVisible;
     }

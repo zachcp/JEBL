@@ -654,11 +654,11 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
     private final String title;
 
 
-    private Font taxonLabelFont;
+    Font taxonLabelFont;
     private Font taxonExponentFont;
     //private double preferredWidth;
-    private double preferredHeight;
-    private float yOffset;
+    double preferredHeight;
+    float yOffset;
 
     private boolean visible = true;
 

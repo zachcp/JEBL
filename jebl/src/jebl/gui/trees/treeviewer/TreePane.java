@@ -1481,11 +1481,131 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                         treeBounds);
         calibrateTreeBoundsForLabels(g2, treeBoundsHelper);
         double xScale = scaleTreeReturningXScale(width, height, availableW, availableH, scaleHeight, treeBounds, treeBoundsHelper);
+        createTreeDrawableElements(g2, externalNodes, xScale);
+        List<TreeDrawableElement> taxonLabels = getTaxonLabels(g2, externalNodes);
 
+        calibrateForScaleBarPainter(g2, height, treeBounds);
+
+//        long now = System.currentTimeMillis();
         /**
-         * Now we make all of the branch, node, taxa and collapsed node labels, adding them to treeElements to be drawn
-         * later in the drawTree method.
+         * Checks for label collisions and sets visibility based on that. Very complex right now -
+         * returns w/o doing anything if given a large list of elements
          */
+        TreeDrawableElement.setOverlappingVisiblitiy(treeElements, g2);
+        TreeDrawableElement.setOverlappingVisiblitiy(taxonLabels, g2);
+//        System.err.println("Clash " + (System.currentTimeMillis() - now));
+
+        //this block of code makes sure that all labels are the same size
+        //so that users don't think that some labels are more important than others
+        float size = Float.MAX_VALUE;
+        for(TreeDrawableElement element : taxonLabels){
+            if(element.getCurrentSize() < size){
+                size = element.getCurrentSize();
+                //taxonLabelPainter.setFontSize(size, false);
+                //calibrated = false;
+            }
+        }
+        for(TreeDrawableElement element : taxonLabels){
+            element.setSize((int)size,g2);
+        }
+
+        treeElements.addAll(taxonLabels);
+
+        checkIfPaintingLabelsAndReScaleTreeIfNot(width, height, treeBounds, externalNodes, scaleHeight, availableW, availableH);
+
+        calibrated = true;
+//        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+    }
+
+    private void calibrateTreeBoundsForLabels(Graphics2D g2, TreeBoundsHelper treeBoundsHelper) {
+        Set<Node> externalNodes = tree.getExternalNodes();
+
+        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
+
+            for (Node node : externalNodes) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+                taxonLabelPainter.calibrate(g2);
+                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+
+                // Get the line that represents the orientation for the taxon label
+                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
+                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
+
+                //System.out.println("For " + tree.getTaxon(node).getName())
+                treeBoundsHelper.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
+            }
+        }
+
+        if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
+
+            for( Node node : tree.getNodes() ) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+
+                // Get the line that represents the label orientation
+                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+
+                if (labelPath != null) {
+                    nodeLabelPainter.calibrate(g2);
+                    final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
+                    final double labelWidth = nodeLabelPainter.getWidth(g2, node);
+
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
+                }
+            }
+        }
+
+        if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
+            // Iterate though the nodes
+            for (Node node : tree.getNodes()) {
+                if( hideNode(node) || !isNodeVisible(node)) continue;
+
+                // Get the line that represents the path for the branch label
+                final Line2D labelPath = treeLayout.getBranchLabelPath(node);
+
+                if (labelPath != null) {
+                    branchLabelPainter.calibrate(g2);
+                    final double labelHeight = branchLabelPainter.getHeightBound(g2, node);
+                    final double labelWidth = branchLabelPainter.getWidth(g2, node);
+
+                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
+                }
+            }
+        }
+
+        if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
+            collapsedNodeLabelPainter.calibrate(g2);
+
+            for (Node node : tree.getInternalNodes()) {
+                if(hideNode(node) || !isNodeCollapsed(node)) continue;
+
+                final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
+                double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
+
+                // Get the line that represents the orientation for the collapsed node label
+                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
+
+                //System.out.println("For " + tree.getTaxon(node).getName())
+                treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
+            }
+        }
+    }
+
+    private void calibrateForScaleBarPainter(Graphics2D g2, double height, Rectangle2D treeBounds) {
+        if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
+            scaleBarPainter.calibrate(g2);
+            final double h1 = scaleBarPainter.getPreferredHeight(g2, this);
+            final double xl = transform.getTranslateX() + transform.getScaleX() * treeBounds.getX();
+            final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
+            final double wid = xh - xl;
+            scaleBarBounds = new Rectangle2D.Double(xl, height - h1, wid, h1);
+        }
+    }
+
+    /**
+     * Now we make all of the branch, node, and collapsed node labels, adding them to treeElements to be drawn
+     * later in the drawTree method.
+     */
+    private List<TreeDrawableElement> createTreeDrawableElements(Graphics2D g2, Set<Node> externalNodes, double xScale) {
         treeElements.clear();
 
         if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
@@ -1516,65 +1636,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                                 new TreeDrawableElementNodeLabel(tree, node, justification, labelBounds, labelTransform, 8,
                                         null, ((BasicLabelPainter) collapsedNodeLabelPainter), "node", paintAsGray);
 
-                        Color nodeColor = Color.red; //Collapsed nodes default to RED right now
+                        Color nodeColor = Color.black; //Collapsed nodes default to black right now, but overwritten with nodeColor
+                        Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
+                        if(colorAttr != null){
+                            nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString()).darker();
+                        }
                         e.setForeground(nodeColor);
                         treeElements.add(e);
                     }
                 }
-            }
-        }
-
-        /**
-         * Create and store taxon/tip labels
-         */
-        // Clear previous values of taxon label bounds and transforms
-        taxonLabelBounds.clear();
-        taxonLabelTransforms.clear();
-        taxonLabelJustifications.clear();
-
-        //the contents of taxonLabels are added to treeElements at the end of this method
-        List<TreeDrawableElement> taxonLabels = new ArrayList<TreeDrawableElement>();
-        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
-
-            // Iterate though the external nodes
-            for (Node node : externalNodes) {
-                if (hideNode(node) || !isNodeVisible(node)) continue;
-
-                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
-                final Taxon taxon = tree.getTaxon(node);
-                taxonLabelPainter.calibrate(g2);
-                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
-                Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
-                // Get the line that represents the path for the taxon label
-                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
-
-                // Work out how it is rotated and create a transform that matches that
-                AffineTransform taxonTransform = calculateTransform(transform, taxonPath, taxonLabelWidth, labelHeight, true);
-
-                // Store the alignment in the map for use when drawing
-                final Painter.Justification just = (taxonPath.getX1() < taxonPath.getX2()) ?
-                        Painter.Justification.LEFT : Painter.Justification.RIGHT;
-
-                int priority = 10;
-                Color nodeColor = Color.black;
-                if (referenceSequenceName!=null && referenceSequenceName.equals(taxon.getName())) {
-                    nodeColor = new Color(0, 150,0);
-                    priority = 11; // if there are too many labels to show them all, we prefer to show the reference sequence rather than other sequences
-                }
-
-                //Paint this node label grey if we ARE using a filter and the node DOES NOT match the filter. Paint normally in every other case
-                boolean paintAsGray = isFiltering && !externalNodesThatFitFilter.contains(node);
-                final TreeDrawableElementNodeLabel e =
-                        new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
-                                                         null, taxonLabelPainter,
-                        null, false, paintAsGray);
-
-                Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
-                if(colorAttr != null){
-                    nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
-                }
-                e.setForeground(nodeColor);
-                taxonLabels.add(e);
             }
         }
 
@@ -1668,48 +1738,70 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                     Paint nodeColor = new RgbBranchDecorator().getBranchPaint(tree, node);
                     e.setForeground(nodeColor);
                     treeElements.add(e);
-                //}
                 }
             }
         }
+        return treeElements;
+    }
 
-        if (scaleBarPainter != null && scaleBarPainter.isVisible()) {
-            scaleBarPainter.calibrate(g2);
-            final double h1 = scaleBarPainter.getPreferredHeight(g2, this);
-            final double xl = transform.getTranslateX() + transform.getScaleX() * treeBounds.getX();
-            final double xh = transform.getTranslateX() + transform.getScaleX() * treeBounds.getMaxX();
-            final double wid = xh - xl;
-            scaleBarBounds = new Rectangle2D.Double(xl, height - h1, wid, h1);
-        }
-//        long now = System.currentTimeMillis();
-        /**
-         * Checks for label collisions and sets visibility based on that. Very complex right now -
-         * returns w/o doing anything if given a large list of elements
-         */
-        TreeDrawableElement.setOverlappingVisiblitiy(treeElements, g2);
-        TreeDrawableElement.setOverlappingVisiblitiy(taxonLabels, g2);
-//        System.err.println("Clash " + (System.currentTimeMillis() - now));
+    /**
+     * Create and return the taxon labels
+     * @param g2
+     * @param externalNodes
+     * @return
+     */
+    private List<TreeDrawableElement> getTaxonLabels(Graphics2D g2, Set<Node> externalNodes) {
+        // Clear previous values of taxon label bounds and transforms
+        taxonLabelBounds.clear();
+        taxonLabelTransforms.clear();
+        taxonLabelJustifications.clear();
 
-        //this block of code makes sure that all labels are the same size
-        //so that users don't think that some labels are more important than others
-        float size = Float.MAX_VALUE;
-        for(TreeDrawableElement element : taxonLabels){
-            if(element.getCurrentSize() < size){
-                size = element.getCurrentSize();
-                //taxonLabelPainter.setFontSize(size, false);
-                //calibrated = false;
+        //the contents of taxonLabels are added to treeElements at the end of this method
+        List<TreeDrawableElement> taxonLabels = new ArrayList<TreeDrawableElement>();
+        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
+
+            // Iterate though the external nodes
+            for (Node node : externalNodes) {
+                if (hideNode(node) || !isNodeVisible(node)) continue;
+
+                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
+                final Taxon taxon = tree.getTaxon(node);
+                taxonLabelPainter.calibrate(g2);
+                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
+                Rectangle2D labelBounds = new Rectangle2D.Double(0.0, 0.0, taxonLabelWidth, labelHeight);
+                // Get the line that represents the path for the taxon label
+                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
+
+                // Work out how it is rotated and create a transform that matches that
+                AffineTransform taxonTransform = calculateTransform(transform, taxonPath, taxonLabelWidth, labelHeight, true);
+
+                // Store the alignment in the map for use when drawing
+                final Painter.Justification just = (taxonPath.getX1() < taxonPath.getX2()) ?
+                        Painter.Justification.LEFT : Painter.Justification.RIGHT;
+
+                int priority = 10;
+                Color nodeColor = Color.black;
+                if (referenceSequenceName!=null && referenceSequenceName.equals(taxon.getName())) {
+                    nodeColor = new Color(0, 150,0);
+                    priority = 11; // if there are too many labels to show them all, we prefer to show the reference sequence rather than other sequences
+                }
+
+                //Paint this node label grey if we ARE using a filter and the node DOES NOT match the filter. Paint normally in every other case
+                boolean paintAsGray = isFiltering && !externalNodesThatFitFilter.contains(node);
+                final TreeDrawableElementNodeLabel e =
+                        new TreeDrawableElementNodeLabel(tree, node, just, labelBounds, taxonTransform, priority,
+                                                         null, taxonLabelPainter,
+                        null, false, paintAsGray);
+
+                Object colorAttr = node.getAttribute(TreeViewerUtilities.KEY_NODE_COLOR);
+                if(colorAttr != null){
+                    nodeColor = RgbBranchDecorator.getColorFromString(colorAttr.toString());
+                }
+                e.setForeground(nodeColor);
+                taxonLabels.add(e);
             }
         }
-        for(TreeDrawableElement element : taxonLabels){
-            element.setSize((int)size,g2);
-        }
-
-        treeElements.addAll(taxonLabels);
-
-        checkIfPaintingLabelsAndReScaleTreeIfNot(width, height, treeBounds, externalNodes, scaleHeight, availableW, availableH);
-
-        calibrated = true;
-//        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
+        return taxonLabels;
     }
 
     private void checkIfPaintingLabelsAndReScaleTreeIfNot(double width, double height, Rectangle2D treeBounds, Set<Node> externalNodes, double scaleHeight, double availableW, double availableH) {
@@ -1793,79 +1885,6 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         transform.translate(xOffset + insets.left, yOffset + insets.top);
         transform.scale(xScale, yScale);
         return xScale;
-    }
-
-    private void calibrateTreeBoundsForLabels(Graphics2D g2, TreeBoundsHelper treeBoundsHelper) {
-        Set<Node> externalNodes = tree.getExternalNodes();
-
-        if (taxonLabelPainter != null && taxonLabelPainter.isVisible()) {
-
-            for (Node node : externalNodes) {
-                if( hideNode(node) || !isNodeVisible(node)) continue;
-                taxonLabelPainter.calibrate(g2);
-                taxonLabelWidth = taxonLabelPainter.getWidth(g2, node);
-
-                // Get the line that represents the orientation for the taxon label
-                final Line2D taxonPath = treeLayout.getTaxonLabelPath(node);
-                double labelHeight = taxonLabelPainter.getPreferredHeight(g2, node);
-
-                //System.out.println("For " + tree.getTaxon(node).getName())
-                treeBoundsHelper.addBounds(taxonPath, labelHeight, labelXOffset + taxonLabelWidth, false);
-            }
-        }
-
-        if (nodeLabelPainter != null && nodeLabelPainter.isVisible()) {
-
-            for( Node node : tree.getNodes() ) {
-                if( hideNode(node) || !isNodeVisible(node)) continue;
-
-                // Get the line that represents the label orientation
-                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
-
-                if (labelPath != null) {
-                    nodeLabelPainter.calibrate(g2);
-                    final double labelHeight = nodeLabelPainter.getPreferredHeight(g2, node);
-                    final double labelWidth = nodeLabelPainter.getWidth(g2, node);
-
-                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
-                }
-            }
-        }
-
-        if (branchLabelPainter != null && branchLabelPainter.isVisible()) {
-            // Iterate though the nodes
-            for (Node node : tree.getNodes()) {
-                if( hideNode(node) || !isNodeVisible(node)) continue;
-
-                // Get the line that represents the path for the branch label
-                final Line2D labelPath = treeLayout.getBranchLabelPath(node);
-
-                if (labelPath != null) {
-                    branchLabelPainter.calibrate(g2);
-                    final double labelHeight = branchLabelPainter.getHeightBound(g2, node);
-                    final double labelWidth = branchLabelPainter.getWidth(g2, node);
-
-                    treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, true);
-                }
-            }
-        }
-
-        if (collapsedNodeLabelPainter != null && collapsedNodeLabelPainter.isVisible()) {
-            collapsedNodeLabelPainter.calibrate(g2);
-
-            for (Node node : tree.getInternalNodes()) {
-                if(hideNode(node) || !isNodeCollapsed(node)) continue;
-
-                final double labelWidth = collapsedNodeLabelPainter.getWidth(g2, node);
-                double labelHeight = collapsedNodeLabelPainter.getPreferredHeight(g2, node);
-
-                // Get the line that represents the orientation for the collapsed node label
-                final Line2D labelPath = treeLayout.getNodeLabelPath(node);
-
-                //System.out.println("For " + tree.getTaxon(node).getName())
-                treeBoundsHelper.addBounds(labelPath, labelHeight, labelXOffset + labelWidth, false);
-            }
-        }
     }
 
     /**
