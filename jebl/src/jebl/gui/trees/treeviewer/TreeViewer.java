@@ -273,7 +273,7 @@ public class TreeViewer extends JPanel implements Printable {
 
         treePane.setBranchLabelPainter(branchLabelPainter.getAttributes().length > 0 ? branchLabelPainter : null);
 
-        CollapsedNodeLabelPainter collapsedNodeLabelPainter = new CollapsedNodeLabelPainter(tree);
+        CollapsedNodeLabelPainter collapsedNodeLabelPainter = new CollapsedNodeLabelPainter(tree, taxonLabelPainter);
         treePane.setCollapsedNodeLabelPainter(collapsedNodeLabelPainter);
 
         treePane.setScaleBarPainter(new ScaleBarPainter());

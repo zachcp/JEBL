@@ -34,7 +34,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private static String KEY_IS_COLLAPSED = "autoCollapseNodes";
     private double maxDistanceForCurrentTree;
     private boolean resetCollapseState = false;
-    private int numberManualNodes;
+    private BasicLabelPainter taxonLabelPainterHook;
     private Map<Node, Integer> externalNodesUnderNode = new HashMap<Node, Integer>();
 
     private OptionsPanel optionsPanel;
@@ -43,18 +43,26 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     private JLabel sliderLabel;
     private JCheckBox showLabelsCheckBox;
 
-    public CollapsedNodeLabelPainter(RootedTree tree) {
+    /**
+     * Constructor takes the instance of TaxonLabelPainter so we can use its getLabel method to get
+     * collapsed node labels with the same attributes as the taxon labels.
+     */
+    public CollapsedNodeLabelPainter(RootedTree tree, BasicLabelPainter taxonLabelPainterHook) {
         super("Collapsed Node Labels", tree, PainterIntent.COLLAPSED, 12);
         maxDistanceForCurrentTree = getMaxDistanceForTree(tree);
         collapsedDistanceThreshold = getPrefs().getDouble(KEY_COLLAPSE_THRESHOLD, 0.0) * maxDistanceForCurrentTree / 100;
         isCollapsedDefault = getPrefs().getBoolean(KEY_IS_COLLAPSED, (tree.getNodes().size() > 1000));
         isCollapsed = isCollapsedDefault;
         areLabelsVisible = getPrefs().getBoolean(KEY_SHOW_COLLAPSE_LABELS, true);
-        numberManualNodes = 0;
+        this.taxonLabelPainterHook = taxonLabelPainterHook;
+    }
+
+    public CollapsedNodeLabelPainter(RootedTree tree) {
+        this(tree, null);
     }
 
     private static final String ELIPSES = "...";
-    private static final int MAX_CHARS_TAXON = 16;
+    private static final int MAX_CHARS_TAXON = 20;
 
     @Override
     public String getLabel(Node node) {
@@ -73,11 +81,17 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
         final int extraNodes = countExternalNodesUnderNode(node) - 1;
 
-        String taxon = tree.getTaxon(first).getName();
-        if(taxon.length() > MAX_CHARS_TAXON) {
-            taxon = taxon.substring(0, MAX_CHARS_TAXON-ELIPSES.length()) + ELIPSES;
-        }
+        String taxon = getTaxonLabel(first);
         return taxon + " and " + extraNodes + " other" + (extraNodes == 1 ? "" : "s") + " (" + String.format("%.3f", distance) + ")";
+    }
+
+    private String getTaxonLabel(Node first) {
+        return (taxonLabelPainterHook != null) ? limitString(taxonLabelPainterHook.getLabel(first))
+                : limitString(tree.getTaxon(first).getName());
+    }
+
+    private String limitString(String name) {
+        return (name.length() > MAX_CHARS_TAXON) ? name.substring(0, MAX_CHARS_TAXON-ELIPSES.length()) + ELIPSES : name;
     }
 
     private int countExternalNodesUnderNode(Node node) {
@@ -212,7 +226,6 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
     }
 
     public void setNumberManualNodes(int numberManualNodes) {
-        this.numberManualNodes = numberManualNodes;
         if (resetButton != null) {
             resetButton.setText("Reset state of " + numberManualNodes + " nodes");
         }

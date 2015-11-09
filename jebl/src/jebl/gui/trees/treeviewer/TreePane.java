@@ -1517,6 +1517,13 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
 //        System.err.println("Calibrate " + (System.currentTimeMillis() - start));
     }
 
+    /**
+     * Goes through each label that could be drawn on to the tree, getting their size and adding their bounds
+     * to the treeBoundsHelper
+     *
+     * @param g2
+     * @param treeBoundsHelper
+     */
     private void calibrateTreeBoundsForLabels(Graphics2D g2, TreeBoundsHelper treeBoundsHelper) {
         Set<Node> externalNodes = tree.getExternalNodes();
 
