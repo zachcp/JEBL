@@ -636,24 +636,50 @@ public final class Utils {
      * @return the number of external nodes under this node.
      */
     public static int getExternalNodeCount(RootedTree tree, Node node) {
-        Stack<Node> countStack = new Stack<Node>();
-        int externalNodeCount = 0;
+        return getExternalNodeCount(tree, node, null);
+    }
 
+    /**
+     * Return the number of external nodes under this node. Reads values from provided cache and stores any
+     * newly computed values back in the cache, if it's not null.
+     *
+     * @param tree
+     * @param node
+     * @param cache Cached values of nodes under nodes
+     * @return the number of external nodes under this node.
+     */
+    public static int getExternalNodeCount(RootedTree tree, Node node, Map<Node, Integer> cache) {
+        if (tree.isExternal(node)) {
+            return 0;
+        }
+        if (cache != null && cache.get(node) != null) {
+            return cache.get(node);
+        }
+
+        Stack<Node> countStack = new Stack<Node>();
+        int count  = 0;
         countStack.push(node);
-        while (!countStack.isEmpty()) {
-            Node current = countStack.pop();
-            final List<Node> children = tree.getChildren(current);
-            if (children.size() == 0) {
-                externalNodeCount++;
+        while (!countStack.empty()) {
+            Node currentNode = countStack.pop();
+            if (tree.isExternal(currentNode)) {
+                count++;
             } else {
-                for (Node child : children) {
-                    countStack.push(child);
+                if (cache != null && cache.get(currentNode) != null) {
+                    count += cache.get(currentNode);
+                } else {
+                    for (Node child : tree.getChildren(currentNode)) {
+                        countStack.push(child);
+                    }
                 }
             }
         }
 
-        return externalNodeCount;
+        if (cache != null) {
+            cache.put(node, count);
+        }
+        return count;
     }
+
 
     /**
      * All nodes in subtree - parents before children (pre - order).

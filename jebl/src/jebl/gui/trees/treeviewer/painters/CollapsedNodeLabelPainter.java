@@ -2,6 +2,7 @@ package jebl.gui.trees.treeviewer.painters;
 
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.TreePane;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.Controls;
@@ -79,7 +80,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             throw new IllegalStateException("Collapsed Node encountered with no distance to lowest ancestor");
         }
 
-        final int extraNodes = countExternalNodesUnderNode(node) - 1;
+        final int extraNodes = Utils.getExternalNodeCount(tree, node, externalNodesUnderNode) - 1;
 
         String taxon = getTaxonLabel(first);
         return taxon + " and " + extraNodes + " other" + (extraNodes == 1 ? "" : "s") + " (" + String.format("%.3f", distance) + ")";
@@ -92,30 +93,6 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
     private String limitString(String name) {
         return (name.length() > MAX_CHARS_TAXON) ? name.substring(0, MAX_CHARS_TAXON-ELIPSES.length()) + ELIPSES : name;
-    }
-
-    private int countExternalNodesUnderNode(Node node) {
-        if (tree.isExternal(node)) {
-            return 0;
-        }
-        Integer cachedValue = externalNodesUnderNode.get(node);
-        if (cachedValue != null) return cachedValue;
-
-        Stack<Node> stack = new Stack<Node>();
-        int count  = 0;
-        stack.push(node);
-        while (!stack.empty()) {
-            Node currentNode = stack.pop();
-            if (tree.isExternal(currentNode)) {
-                count++;
-            } else {
-                for (Node child : tree.getChildren(currentNode)) {
-                    stack.push(child);
-                }
-            }
-        }
-        externalNodesUnderNode.put(node, count);
-        return count;
     }
 
     private static Preferences getPrefs() {
