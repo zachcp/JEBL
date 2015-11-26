@@ -185,53 +185,56 @@ public final class Utils {
         }
 
         final List<Node> children = tree.getChildren(node);
-        List<String[]> a = new ArrayList<String[]>(children.size());
-        int[] branches = new int[children.size()];
-        int tot = 0;
-        int maxHeight = -1;
+        List<String[]> subtreeLines = new ArrayList<String[]>(children.size());
+        int[] drawnBranchLengths = new int[children.size()];
+        int totalNumberLines = 0;
+        int maxLengthOfLine = -1;
 
-        int k = 0;
-        for (Node n : children) {
-            String[] s = asText(tree, n, factor);
-            tot += s.length;
-            final double len = tree.hasLengths() ? tree.getLength(n) : 1.0;
+        int lineNumber = 0;
+        for (Node child : children) {
+            String[] linesToDrawForNodesUnderChild = asText(tree, child, factor); //progressive build up of all the full lines underneath node child
+            totalNumberLines += linesToDrawForNodesUnderChild.length;
+            final double realBranchLength = tree.hasLengths() ? tree.getLength(child) : 1.0;
             // set 1 as lower bound for branch since the vertical connector
             // (which theoretically has zero width) takes one line.
-            final int branchLen = Math.max((int) Math.round(len * factor), 1);
-            branches[k] = branchLen;
-            ++k;
-            maxHeight = Math.max(maxHeight, s[0].length() + branchLen);
-            a.add(s);
+            final int branchLengthToDraw = Math.max((int) Math.round(realBranchLength * factor), 1);
+            drawnBranchLengths[lineNumber] = branchLengthToDraw;
+            ++lineNumber;
+            maxLengthOfLine = Math.max(maxLengthOfLine, linesToDrawForNodesUnderChild[0].length() + branchLengthToDraw); //only check .get(0) because all lines are the same length
+            subtreeLines.add(linesToDrawForNodesUnderChild);
         }
         // one empty line between sub trees
-        tot += children.size() - 1;
+        totalNumberLines += children.size() - 1;
 
-        ArrayList<String> x = new ArrayList<String>(tot);
-        for (int i = 0; i < a.size(); ++i) {
-            String[] s = a.get(i);
-            int branchIndex = s.length / 2;
-            boolean isLast = i == a.size() - 1;
-            for (int j = 0; j < s.length; ++j) {
-                char c = (j == branchIndex) ? '=' : ' ';
-                char l = (i == 0 && j < branchIndex || isLast && j > branchIndex) ? ' ' :
-                        (j == branchIndex ? '+' : '|');
-                String l1 = l + rep(c, branches[i] - 1) + s[j];
-                x.add(l1 + rep(' ', maxHeight - l1.length()));
+        ArrayList<String> allTreeLines = new ArrayList<String>(totalNumberLines);
+        for (int subtreeIndex = 0; subtreeIndex < subtreeLines.size(); ++subtreeIndex) {
+            String[] linesToDrawForSubtree = subtreeLines.get(subtreeIndex);
+            int indexOfBranchToParent = linesToDrawForSubtree.length / 2;
+            boolean isLast = (subtreeIndex == subtreeLines.size() - 1);
+
+            //Add space and connectors in front of already created subtrees
+            for (int j = 0; j < linesToDrawForSubtree.length; ++j) {
+                char connectorCharacter = (j == indexOfBranchToParent) ? '=' : ' '; //branch to parent is drawn with '=', the others have preceding whitespace
+                char lineBeginning = (subtreeIndex == 0 && j < indexOfBranchToParent || isLast && j > indexOfBranchToParent) ? ' ' : //
+                        (j == indexOfBranchToParent ? '+' : '|');
+                String extendedLine = lineBeginning + repeatCharacter(connectorCharacter, drawnBranchLengths[subtreeIndex] - 1) + linesToDrawForSubtree[j];
+                allTreeLines.add(extendedLine + repeatCharacter(' ', maxLengthOfLine - extendedLine.length())); //add whitespace after the line out to the max line length
             }
+            //Add blank line between each subtree
             if (!isLast) {
-                x.add('|' + rep(' ', maxHeight - 1));
+                allTreeLines.add('|' + repeatCharacter(' ', maxLengthOfLine - 1));
             }
         }
 
-        for (String ss : x) {
-            assert(ss.length() == x.get(0).length());
+        //Assert all lines have the same length
+        for (String line : allTreeLines) {
+            assert(line.length() == allTreeLines.get(0).length());
         }
 
-        return x.toArray(new String[]{});
-
+        return allTreeLines.toArray(new String[]{});
     }
 
-    private static String rep(char c, int count) {
+    private static String repeatCharacter(char c, int count) {
         final StringBuilder b = new StringBuilder();
         while (count > 0) {
             b.append(c);
