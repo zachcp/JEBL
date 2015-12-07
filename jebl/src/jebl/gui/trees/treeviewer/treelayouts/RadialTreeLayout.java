@@ -277,9 +277,7 @@ public class RadialTreeLayout extends AbstractTreeLayout {
 
                 final double childLength = tree.getLength(child);
                 double a1 = a2;
-                if (totalLeafs > 0) {
-                    a2 = a1 + (span * leafCounts[i] / totalLeafs);
-                }
+                a2 = a1 + (span * leafCounts[i] / totalLeafs);
 
                 final Point2D childPoint = constructNode(child, a1, a2, x, y, childLength);
 

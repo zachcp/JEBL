@@ -653,7 +653,7 @@ public final class Utils {
      */
     public static int getExternalNodeCount(RootedTree tree, Node node, Map<Node, Integer> cache) {
         if (tree.isExternal(node)) {
-            return 0;
+            return 1;
         }
         if (cache != null && cache.get(node) != null) {
             return cache.get(node);
