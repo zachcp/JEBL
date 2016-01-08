@@ -177,6 +177,7 @@ public final class Utils {
             branchesMinMax(tree, n, bounds);
         }
         if (bounds[0] < 0) bounds[0] = 0.0; //GEN-25787 - if negative branch length exists in tree, a negative lower bound causes OOMs lower down
+        if (bounds[1] < 0) bounds[1] = 0.0;
     }
 
     private static String[] asText(RootedTree tree, Node node, final double factor) {
