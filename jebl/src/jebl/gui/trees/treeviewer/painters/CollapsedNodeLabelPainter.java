@@ -113,7 +113,7 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
 
             final JCheckBox collapseCheckbox = new JCheckBox(helpTitle);
             collapseCheckbox.setSelected(isCollapsedDefault);
-            collapseCheckbox.setToolTipText("Automatically collapse subtrees when there is not enough space on-screen");
+            collapseCheckbox.setToolTipText("Automatically collapse subtrees based on distance");
 
             collapseCheckbox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
@@ -150,7 +150,8 @@ public class CollapsedNodeLabelPainter extends BasicLabelPainter {
             showLabelsBox.add(showLabelsCheckBox);
             showLabelsBox.add(checkBoxWarningLabel);
 
-            optionsPanel.addComponentWithLabel("Subtree Distance:", sliderBox, true);
+            optionsPanel.addComponent(new JLabel("  Subtree Distance:"), true);
+            optionsPanel.addComponent(sliderBox, true);
             optionsPanel.addComponent(showLabelsBox, true);
             optionsPanel.addComponent(resetButton, false);
 
