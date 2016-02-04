@@ -13,6 +13,8 @@ import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.HashPair;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -130,6 +132,7 @@ public final class Utils {
      * @param metacommentKeysToIgnore Keys to ignore when writing metacomments. Null to not export with metacomments
      */
     private static void toNewick(RootedTree tree, Node node, StringBuilder buffer, List<String> metacommentKeysToIgnore) {
+        double treeLength = tree.getLength(node);
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
@@ -138,7 +141,7 @@ public final class Utils {
             buffer.append(name);
             if (tree.hasLengths()) {
                 buffer.append(':');
-                buffer.append(tree.getLength(node));
+                appendTreeLength(buffer, treeLength);
             }
         } else {
             buffer.append('(');
@@ -154,8 +157,16 @@ public final class Utils {
             // Don't write root length. This is ignored elsewhere and the nexus importer fails when it is present.
             if (parent != null && tree.hasLengths()) {
                 if (metacommentKeysToIgnore != null) addSimpleMetaComment(node, buffer, metacommentKeysToIgnore);
-                buffer.append(":").append(tree.getLength(node));
+                appendTreeLength(buffer.append(":"), treeLength);
             }
+        }
+    }
+
+    private static void appendTreeLength(StringBuilder buffer, double treeLength) {
+        if (String.valueOf(treeLength).toUpperCase().contains("E")) {
+            buffer.append(convertScientificNotationIntoStandardNotation(treeLength));
+        } else {
+            buffer.append(treeLength);
         }
     }
 
@@ -1003,6 +1014,18 @@ public final class Utils {
         } else {
             return new SimpleRootedTree(treeToCopy);
         }
+    }
+
+    /**
+     * This method converts tree length into standard format with 6 digit decimal point if it appears into scientific notation.
+     *
+     * @param treeLength the length of a tree should be scientific notation, non-null
+     * @return tree length in standard format
+     */
+    public static String convertScientificNotationIntoStandardNotation(double treeLength) {
+        NumberFormat formatter = new DecimalFormat();
+        formatter.setMinimumFractionDigits(6);
+        return formatter.format(treeLength);
     }
 
     // debug aid - unrooted tree printout - un-comment in emergency

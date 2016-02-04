@@ -369,6 +369,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * @param builder
      */
     private void appendTree(RootedTree tree, Node node, StringBuilder builder) {
+        double treeLength = tree.getLength(node);
         if (tree.isExternal(node)) {
             appendTaxonName(tree.getTaxon(node), builder);
 
@@ -376,7 +377,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             if( tree.hasLengths() ) {
                 builder.append(':');
-                builder.append(roundDouble(tree.getLength(node), 6));
+                appendTreeLength(builder, treeLength);
             }
         } else {
             builder.append('(');
@@ -394,9 +395,17 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // whet it is present.
             if (parent != null) {
                 if (tree.hasLengths()) {
-                    builder.append(":").append(roundDouble(tree.getLength(node), 6));
+                    appendTreeLength(builder.append(":"), treeLength);
                 }
             }
+        }
+    }
+
+    private void appendTreeLength(StringBuilder builder, double treeLength) {
+        if (String.valueOf(treeLength).toUpperCase().contains("E")) {//Converting Scientific Notation into Standard one to write
+            builder.append(Utils.convertScientificNotationIntoStandardNotation(roundDouble(treeLength, 6)));
+        } else {
+            builder.append(roundDouble(treeLength, 6));
         }
     }
 
