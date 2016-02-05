@@ -369,7 +369,6 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
      * @param builder
      */
     private void appendTree(RootedTree tree, Node node, StringBuilder builder) {
-        double treeLength = tree.getLength(node);
         if (tree.isExternal(node)) {
             appendTaxonName(tree.getTaxon(node), builder);
 
@@ -377,7 +376,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             if( tree.hasLengths() ) {
                 builder.append(':');
-                appendTreeLength(builder, treeLength);
+                appendTreeLength(builder, tree.getLength(node));
             }
         } else {
             builder.append('(');
@@ -395,7 +394,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // whet it is present.
             if (parent != null) {
                 if (tree.hasLengths()) {
-                    appendTreeLength(builder.append(":"), treeLength);
+                    appendTreeLength(builder.append(":"), tree.getLength(node));
                 }
             }
         }

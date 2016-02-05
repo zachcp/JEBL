@@ -132,7 +132,6 @@ public final class Utils {
      * @param metacommentKeysToIgnore Keys to ignore when writing metacomments. Null to not export with metacomments
      */
     private static void toNewick(RootedTree tree, Node node, StringBuilder buffer, List<String> metacommentKeysToIgnore) {
-        double treeLength = tree.getLength(node);
         if (tree.isExternal(node)) {
             String name = tree.getTaxon(node).getName();
             if (!name.matches("^(\\w|-)+$")) {
@@ -141,7 +140,7 @@ public final class Utils {
             buffer.append(name);
             if (tree.hasLengths()) {
                 buffer.append(':');
-                appendTreeLength(buffer, treeLength);
+                appendTreeLength(buffer, tree.getLength(node));
             }
         } else {
             buffer.append('(');
@@ -157,7 +156,7 @@ public final class Utils {
             // Don't write root length. This is ignored elsewhere and the nexus importer fails when it is present.
             if (parent != null && tree.hasLengths()) {
                 if (metacommentKeysToIgnore != null) addSimpleMetaComment(node, buffer, metacommentKeysToIgnore);
-                appendTreeLength(buffer.append(":"), treeLength);
+                appendTreeLength(buffer.append(":"), tree.getLength(node));
             }
         }
     }
