@@ -376,7 +376,7 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
 
             if( tree.hasLengths() ) {
                 builder.append(':');
-                appendTreeLength(builder, tree.getLength(node));
+                Utils.appendBranchLength(builder, tree.getLength(node));
             }
         } else {
             builder.append('(');
@@ -394,17 +394,9 @@ public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeE
             // whet it is present.
             if (parent != null) {
                 if (tree.hasLengths()) {
-                    appendTreeLength(builder.append(":"), tree.getLength(node));
+                    Utils.appendBranchLength(builder.append(":"), tree.getLength(node));
                 }
             }
-        }
-    }
-
-    private void appendTreeLength(StringBuilder builder, double treeLength) {
-        if (String.valueOf(treeLength).toUpperCase().contains("E")) {//Converting Scientific Notation into Standard one to write
-            builder.append(Utils.convertScientificNotationIntoStandardNotation(roundDouble(treeLength, 6)));
-        } else {
-            builder.append(roundDouble(treeLength, 6));
         }
     }
 

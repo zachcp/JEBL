@@ -140,7 +140,7 @@ public final class Utils {
             buffer.append(name);
             if (tree.hasLengths()) {
                 buffer.append(':');
-                appendTreeLength(buffer, tree.getLength(node));
+                appendBranchLength(buffer, tree.getLength(node));
             }
         } else {
             buffer.append('(');
@@ -156,16 +156,23 @@ public final class Utils {
             // Don't write root length. This is ignored elsewhere and the nexus importer fails when it is present.
             if (parent != null && tree.hasLengths()) {
                 if (metacommentKeysToIgnore != null) addSimpleMetaComment(node, buffer, metacommentKeysToIgnore);
-                appendTreeLength(buffer.append(":"), tree.getLength(node));
+                appendBranchLength(buffer.append(":"), tree.getLength(node));
             }
         }
     }
 
-    private static void appendTreeLength(StringBuilder buffer, double treeLength) {
-        if (String.valueOf(treeLength).toUpperCase().contains("E")) {
-            buffer.append(convertScientificNotationIntoStandardNotation(treeLength));
+    /**
+     * Writes the branch length to the given string builder, converting any scientific
+     * notation to decimal format.
+     *
+     * @param buffer To write the length into
+     * @param branchLength the number to be written to the string builder
+     */
+    public static void appendBranchLength(StringBuilder buffer, double branchLength) {
+        if (String.valueOf(branchLength).toUpperCase().contains("E")) {
+            buffer.append(convertScientificNotationIntoStandardNotation(branchLength));
         } else {
-            buffer.append(treeLength);
+            buffer.append(branchLength);
         }
     }
 
@@ -1016,15 +1023,16 @@ public final class Utils {
     }
 
     /**
-     * This method converts tree length into standard format with 6 digit decimal point if it appears into scientific notation.
+     * Returns the string representation of a double in decimal format, even if it would
+     * be in scientific notation using Double.toString()
      *
-     * @param treeLength the length of a tree should be scientific notation, non-null
-     * @return tree length in standard format
+     * @param number the double to be converted to standard format, non-null
+     * @return number in standard format
      */
-    public static String convertScientificNotationIntoStandardNotation(double treeLength) {
+    private static String convertScientificNotationIntoStandardNotation(double number) {
         NumberFormat formatter = new DecimalFormat();
         formatter.setMinimumFractionDigits(6);
-        return formatter.format(treeLength);
+        return formatter.format(number);
     }
 
     // debug aid - unrooted tree printout - un-comment in emergency
