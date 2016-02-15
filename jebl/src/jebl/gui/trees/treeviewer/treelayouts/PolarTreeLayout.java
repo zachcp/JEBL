@@ -256,7 +256,17 @@ public class PolarTreeLayout extends AbstractTreeLayout {
                 branchPath.append(arc, true);
 
                 final Point2D p = transform(childPoints[i]);
-                branchPath.lineTo((float) p.getX(), (float) p.getY());
+
+                try {
+                    branchPath.lineTo((float) p.getX(), (float) p.getY());
+                } catch (IllegalPathStateException ipse) {
+                    String extraInfo = "nodePoint=" + nodePoint.getX() + "," + nodePoint.getY() +
+                            " transformedNodePont=" + transformedNodePoint.getX() + "," + transformedNodePoint.getY() +
+                            " numChildren=" + children.size() + " childIndex=" + i +
+                            " childPoint=" + childPoints[i].getX() + "," + childPoints[i].getY() +
+                            " transformedChildPoint=" + p.getX() + "," + p.getY();
+                    throw new IllegalPathStateException(ipse.getMessage() + ": " + extraInfo);
+                }
 
                 // add the branchPath to the map of branch paths
                 branchPaths.put(child, branchPath);
