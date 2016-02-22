@@ -398,7 +398,7 @@ public class MostProbableTopology {
                 final RootedTree t = (RootedTree)trees.get(nTree);
                 new TraversableRootedTree(t).traverse(new NodeCallback() {
                     public void visit(Node n, FixedBitSet tipSet) {
-                        final double height = t.getHeight(n);
+                        final double height = t.hasHeights() ? t.getHeight(n) : 0;
                         for( Info ti : candidates ) {
                             final TreeInfo.NodeInfo ni = ((TreeInfo)ti).m.get(tipSet);
 
