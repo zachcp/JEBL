@@ -301,20 +301,23 @@ public class MostProbableTopology {
         public void setBranches() {
             traverse(new NodeCallback() {
                 public void visit(Node n, FixedBitSet tipSet) {
-                    final NodeInfo info = m.get(tipSet);                                  assert(info != null);
-                    double h = info.length();
-                    for( Node c : t.getChildren(info.n) ) {
-                        final double ch = t.getHeight(c);
-                        if( ch > h ) {
-                            h = ch;
+                    final NodeInfo info = m.get(tipSet);                               assert (info != null);
+
+                    if (t.hasHeights()) {
+                        double h = info.length();
+                        for (Node c : t.getChildren(info.n)) {
+                            final double ch = t.getHeight(c);
+                            if (ch > h) {
+                                h = ch;
+                            }
                         }
+                        ((SimpleRootedTree) t).setHeight(info.n, h);
                     }
-                    ((SimpleRootedTree)t).setHeight(info.n, h);
 
                     info.n.setAttribute(consAttributeName,
                             (100.0 * info.count) / trees.size());
                 }
-            } );
+            });
         }
     }
 
@@ -398,11 +401,12 @@ public class MostProbableTopology {
                 final RootedTree t = (RootedTree)trees.get(nTree);
                 new TraversableRootedTree(t).traverse(new NodeCallback() {
                     public void visit(Node n, FixedBitSet tipSet) {
-                        final double height = t.hasHeights() ? t.getHeight(n) : 0;
+                        boolean hasHeights = t.hasHeights();
+                        final double height = hasHeights ? t.getHeight(n) : 0;
                         for( Info ti : candidates ) {
                             final TreeInfo.NodeInfo ni = ((TreeInfo)ti).m.get(tipSet);
 
-                            if( ni != null ) {
+                            if( ni != null && hasHeights) {
                                 ni.add(height);
                             }
                         }
