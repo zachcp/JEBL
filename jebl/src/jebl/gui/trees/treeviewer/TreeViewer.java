@@ -20,6 +20,7 @@ import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.painters.*;
+import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.treelayouts.PolarTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RadialTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;

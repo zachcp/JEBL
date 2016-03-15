@@ -6,6 +6,7 @@ import jebl.evolution.trees.*;
 import jebl.gui.trees.treeviewer.decorators.BranchDecorator;
 import jebl.gui.trees.treeviewer.decorators.RgbBranchDecorator;
 import jebl.gui.trees.treeviewer.painters.*;
+import jebl.gui.trees.treeviewer.painters.Painter;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayoutListener;
@@ -135,6 +136,9 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         treeLayout.setTree(tree);
 
         setDistancesToAncestorsForAutoExpansion();
+        if (isFiltering) {
+            setFilterText(filterText);
+        }
         calibrated = false;
         invalidate();
         repaint();
@@ -2071,7 +2075,10 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         this.isFiltering = !"".equals(filterText);
         externalNodesThatFitFilter.clear();
         internalNodesAboveFilterNodes.clear();
-        for (Node node : tree.getExternalNodes()) {
+        for (Node node : nodesInOrder) {
+            if (!tree.isExternal(node)) {
+                continue;
+            }
             BasicLabelPainter painter = (BasicLabelPainter) taxonLabelPainter;
             if (painter.matchesFilter(node, filterText)) {
                 externalNodesThatFitFilter.add(node);
