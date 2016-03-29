@@ -330,7 +330,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             significantDigitSpinner.addChangeListener(sigFigListener);
             sigFigListener.stateChanged(null);
 
-            final JSpinner maxCharsDigitSpinner = new JSpinner(new SpinnerNumberModel(getPrefs().getInt("Tip Labels_maxChars", maxChars), 2, 100, 1));
+            final JSpinner maxCharsDigitSpinner = new JSpinner(new SpinnerNumberModel(getPrefs().getInt("Tip Labels_maxChars", maxChars), 2, 9999, 1));
             panel.addComponentWithLabel("Max Chars:", maxCharsDigitSpinner);
             ChangeListener maxCharListener = new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
