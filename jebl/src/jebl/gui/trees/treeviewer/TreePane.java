@@ -2071,6 +2071,8 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
      * @param filterText
      */
     public void setFilterText(String filterText) {
+        int nodesThatFitFilter = externalNodesThatFitFilter.size();
+        Node currentlySelected = nodesThatFitFilter > 0 ? externalNodesThatFitFilter.get(currentFilterNodeIndex) : null;
         this.filterText = filterText;
         this.isFiltering = !"".equals(filterText);
         externalNodesThatFitFilter.clear();
@@ -2085,7 +2087,15 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 internalNodesAboveFilterNodes.addAll(getParentsToRoot(node));
             }
         }
-        currentFilterNodeIndex = externalNodesThatFitFilter.size() - 1;
+
+        // This method can be called when the filter text hasn't changed (if something like a branch transform calls setupTree every paint).
+        // Not skipping this gets the filter locked on a single node in that situation.
+        if (nodesThatFitFilter != externalNodesThatFitFilter.size()) {
+            currentFilterNodeIndex = externalNodesThatFitFilter.size() - 1;
+        } else if (currentlySelected != null) {
+            int newIndex = externalNodesThatFitFilter.indexOf(currentlySelected);
+            currentFilterNodeIndex = newIndex >= 0 ? newIndex : 0;
+        }
         calibrated = false;
         repaint();
     }
