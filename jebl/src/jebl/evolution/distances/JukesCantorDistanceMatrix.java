@@ -13,7 +13,6 @@ import jebl.util.ProgressListener;
  * @author Korbinian Strimmer
  * @author Joseph Heled
  *
- * @version $Id$
  */
 
 public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {

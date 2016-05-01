@@ -55,7 +55,6 @@ import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 @SuppressWarnings("unused")
 public class TreeViewer extends JPanel implements Printable {

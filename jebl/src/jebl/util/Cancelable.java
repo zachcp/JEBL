@@ -10,7 +10,6 @@ package jebl.util;
  * different name - any ideas?)
  *
  * @author Tobias Thierer
- * @version $Id$
  *          <p/>
  *          Created on 10/08/2007 16:25:35
  */

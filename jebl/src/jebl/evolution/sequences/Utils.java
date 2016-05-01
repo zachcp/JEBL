@@ -14,7 +14,6 @@ import jebl.evolution.taxa.Taxon;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class Utils {
     private Utils() { }  // make class uninstantiable

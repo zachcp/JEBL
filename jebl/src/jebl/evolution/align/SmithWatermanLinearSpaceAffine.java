@@ -6,7 +6,6 @@ import jebl.util.ProgressListener;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class SmithWatermanLinearSpaceAffine extends AlignLinearSpaceAffine {
 

@@ -29,7 +29,6 @@ import java.util.List;
  * that forward to a single parent progress listener, see {@link ProgressListener#createSplitProgress(ProgressListener, int)}
  *
  * @author Tobias Thierer
- * @version $Id$
  */
 public final class CompositeProgressListener extends ProgressListener {
     private int numOperations;

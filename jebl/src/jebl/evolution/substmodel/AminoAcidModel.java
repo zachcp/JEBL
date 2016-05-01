@@ -13,7 +13,6 @@ import jebl.evolution.sequences.SequenceType;
 /**
  * base class of rate matrices for amino acids
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

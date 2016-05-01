@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class BasicLabelPainter extends AbstractPainter<Node> {
 

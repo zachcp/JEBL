@@ -13,7 +13,6 @@ import java.util.List;
  * PreferencesDialog.java
  *
  * @author			Andrew Rambaut
- * @version			$Id$
  */
 public class PreferencesDialog {
 

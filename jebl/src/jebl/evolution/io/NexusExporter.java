@@ -26,7 +26,6 @@ import java.util.List;
  * @author Alexei Drummond
  * @author Joseph Heled
  *
- * @version $Id$
  */
 
 public class NexusExporter implements AlignmentExporter, SequenceExporter, TreeExporter {

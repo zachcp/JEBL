@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  */
 public class AlignmentTreeBuilderFactory {
     private final static Logger logger = Logger.getLogger(AlignmentTreeBuilderFactory.class.getName());

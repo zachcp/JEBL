@@ -7,7 +7,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface BranchDecorator {
     Paint getBranchPaint(Tree tree, Node node);

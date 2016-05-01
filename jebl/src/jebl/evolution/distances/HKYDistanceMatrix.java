@@ -11,7 +11,6 @@ import jebl.util.ProgressListener;
  *
  * @author Andrew Rambaut
  * @author Joseph Heled
- * @version $Id$
  *
  * Adapted from BEAST source code.
  *

@@ -11,7 +11,6 @@ import jebl.util.ProgressListener;
  * Time: 17:28:59
  *
  * @author Joseph Heled
- * @version $Id$
  *
  *  Estimation of the Number of Nucleotide Substitutions in
  *  the Control Region of Mitochondrial DNA in Humans and

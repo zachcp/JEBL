@@ -15,7 +15,6 @@ import java.util.Arrays;
  * @author Alexei Drummond
  * @author Joseph Heled
  *
- * @version $Id$
  */
 public class NeighborJoiningTreeBuilder extends ClusteringTreeBuilder<Tree> {
 

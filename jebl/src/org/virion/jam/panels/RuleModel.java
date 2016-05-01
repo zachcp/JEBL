@@ -9,7 +9,6 @@ package org.virion.jam.panels;
  * RuleModel.
  *
  * @author Andrew Rambaut
- * @version $Id$
  */
 
 

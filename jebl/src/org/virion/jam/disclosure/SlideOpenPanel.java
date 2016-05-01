@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
  * in from the top.
  *
  * @author Andrew Rambaut
- * @version $Id: FigTreePanel.java,v 1.13 2007/09/05 10:51:49 rambaut Exp $
  */
 public class SlideOpenPanel extends JPanel {
 

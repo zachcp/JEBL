@@ -13,7 +13,6 @@ import jebl.math.MachineAccuracy;
  * compute matrix exponential and, subsequently, transition probabilities
  * for a given rate matrix
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

@@ -13,7 +13,6 @@ import jebl.evolution.coalescent.DemographicFunction;
 /**
  * @author Oliver Pybus
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class EmpiricalDemographicFunction implements DemographicFunction {
 

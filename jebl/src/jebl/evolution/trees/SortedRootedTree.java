@@ -7,7 +7,6 @@ import java.util.*;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public class SortedRootedTree extends FilteredRootedTree {
 	private Map<Node, Integer> externalNodesUnderNodeCounts;

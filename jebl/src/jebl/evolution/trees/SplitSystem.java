@@ -9,7 +9,6 @@ import java.util.*;
 /**
  * data structure for a set of splits
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

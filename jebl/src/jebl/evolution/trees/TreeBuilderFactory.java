@@ -8,7 +8,6 @@ import jebl.evolution.taxa.Taxon;
  * methods and distances. Currently only pairwise distance methods are implemented.
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 

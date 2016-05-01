@@ -5,7 +5,6 @@ package jebl.evolution.align.scores;
  *
  * @author Alexei Drummond
  *
- * @version $Id$
  *
  * Based on code originally by Peter Setsoft. See package.html.
  */

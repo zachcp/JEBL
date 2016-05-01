@@ -14,7 +14,6 @@ package jebl.evolution.coalescent;
  * (Parameters: N0=present-day population size; N1=ancestral population size; r=growth rate).
  * This model is nested with the exponential-growth population size model (N1=0).
  *
- * @version $Id$
  *
  * @author Alexei Drummond
  * @author Andrew Rambaut

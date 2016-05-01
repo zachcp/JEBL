@@ -12,7 +12,6 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  *          <p/>
  *          Created by IntelliJ IDEA.
  *          User: joseph

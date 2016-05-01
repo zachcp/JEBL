@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public final class AminoAcids {
     private AminoAcids() { } // make class uninstantiable

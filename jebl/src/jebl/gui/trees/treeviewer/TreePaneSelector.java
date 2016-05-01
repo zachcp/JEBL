@@ -12,7 +12,6 @@ import java.util.Set;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class TreePaneSelector implements MouseListener, MouseMotionListener {
     public enum SelectionMode {

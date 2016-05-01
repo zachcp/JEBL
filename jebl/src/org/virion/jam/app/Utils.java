@@ -28,7 +28,6 @@ import java.io.StringWriter;
  * @author Alexei Drummond
  * @author Andrew Rambaut
  *
- * @version $Id$
  */
 public class Utils {
 

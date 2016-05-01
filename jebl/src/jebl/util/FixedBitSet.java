@@ -6,7 +6,6 @@ import java.util.Arrays;
  * A bit-set of fixed size. Size is determined on creation.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public class FixedBitSet {
     int[] bits;

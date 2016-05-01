@@ -10,7 +10,6 @@ package jebl.evolution.substmodel;
 /**
  * WAG model of amino acid evolution (S. Whelan and N. Goldman 2000)
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  * @author Alexei Drummond

@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public class TabDelimitedImporter implements DistanceMatrixImporter {
 

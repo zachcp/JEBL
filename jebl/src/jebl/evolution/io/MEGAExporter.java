@@ -13,7 +13,6 @@ import java.util.List;
  * * Export to MEGA.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public class MEGAExporter implements AlignmentExporter {
     private SafePrintWriter writer;

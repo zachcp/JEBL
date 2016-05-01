@@ -20,7 +20,6 @@ import java.util.prefs.Preferences;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 
 public final class GeneticCode {

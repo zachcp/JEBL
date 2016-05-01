@@ -19,7 +19,6 @@ import java.util.Vector;
  * be embedded in a JMenu.
  *
  * @author Tony Johnson (tonyj@slac.stanford.edu)
- * @version $Id$
  */
 public class RecentFileList implements ActionListener {
     /**

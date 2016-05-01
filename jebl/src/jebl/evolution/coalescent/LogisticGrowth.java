@@ -12,7 +12,6 @@ package jebl.evolution.coalescent;
 /**
  * This class models logistic growth.
  *
- * @version $Id$
  *
  * @author Alexei Drummond
  * @author Andrew Rambaut

@@ -27,7 +27,6 @@ import java.util.prefs.Preferences;
 
 /**
  * @author Steven Stones-Havas
- * @version $Id$
  *          <p/>
  *          Created on 24/03/2009 11:35:41 AM
  */

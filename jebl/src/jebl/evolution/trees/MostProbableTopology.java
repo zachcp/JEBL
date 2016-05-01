@@ -15,7 +15,6 @@ import java.util.*;
  * Set branch lengths / node heights from set conditional on topology.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public class MostProbableTopology {
     /**

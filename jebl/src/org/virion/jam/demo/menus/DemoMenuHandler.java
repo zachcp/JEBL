@@ -4,7 +4,6 @@ import javax.swing.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface DemoMenuHandler {
 	Action getFirstAction();

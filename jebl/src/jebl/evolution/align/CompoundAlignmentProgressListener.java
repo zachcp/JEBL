@@ -4,7 +4,6 @@ import jebl.util.ProgressListener;
 
 /**
  * @author Matt Kearse
- * @version $Id$
  */
 class CompoundAlignmentProgressListener  {
     private boolean cancelled = false;

@@ -12,7 +12,6 @@ import java.util.List;
  * @author Richard Moir
  * @author Alexei Drummond
  *
- * @version $Id$
  * 
  */
 public class NucleotideScores extends Scores {

@@ -11,7 +11,6 @@ import jebl.evolution.graphs.Node;
  * are recalculated on the fly for every call to getHeight and
  * getLength and it may be desirable to precalculate and cache them.
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class TransformedRootedTree extends FilteredRootedTree {
 

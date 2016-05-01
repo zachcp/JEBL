@@ -17,7 +17,6 @@ import java.util.NoSuchElementException;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public class NewickImporter implements TreeImporter {
     private final ImportHelper helper;

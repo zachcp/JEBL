@@ -15,7 +15,6 @@ import java.util.Map;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id: BasicSequence.java 641 2007-02-16 11:56:21Z rambaut $
  */
 public class CanonicalSequence implements Sequence {
 

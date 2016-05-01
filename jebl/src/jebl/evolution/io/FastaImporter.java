@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  * @author Joseph Heled
- * @version $Id$
  */
 public class FastaImporter implements SequenceImporter, ImmediateSequenceImporter {
 

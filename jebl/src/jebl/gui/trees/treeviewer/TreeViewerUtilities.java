@@ -10,7 +10,6 @@ import java.util.Map;
 
 /**
  * @author Steven Stones-Havas
- * @version $Id$
  *          <p/>
  *          Created on 20/03/2009 8:19:25 PM
  */

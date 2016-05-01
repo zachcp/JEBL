@@ -11,7 +11,6 @@ import java.awt.geom.Point2D;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface TreeLayout extends ControlsProvider {
 

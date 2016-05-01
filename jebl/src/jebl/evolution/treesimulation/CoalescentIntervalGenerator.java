@@ -21,7 +21,6 @@ import jebl.evolution.coalescent.DemographicFunction;
  *
  * @author Andrew Rambaut
  * @author Oliver Pybus
- * @version $Id$
  */
 public class CoalescentIntervalGenerator implements IntervalGenerator {
 

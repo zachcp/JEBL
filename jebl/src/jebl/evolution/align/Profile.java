@@ -9,7 +9,6 @@ import java.util.Map;
 
 /**
  * @author Matt Kearse
- * @version $Id$
  *
  * Represents a profile of a number of sequences to be used in a
  * multiple sequence alignment.

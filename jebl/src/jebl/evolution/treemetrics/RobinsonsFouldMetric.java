@@ -9,7 +9,6 @@ import java.util.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class RobinsonsFouldMetric implements RootedTreeMetric {
 

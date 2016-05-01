@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 /**
  * Work in progress
  * @author Joseph Heled
- * @version $Id$
  */
 public class TreeBiPartitionInfo {
     class BiPartiotionInfo {

@@ -42,7 +42,6 @@ import java.util.*;
  * can store attributes such as support only for nodes.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 
 final class GreedyUnrootedConsensusTreeBuilder extends ConsensusTreeBuilder<Tree> {

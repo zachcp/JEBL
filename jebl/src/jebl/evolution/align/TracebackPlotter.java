@@ -4,7 +4,6 @@ package jebl.evolution.align;
  *
  * @author Alexei Drummond
  *
- * @version $Id$
  *
  */
 public interface TracebackPlotter {

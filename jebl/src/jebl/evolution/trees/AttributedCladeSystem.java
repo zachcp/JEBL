@@ -9,7 +9,6 @@ import java.util.*;
  * Stores a set of unique clades for a tree
  *
  * @author Marc A. Suchard
- * @version $Id: CladeSystem.java 317 2006-05-04 11:42:12 +1200 (Thu, 04 May 2006) alexeidrummond $
  */
 public class AttributedCladeSystem extends CladeSystem {
 

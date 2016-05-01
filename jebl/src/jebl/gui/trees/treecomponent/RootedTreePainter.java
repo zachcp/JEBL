@@ -17,7 +17,6 @@ import java.awt.geom.Point2D;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public interface RootedTreePainter  {
 

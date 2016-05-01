@@ -22,7 +22,6 @@ import java.util.List;
  * @author rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public interface RootedTree extends Tree {
 

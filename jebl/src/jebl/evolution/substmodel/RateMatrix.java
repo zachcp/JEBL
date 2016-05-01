@@ -14,7 +14,6 @@ import java.io.Serializable;
 /**
  * abstract base class for all rate matrices
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  * @author Alexei Drummond

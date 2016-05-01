@@ -8,7 +8,6 @@ import java.util.Random;
  * Time: 10:13:50
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public class BootstrappedAlignment extends ResampledAlignment {

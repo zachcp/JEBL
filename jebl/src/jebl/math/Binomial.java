@@ -12,7 +12,6 @@ package jebl.math;
 /**
  * Binomial coefficients
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

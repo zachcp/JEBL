@@ -16,7 +16,6 @@ import java.util.*;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id: SimpleRootedTree.java 935 2008-07-22 16:52:04Z rambaut $
  */
 final public class RootedSubtree implements RootedTree {
 

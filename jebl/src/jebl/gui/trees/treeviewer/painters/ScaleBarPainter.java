@@ -21,7 +21,6 @@ import java.util.prefs.Preferences;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public class ScaleBarPainter extends AbstractPainter<TreePane> {
     private int defaultFontSize;

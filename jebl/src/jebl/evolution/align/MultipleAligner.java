@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  *          Date: 6/05/2006 Time: 08:08:22
  */
 public interface MultipleAligner {

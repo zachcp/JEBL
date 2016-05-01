@@ -18,7 +18,6 @@ import jebl.util.Attributable;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public interface Node extends Attributable {
 

@@ -3,7 +3,6 @@ package jebl.util;
 /**
  * A tri-state boolean value that can also be "Maybe" besides True and False.
  * @author Tobias Thierer
- * @version $Id$
  *          <p/>
  *          Created on 30/07/2007 14:15:09
  */

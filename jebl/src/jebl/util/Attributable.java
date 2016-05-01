@@ -17,7 +17,6 @@ import java.util.Set;
 /**
  * Interface for associating attributeNames with an object.
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  */

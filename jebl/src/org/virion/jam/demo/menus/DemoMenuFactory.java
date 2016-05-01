@@ -7,7 +7,6 @@ import javax.swing.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  *
  * Created on 24 February 2005, 17:12:11
  */

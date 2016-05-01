@@ -7,7 +7,6 @@ import javax.swing.*;
  * Time: 10:23:21
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public interface ControlPalette {
 

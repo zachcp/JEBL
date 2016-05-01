@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * utilities for split systems
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

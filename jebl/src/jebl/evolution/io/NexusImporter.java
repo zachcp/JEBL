@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
  *
  *    http://www.cs.nmsu.edu/~epontell/nexus/nexus_grammar
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

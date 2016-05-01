@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  */
 public abstract class TreeDrawableElement implements QuadTree.Item {
     final protected Node node;

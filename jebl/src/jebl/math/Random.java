@@ -15,7 +15,6 @@ package jebl.math;
  * @author Matthew Goode
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class Random {
 

@@ -2,7 +2,6 @@ package jebl.evolution.align;
 
 /**
  * @author Matt Kearse
- * @version $Id$
  *
  * Used for representing the results of a sequence alignment. Basically just stores
  * an array representing whether or not each position in the alignment is a gap or not.

@@ -22,7 +22,6 @@ import java.util.*;
  * Any object may exhibit undefined behaviour when dealing with a ProgressListener 
  * that is not fulfilling this contract.
  * @author Matt Kearse
- * @version $Id$
  *
  */
 public abstract class ProgressListener implements Cancelable {

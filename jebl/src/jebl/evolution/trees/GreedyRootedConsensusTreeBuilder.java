@@ -10,7 +10,6 @@ import java.util.*;
  * Time: 09:40:18
  *
  * @author Joseph Heled
- * @version $Id$
  *          <p/>
  *          Implementation shares some code with GreedyUnrootedConsensusTreeBuilder (which preceded it), and perhaps I will
  *          find a way to merge the two at a later stage when I have the time.

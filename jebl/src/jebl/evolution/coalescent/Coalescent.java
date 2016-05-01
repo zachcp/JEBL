@@ -17,7 +17,6 @@ import jebl.evolution.trees.RootedTree;
  *
  * Parts of this class were derived from C++ code provided by Oliver Pybus.
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

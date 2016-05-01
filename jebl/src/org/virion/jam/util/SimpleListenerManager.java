@@ -19,7 +19,6 @@ import java.util.List;
  * internal SimpleListeners). This class is thread safe.
  *
  * @author Richard Moir
- * @version $Id$
  */
 public class SimpleListenerManager implements SimpleListener {
     private final List<SimpleListener> listeners;

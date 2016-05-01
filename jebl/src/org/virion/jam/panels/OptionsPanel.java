@@ -12,7 +12,6 @@ import java.util.Map;
  * OptionsPanel.
  *
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class OptionsPanel extends JPanel {
 

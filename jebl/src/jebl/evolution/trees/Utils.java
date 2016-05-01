@@ -22,7 +22,6 @@ import java.util.*;
  *
  * @author rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public final class Utils {
     private Utils() { }  // make class uninstantiable

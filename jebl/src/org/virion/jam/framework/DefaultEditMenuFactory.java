@@ -11,7 +11,6 @@ import java.awt.event.KeyEvent;
  *         Date: Dec 26, 2004
  *         Time: 11:01:40 AM
  *
- * @version $Id$
  */
 public class DefaultEditMenuFactory implements MenuFactory {
 	public String getMenuName() {

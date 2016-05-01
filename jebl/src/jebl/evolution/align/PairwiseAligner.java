@@ -6,7 +6,6 @@ import jebl.util.ProgressListener;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public interface PairwiseAligner {

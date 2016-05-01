@@ -6,7 +6,6 @@ package jebl.evolution.align.scores;
  * 
  * @author Richard Moir
  *
- * @version $Id$
  */
 public class JukesCantor extends NucleotideScores {
 	

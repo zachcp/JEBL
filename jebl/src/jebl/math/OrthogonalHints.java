@@ -15,7 +15,6 @@ package jebl.math;
  * Provides a means for giving an Orthogonal base optimiser (IE, OrthognalMinimum)
  * hints about the function that may alow it to optimise better.
  *
- * @version $Id$
  *
  * @author Matthew Goode
  */

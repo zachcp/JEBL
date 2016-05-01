@@ -19,7 +19,6 @@ import java.util.List;
  * OptionsPanel.
  *
  * @author Andrew Rambaut
- * @version $Id$
  */
 
 

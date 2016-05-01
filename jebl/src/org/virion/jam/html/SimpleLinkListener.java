@@ -15,7 +15,6 @@ import javax.swing.event.HyperlinkListener;
  * see  http://ostermiller.org/utils/Browser.html  for more information
  *
  * @author Nasser Giacaman
- * @version $Id$
  *          Date: 26/01/2005
  *          Time: 11:54:50
  */

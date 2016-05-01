@@ -12,7 +12,6 @@ import jebl.evolution.graphs.Node;
  * A painter draws a particular decoration onto the tree within a
  * rectangle.
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface Painter<T> extends ControlsProvider {
 

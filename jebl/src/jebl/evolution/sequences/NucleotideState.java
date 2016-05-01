@@ -12,7 +12,6 @@ package jebl.evolution.sequences;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public final class NucleotideState extends State {
 

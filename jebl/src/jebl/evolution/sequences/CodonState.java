@@ -15,7 +15,6 @@ package jebl.evolution.sequences;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public final class CodonState extends State {
     CodonState(String name, String stateCode, int index) {

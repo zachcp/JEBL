@@ -17,7 +17,6 @@ import java.util.List;
  * extract the pairwise distances from a multiple sequence alignment).
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public class SequenceAlignmentsDistanceMatrix extends BasicDistanceMatrix {

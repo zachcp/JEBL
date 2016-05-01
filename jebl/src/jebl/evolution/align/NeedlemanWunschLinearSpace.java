@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class NeedlemanWunschLinearSpace extends AlignLinearSpace {
 

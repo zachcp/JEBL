@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public abstract class AbstractController implements Controller {
 	protected static final String IS_SHOWN = "isShown";

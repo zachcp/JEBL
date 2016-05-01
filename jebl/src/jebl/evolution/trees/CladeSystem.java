@@ -8,7 +8,6 @@ import java.util.*;
 /**
  * Stores a set of unique clades for a tree
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  */

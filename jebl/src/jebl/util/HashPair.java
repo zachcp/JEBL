@@ -5,7 +5,6 @@ package jebl.util;
  *
  * @author Joseph Heled
  *
- * @version $Id$
  */
 
 public class HashPair<T> {

@@ -15,7 +15,6 @@ package jebl.evolution.coalescent;
  * @author Alexei Drummond
  * @author Andrew Rambaut
  *
- * @version $Id$
  *
  */
 public class ConstExponential extends ExponentialGrowth {

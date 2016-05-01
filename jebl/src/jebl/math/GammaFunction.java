@@ -14,7 +14,6 @@ package jebl.math;
 /**
  * gamma function
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

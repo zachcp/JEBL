@@ -4,7 +4,6 @@ package jebl.evolution.io;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class ImportException extends Exception {
 	public ImportException() { super(); }

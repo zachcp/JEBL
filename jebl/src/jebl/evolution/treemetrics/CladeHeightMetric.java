@@ -65,7 +65,6 @@ import java.util.*;
  * So the score is sqrt(8^2 + 10^2) = sqrt(164)
  *
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class CladeHeightMetric implements RootedTreeMetric {
 

@@ -19,7 +19,6 @@ import java.util.*;
  * sequence on one line.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public class PHYLIPExporter implements AlignmentExporter, TreeExporter {
     private SafePrintWriter writer;

@@ -15,7 +15,6 @@ import java.util.Vector;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class MultipleTreeViewer extends TreeViewer {
 

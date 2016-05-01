@@ -11,7 +11,6 @@ import java.util.Set;
  * Common implementation of Attributable interface used by Nodes.
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 

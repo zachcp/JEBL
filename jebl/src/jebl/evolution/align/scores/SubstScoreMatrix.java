@@ -6,7 +6,6 @@ import jebl.evolution.substmodel.RateMatrix;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class SubstScoreMatrix extends Scores {
 

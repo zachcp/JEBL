@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * An abstract base class for clustering algorithms from pairwise distances
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

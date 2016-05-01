@@ -8,7 +8,6 @@ import java.io.FileReader;
 /**
  *
  * @author MattK
- * @version $Id$
  */
 public class SequenceTester {
     public static String readSequence(String name) {

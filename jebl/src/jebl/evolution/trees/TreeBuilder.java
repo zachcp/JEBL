@@ -5,7 +5,6 @@ import jebl.util.ProgressListener;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public interface TreeBuilder<T extends Tree> {
 

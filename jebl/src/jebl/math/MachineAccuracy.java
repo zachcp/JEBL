@@ -12,7 +12,6 @@ package jebl.math;
 /**
  * determines machine accuracy
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  * @author Alexei Drummond

@@ -10,7 +10,6 @@ import java.util.Arrays;
 /**
  * constructs a UPGMA tree from pairwise distances
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

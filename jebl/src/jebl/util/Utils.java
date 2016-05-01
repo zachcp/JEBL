@@ -11,7 +11,6 @@ package jebl.util;
  * Provides some miscellaneous methods.
  *
  * @author Matthew Goode
- * @version $Id$
  */
 public class Utils {
     private Utils() { }  // make class uninstantiable

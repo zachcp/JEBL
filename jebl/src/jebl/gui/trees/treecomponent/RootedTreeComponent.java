@@ -22,7 +22,6 @@ import java.util.Vector;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class RootedTreeComponent extends JComponent implements Printable {
 

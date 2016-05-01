@@ -20,7 +20,6 @@ import java.util.*;
  *      nodes etc. Traversing the tree and handling attributes speed should be fine (compared to SimpkeRootedTree)
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public class CompactRootedTree extends AttributableImp implements RootedTree {

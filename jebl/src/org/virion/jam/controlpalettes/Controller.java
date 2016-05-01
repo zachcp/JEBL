@@ -5,7 +5,6 @@ import java.util.Map;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface Controller {
 

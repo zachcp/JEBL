@@ -12,7 +12,6 @@ import java.io.*;
  * 
  * @author Richard Moir
  *
- * @version $Id$
  *
  */
 public class AlignCommand {

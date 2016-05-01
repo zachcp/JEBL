@@ -15,7 +15,6 @@ package jebl.math;
 /**
  * A means for describing odering information, and Utilities for creating such Orderings
  *
- * @version $Id$
  *
  * @author Matthew Goode
  */

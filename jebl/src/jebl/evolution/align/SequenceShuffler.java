@@ -10,7 +10,6 @@ import java.util.Random;
  * @author Richard Moir
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class SequenceShuffler {
 

@@ -12,7 +12,6 @@ package jebl.evolution.coalescent;
 /**
  * An interface for a set of coalescent intevals.
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

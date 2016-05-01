@@ -11,7 +11,6 @@ import java.util.Set;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public abstract class FilteredRootedTree implements RootedTree {
 

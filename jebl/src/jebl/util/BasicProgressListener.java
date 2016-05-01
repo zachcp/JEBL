@@ -5,7 +5,6 @@ package jebl.util;
  * status. Typically this class is used when you don't care about providing immediate feedback to
  * the user, but still need to be able to cancel an operation.
  * @author Matt Kearse
- * @version $Id$
  */
 
 public class BasicProgressListener extends ProgressListener {

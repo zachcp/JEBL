@@ -12,7 +12,6 @@ import jebl.evolution.sequences.SequenceType;
 /**
  * abstract base class for all rate matrices
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  * @author Alexei Drummond

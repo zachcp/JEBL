@@ -5,7 +5,6 @@ import jebl.evolution.align.scores.Scores;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public class MaximalSegmentPair extends AlignSimple {
 	

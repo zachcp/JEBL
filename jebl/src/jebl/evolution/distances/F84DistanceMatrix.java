@@ -9,7 +9,6 @@ import jebl.util.ProgressListener;
 /**
 
  * @author Joseph Heled
- * @version $Id$
  *
  * See the detailed comment in {@link HKYDistanceMatrix} on the model and the formula used for estimating the distance.
  */

@@ -3,7 +3,6 @@ package jebl.evolution.align.scores;
 /**
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public interface ScoreMatrix {
     /**

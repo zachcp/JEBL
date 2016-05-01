@@ -14,7 +14,6 @@ import java.util.List;
  * This abstract base class is designed to be extended.
  *
  * @author Joseph Heled
- * @version $Id$
  */
 
 public abstract class ConsensusTreeBuilder<T extends Tree> implements TreeBuilder<T> {

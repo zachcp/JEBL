@@ -33,7 +33,6 @@ import java.util.prefs.Preferences;
 /**
  *
  * @author Andrew Rambaut
- * @version $Id$
  */
 @SuppressWarnings({"unused", "ForLoopReplaceableByForEach", "ToArrayCallWithZeroLengthArrayArgument", "OverlyLongMethod"})
 public class TreePane extends JComponent implements ControlsProvider, PainterListener, Printable {

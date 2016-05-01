@@ -4,7 +4,6 @@ package jebl.evolution.trees;
  * A listener for notifying about changes to a tree or to the selected nodes in a tree.
  *
  * @author Matt Kearse
- * @version $Id$
  */
 
 public abstract class TreeChangeListener {

@@ -22,7 +22,6 @@ import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class RectilinearTreeLayout extends AbstractTreeLayout {
 

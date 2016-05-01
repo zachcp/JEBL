@@ -27,7 +27,6 @@ import java.util.Set;
  * @author rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public interface Tree extends Graph {
 

@@ -21,7 +21,6 @@ package jebl.math;
  * (Richard P. Brent.  1973.   Algorithms for finding zeros and extrema
  *  of functions without calculating derivatives.  Prentice-Hall.)
  *
- * @version $Id$
  *
  * @author Korbinian Strimmer
  */

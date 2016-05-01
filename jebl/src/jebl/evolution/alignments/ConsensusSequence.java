@@ -13,7 +13,6 @@ import java.util.Set;
 /**
  * @author rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public abstract class ConsensusSequence implements Sequence {
     /**

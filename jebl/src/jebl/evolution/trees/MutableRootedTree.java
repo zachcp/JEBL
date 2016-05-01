@@ -16,7 +16,6 @@ import java.util.*;
  *   - Re-root a rooted tree given an outgroup.
 
  * @author Joseph Heled
- * @version $Id$
  *
  */
 

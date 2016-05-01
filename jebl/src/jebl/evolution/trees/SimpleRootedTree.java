@@ -14,7 +14,6 @@ import java.util.*;
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 final public class SimpleRootedTree implements RootedTree {
 

@@ -14,7 +14,6 @@ import java.util.Set;
  * Time: 08:08:44
  *
  * @author Joseph Heled
- * @version $Id$
  *
  * Provide a re-sampled alignment. This means an alignment constructed by choosing a set of sites from
  * the source alignment and concataneting them. The set may be of any length and may contain duplications

@@ -4,7 +4,6 @@ import jebl.evolution.align.scores.Scores;
 
 /**
  * @author Matt Kearse
- * @version $Id$
  *
  * Represents a single residue in a multiple alignment profile
  * It can represent character frequencies inside an alignment column

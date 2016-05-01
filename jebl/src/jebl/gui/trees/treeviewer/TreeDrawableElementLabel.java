@@ -9,7 +9,6 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * @author Joseph Heled
- * @version $Id$
  *          <p/>
  */
 public abstract class TreeDrawableElementLabel extends TreeDrawableElement {

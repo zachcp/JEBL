@@ -26,7 +26,6 @@ import java.util.List;
 
 /**
  * @author Matt Kearse
- * @version $Id$
  *
  * Implements the BartonSternberg multiple sequence alignment algorithm.
  *

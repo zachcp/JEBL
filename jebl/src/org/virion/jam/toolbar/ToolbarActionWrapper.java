@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class ToolbarActionWrapper extends ToolbarAction {
     public ToolbarActionWrapper(AbstractAction action, String toolTipText, Icon icon) {

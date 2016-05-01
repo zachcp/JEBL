@@ -19,7 +19,6 @@ import jebl.evolution.trees.Tree;
  * Date: Jun 20, 2005
  * Time: 4:56:34 PM
  *
- * @version $Id$
  */
 public interface ParsimonyCriterion {
 

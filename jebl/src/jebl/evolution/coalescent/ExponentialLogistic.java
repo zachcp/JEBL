@@ -13,7 +13,6 @@ package jebl.evolution.coalescent;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  *
  */
 public class ExponentialLogistic extends LogisticGrowth {

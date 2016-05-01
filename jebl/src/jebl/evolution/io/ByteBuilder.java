@@ -9,7 +9,6 @@ import java.util.logging.Logger;
  * characters.
  * 
  * @author Joseph Heled
- * @version $Id$
  */
 public class ByteBuilder implements CharSequence, Appendable {
     private static final Logger logger = Logger.getLogger(ByteBuilder.class.getName());

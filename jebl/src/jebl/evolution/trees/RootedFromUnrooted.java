@@ -14,7 +14,6 @@ import java.util.*;
  * be problematic when converting back from the Newick format.
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 

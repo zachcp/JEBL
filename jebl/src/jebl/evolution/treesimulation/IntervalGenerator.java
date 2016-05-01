@@ -11,7 +11,6 @@ package jebl.evolution.treesimulation;
 /**
  * @author Andrew Rambaut
  * @author Alexei Drummond
- * @version $Id$
  */
 public interface IntervalGenerator {
 

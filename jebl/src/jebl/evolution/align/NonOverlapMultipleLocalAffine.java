@@ -12,7 +12,6 @@ import java.util.ArrayList;
  *
  * @author Richard Moir
  *
- * @version $Id$
  *
  */
 

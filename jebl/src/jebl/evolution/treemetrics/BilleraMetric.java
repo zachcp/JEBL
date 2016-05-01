@@ -14,7 +14,6 @@ import java.util.List;
  * Creating TreeBiPartitionInfo's as a pre step is better unless memory is an issue.
  * 
  * @author Joseph Heled
- * @version $Id$
  */
 public class BilleraMetric implements RootedTreeMetric {
     public double getMetric(RootedTree tree1, RootedTree tree2) {

@@ -4,7 +4,6 @@ package jebl.evolution.io;
  * What to do when an imported document contains illegal characters
  *
  * @author Tobias Thierer
- * @version $Id$
  *          <p/>
  *          created on 04.12.2006 15:15:54
  */

@@ -14,7 +14,6 @@ package jebl.evolution.coalescent;
  * (Parameters: N0=present-day population size; r=growth rate).
  * This model is nested with the constant-population size model (r=0).
  *
- * @version $Id$
  *
  * @author Alexei Drummond
  * @author Andrew Rambaut

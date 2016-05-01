@@ -6,7 +6,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public interface TaxonDecorator {
     Paint getTaxonPaint(Taxon taxon);

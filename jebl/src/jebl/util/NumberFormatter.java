@@ -14,7 +14,6 @@ import java.text.DecimalFormat;
 /**
  * An interface for a numerical column in a log.
  *
- * @version $Id$
  *
  * @author Andrew Rambaut
  * @author Alexei Drummond

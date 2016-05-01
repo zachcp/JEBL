@@ -13,7 +13,6 @@ import java.util.List;
  * trees). This seems natural as it connects clades in reverse time order.
  *
  * @author Joseph Heled
- * @version $Id$
  **/
 
 class MRCACConsensusTreeBuilder extends ConsensusTreeBuilder<RootedTree> {

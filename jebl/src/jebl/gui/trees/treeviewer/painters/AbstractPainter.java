@@ -8,7 +8,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public abstract class AbstractPainter<T> implements Painter<T> {
 

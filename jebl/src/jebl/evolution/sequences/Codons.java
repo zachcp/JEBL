@@ -14,7 +14,6 @@ import java.util.*;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public final class Codons {
 	public static final String NAME = "codon";

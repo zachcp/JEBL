@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Andrew Rambaut
  * @author Alexei Drummond
  *
- * @version $Id$
  */
 public final class Taxon implements Attributable, Comparable {
 

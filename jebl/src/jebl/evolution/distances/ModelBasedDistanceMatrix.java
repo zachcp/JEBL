@@ -10,7 +10,6 @@ import java.util.List;
 /**
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public class ModelBasedDistanceMatrix  {

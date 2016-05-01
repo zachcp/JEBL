@@ -9,7 +9,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class PinnedButton extends JToggleButton {
 

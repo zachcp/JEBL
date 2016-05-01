@@ -8,7 +8,6 @@ import java.util.Random;
  * Time: 08:18:32
  *
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public class JackknifedAlignment extends ResampledAlignment {

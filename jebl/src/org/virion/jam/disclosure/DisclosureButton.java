@@ -11,7 +11,6 @@ import org.virion.jam.util.IconUtils;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class DisclosureButton extends JToggleButton {
 

@@ -8,7 +8,6 @@ import java.util.Map;
  * Time: 10:23:21
  *
  * @author Joseph Heled
- * @version $Id$
  */
 public interface ControlPalette {
 

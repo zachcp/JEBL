@@ -14,7 +14,6 @@ import java.util.Set;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public abstract class AbstractTreeLayout implements TreeLayout {
     public void setTree(Tree tree) {

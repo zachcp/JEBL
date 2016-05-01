@@ -9,7 +9,6 @@ import java.util.Map;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class AttributeBranchDecorator implements BranchDecorator {
     public AttributeBranchDecorator(String attributeName, Map<Object, Paint> paintMap) {

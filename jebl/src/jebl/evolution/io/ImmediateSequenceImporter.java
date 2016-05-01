@@ -11,7 +11,6 @@ import java.io.IOException;
  * possible to import larger documents if handled wisely on the other side.
  * 
  * @author Joseph Heled
- * @version $Id$
  *
  */
 public interface ImmediateSequenceImporter {

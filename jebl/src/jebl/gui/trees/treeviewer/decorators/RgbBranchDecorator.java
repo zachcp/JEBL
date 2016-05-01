@@ -9,7 +9,6 @@ import java.awt.*;
 
 /**
  * @author Steven Stones-Havas
- * @version $Id$
  *          <p/>
  *          Created on 15/07/2008 13:19:33
  */

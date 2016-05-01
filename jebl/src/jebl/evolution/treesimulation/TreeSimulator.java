@@ -25,7 +25,6 @@ import java.util.*;
  * by the IntervalGenerator and an implementation of this is the CoalescentIntervalGenerator in
  * the jebl.evolution.coalescent package.
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class TreeSimulator {
 

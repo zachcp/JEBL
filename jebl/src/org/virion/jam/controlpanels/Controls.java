@@ -5,7 +5,6 @@ import java.awt.*;
 
 /**
  * @author Andrew Rambaut
- * @version $Id$
  */
 public class Controls {
 
