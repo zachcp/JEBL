@@ -419,7 +419,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         double distance;
         if (distanceToAncestor != null && distanceToAncestor instanceof Double) {
             distance = (Double) distanceToAncestor;
-            if (distance < cladeDistanceThresholdToCollapse) {
+            if (distance <= cladeDistanceThresholdToCollapse) {
                 return true;
             } else {
                 return false;
