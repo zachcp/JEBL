@@ -2,6 +2,7 @@ package jebl.evolution.distances;
 
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.Pattern;
+import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.State;
 import jebl.util.ProgressListener;
 
@@ -51,7 +52,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
                 State state1 = pattern.getState(taxon1);
                 State state2 = pattern.getState(taxon2);
 
-                final double weight = pattern.getWeight();
+                final double weight = pattern.getWeight(); //ALWAYS 1
 
 
                 // ignore any ambiguous states or gaps
@@ -88,6 +89,7 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
                 return MAX_DISTANCE;
             }
 
+            //Convert proportion of changed sites to estimate of distance using the Jukes-Cantor adjustment
             double expDist = -maxTheoreticalSubsRate * Math.log(1.0 - ((1/maxTheoreticalSubsRate) * obsDist));
 
             return Math.min(expDist, MAX_DISTANCE);
@@ -98,8 +100,8 @@ public class JukesCantorDistanceMatrix extends BasicDistanceMatrix {
         {
             this.alignment = alignment;
 
-            // ASK Alexei
-            int stateCount = alignment.getSequenceType().getCanonicalStateCount();
+            // Manually put in 4 and 20 because JEBL returns 22 for AA state count (includes pyrrolysine and selenocysteine)
+            int stateCount = alignment.getSequenceType().equals(SequenceType.NUCLEOTIDE) ? 4 : 20;
 
             maxTheoreticalSubsRate = ((double)stateCount - 1) / stateCount;
 
