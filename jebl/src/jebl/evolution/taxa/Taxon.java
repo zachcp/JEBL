@@ -117,6 +117,12 @@ public final class Taxon implements Attributable, Comparable {
     // Static factory methods
 
     /**
+     * Return a Set containing all Taxon objects created after
+     * {@link #setTreatingTaxonsNamesAsUnique(boolean)} was called with true.
+     * More precisely, {@link #setTreatingTaxonsNamesAsUnique(boolean)} can be used to
+     * repeatably toggle a state that is initially false, but the intention is that it is called
+     * only once to enable the true state when initialising an application if that is
+     * the desired behaviour. This has not been used by default since tag geneious_6_0_5.
      * @return a Set containing all the currently created Taxon objects.
      */
     public static Set<Taxon> getAllTaxa() {
@@ -150,8 +156,11 @@ public final class Taxon implements Attributable, Comparable {
     }
 
     /**
-     * A static method that returns a Taxon object with the given name. If this has
-     * already been created then the same instance will be returned.
+     * A static method that returns a Taxon instance with the given name.
+     * If {@link #setTreatingTaxonsNamesAsUnique(boolean)} was last called with false
+     * (the default state after geneious_6_0_5 tag) it will create a new instance of Taxon.
+     * If {@link #setTreatingTaxonsNamesAsUnique(boolean)} was last called with true,
+     * if a Taxon with that name has already been created then the same instance will be returned.
      *
      * @param name
      * @return the taxon
