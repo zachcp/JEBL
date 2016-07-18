@@ -1116,6 +1116,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     }
 
     private Point2D.Double nodeCoord(final Node node) {
+        if (treeLayout == null || transform == null) {
+            throw new IllegalStateException("TreePane in incorrect state. treeLayout=" + (treeLayout == null ? "null" : treeLayout.toString())
+            + " transform=" + (transform == null? "null" : transform.toString()) +
+            " branchTransform=" + getBranchTransform().toString() + " treeDocType=" + tree.getClass().toString());
+        }
         final Point2D nodePoint = treeLayout.getNodePoint(node);
         final Point2D.Double result = new Point2D.Double();
         transform.transform(nodePoint, result);
