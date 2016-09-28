@@ -1,14 +1,12 @@
 package org.virion.jam.html;
 
-import org.virion.jam.framework.JeblFrame;
-
 import javax.swing.*;
 import java.awt.*;
 
 /**
  * General-purpose class to display HTML in a standalone frame.
  */
-public class HTMLViewer extends JeblFrame {
+public class HTMLViewer extends JFrame {
 
     private JEditorPane editorPane;
 
