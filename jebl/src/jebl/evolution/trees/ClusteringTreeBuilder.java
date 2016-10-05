@@ -39,7 +39,10 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
 
             newCluster();
             assert( progress <= totalPairs );
-            fireSetProgress(progress / totalPairs);
+            if(fireSetProgress(progress / totalPairs)) {
+                // return null if cancelled
+                return null;
+            }
             progress++;
         }
         finish();
@@ -55,10 +58,13 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         listeners.remove(listener);
     }
 
-    public void fireSetProgress(double fractionCompleted) {
+    public boolean fireSetProgress(double fractionCompleted) {
         for (ProgressListener listener : listeners) {
-            listener.setProgress(fractionCompleted);
+            if(listener.setProgress(fractionCompleted)) {
+                return true;
+            }
         }
+        return false;
     }
 
     // must be a type of list that supports the remove() operation

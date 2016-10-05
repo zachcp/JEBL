@@ -169,7 +169,7 @@ public class BartonSternberg implements MultipleAligner {
                                     this, compoundProgress.getMinorProgress(),true) :
                             AlignmentTreeBuilderFactory.build(sequencesForGuideTree, TreeBuilderFactory.Method.NEIGHBOR_JOINING,
                                     aligner, compoundProgress.getMinorProgress(), TreeBuilderFactory.DistanceModel.AlignmentScore);
-            if (compoundProgress.isCanceled()) return null;
+            if (compoundProgress.isCanceled() || unrootedGuideTree == null) return null;
             //long duration = System.currentTimeMillis() - start;
             //System.out.println("took " + duration +  " for " + (fastGuide ? " fast" : "normal") + " guide tree");
 
