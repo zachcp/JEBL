@@ -152,10 +152,13 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
 
         if (intent == PainterIntent.BRANCH) {
             Set<Node> nodes = tree.getInternalNodes();
+            Set<String> nonSupportAttributesSeen = new HashSet<String>();
             for (Node node : nodes) {
                 for (String attributeName : node.getAttributeNames()) {
-                    if (isConsensusSupportAttribute(attributeName)) {
+                    if (!nonSupportAttributesSeen.contains(attributeName) && isConsensusSupportAttribute(attributeName)) { //try to avoid regex searching every attribute's name on every internal node
                         names.add(attributeName);
+                    } else {
+                        nonSupportAttributesSeen.add(attributeName);
                     }
                 }
             }
