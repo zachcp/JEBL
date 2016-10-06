@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class BasicLabelPainter extends AbstractPainter<Node> {
 
     private static final Pattern consensusSupportAttributePattern = Pattern.compile(
-            "(consensus|clade|bootstrap|posterior|fasttree)\\s*(support|probability|value).*",
+            "(consensus|clade|bootstrap|posterior|fasttree)\\s*(support|probability|value)",
             Pattern.CASE_INSENSITIVE);
 
     final String fontMinSizePrefKey;
