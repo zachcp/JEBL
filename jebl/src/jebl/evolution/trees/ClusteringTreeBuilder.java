@@ -58,7 +58,7 @@ public abstract class ClusteringTreeBuilder<T extends Tree> implements TreeBuild
         listeners.remove(listener);
     }
 
-    public boolean fireSetProgress(double fractionCompleted) {
+    private boolean fireSetProgress(double fractionCompleted) {
         for (ProgressListener listener : listeners) {
             if(listener.setProgress(fractionCompleted)) {
                 return true;

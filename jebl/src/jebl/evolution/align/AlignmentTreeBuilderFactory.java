@@ -41,7 +41,7 @@ public class AlignmentTreeBuilderFactory {
      * @param distanceMatrixBuilder Encapsulation of all information required to build distance matrix
      * @param method the tree building method to use
      * @param _progressListener must not be null
-     * @return A tree building result (containing a tree and a distance matrix)
+     * @return A tree building result (containing a tree and a distance matrix) or possibly null if _progressListener.isCanceled()
      */
     private static Result build(DistanceMatrixBuilder distanceMatrixBuilder, TreeBuilderFactory.Method method, ProgressListener _progressListener) throws CannotBuildDistanceMatrixException {
         // The requirement that progress isn't null has only been added on 2006-12-29.
@@ -72,7 +72,7 @@ public class AlignmentTreeBuilderFactory {
      * @param useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable If the alignment contains pairs of sequences that are not overlapping it is not possible to build
      *          a tree from the alignment. If this parameter is false, then CannotBuildDistanceMatrixException will be thrown. If this parameter
      *          is true, then twice the maximum distance between all other pairs will be used non-overlapping pairs.
-     * @return A tree building result (containing a tree and a distance matrix)
+     * @return A tree building result (containing a tree and a distance matrix) or possibly null if progressListener.isCanceled()
      * @throws CannotBuildDistanceMatrixException only if useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable is false
      */
     static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener, final boolean useTwiceMaximumDistanceWhenPairwiseDistanceNotCalculatable)
@@ -101,7 +101,7 @@ public class AlignmentTreeBuilderFactory {
      * @param method the tree building method to use
      * @param model substitution model for distance matrix: JukesCantor, TamuraNei, HKY or F84.
      * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
-     * @return A tree building result (containing a tree and a distance matrix)
+     * @return A tree building result (containing a tree and a distance matrix)  or possibly null if progressListener.isCanceled()
      */
     static public Result build(final Alignment alignment, TreeBuilderFactory.Method method, final TreeBuilderFactory.DistanceModel model, ProgressListener progressListener)
             throws CannotBuildDistanceMatrixException
@@ -116,7 +116,7 @@ public class AlignmentTreeBuilderFactory {
      * @param method method the tree building method to use
      * @param aligner pairwise aligner which will be used to calculate a pairwise distance
      * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
-     * @return A tree building result (containing a tree and a distance matrix)
+     * @return A tree building result (containing a tree and a distance matrix) or possibly null if progressListener.isCanceled()
      */
     static public Result build(final List<Sequence> seqs, TreeBuilderFactory.Method method, final PairwiseAligner aligner,
                                ProgressListener progressListener)
@@ -132,7 +132,7 @@ public class AlignmentTreeBuilderFactory {
      * @param aligner pairwise aligner which will be used to calculate a pairwise distance
      * @param progressListener must not be null. If you are not interested in progress, pass in ProgressListener.EMPTY
      * @param model distance model to use
-     * @return A tree building result (containing a tree and a distance matrix)
+     * @return A tree building result (containing a tree and a distance matrix) or possibly null if progressListener.isCanceled()
      */
     static public Result build(final List<Sequence> seqs, TreeBuilderFactory.Method method, final PairwiseAligner aligner,
                                ProgressListener progressListener, final TreeBuilderFactory.DistanceModel model)
