@@ -262,13 +262,14 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             OptionsPanel panel = new OptionsPanel();
 
             final JCheckBox visibleCheckBox = new JCheckBox("Show Tip Labels", visible);
-            visibleCheckBox.addChangeListener(new ChangeListener(){
+            visibleCheckBox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     visible = visibleCheckBox.isSelected();
                     getPrefs().putBoolean("Tip Labels_isopoen", visible);
                     firePainterChanged();
                 }
             });
+            final JComponent checkBoxAndLabel = combineCheckBoxWithLabel(visibleCheckBox);
 
             final JList attributeBox = new JList(attributes){
                 @Override
@@ -277,7 +278,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
                     int maximumHeight = System.getProperty("os.name").toLowerCase().contains("windows") ? 50 : 70; //needs to be a bit taller on macos because the scrollbar buttons are bigger
                     return new Dimension(super.getPreferredSize().width+1, Math.min(getPreferredSize().height+ insets.top+insets.bottom, maximumHeight)); // +1 seems to stop ugly horizontal scroll bars showing up
                 }
-            };;
+            };
             String[] prefsValue = getPrefs().get("Tip Labels_whatToDisplay", TAXON_NAMES).split("\\" + SELECTED_FIELDS_SERIALIZATION_SEPARATOR);
             attributeBox.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -347,8 +348,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             infoLabel.setBorder(new EmptyBorder(5,0,5,0));
             panel.addSpanningComponent(infoLabel);
 
-            controls = new Controls("Tip Labels", panel, true, true, visibleCheckBox);
-            
+            controls = new Controls("Tip Labels", panel, true, true, checkBoxAndLabel);
         }
         controlsList.add(controls);
 

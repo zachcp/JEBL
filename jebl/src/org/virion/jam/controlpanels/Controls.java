@@ -1,6 +1,7 @@
 package org.virion.jam.controlpanels;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author Andrew Rambaut
@@ -18,14 +19,31 @@ public class Controls {
      * @param panel
      * @param isVisible
      * @param isPinned
-     * @param primaryCheckbox the "main" on/off toggle, if any.
+     * @param primaryComponent A JCheckBox or a JComponent encapsulating a checkbox that serves as the "main" on/off toggle, or null.
      */
-    public Controls(String title, JPanel panel, boolean isVisible, boolean isPinned, JCheckBox primaryCheckbox) {
+    public Controls(String title, JPanel panel, boolean isVisible, boolean isPinned, JComponent primaryComponent) {
         this.title = title;
         this.panel = panel;
         this.isVisible = isVisible;
         this.isPinned = isPinned;
-        this.primaryCheckbox = primaryCheckbox;
+        this.primaryCheckbox = getCheckBoxFromComponent(primaryComponent);
+        this.primaryComponent = primaryComponent;
+    }
+
+    private JCheckBox getCheckBoxFromComponent(JComponent primaryComponent) {
+        if (primaryComponent == null) {
+            return null;
+        }
+        if (primaryComponent instanceof JCheckBox) {
+            return (JCheckBox) primaryComponent;
+        } else {
+            for (Component component : primaryComponent.getComponents()) {
+                if (component instanceof JCheckBox) {
+                    return (JCheckBox) component;   // we shouldn't have more than one here!
+                }
+            }
+        }
+        return null;
     }
 
     public String getTitle() {
@@ -56,9 +74,14 @@ public class Controls {
         return primaryCheckbox;
     }
 
+    public JComponent getPrimaryComponent() {
+        return primaryComponent;
+    }
+
     private String title;
     private JPanel panel;
     private JCheckBox primaryCheckbox;
+    private JComponent primaryComponent;
     private boolean isVisible;
 
     private boolean isPinned;

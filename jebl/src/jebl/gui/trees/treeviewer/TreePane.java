@@ -1368,11 +1368,11 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
     private void drawLabelElements(Graphics2D g2, boolean clipOffscreenShapes, boolean drawOnlyVisibleElements) {
         boolean antiAliasingWasOn = g2.getRenderingHints().containsValue(RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // check if there are too many labels to be shown effectively
         Rectangle viewRect = clipOffscreenShapes ? viewport.getViewRect() : null;
         if(flipTree && viewRect != null) {
             viewRect.translate(getWidth()-2*viewRect.x-viewRect.width,0);
         }
+        // check if there are too many labels to be shown effectively
         int count = 0;
         final int maxCount = 1000;
         if (viewRect != null) {
@@ -1388,6 +1388,7 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
         }
 
         if (count < maxCount) {
+            showTooManyLabelsWarning(false);
             for( TreeDrawableElement label : treeElements ) {
                 if((label.isVisible() || !drawOnlyVisibleElements)){
                     if (showingTaxonCallouts) {
@@ -1404,16 +1405,17 @@ public class TreePane extends JComponent implements ControlsProvider, PainterLis
                 }
             }
         } else {
-            String tooManyTipsWarning = "Too many labels to display";
-            int padding = 10;
-            double textWidth = TreeViewerUtilities.getTextWidth(tooManyTipsWarning, g2.getFont(), g2);
-            double warningLabelX = viewport.getViewRect().x + viewport.getViewRect().width - textWidth - padding;
-            double warningLabelY = viewport.getViewRect().y + viewport.getViewRect().height - padding;
-
-            g2.setColor(Color.darkGray);
-            g2.drawString(tooManyTipsWarning, (int) warningLabelX, (int) warningLabelY);
+            showTooManyLabelsWarning(true);
         }
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, (antiAliasingWasOn) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
+    private void showTooManyLabelsWarning(boolean showWarning) {
+        for (Painter painter : new Painter[]{taxonLabelPainter, nodeLabelPainter, branchLabelPainter, collapsedNodeLabelPainter}) {
+            if (painter instanceof BasicLabelPainter) {
+                ((BasicLabelPainter) painter).showTooManyLabelsWarning(showWarning);
+            }
+        }
     }
 
     /**

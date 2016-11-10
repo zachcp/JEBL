@@ -5,14 +5,17 @@ import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TransformedRootedTree;
 import jebl.gui.trees.treeviewer.TreePane;
+import jebl.gui.trees.treeviewer.TreeViewer;
 import jebl.gui.trees.treeviewer.TreeViewerUtilities;
 import jebl.util.NumberFormatter;
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
+import org.virion.jam.util.IconUtils;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -54,6 +57,7 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
             TreePane.KEY_INVISIBLE_NODE,
             TreePane.KEY_INVISIBLE_NODE_WHEN_AUTOCOLLAPSE
     };
+    protected JLabel checkBoxWarningLabel;
 
     private final String isOpenKey;
 
@@ -446,24 +450,23 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
         if (controls == null) {
             OptionsPanel optionsPanel = new OptionsPanel();
 
-            final JCheckBox showTextCHeckBox = new JCheckBox("Show " + getTitle());
+            final JCheckBox visibleCheckBox = new JCheckBox("Show " + getTitle());
             if (! detachPrimaryCheckbox) {
-                optionsPanel.addComponent(showTextCHeckBox);
+                optionsPanel.addComponent(visibleCheckBox);
             }
 
             Preferences prefs = getPrefs();
             visible = prefs.getBoolean(isOpenKey, (intent == PainterIntent.BRANCH && containsConsensusSupport) || intent == PainterIntent.TIP);
-            showTextCHeckBox.setSelected(visible);
-
-            showTextCHeckBox.addChangeListener(new ChangeListener() {
+            visibleCheckBox.setSelected(visible);
+            visibleCheckBox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent changeEvent) {
-                    final boolean selected = showTextCHeckBox.isSelected();
-                    if( isVisible() != selected ) {
+                    final boolean selected = visibleCheckBox.isSelected();
+                    if (isVisible() != selected) {
                         setVisible(selected);
                     }
                 }
             });
-
+            final JComponent checkBoxWithLabel = combineCheckBoxWithLabel(visibleCheckBox);
 
             final String whatPrefKey = getTitle() + "_whatToDisplay" + (containsConsensusSupport ? "_withconsensusSupport" : "");
             String[] attributes = getAttributes();
@@ -571,12 +574,39 @@ public class BasicLabelPainter extends AbstractPainter<Node> {
                 });
             }
 
-            controls = new Controls(getTitle(), optionsPanel, false, false, detachPrimaryCheckbox ? showTextCHeckBox : null);
+            controls = new Controls(getTitle(), optionsPanel, false, false, detachPrimaryCheckbox ? checkBoxWithLabel : null);
         }
 
         controlsList.add(controls);
 
         return controlsList;
+    }
+
+    protected JComponent combineCheckBoxWithLabel(JCheckBox checkBox) {
+        createCheckBoxWarningLabel(false);
+        JPanel checkBoxAndLabel = new JPanel(new BorderLayout());
+        checkBoxAndLabel.setBorder(new EmptyBorder(0, 0, 0, 10));
+        checkBoxAndLabel.add(checkBox, BorderLayout.WEST);
+        checkBoxAndLabel.add(checkBoxWarningLabel, BorderLayout.EAST);
+        return checkBoxAndLabel;
+    }
+
+    protected void createCheckBoxWarningLabel(boolean showOnlyIcon) {
+        Icon warningIcon = IconUtils.getIcon(TreeViewer.class, "/jebl/gui/trees/treeviewer/images/warning16.png");
+        if (showOnlyIcon) {
+            checkBoxWarningLabel = new JLabel(warningIcon);
+            checkBoxWarningLabel.setToolTipText("Too many labels to display. Zoom in or collapse subtrees to show labels");
+        } else {
+            checkBoxWarningLabel = new JLabel("Too many to display", warningIcon, SwingConstants.LEFT);
+            checkBoxWarningLabel.setToolTipText("Zoom in or collapse subtrees to show labels");
+        }
+        checkBoxWarningLabel.setVisible(false);     // not visible by default, only visible when set explicitly!
+    }
+
+    public void showTooManyLabelsWarning(boolean showWarning) {
+        if (checkBoxWarningLabel != null) {
+            checkBoxWarningLabel.setVisible(showWarning && isVisible());
+        }
     }
 
     private int getConsensusSupportIndex() {
