@@ -1545,6 +1545,29 @@ public class NexusImporter implements AlignmentImporter, SequenceImporter, TreeI
 		return value;
 	}
 
+	/**
+	 * Deprecated method kept in for backwards compatibility.
+	 * Use jebl.evolution.trees.Utils.isPossibleInteger() instead
+	 * @param s
+	 * @return
+	 */
+	@Deprecated
+	public static boolean isPossibleInteger(String s) {
+		return Utils.isPossibleInteger(s);
+	}
+
+	/**
+	 * Deprecated method kept in for backwards compatibility.
+	 * Use jebl.evolution.trees.Utils.isPossibleDouble() instead
+	 * @param s
+	 * @return
+	 */
+	@Deprecated
+	public static boolean isPossibleDouble(String s) {
+		return Utils.isPossibleDouble(s);
+	}
+
+
 	// private stuff
 	private NexusBlock nextBlock = null;
 	private String nextBlockName = null;

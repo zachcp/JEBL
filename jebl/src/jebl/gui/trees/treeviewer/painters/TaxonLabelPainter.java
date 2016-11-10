@@ -85,7 +85,7 @@ public class TaxonLabelPainter extends BasicLabelPainter{
             }
         }
         if(attributeValues.size() == 0) {
-            return null;
+            return "";
         }
         return join(", ", attributeValues);
     }
