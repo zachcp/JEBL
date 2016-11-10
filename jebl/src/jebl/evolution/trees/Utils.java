@@ -636,26 +636,6 @@ public final class Utils {
      * @return the number of external nodes under this node.
      */
     public static int getExternalNodeCount(RootedTree tree, Node node) {
-        return getExternalNodeCount(tree, node, null);
-    }
-
-    /**
-     * Return the number of external nodes under this node. Reads values from provided cache and stores any
-     * newly computed values back in the cache, if it's not null. Will never return a number less than 1.
-     *
-     * @param tree
-     * @param node
-     * @param cache Cached values of nodes under nodes
-     * @return the number of external nodes under this node. Always >= 1
-     */
-    public static int getExternalNodeCount(RootedTree tree, Node node, Map<Node, Integer> cache) {
-        if (tree.isExternal(node)) {
-            return 1;
-        }
-        if (cache != null && cache.get(node) != null) {
-            return cache.get(node);
-        }
-
         Stack<Node> countStack = new Stack<Node>();
         int externalNodeCount = 0;
 
@@ -672,16 +652,7 @@ public final class Utils {
             }
         }
 
-        //Hopefully shouldn't happen, but the cache could be modified externally,
-        //so this extra check is here to make sure 0 is never returned
-        if (count < 1) {
-            count = 1;
-        }
-
-        if (cache != null) {
-            cache.put(node, count);
-        }
-        return count;
+        return externalNodeCount;
     }
 
     /**
