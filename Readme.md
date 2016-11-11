@@ -31,3 +31,7 @@ so it can be included on the classpath for non-Macs.  If anything is changed in 
 ### Operating System
 If you are using an IDE and not on a Mac then you will need to exclude org.virion.jam.maconly in order to compile the
 project.
+
+## Contributing
+* Log issues in [Github issue tracker|https://github.com/Biomatters/JEBL/issues]
+* Pull requests are welcome, we will try to review them in a timely manner
